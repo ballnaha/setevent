@@ -3,24 +3,41 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Premium & Luxury Palette */
+  --primary: #0A5C5A;
+  /* Deep Emerald / Teal - Professional & Stability */
+  --secondary: #B91C1C;
+  /* Ruby Red - Passion but controlled */
+  --tertiary: #CCA43B;
+  /* Satin Gold - Elegant & Expensive */
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+  --font-prompt: var(--font-prompt);
+  --font-comfortaa: var(--font-comfortaa);
+  --font-sans: var(--font-comfortaa), var(--font-prompt), sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #14807D;
+    /* Slightly lighter Emerald for dark mode */
+    --secondary: #D94545;
+    /* Lighter Ruby */
+    --tertiary: #D4AF37;
+    /* Metallic Gold */
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-comfortaa), var(--font-prompt), sans-serif;
 }
