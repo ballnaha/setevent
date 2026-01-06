@@ -5,219 +5,154 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, EffectFade } from "swiper/modules";
 import { Box, Typography, Button, Container, Stack } from "@mui/material";
 import { ArrowRight, Star1 } from "iconsax-react";
+import Image from "next/image";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/effect-fade";
 
+
+
 const slides = [
     {
-        subtitle: "อันดับ 1 ด้านอุปกรณ์จัดงานอีเว้นท์",
-        title: "เนรมิตงานของคุณให้",
-        highlight: "สมบูรณ์แบบ",
-        description: "SetEvent บริการให้เช่าอุปกรณ์จัดงานครบวงจร และทีมงานมืออาชีพที่พร้อมดูแลทุกรายละเอียด เพื่อให้งานของคุณออกมาน่าประทับใจที่สุด",
-        bgGradient: "linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%)",
-        accentGradient: "radial-gradient(circle, rgba(0,127,134,0.3) 0%, rgba(0,0,0,0) 70%)", // Primary teal tint
-    },
-    {
-        subtitle: "บริการครบวงจร",
-        title: "จัดงานแต่งงานในฝัน",
-        highlight: "ที่คุณเลือกได้",
-        description: "แพ็กเกจจัดงานแต่งงานสุดคุ้ม ดูแลโดยทีม Planner มืออาชีพ พร้อมอุปกรณ์แสงสีเสียงที่ทันสมัยที่สุด",
-        bgGradient: "linear-gradient(135deg, #1a1a1a 0%, #2d1b2e 100%)", // Slight purple/pink tint for wedding
-        accentGradient: "radial-gradient(circle, rgba(255,82,82,0.2) 0%, rgba(0,0,0,0) 70%)", // Secondary red/pink tint
-    },
-    {
-        subtitle: "Event Organizer",
-        title: "งานเปิดตัวสินค้า",
-        highlight: "ระดับมืออาชีพ",
-        description: "สร้างภาพลักษณ์ที่โดดเด่นให้กับแบรนด์ของคุณ ด้วยเวที แสง สี เสียง และจอ LED คุณภาพสูง รองรับทุกสเกลงาน",
-        bgGradient: "linear-gradient(135deg, #0f1718 0%, #112222 100%)", // Slight teal tint
-        accentGradient: "radial-gradient(circle, rgba(255,171,64,0.2) 0%, rgba(0,0,0,0) 70%)", // Tertiary orange tint
-    },
+        titlePart1: "SET",
+        titlePart2: "EVENT",
+        titlePart3: "",
+        subtitle: "AND EQUIPMENT",
+        button1: "TICKETS KAUFEN", // Keeping reference text for now, should likely be "OUR SERVICES" or similar
+        button2: "ZUM LINE UP",
+        image: "/images/banner1-2.webp", // Reusing an existing image as placeholder, or could use new one
+    }
 ];
 
 export default function BannerSlider() {
     return (
-        <Box sx={{ width: "100%", height: { xs: "600px", md: "800px" }, position: "relative" }}>
-            <Swiper
-                modules={[Autoplay, Pagination, EffectFade]}
-                spaceBetween={0}
-                slidesPerView={1}
-                effect="fade"
-                speed={1500}
-                autoplay={{
-                    delay: 5000,
-                    disableOnInteraction: false,
-                }}
-                pagination={{
-                    clickable: true,
-                    renderBullet: (index, className) => {
-                        return '<span class="' + className + '" style="background-color: var(--primary); width: 10px; height: 10px; margin: 0 6px;"></span>';
-                    }
-                }}
-                style={{ width: "100%", height: "100%" }}
-            >
-                {slides.map((slide, index) => (
-                    <SwiperSlide key={index}>
-                        <Box
-                            sx={{
-                                width: "100%",
-                                height: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                background: slide.bgGradient,
-                                position: "relative",
-                                overflow: "hidden",
-                            }}
-                        >
-                            {/* Background Decorative Elements */}
-                            <Box
-                                sx={{
-                                    position: "absolute",
-                                    top: "-20%",
-                                    right: "-10%",
-                                    width: "60%",
-                                    height: "60%",
-                                    background: slide.accentGradient,
-                                    filter: "blur(60px)",
-                                    zIndex: 1,
-                                    animation: "pulse 4s infinite alternate",
-                                }}
-                            />
+        <Box sx={{ width: "100%", height: "100vh", position: "relative", top: 0, left: 0 }}>
+            {/* Background Image - Static for Single Hero Look */}
+            <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+                <Image
+                    src="/images/banner1-2.webp"
+                    alt="Event Background"
+                    fill
+                    priority
+                    style={{ objectFit: "cover", filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
+                />
+            </Box>
 
-                            <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
-                                <Stack spacing={4} sx={{ maxWidth: "800px" }}>
-                                    <Box
-                                        sx={{
-                                            display: "inline-flex",
-                                            alignItems: "center",
-                                            gap: 1,
-                                            px: 2,
-                                            py: 1,
-                                            borderRadius: "50px",
-                                            border: "1px solid rgba(255,255,255,0.1)",
-                                            bgcolor: "rgba(255,255,255,0.05)",
-                                            width: "fit-content",
-                                            backdropFilter: "blur(4px)",
-                                        }}
-                                    >
-                                        <Star1 size="16" color="var(--tertiary)" variant="Bold" />
-                                        <Typography
-                                            variant="body2"
-                                            sx={{ color: "white", fontFamily: "var(--font-prompt)" }}
-                                        >
-                                            {slide.subtitle}
-                                        </Typography>
-                                    </Box>
+            {/* Geometric Decor - Left Bottom */}
+            <Box sx={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1, display: { xs: 'none', md: 'block' } }}>
+                <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M0 400V200L200 400H0Z" fill="#E94560" /> {/* Red Triangle */}
+                    <path d="M0 200V0L200 200H0Z" fill="#0F3460" /> {/* Blue Triangle */}
+                    <path d="M200 400L400 400L200 200L200 400Z" fill="#C29B40" /> {/* Gold Triangle */}
+                    <rect x="50" y="250" width="100" height="100" fill="white" fillOpacity="0.1" />
+                </svg>
+            </Box>
 
-                                    <Typography
-                                        variant="h1"
-                                        sx={{
-                                            fontSize: { xs: "2.5rem", md: "4.5rem" },
-                                            fontWeight: "bold",
-                                            lineHeight: 1.1,
-                                            fontFamily: "var(--font-prompt)",
-                                            color: "white",
-                                            background: "-webkit-linear-gradient(45deg, #FFFFFF 30%, #CFD8DC 90%)",
-                                            WebkitBackgroundClip: "text",
-                                            WebkitTextFillColor: "transparent",
-                                        }}
-                                    >
-                                        {slide.title}
-                                        <br />
-                                        <span
-                                            style={{
-                                                color: "var(--primary)",
-                                                WebkitTextFillColor: "var(--primary)",
-                                            }}
-                                        >
-                                            {slide.highlight}
-                                        </span>{" "}
-                                        ที่สุด
-                                    </Typography>
+            {/* Geometric Decor - Right Bottom */}
+            <Box sx={{ position: 'absolute', bottom: 0, right: 0, zIndex: 1, display: { xs: 'none', md: 'block' } }}>
+                <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M400 400V200L200 400H400Z" fill="#E94560" />
+                    <path d="M400 200V0L200 200H400Z" fill="#0F3460" />
+                    <path d="M200 400L0 400L200 200L200 400Z" fill="#C29B40" />
+                </svg>
+            </Box>
 
-                                    <Typography
-                                        variant="h5"
-                                        sx={{
-                                            color: "rgba(255,255,255,0.8)",
-                                            fontFamily: "var(--font-prompt)",
-                                            lineHeight: 1.6,
-                                            fontWeight: 300,
-                                            maxWidth: "600px",
-                                        }}
-                                    >
-                                        {slide.description}
-                                    </Typography>
+            {/* Main Center Content */}
+            <Box sx={{
+                position: 'relative',
+                zIndex: 2,
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+                pt: 10
+            }}>
+                <Typography variant="h1" sx={{
+                    fontFamily: 'var(--font-prompt)',
+                    fontWeight: 900,
+                    color: 'white',
+                    fontSize: { xs: '3rem', sm: '5rem', md: '7rem', lg: '9rem' },
+                    lineHeight: 0.85,
+                    letterSpacing: -2,
+                    textTransform: 'uppercase'
+                }}>
+                    EVENT<br />RENTAL<br />SERVICE
+                </Typography>
 
-                                    <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                                        <Button
-                                            variant="contained"
-                                            size="large"
-                                            endIcon={<ArrowRight />}
-                                            sx={{
-                                                bgcolor: "var(--primary)",
-                                                color: "white",
-                                                fontFamily: "var(--font-prompt)",
-                                                borderRadius: "50px",
-                                                px: 4,
-                                                py: 1.5,
-                                                fontSize: "1.1rem",
-                                                textTransform: "none",
-                                                boxShadow: "0 10px 20px -5px rgba(0, 127, 134, 0.4)",
-                                                "&:hover": {
-                                                    bgcolor: "#006A70",
-                                                    transform: "translateY(-2px)",
-                                                    boxShadow: "0 15px 25px -5px rgba(0, 127, 134, 0.5)",
-                                                },
-                                                transition: "all 0.3s ease",
-                                            }}
-                                        >
-                                            ดูบริการของเรา
-                                        </Button>
-                                        <Button
-                                            variant="outlined"
-                                            size="large"
-                                            sx={{
-                                                color: "white",
-                                                borderColor: "rgba(255,255,255,0.3)",
-                                                fontFamily: "var(--font-prompt)",
-                                                borderRadius: "50px",
-                                                px: 4,
-                                                py: 1.5,
-                                                fontSize: "1.1rem",
-                                                textTransform: "none",
-                                                "&:hover": {
-                                                    borderColor: "white",
-                                                    bgcolor: "white",
-                                                    color: "black",
-                                                },
-                                            }}
-                                        >
-                                            ติดต่อสอบถาม
-                                        </Button>
-                                    </Stack>
-                                </Stack>
-                            </Container>
-                        </Box>
-                    </SwiperSlide>
-                ))}
-            </Swiper>
+                <Typography variant="h3" sx={{
+                    fontFamily: 'var(--font-prompt)',
+                    fontWeight: 700,
+                    color: 'white',
+                    fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2.5rem' },
+                    mt: { xs: 2, md: 2 },
+                    letterSpacing: { xs: 3, sm: 5, md: 10 },
+                    textTransform: 'uppercase',
+                    textAlign: 'center'
+                }}>
+                    PROFESSIONAL TEAM
+                </Typography>
 
-            {/* Custom Styles for Swiper Pagination */}
-            <style jsx global>{`
-        .swiper-pagination-bullet {
-            background: rgba(255,255,255,0.3) !important;
-            opacity: 1;
-            transition: all 0.3s;
-        }
-        .swiper-pagination-bullet-active {
-            background: var(--primary) !important;
-            width: 25px !important;
-            border-radius: 5px;
-        }
-      `}</style>
+                <Typography variant="h6" sx={{
+                    fontFamily: 'var(--font-prompt)',
+                    color: 'rgba(255,255,255,0.9)',
+                    mt: { xs: 2, md: 3 },
+                    maxWidth: '800px',
+                    fontWeight: 300,
+                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+                    px: 2
+                }}>
+                    รับจัดงานอีเว้นท์ · เช่าอุปกรณ์ครบวงจร · งานแต่งงาน · งานสัมมนา
+                </Typography>
+
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} mt={{ xs: 4, md: 5 }}>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            bgcolor: '#E94560',
+                            color: 'white',
+                            fontWeight: 700,
+                            fontFamily: 'var(--font-prompt)',
+                            px: { xs: 3, md: 4 },
+                            py: 1.5,
+                            borderRadius: 1,
+                            fontSize: '1rem',
+                            '&:hover': { bgcolor: '#c32f4b' }
+                        }}
+                    >
+                        บริการของเรา
+                    </Button>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            bgcolor: '#1A5F7A',
+                            color: 'white',
+                            fontWeight: 700,
+                            fontFamily: 'var(--font-prompt)',
+                            px: { xs: 3, md: 4 },
+                            py: 1.5,
+                            borderRadius: 1,
+                            fontSize: '1rem',
+                            '&:hover': { bgcolor: '#134b61' }
+                        }}
+                    >
+                        ติดต่อสอบถาม
+                    </Button>
+                </Stack>
+
+                {/* Bottom Date/Location */}
+                <Box sx={{ mt: 8, color: 'white', textAlign: 'center' }}>
+                    <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontSize: { xs: '1.5rem', md: '2rem' }, fontWeight: 600 }}>
+                        ONE STOP SERVICE
+                    </Typography>
+                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1.1rem', opacity: 0.8, mt: 1 }}>
+                        บริการจัดงานครบวงจร พร้อมอุปกรณ์ทันสมัย
+                    </Typography>
+                </Box>
+            </Box>
         </Box>
     );
 }

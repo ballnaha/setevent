@@ -18,7 +18,7 @@ import {
     Collapse,
     Fade
 } from "@mui/material";
-import { HambergerMenu, ArrowDown2, ArrowRight2, Speaker, Monitor, LampOn, Layer } from "iconsax-react";
+import { HambergerMenu, ArrowDown2, ArrowRight2, Speaker, Monitor, LampOn, Layer, Call, Message } from "iconsax-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -48,10 +48,22 @@ export default function Header() {
     const openDropdown = Boolean(anchorEl);
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
+    // State for Contact Menu
+    const [contactAnchorEl, setContactAnchorEl] = useState<null | HTMLElement>(null);
+    const openContact = Boolean(contactAnchorEl);
+    const handleContactClick = (event: React.MouseEvent<HTMLElement>) => {
+        setContactAnchorEl(event.currentTarget);
+    };
+    const handleContactClose = () => {
+        setContactAnchorEl(null);
+    };
+
     // State for Mobile Products Collapse
     const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
 
     const pathname = usePathname();
+    // Check if we are on the home page
+    const isHome = pathname === "/";
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -199,78 +211,82 @@ export default function Header() {
                     </React.Fragment>
                 ))}
             </List>
-            <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
-                <Button
-                    variant="contained"
-                    fullWidth
-                    sx={{
-                        bgcolor: 'var(--tertiary)',
-                        color: 'white',
-                        borderRadius: '50px',
-                        fontFamily: 'var(--font-prompt)',
-                        py: 1.5,
-                        boxShadow: '0 4px 15px rgba(204, 164, 59, 0.25)',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        '&:hover': {
-                            bgcolor: 'var(--secondary)',
-                        }
-                    }}
-                >
-                    ขอใบเสนอราคา
-                </Button>
-            </Box>
+
         </Box>
     );
 
     return (
-        <Box sx={{ display: "flex" }}>
+        <Box sx={{ display: "flex", position: 'relative', zIndex: 1200 }}>
             <AppBar
                 component="nav"
-                position="sticky"
-                color="default"
+                position={isHome ? "absolute" : "sticky"}
+                color="transparent"
+                elevation={0}
                 sx={{
-                    bgcolor: "var(--background)",
-                    boxShadow: "0 4px 20px -10px rgba(0,0,0,0.1)",
-                    borderBottom: "1px solid rgba(0,0,0,0.05)",
-                    backgroundImage: 'none'
+                    bgcolor: isHome ? "transparent" : "var(--background)",
+                    boxShadow: isHome ? "none" : "0 4px 20px -10px rgba(0,0,0,0.1)",
+                    borderBottom: isHome ? "none" : "1px solid rgba(0,0,0,0.05)",
+                    transition: "all 0.3s ease",
+                    paddingTop: isHome ? 2 : 0,
                 }}
             >
-                <Toolbar sx={{ justifyContent: "space-between", height: '80px' }}>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{ mr: 2, display: { md: "none" }, color: "var(--foreground)" }}
-                    >
-                        <HambergerMenu size="32" color="var(--foreground)" />
-                    </IconButton>
+                <Toolbar sx={{ justifyContent: "space-between", height: '90px' }}>
 
-                    <Box
-                        component={Link}
-                        href="/"
-                        sx={{
-                            display: { xs: "block", md: "block" },
-                            position: 'relative',
-                            width: { xs: 120, sm: 160 },
-                            height: 60,
-                            ml: { xs: 'auto', md: 0 },
-                            mr: { xs: 'auto', md: 0 },
-                        }}
-                    >
-                        <Image
-                            src="/images/logo1.png"
-                            alt="SetEvent Logo"
-                            fill
-                            style={{ objectFit: 'contain' }}
-                            priority
-                        />
+
+                    {/* Brand / Logo */}
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <IconButton
+                            color="inherit"
+                            aria-label="open drawer"
+                            edge="start"
+                            onClick={handleDrawerToggle}
+                            sx={{ mr: { xs: 1, sm: 2 }, display: { md: "none" }, color: isHome ? "white" : "var(--foreground)" }}
+                        >
+                            <HambergerMenu size="32" color={isHome ? "white" : "var(--foreground)"} />
+                        </IconButton>
+
+                        <Box
+                            component={Link}
+                            href="/"
+                            sx={{
+                                position: 'relative',
+                                width: { xs: 120, sm: 150, md: 180 },
+                                height: { xs: 40, md: 50 },
+                                display: 'block'
+                            }}
+                        >
+                            <Image
+                                src="/images/logo_white.png"
+                                alt="SETEVENT"
+                                fill
+                                style={{
+                                    objectFit: 'contain',
+                                }}
+                                priority
+                            />
+                        </Box>
+
+                        {/* Date/Location Text similar to reference - Hide on mobile, show on large screens */}
+                        <Box sx={{ display: { xs: 'none', lg: 'block' }, ml: 3, borderLeft: '1px solid rgba(255,255,255,0.3)', pl: 3 }}>
+                            <Typography variant="caption" sx={{ color: isHome ? 'rgba(255,255,255,0.8)' : 'text.secondary', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                                PROFESSIONAL TEAM
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: isHome ? 'rgba(255,255,255,0.6)' : 'text.disabled', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                                ONE STOP SERVICE
+                            </Typography>
+                        </Box>
                     </Box>
 
-                    <Box sx={{ display: { xs: "none", md: "flex" }, gap: 5 }}>
+                    {/* Navigation */}
+                    <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4, alignItems: 'center' }}>
                         {navItems.map((item) => {
                             const active = isActive(item.href) || (item.children && item.children.some(child => isActive(child.href)));
+                            const textColor = isHome && !active ? 'white' : (active ? 'var(--secondary)' : 'var(--foreground)');
+
+                            // Adjust text color for home page transparency
+                            const finalColor = isHome
+                                ? (active ? 'var(--secondary)' : 'rgba(255,255,255,0.9)')
+                                : (active ? 'var(--primary)' : 'var(--foreground)');
 
                             if (item.children) {
                                 return (
@@ -289,39 +305,27 @@ export default function Header() {
                                                 display: 'flex',
                                                 alignItems: 'center',
                                                 gap: 0.5,
-                                                '&::after': {
-                                                    content: '""',
-                                                    position: 'absolute',
-                                                    bottom: 0,
-                                                    left: 0,
-                                                    width: (active || openDropdown) ? '100%' : '0%',
-                                                    height: '2px',
-                                                    bgcolor: 'var(--tertiary)',
-                                                    transition: 'width 0.3s ease-in-out',
-                                                },
-                                                '&:hover::after': {
-                                                    width: '100%',
-                                                }
                                             }}
                                         >
                                             <Typography
                                                 sx={{
-                                                    color: (active || openDropdown) ? 'var(--primary)' : 'var(--foreground)',
+                                                    color: finalColor,
                                                     fontFamily: 'var(--font-prompt)',
-                                                    fontWeight: (active || openDropdown) ? 700 : 500,
-                                                    fontSize: '1rem',
+                                                    fontWeight: 700,
+                                                    fontSize: '0.9rem',
                                                     transition: 'color 0.3s ease',
-                                                    textTransform: 'none',
+                                                    textTransform: 'uppercase',
+                                                    letterSpacing: 1,
                                                     '&:hover': {
-                                                        color: 'var(--primary)',
+                                                        color: 'var(--secondary)',
                                                     }
                                                 }}
                                             >
                                                 {item.label}
                                             </Typography>
                                             <ArrowDown2
-                                                size="16"
-                                                color={(active || openDropdown) ? 'var(--primary)' : 'var(--foreground)'}
+                                                size="14"
+                                                color={finalColor}
                                                 variant="Bold"
                                                 style={{
                                                     transform: openDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
@@ -346,10 +350,10 @@ export default function Header() {
                                                     mt: 2,
                                                     overflow: 'visible',
                                                     filter: 'drop-shadow(0px 20px 50px rgba(0,0,0,0.1))',
-                                                    bgcolor: 'rgba(255, 255, 255, 0.95)', // Increased opacity for readability
+                                                    bgcolor: 'rgba(255, 255, 255, 0.95)',
                                                     backdropFilter: 'blur(20px)',
                                                     border: '1px solid rgba(255, 255, 255, 0.8)',
-                                                    borderRadius: 4,
+                                                    borderRadius: 1, // Sharper corners for modern look
                                                     minWidth: 260,
                                                 },
                                             }}
@@ -366,45 +370,25 @@ export default function Header() {
                                                         fontFamily: 'var(--font-prompt)',
                                                         color: 'var(--foreground)',
                                                         py: 1.5,
-                                                        px: 2, // slightly less px to allow internal padding
-                                                        mx: 1, // subtle margin for floating item look
+                                                        px: 2,
+                                                        mx: 1,
                                                         my: 0.5,
-                                                        borderRadius: 2,
+                                                        borderRadius: 1,
                                                         gap: 2,
                                                         transition: 'all 0.3s ease',
                                                         '&:hover': {
-                                                            bgcolor: 'rgba(10, 92, 90, 0.04)', // Very subtle primary tint
+                                                            bgcolor: 'rgba(10, 92, 90, 0.04)',
                                                             transform: 'translateX(4px)',
-                                                            '& .menu-icon': {
-                                                                bgcolor: 'var(--primary)',
-                                                                color: 'white',
-                                                                transform: 'scale(1.1)',
-                                                                boxShadow: '0 4px 12px rgba(10, 92, 90, 0.2)'
-                                                            }
                                                         }
                                                     }}
                                                 >
                                                     <Box
                                                         className="menu-icon"
-                                                        sx={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center',
-                                                            p: 1,
-                                                            borderRadius: '12px',
-                                                            bgcolor: 'rgba(10, 92, 90, 0.08)', // Light primary bg
-                                                            color: 'var(--primary)',
-                                                            transition: 'all 0.3s ease'
-                                                        }}
+                                                        sx={{ p: 0.5, borderRadius: 1, bgcolor: 'rgba(0,0,0,0.05)' }}
                                                     >
                                                         {child.icon}
                                                     </Box>
-                                                    <Box>
-                                                        <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.95rem', fontFamily: 'var(--font-prompt)' }}>{child.label}</Typography>
-                                                        <Typography variant="caption" sx={{ display: 'block', color: 'text.secondary', fontSize: '0.75rem', fontFamily: 'var(--font-prompt)' }}>
-                                                            One-Stop Service
-                                                        </Typography>
-                                                    </Box>
+                                                    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.95rem', fontFamily: 'var(--font-prompt)' }}>{child.label}</Typography>
                                                 </MenuItem>
                                             ))}
                                         </Menu>
@@ -414,36 +398,18 @@ export default function Header() {
 
                             return (
                                 <Link key={item.label} href={item.href} style={{ textDecoration: 'none' }}>
-                                    <Box
-                                        sx={{
-                                            position: 'relative',
-                                            cursor: 'pointer',
-                                            py: 1,
-                                            '&::after': {
-                                                content: '""',
-                                                position: 'absolute',
-                                                bottom: 0,
-                                                left: 0,
-                                                width: active ? '100%' : '0%',
-                                                height: '2px',
-                                                bgcolor: 'var(--tertiary)',
-                                                transition: 'width 0.3s ease-in-out',
-                                            },
-                                            '&:hover::after': {
-                                                width: '100%',
-                                            }
-                                        }}
-                                    >
+                                    <Box sx={{ position: 'relative', cursor: 'pointer', py: 1 }}>
                                         <Typography
                                             sx={{
-                                                color: active ? 'var(--primary)' : 'var(--foreground)',
+                                                color: finalColor,
                                                 fontFamily: 'var(--font-prompt)',
-                                                fontWeight: active ? 700 : 500,
-                                                fontSize: '1rem',
+                                                fontWeight: 700,
+                                                fontSize: '0.9rem',
                                                 transition: 'color 0.3s ease',
-                                                textTransform: 'none',
+                                                textTransform: 'uppercase',
+                                                letterSpacing: 1,
                                                 '&:hover': {
-                                                    color: 'var(--primary)',
+                                                    color: 'var(--secondary)',
                                                 }
                                             }}
                                         >
@@ -455,30 +421,122 @@ export default function Header() {
                         })}
                     </Box>
 
-                    <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+                    {/* Right Action Area */}
+                    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: 'center', gap: 3 }}>
+                        {/* Social Icons Placeholder - matching reference layout */}
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%', opacity: 0.5 }} />
+                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%', opacity: 0.5 }} />
+                        </Box>
+
                         <Button
-                            variant="contained"
+                            variant="outlined"
+                            onClick={handleContactClick}
                             sx={{
-                                bgcolor: 'var(--tertiary)', // Use Gold for CTA to be distinct
-                                color: 'white',
-                                borderRadius: '50px',
+                                color: isHome ? 'white' : 'var(--primary)',
+                                borderColor: isHome ? 'rgba(255,255,255,0.5)' : 'var(--primary)',
+                                borderRadius: '0',
                                 fontFamily: 'var(--font-prompt)',
-                                px: 4,
+                                px: 3,
                                 py: 1,
-                                boxShadow: '0 4px 15px rgba(204, 164, 59, 0.25)', // Gold shadow
                                 textTransform: 'none',
                                 fontWeight: 600,
-                                transition: 'all 0.3s ease',
+                                letterSpacing: 0.5,
+                                fontSize: '0.9rem',
                                 '&:hover': {
-                                    bgcolor: 'var(--secondary)', // Hover to Red (Ruby) for attention
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: '0 6px 20px rgba(185, 28, 28, 0.3)',
+                                    bgcolor: 'var(--secondary)',
+                                    borderColor: 'var(--secondary)',
+                                    color: 'white'
                                 }
                             }}
                         >
-                            ขอใบเสนอราคา
+                            ติดต่อเราทันที
                         </Button>
+                        <Menu
+                            anchorEl={contactAnchorEl}
+                            open={openContact}
+                            onClose={handleContactClose}
+                            TransitionComponent={Fade}
+                            disableScrollLock={true}
+                            PaperProps={{
+                                elevation: 0,
+                                sx: {
+                                    mt: 1.5,
+                                    overflow: 'visible',
+                                    filter: 'drop-shadow(0px 20px 50px rgba(0,0,0,0.1))',
+                                    bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                    backdropFilter: 'blur(20px)',
+                                    border: '1px solid rgba(255, 255, 255, 0.8)',
+                                    borderRadius: 2,
+                                    minWidth: 200,
+                                    '&:before': {
+                                        content: '""',
+                                        display: 'block',
+                                        position: 'absolute',
+                                        top: 0,
+                                        right: 25,
+                                        width: 10,
+                                        height: 10,
+                                        bgcolor: 'rgba(255, 255, 255, 0.95)',
+                                        transform: 'translateY(-50%) rotate(45deg)',
+                                        zIndex: 0,
+                                        borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
+                                        borderTop: '1px solid rgba(255, 255, 255, 0.8)',
+                                    },
+                                },
+                            }}
+                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        >
+                            <MenuItem onClick={handleContactClose} component="a" href="https://line.me/ti/p/~@setevent" target="_blank">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    <Box sx={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: '50%',
+                                        bgcolor: '#06C755',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <Message size="20" color="white" variant="Bold" />
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>
+                                            @setevent
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
+                                            Line Official
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </MenuItem>
+                            <MenuItem onClick={handleContactClose} component="a" href="tel:0812345678">
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                    <Box sx={{
+                                        width: 36,
+                                        height: 36,
+                                        borderRadius: '50%',
+                                        bgcolor: 'var(--secondary)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <Call size="20" color="white" variant="Bold" />
+                                    </Box>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>
+                                            081-234-5678
+                                        </Typography>
+                                        <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
+                                            ติดต่อด่วน
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </MenuItem>
+                        </Menu>
                     </Box>
+
                 </Toolbar>
             </AppBar>
             <nav>
@@ -487,11 +545,11 @@ export default function Header() {
                     open={mobileOpen}
                     onClose={handleDrawerToggle}
                     ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
+                        keepMounted: true,
                     }}
                     sx={{
                         display: { xs: "block", sm: "none" },
-                        "& .MuiDrawer-paper": { boxSizing: "border-box", width: 280, borderTopRightRadius: 20, borderBottomRightRadius: 20 },
+                        "& .MuiDrawer-paper": { boxSizing: "border-box", width: 280 },
                     }}
                 >
                     {drawer}
@@ -500,3 +558,4 @@ export default function Header() {
         </Box>
     );
 }
+
