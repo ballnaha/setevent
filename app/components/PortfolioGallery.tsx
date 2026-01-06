@@ -27,7 +27,7 @@ const works = [
 
 export default function PortfolioGallery() {
     return (
-        <Box sx={{ py: 12, bgcolor: "#F8FAFC" }}>
+        <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)" }}>
             <Container maxWidth="lg">
                 <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="end" mb={6} spacing={2}>
                     <Box>

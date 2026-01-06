@@ -3,49 +3,28 @@
 import React from "react";
 import { Box, Container, Stack, Typography } from "@mui/material";
 import { Medal } from "iconsax-react";
+import Image from "next/image";
 
 export default function WhyChooseUs() {
     return (
-        <Box sx={{ py: 12, bgcolor: "white" }}>
+        <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)" }}>
             <Container maxWidth="lg">
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={8} alignItems="center">
+                <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 6, md: 8 }} alignItems="center">
                     <Box sx={{ flex: 1 }}>
                         <Box sx={{
                             height: { xs: '300px', sm: '400px', md: '500px' },
                             width: '100%',
-                            bgcolor: '#2c3e50',
                             borderRadius: 4,
                             overflow: 'hidden',
                             position: 'relative',
-                            boxShadow: '0 30px 60px -15px rgba(0,0,0,0.2)',
-                            background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)'
                         }}>
-                            {/* Decorative Elements */}
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '20%',
-                                left: '10%',
-                                width: '200px',
-                                height: '200px',
-                                borderRadius: '50%',
-                                bgcolor: 'var(--primary)',
-                                filter: 'blur(80px)',
-                                opacity: 0.2
-                            }} />
+                            <Image
+                                src="/images/mobileapp.png"
+                                alt="Event Management Mockup"
+                                fill
+                                style={{ objectFit: 'cover' }}
+                            />
 
-                            <Box sx={{ position: 'absolute', bottom: 30, left: 30, right: 30, p: 3, bgcolor: 'rgba(255,255,255,0.1)', backdropFilter: 'blur(10px)', borderRadius: 2, border: '1px solid rgba(255,255,255,0.2)' }}>
-                                <Stack direction="row" alignItems="center" spacing={2}>
-                                    <Medal size="40" color="#FFD700" variant="Bold" />
-                                    <Box>
-                                        <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', color: 'white' }}>
-                                            การันตีผลงาน
-                                        </Typography>
-                                        <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'rgba(255,255,255,0.7)' }}>
-                                            ได้รับความไว้วางใจจากบริษัทชั้นนำกว่า 100+ แห่ง
-                                        </Typography>
-                                    </Box>
-                                </Stack>
-                            </Box>
                         </Box>
                     </Box>
 
