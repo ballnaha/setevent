@@ -102,8 +102,8 @@ export default function FeaturedEvents() {
                 <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
                     <Box sx={{
                         display: "grid",
-                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" },
-                        gap: { xs: 6, md: 4 }
+                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, // Keep 1 col for tablet portrait for better readability
+                        gap: { xs: 6, sm: 8, md: 4 } // Increase gap on tablet to separate sections clearly
                     }}>
                         {events.map((event, index) => (
                             <Box key={index} sx={{ textAlign: 'left' }}>

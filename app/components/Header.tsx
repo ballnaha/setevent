@@ -102,7 +102,7 @@ export default function Header() {
             <Box onClick={handleDrawerToggle} sx={{ py: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
                 <Link href="/" style={{ display: 'block', position: 'relative', width: '150px', height: '60px' }}>
                     <Image
-                        src="/images/logo1.png"
+                        src="/images/logo.png"
                         alt="SetEvent Logo"
                         fill
                         style={{ objectFit: 'contain' }}
@@ -548,7 +548,7 @@ export default function Header() {
                         keepMounted: true,
                     }}
                     sx={{
-                        display: { xs: "block", sm: "none" },
+                        display: { xs: "block", md: "none" },
                         "& .MuiDrawer-paper": { boxSizing: "border-box", width: 280 },
                     }}
                 >

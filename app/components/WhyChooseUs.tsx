@@ -11,7 +11,7 @@ export default function WhyChooseUs() {
                 <Stack direction={{ xs: 'column', md: 'row' }} spacing={8} alignItems="center">
                     <Box sx={{ flex: 1 }}>
                         <Box sx={{
-                            height: '500px',
+                            height: { xs: '300px', sm: '400px', md: '500px' },
                             width: '100%',
                             bgcolor: '#2c3e50',
                             borderRadius: 4,
@@ -59,7 +59,7 @@ export default function WhyChooseUs() {
 
                         <Stack spacing={4}>
                             {[
-                                { title: 'อุปกรณ์ทันสมัย', desc: 'เราอัปเดตอุปกรณ์ใหม่ล่าสุดเสมอ เพื่อให้งานของคุณล้ำสมัยที่สุด' },
+                                { title: 'ระบบติดตามงานอัจฉริยะ', desc: 'ตรวจสอบสถานะการจัดงานและการติดตั้งอุปกรณ์ได้แบบ Real-time ผ่าน Web Application ส่วนตัวที่เราพัฒนาขึ้นเพื่อคุณ' },
                                 { title: 'ทีมงานมืออาชีพ', desc: 'ประสบการณ์กว่า 10 ปี พร้อมแก้ปัญหาหน้างานได้ทันท่วงที' },
                                 { title: 'ราคาที่จับต้องได้', desc: 'บริการคุณภาพระดับพรีเมียม ในราคาที่สมเหตุสมผลและคุ้มค่า' }
                             ].map((item, i) => (

@@ -35,7 +35,7 @@ const services = [
 
 export default function ServicesSection() {
     return (
-        <Box sx={{ py: 15, bgcolor: "white", position: "relative", overflow: "hidden" }}>
+        <Box sx={{ py: { xs: 8, md: 15 }, bgcolor: "white", position: "relative", overflow: "hidden" }}>
             {/* Geometric Decor - Left */}
             <Box sx={{ position: 'absolute', top: '20%', left: 0, zIndex: 0, display: { xs: 'none', lg: 'block' } }}>
                 <svg width="150" height="300" viewBox="0 0 150 300" fill="none" xmlns="http://www.w3.org/2000/svg">
