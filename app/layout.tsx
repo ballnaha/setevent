@@ -83,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th">
+    <html lang="th" translate="no">
       <body
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }}
