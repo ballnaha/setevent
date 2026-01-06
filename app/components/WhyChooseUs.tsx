@@ -7,32 +7,35 @@ import Image from "next/image";
 
 export default function WhyChooseUs() {
     return (
-        <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)" }}>
+        <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)", overflow: 'hidden' }}>
             <Container maxWidth="lg">
-                <Stack direction={{ xs: 'column', md: 'row' }} spacing={{ xs: 6, md: 8 }} alignItems="center">
-                    <Box sx={{ flex: 1 }}>
-                        <Box sx={{
-                            height: { xs: '300px', sm: '400px', md: '500px' },
-                            width: '100%',
-                            borderRadius: 4,
-                            overflow: 'hidden',
-                            position: 'relative',
+                <Stack
+                    direction={{ xs: 'column', md: 'row' }}
+                    spacing={{ xs: 6, md: 8 }}
+                    alignItems="center"
+                >
+                    {/* Content Section */}
+                    <Box sx={{
+                        flex: 1,
+                        order: { xs: 1, md: 2 }
+                    }}>
+                        <Typography variant="h6" sx={{
+                            color: "var(--secondary)",
+                            fontFamily: "var(--font-comfortaa)",
+                            fontWeight: "bold",
+                            mb: 2,
+                            letterSpacing: 1.5,
+                            fontSize: { xs: '0.9rem', md: '1.25rem' }
                         }}>
-                            <Image
-                                src="/images/mobileapp.png"
-                                alt="Event Management Mockup"
-                                fill
-                                style={{ objectFit: 'cover' }}
-                            />
-
-                        </Box>
-                    </Box>
-
-                    <Box sx={{ flex: 1 }}>
-                        <Typography variant="h6" sx={{ color: "var(--secondary)", fontFamily: "var(--font-comfortaa)", fontWeight: "bold", mb: 2, letterSpacing: 1.5 }}>
                             WHY CHOOSE US
                         </Typography>
-                        <Typography variant="h3" sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", fontWeight: "bold", mb: 4 }}>
+                        <Typography variant="h3" sx={{
+                            color: "var(--foreground)",
+                            fontFamily: "var(--font-prompt)",
+                            fontWeight: "bold",
+                            mb: 4,
+                            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+                        }}>
                             ทำไมต้องเลือก <span style={{ color: 'var(--primary)' }}>SetEvent?</span>
                         </Typography>
 
@@ -43,15 +46,39 @@ export default function WhyChooseUs() {
                                 { title: 'ราคาที่จับต้องได้', desc: 'บริการคุณภาพระดับพรีเมียม ในราคาที่สมเหตุสมผลและคุ้มค่า' }
                             ].map((item, i) => (
                                 <Box key={i} sx={{ borderLeft: '4px solid var(--primary)', pl: 3 }}>
-                                    <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', color: 'var(--foreground)', mb: 1 }}>
+                                    <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', color: 'var(--foreground)', mb: 1, fontSize: '1.1rem' }}>
                                         {item.title}
                                     </Typography>
-                                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.7 }}>
+                                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.7, fontSize: '0.95rem' }}>
                                         {item.desc}
                                     </Typography>
                                 </Box>
                             ))}
                         </Stack>
+                    </Box>
+
+                    {/* Image Section */}
+                    <Box sx={{
+                        flex: 1,
+                        order: { xs: 2, md: 1 },
+                        width: '100%'
+                    }}>
+                        <Box sx={{
+                            height: { xs: '350px', sm: '450px', md: '550px' },
+                            width: '100%',
+                            borderRadius: { xs: 2, md: 4 },
+                            overflow: 'hidden',
+                            position: 'relative',
+                            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                        }}>
+                            <Image
+                                src="/images/mobileapp.png"
+                                alt="Event Management Mockup"
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                priority
+                            />
+                        </Box>
                     </Box>
                 </Stack>
             </Container>

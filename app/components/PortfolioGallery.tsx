@@ -6,22 +6,40 @@ import Image from "next/image";
 
 const works = [
     {
-        title: "Neon Light Concert 2024",
+        title: "Neon Light Concert",
         category: "Concert & Festival",
-        image: "/images/concert.png",
-        size: "large"
+        image: "/images/concert.webp",
+        height: { xs: '300px', md: '500px' }
     },
     {
-        title: "Luxury Wedding",
+        title: "Private Wedding",
         category: "Wedding & Party",
-        image: "/images/wedding.png",
-        size: "medium"
+        image: "/images/wedding.webp",
+        height: { xs: '300px', md: '350px' }
     },
     {
         title: "Tech Innovation Summit",
         category: "Corporate Event",
-        image: "/images/corporate.png",
-        size: "medium"
+        image: "/images/seminar.webp",
+        height: { xs: '300px', md: '450px' }
+    },
+    {
+        title: "Grand Opening Gala",
+        category: "Launch Event",
+        image: "/images/banner_launch.png",
+        height: { xs: '300px', md: '400px' }
+    },
+    {
+        title: "Corporate Seminar",
+        category: "Business Meeting",
+        image: "/images/banner_event.png",
+        height: { xs: '300px', md: '600px' }
+    },
+    {
+        title: "Wedding",
+        category: "Entertainment",
+        image: "/images/banner1.png",
+        height: { xs: '300px', md: '380px' }
     }
 ];
 
@@ -29,9 +47,9 @@ export default function PortfolioGallery() {
     return (
         <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)" }}>
             <Container maxWidth="lg">
-                <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="end" mb={6} spacing={2}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="end" mb={4} spacing={2}>
                     <Box>
-                        <Typography variant="h6" sx={{ color: "var(--secondary)", fontFamily: "var(--font-comfortaa)", fontWeight: "bold", mb: 2, letterSpacing: 1.5 }}>
+                        <Typography variant="h6" sx={{ color: "var(--secondary)", fontFamily: "var(--font-comfortaa)", fontWeight: "bold", mb: 1, letterSpacing: 1.5 }}>
                             PORTFOLIO
                         </Typography>
                         <Typography variant="h3" sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", fontWeight: "bold" }}>
@@ -43,15 +61,21 @@ export default function PortfolioGallery() {
                     </Typography>
                 </Stack>
 
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(12, 1fr)', gap: 3 }}>
+                <Box sx={{
+                    columnCount: { xs: 1, sm: 2, md: 3 },
+                    columnGap: 1,
+                    '& > div': {
+                        breakInside: 'avoid',
+                        mb: 1
+                    }
+                }}>
                     {works.map((work, index) => (
                         <Box
                             key={index}
                             sx={{
-                                gridColumn: { xs: 'span 12', md: work.size === 'large' ? 'span 8' : 'span 4' },
                                 position: 'relative',
-                                height: '400px',
-                                borderRadius: 4,
+                                height: work.height,
+                                borderRadius: 2,
                                 overflow: 'hidden',
                                 cursor: 'pointer',
                                 '&:hover .overlay': {

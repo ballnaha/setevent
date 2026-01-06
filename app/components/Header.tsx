@@ -16,7 +16,8 @@ import {
     Menu,
     MenuItem,
     Collapse,
-    Fade
+    Fade,
+    Stack
 } from "@mui/material";
 import { HambergerMenu, ArrowDown2, ArrowRight2, Speaker, Monitor, LampOn, Layer, Call, Message } from "iconsax-react";
 import Link from "next/link";
@@ -98,11 +99,27 @@ export default function Header() {
     };
 
     const drawer = (
-        <Box sx={{ textAlign: "center", height: "100%", bgcolor: "var(--background)", color: "var(--foreground)" }}>
-            <Box onClick={handleDrawerToggle} sx={{ py: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-                <Link href="/" style={{ display: 'block', position: 'relative', width: '150px', height: '60px' }}>
+        <Box sx={{
+            height: "100%",
+            bgcolor: "#0a0a0a",
+            color: "rgba(255,255,255,0.9)",
+            display: 'flex',
+            flexDirection: 'column',
+            overflow: 'hidden'
+        }}>
+            {/* Sticky Header */}
+            <Box sx={{
+                py: 3,
+                px: 2,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderBottom: '1px solid rgba(255,255,255,0.1)',
+                flexShrink: 0
+            }}>
+                <Link href="/" onClick={handleDrawerToggle} style={{ display: 'block', position: 'relative', width: '160px', height: '60px' }}>
                     <Image
-                        src="/images/logo.png"
+                        src="/images/logo_white.png"
                         alt="SetEvent Logo"
                         fill
                         style={{ objectFit: 'contain' }}
@@ -110,108 +127,164 @@ export default function Header() {
                     />
                 </Link>
             </Box>
-            <List>
-                {navItems.map((item) => (
-                    <React.Fragment key={item.label}>
-                        {item.children ? (
-                            <>
+
+            {/* Scrollable Content Area */}
+            <Box sx={{
+                flexGrow: 1,
+                overflowY: 'auto',
+                pt: 1,
+                '&::-webkit-scrollbar': {
+                    width: '4px',
+                },
+                '&::-webkit-scrollbar-track': {
+                    background: 'transparent',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '10px',
+                },
+            }}>
+                <List>
+                    {navItems.map((item) => (
+                        <React.Fragment key={item.label}>
+                            {item.children ? (
+                                <>
+                                    <ListItem disablePadding>
+                                        <ListItemButton
+                                            onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+                                            sx={{
+                                                textAlign: "left",
+                                                px: 4,
+                                                py: 2,
+                                                bgcolor: isActive(item.href) ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                                borderLeft: isActive(item.href) ? '4px solid var(--primary)' : '4px solid transparent',
+                                            }}
+                                        >
+                                            <ListItemText
+                                                primary={
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
+                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', color: isActive(item.href) ? 'var(--primary)' : 'inherit' }}>
+                                                            {item.label}
+                                                        </Typography>
+                                                        <ArrowDown2 size="18" color={isActive(item.href) ? 'var(--primary)' : 'rgba(255,255,255,0.5)'} style={{ transform: mobileProductsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />
+                                                    </Box>
+                                                }
+                                            />
+                                        </ListItemButton>
+                                    </ListItem>
+                                    <Collapse in={mobileProductsOpen} timeout="auto" unmountOnExit>
+                                        <List component="div" disablePadding sx={{ bgcolor: 'rgba(255,255,255,0.03)', mx: 2, my: 1, borderRadius: 1 }}>
+                                            {item.children.map((child) => (
+                                                <ListItem key={child.label} disablePadding>
+                                                    <ListItemButton
+                                                        component={Link}
+                                                        href={child.href}
+                                                        onClick={handleDrawerToggle}
+                                                        sx={{
+                                                            pl: 4,
+                                                            py: 1.5,
+                                                            '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
+                                                        }}
+                                                    >
+                                                        <Box sx={{
+                                                            mr: 2,
+                                                            display: 'flex',
+                                                            color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)'
+                                                        }}>
+                                                            {child.icon}
+                                                        </Box>
+                                                        <ListItemText
+                                                            primary={child.label}
+                                                            primaryTypographyProps={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontSize: '0.9rem',
+                                                                fontWeight: isActive(child.href) ? 600 : 400,
+                                                                color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
+                                                            }}
+                                                        />
+                                                    </ListItemButton>
+                                                </ListItem>
+                                            ))}
+                                        </List>
+                                    </Collapse>
+                                </>
+                            ) : (
                                 <ListItem disablePadding>
                                     <ListItemButton
-                                        onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
                                         sx={{
-                                            textAlign: "center",
-                                            bgcolor: isActive(item.href) ? 'rgba(0,194,203,0.1)' : 'transparent',
+                                            textAlign: "left",
+                                            px: 4,
+                                            py: 2,
+                                            bgcolor: isActive(item.href) ? 'rgba(255,255,255,0.05)' : 'transparent',
                                             borderLeft: isActive(item.href) ? '4px solid var(--primary)' : '4px solid transparent',
+                                            '&:hover': {
+                                                bgcolor: 'rgba(255,255,255,0.08)',
+                                            }
                                         }}
+                                        component={Link}
+                                        href={item.href}
+                                        onClick={handleDrawerToggle}
                                     >
                                         <ListItemText
-                                            primary={
-                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-                                                    {item.label}
-                                                    <ArrowDown2 size="16" color="var(--foreground)" style={{ transform: mobileProductsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />
-                                                </Box>
-                                            }
+                                            primary={item.label}
                                             primaryTypographyProps={{
                                                 fontFamily: 'var(--font-prompt)',
-                                                color: isActive(item.href) ? 'var(--primary)' : 'var(--foreground)',
-                                                fontWeight: isActive(item.href) ? 600 : 400,
+                                                color: isActive(item.href) ? 'var(--primary)' : 'inherit',
+                                                fontWeight: isActive(item.href) ? 700 : 500,
+                                                fontSize: '1rem',
+                                                letterSpacing: 1
                                             }}
                                         />
                                     </ListItemButton>
                                 </ListItem>
-                                <Collapse in={mobileProductsOpen} timeout="auto" unmountOnExit>
-                                    <List component="div" disablePadding sx={{ bgcolor: 'rgba(0,0,0,0.02)', mx: 2, borderRadius: 2, mb: 1 }}>
-                                        {item.children.map((child) => (
-                                            <ListItem key={child.label} disablePadding>
-                                                <ListItemButton
-                                                    component={Link}
-                                                    href={child.href}
-                                                    onClick={handleDrawerToggle} // Close drawer on selection
-                                                    sx={{
-                                                        pl: 2,
-                                                        py: 1.5,
-                                                        borderRadius: 2,
-                                                        mb: 0.5,
-                                                        '&:hover': {
-                                                            bgcolor: 'rgba(0,194,203,0.08)',
-                                                        }
-                                                    }}
-                                                >
-                                                    <Box sx={{
-                                                        mr: 2,
-                                                        display: 'flex',
-                                                        p: 0.8,
-                                                        borderRadius: 1,
-                                                        bgcolor: isActive(child.href) ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
-                                                        color: isActive(child.href) ? '#fff' : 'var(--foreground)'
-                                                    }}>
-                                                        {child.icon}
-                                                    </Box>
-                                                    <ListItemText
-                                                        primary={child.label}
-                                                        primaryTypographyProps={{
-                                                            fontFamily: 'var(--font-prompt)',
-                                                            fontSize: '0.9rem',
-                                                            fontWeight: isActive(child.href) ? 600 : 400,
-                                                            color: isActive(child.href) ? 'var(--primary)' : 'var(--foreground)',
-                                                        }}
-                                                    />
-                                                </ListItemButton>
-                                            </ListItem>
-                                        ))}
-                                    </List>
-                                </Collapse>
-                            </>
-                        ) : (
-                            <ListItem disablePadding>
-                                <ListItemButton
-                                    sx={{
-                                        textAlign: "center",
-                                        bgcolor: isActive(item.href) ? 'rgba(0,194,203,0.1)' : 'transparent',
-                                        borderLeft: isActive(item.href) ? '4px solid var(--primary)' : '4px solid transparent',
-                                        '&:hover': {
-                                            bgcolor: 'rgba(0,194,203,0.05)',
-                                        }
-                                    }}
-                                    component={Link}
-                                    href={item.href}
-                                    onClick={handleDrawerToggle}
-                                >
-                                    <ListItemText
-                                        primary={item.label}
-                                        primaryTypographyProps={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            color: isActive(item.href) ? 'var(--primary)' : 'var(--foreground)',
-                                            fontWeight: isActive(item.href) ? 600 : 400,
-                                        }}
-                                    />
-                                </ListItemButton>
-                            </ListItem>
-                        )}
-                    </React.Fragment>
-                ))}
-            </List>
+                            )}
+                        </React.Fragment>
+                    ))}
+                </List>
+            </Box>
 
+            {/* Sticky Footer */}
+            <Box sx={{ p: 2, bgcolor: 'rgba(255,255,255,0.02)', borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}>
+                <Stack spacing={1}>
+                    <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<Message size="18" variant="Bold" color="currentColor" />}
+                        href="https://line.me/ti/p/~@setevent"
+                        target="_blank"
+                        sx={{
+                            bgcolor: '#06C755',
+                            fontFamily: 'var(--font-prompt)',
+                            fontWeight: 600,
+                            py: 1,
+                            fontSize: '0.85rem',
+                            '&:hover': { bgcolor: '#05b04a' }
+                        }}
+                    >
+                        LINE: @setevent
+                    </Button>
+                    <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<Call size="18" variant="Bold" color="currentColor" />}
+                        href="tel:0812345678"
+                        sx={{
+                            color: 'white',
+                            borderColor: 'rgba(255,255,255,0.3)',
+                            fontFamily: 'var(--font-prompt)',
+                            fontWeight: 600,
+                            py: 1,
+                            fontSize: '0.85rem',
+                            '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.05)' }
+                        }}
+                    >
+                        081-234-5678
+                    </Button>
+                </Stack>
+                <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1.5, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-prompt)', fontSize: '0.7rem' }}>
+                    © 2024 SETEVENT ALL RIGHTS RESERVED
+                </Typography>
+            </Box>
         </Box>
     );
 
@@ -234,13 +307,25 @@ export default function Header() {
 
 
                     {/* Brand / Logo */}
-                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: { xs: 'center', md: 'flex-start' },
+                        flex: { xs: 1, md: 'unset' },
+                        position: 'relative'
+                    }}>
                         <IconButton
                             color="inherit"
                             aria-label="open drawer"
                             edge="start"
                             onClick={handleDrawerToggle}
-                            sx={{ mr: { xs: 1, sm: 2 }, display: { md: "none" }, color: isHome ? "white" : "var(--foreground)" }}
+                            sx={{
+                                display: { md: "none" },
+                                color: isHome ? "white" : "var(--foreground)",
+                                position: { xs: 'absolute', md: 'static' },
+                                left: { xs: 0, md: 'auto' },
+                                zIndex: 1
+                            }}
                         >
                             <HambergerMenu size="32" color={isHome ? "white" : "var(--foreground)"} />
                         </IconButton>
@@ -250,9 +335,10 @@ export default function Header() {
                             href="/"
                             sx={{
                                 position: 'relative',
-                                width: { xs: 120, sm: 150, md: 180 },
-                                height: { xs: 40, md: 50 },
-                                display: 'block'
+                                width: { xs: 110, sm: 140, md: 180 },
+                                height: { xs: 35, md: 50 },
+                                display: 'block',
+                                mx: { xs: 'auto', md: 0 }
                             }}
                         >
                             <Image

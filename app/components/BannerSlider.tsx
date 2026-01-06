@@ -28,7 +28,7 @@ const slides = [
 
 export default function BannerSlider() {
     return (
-        <Box sx={{ width: "100%", height: "100vh", position: "relative", top: 0, left: 0 }}>
+        <Box sx={{ width: "100%", minHeight: "100vh", position: "relative", top: 0, left: 0, overflow: 'hidden' }}>
             {/* Background Image - Static for Single Hero Look */}
             <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <Image
@@ -63,19 +63,20 @@ export default function BannerSlider() {
             <Box sx={{
                 position: 'relative',
                 zIndex: 2,
-                height: '100%',
+                minHeight: '100vh',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
                 textAlign: 'center',
-                pt: 10
+                pt: { xs: 12, md: 15 },
+                pb: { xs: 6, md: 4 }
             }}>
                 <Typography variant="h1" sx={{
                     fontFamily: 'var(--font-prompt)',
                     fontWeight: 900,
                     color: 'white',
-                    fontSize: { xs: '3rem', sm: '5rem', md: '7rem', lg: '9rem' },
+                    fontSize: { xs: '3.5rem', sm: '5rem', md: '7rem', lg: '8.5rem' },
                     lineHeight: 0.85,
                     letterSpacing: -2,
                     textTransform: 'uppercase'
@@ -87,9 +88,9 @@ export default function BannerSlider() {
                     fontFamily: 'var(--font-prompt)',
                     fontWeight: 700,
                     color: 'white',
-                    fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2.5rem' },
+                    fontSize: { xs: '1.2rem', sm: '1.8rem', md: '2.2rem' },
                     mt: { xs: 2, md: 2 },
-                    letterSpacing: { xs: 3, sm: 5, md: 10 },
+                    letterSpacing: { xs: 3, sm: 5, md: 8 },
                     textTransform: 'uppercase',
                     textAlign: 'center'
                 }}>
@@ -99,16 +100,16 @@ export default function BannerSlider() {
                 <Typography variant="h6" sx={{
                     fontFamily: 'var(--font-prompt)',
                     color: 'rgba(255,255,255,0.9)',
-                    mt: { xs: 2, md: 3 },
+                    mt: { xs: 1.5, md: 2 },
                     maxWidth: '800px',
                     fontWeight: 300,
-                    fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' },
+                    fontSize: { xs: '0.85rem', sm: '1rem', md: '1.2rem' },
                     px: 2
                 }}>
                     รับจัดงานอีเว้นท์ · เช่าอุปกรณ์ครบวงจร · งานแต่งงาน · งานสัมมนา
                 </Typography>
 
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} mt={{ xs: 4, md: 5 }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} mt={{ xs: 3, md: 4 }}>
                     <Button
                         variant="contained"
                         sx={{
@@ -144,11 +145,21 @@ export default function BannerSlider() {
                 </Stack>
 
                 {/* Bottom Date/Location */}
-                <Box sx={{ mt: 8, color: 'white', textAlign: 'center' }}>
-                    <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontSize: { xs: '1.5rem', md: '2rem' }, fontWeight: 600 }}>
+                <Box sx={{ mt: { xs: 4, md: 6 }, color: 'white', textAlign: 'center' }}>
+                    <Typography variant="h4" sx={{
+                        fontFamily: 'var(--font-prompt)',
+                        fontSize: { xs: '1.2rem', md: '1.8rem' },
+                        fontWeight: 600,
+                        letterSpacing: 1
+                    }}>
                         ONE STOP SERVICE
                     </Typography>
-                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1.1rem', opacity: 0.8, mt: 1 }}>
+                    <Typography variant="body1" sx={{
+                        fontFamily: 'var(--font-prompt)',
+                        fontSize: { xs: '0.9rem', md: '1.1rem' },
+                        opacity: 0.8,
+                        mt: 0.5
+                    }}>
                         บริการจัดงานครบวงจร พร้อมอุปกรณ์ทันสมัย
                     </Typography>
                 </Box>
