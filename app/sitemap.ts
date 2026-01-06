@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://setevent.co.th';
+    const baseUrl = 'https://seteventthailand.com';
 
     // Future: Fetch dynamic categories or services from DB
     const serviceRoutes = [

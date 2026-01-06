@@ -32,14 +32,14 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://seteventbkk.com"),
+  metadataBase: new URL("https://seteventthailand.com"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
     title: "SetEvent - บริการให้เช่าอุปกรณ์จัดงาน และรับจัดงานอีเว้นท์ครบวงจร",
     description: "บริการให้เช่าอุปกรณ์จัดงานอีเว้นท์ และรับจัดงานทุกรูปแบบ งานแต่ง งานเลี้ยง งานเปิดตัวสินค้า มืออาชีพ ราคามิตรภาพ",
-    url: "https://seteventbkk.com",
+    url: "https://seteventthailand.com",
     siteName: "SetEvent",
     images: [
       {

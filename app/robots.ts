@@ -5,8 +5,8 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: '*',
             allow: '/',
-            disallow: '/admin/', // Disallow admin area
+            disallow: ['/admin/'],
         },
-        sitemap: 'https://setevent.co.th/sitemap.xml',
+        sitemap: 'https://seteventthailand.com/sitemap.xml',
     };
 }

@@ -107,7 +107,7 @@ export default function Footer() {
                             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
                                 <Sms size="24" color="var(--secondary)" variant="Bulk" />
                                 <Typography sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", opacity: 0.8 }}>
-                                    contact@seteventbkk.com
+                                    contact@seteventthailand.com
                                 </Typography>
                             </Box>
                         </Box>
