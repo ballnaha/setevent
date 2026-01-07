@@ -1,9 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Avatar, Typography, Skeleton, IconButton, Chip } from '@mui/material';
-import { Home2, Notification, Setting2 } from 'iconsax-react';
-import Link from 'next/link';
+import { Box, Avatar, Typography, Skeleton, Chip } from '@mui/material';
 import { initializeLiff, LiffProfile, isMockMode } from '@/lib/liff';
 
 export default function LiffHeader() {
@@ -28,99 +26,105 @@ export default function LiffHeader() {
         <Box
             component="header"
             sx={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 100,
-                bgcolor: '#1a1a1a',
-                borderBottom: '1px solid rgba(0,0,0,0.08)',
-                px: 2,
-                py: 1.5,
+                position: 'relative',
+                background: 'linear-gradient(180deg, #F0F9FF 0%, #FFFFFF 100%)',
+                px: 3,
+                pt: 5, // Increased top padding for better spacing
+                pb: 3,
+                borderBottom: '1px solid rgba(0,0,0,0.04)',
             }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                {/* Profile Section */}
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            {/* Content Container */}
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+                {/* Left - Text */}
+                <Box sx={{ flex: 1 }}>
                     {loading ? (
                         <>
-                            <Skeleton variant="circular" width={44} height={44} />
-                            <Box>
-                                <Skeleton variant="text" width={100} height={20} />
-                                <Skeleton variant="text" width={60} height={16} />
-                            </Box>
+                            <Skeleton variant="text" width={100} height={20} sx={{ bgcolor: 'rgba(0,0,0,0.06)' }} />
+                            <Skeleton variant="text" width={180} height={40} sx={{ bgcolor: 'rgba(0,0,0,0.06)', mt: 1 }} />
                         </>
                     ) : profile ? (
-                        <>
-                            <Avatar
-                                src={profile.pictureUrl}
-                                alt={profile.displayName}
-                                sx={{ width: 44, height: 44, border: '2px solid var(--primary)' }}
-                            />
-                            <Box>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                            <Typography
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.9rem',
+                                    color: '#64748B', // Slate-500
+                                    fontWeight: 500,
+                                }}
+                            >
+                                สวัสดี, {profile.displayName} 👋
+                            </Typography>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                 <Typography
+                                    component="h1"
                                     sx={{
                                         fontFamily: 'var(--font-prompt)',
-                                        fontWeight: 600,
-                                        fontSize: '0.95rem',
-                                        color: '#fff',
-                                        lineHeight: 1.2,
+                                        fontWeight: 800,
+                                        fontSize: '1.75rem',
+                                        color: '#1E293B', // Slate-800
+                                        letterSpacing: '-0.02em',
+                                        lineHeight: 1.1,
                                     }}
                                 >
-                                    {profile.displayName}
+                                    ติดตามงาน
                                 </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Typography
+                                {isMockMode() && (
+                                    <Chip
+                                        label="DEV"
+                                        size="small"
                                         sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontSize: '0.75rem',
-                                            color: 'var(--primary)',
-                                            fontWeight: 500,
+                                            height: 20,
+                                            fontSize: '0.65rem',
+                                            fontWeight: 700,
+                                            bgcolor: 'rgba(37, 99, 235, 0.1)', // Blue-600 with opacity
+                                            color: '#2563EB',
+                                            borderRadius: 1,
                                         }}
-                                    >
-                                        SETEVENT Member
-                                    </Typography>
-                                    {isMockMode() && (
-                                        <Chip
-                                            label="🧪 Mock"
-                                            size="small"
-                                            sx={{
-                                                height: 18,
-                                                fontSize: '0.6rem',
-                                                bgcolor: '#fef3c7',
-                                                color: '#d97706',
-                                                fontWeight: 600,
-                                            }}
-                                        />
-                                    )}
-                                </Box>
+                                    />
+                                )}
                             </Box>
-                        </>
+                        </Box>
                     ) : (
-                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
-                            กรุณาเข้าสู่ระบบ
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#64748B' }}>
+                            กรุณาเข้าสู่ระบบ...
                         </Typography>
                     )}
                 </Box>
 
-                {/* Action Icons */}
-                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                    <IconButton
-                        component={Link}
-                        href="/liff"
-                        sx={{ color: 'var(--foreground)' }}
-                    >
-                        <Home2 size={22} variant="Outline" color="#fff" />
-                    </IconButton>
-                    <IconButton sx={{ color: 'var(--foreground)' }}>
-                        <Notification size={22} variant="Outline" color="#fff" />
-                    </IconButton>
-                    <IconButton
-                        component={Link}
-                        href="/liff/settings"
-                        sx={{ color: 'var(--foreground)' }}
-                    >
-                        <Setting2 size={22} variant="Outline" color="#fff" />
-                    </IconButton>
-                </Box>
+                {/* Right - Avatar */}
+                {!loading && profile && (
+                    <Box sx={{ position: 'relative' }}>
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                inset: -2,
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #3B82F6 0%, #2563EB 100%)',
+                                opacity: 0.2,
+                                filter: 'blur(8px)',
+                            }}
+                        />
+                        <Avatar
+                            src={profile.pictureUrl}
+                            alt={profile.displayName}
+                            sx={{
+                                width: 52,
+                                height: 52,
+                                border: '2px solid white',
+                                boxShadow: '0 4px 12px rgba(37, 99, 235, 0.15)',
+                            }}
+                        />
+                    </Box>
+                )}
+                {loading && (
+                    <Skeleton
+                        variant="circular"
+                        width={52}
+                        height={52}
+                        sx={{ bgcolor: 'rgba(0,0,0,0.06)' }}
+                    />
+                )}
             </Box>
         </Box>
     );

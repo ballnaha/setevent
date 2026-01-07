@@ -13,50 +13,19 @@ export interface LiffProfile {
     statusMessage?: string;
 }
 
-// Mock Profile สำหรับทดสอบ
+// Mock Profile สำหรับทดสอบ (ตรงกับ seed.ts)
 const MOCK_PROFILE: LiffProfile = {
-    userId: 'U_mock_user_12345',
-    displayName: 'คุณทดสอบ ระบบ',
+    userId: 'U28a72146890f8dfa7fbbac7560d3195e',
+    displayName: 'ทดสอบ ลูกค้า',
     pictureUrl: 'https://i.pravatar.cc/150?u=setevent-mock',
     statusMessage: 'Testing SETEVENT LIFF',
 };
 
-// Mock Events สำหรับทดสอบ
-export const MOCK_EVENTS = [
-    {
-        id: 'evt-001',
-        eventName: 'งานเปิดตัวสินค้า ABC',
-        inviteCode: 'EVT-2026-001',
-        eventDate: new Date('2026-02-15'),
-        venue: 'Central World',
-        status: 'confirmed',
-        totalPrice: 150000,
-    },
-    {
-        id: 'evt-002',
-        eventName: 'งานแต่งงาน คุณสมชาย',
-        inviteCode: 'EVT-2026-002',
-        eventDate: new Date('2026-03-20'),
-        venue: 'โรงแรมแกรนด์ไฮแอท',
-        status: 'draft',
-        totalPrice: 250000,
-    },
-    {
-        id: 'evt-003',
-        eventName: 'งานสัมมนาประจำปี',
-        inviteCode: 'EVT-2026-003',
-        eventDate: new Date('2026-01-30'),
-        venue: 'ศูนย์ประชุมแห่งชาติสิริกิติ์',
-        status: 'in-progress',
-        totalPrice: 80000,
-    },
-];
-
-// Mock Customer สำหรับทดสอบ
+// Mock Customer สำหรับทดสอบ (ตรงกับ seed.ts)
 export const MOCK_CUSTOMER = {
     id: 'cust-001',
-    lineUid: 'U_mock_user_12345',
-    displayName: 'คุณทดสอบ ระบบ',
+    lineUid: 'U28a72146890f8dfa7fbbac7560d3195e',
+    displayName: 'ทดสอบ ลูกค้า',
     pictureUrl: 'https://i.pravatar.cc/150?u=setevent-mock',
     phone: '081-234-5678',
     email: 'test@example.com',

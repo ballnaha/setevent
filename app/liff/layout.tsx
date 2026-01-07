@@ -30,7 +30,7 @@ export default function LiffLayout({
                     position: 'fixed',
                     inset: 0,
                     zIndex: 9999,
-                    bgcolor: '#f5f5f5',
+                    bgcolor: '#ffffff',
                     display: 'flex',
                     flexDirection: 'column',
                     overflow: 'hidden',
@@ -41,7 +41,8 @@ export default function LiffLayout({
                     component="main"
                     sx={{
                         flex: 1,
-                        pb: '70px',
+                        pb: '75px',
+                        pt: '15px', // Space for curved header overlap
                         overflowY: 'auto',
                         overflowX: 'hidden',
                     }}
@@ -53,3 +54,4 @@ export default function LiffLayout({
         </>
     );
 }
+

@@ -95,6 +95,25 @@ model Event {
 
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   bookings    Booking[]
+  timelines   EventTimeline[]
+}
+
+// EventTimeline - Timeline ของงาน (แจ้งความคืบหน้า)
+model EventTimeline {
+  id          String   @id @default(cuid())
+  eventId     String
+  title       String
+  description String?
+  images      String?  @db.Text // JSON Array of image URLs: ["url1", "url2"]
+  progress    Int?     // เปอร์เซ็นต์ความคืบหน้า 0-100
+  status      String   @default("pending") // pending, in-progress, completed
+  order       Int      @default(0)
+  dueDate     DateTime?
+  completedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 // Booking - รายการจองอุปกรณ์/บริการ

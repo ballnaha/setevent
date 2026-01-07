@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { MOCK_EVENTS } from '@/lib/liff';
 
 export async function POST(request: NextRequest) {
     try {
@@ -10,13 +9,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'LINE UID is required' }, { status: 400 });
         }
 
-        // 🧪 Mock Mode
-        if (lineUid.startsWith('U_mock_')) {
-            console.log('🧪 API Mock Mode: events');
-            return NextResponse.json({ events: MOCK_EVENTS });
-        }
-
-        // 🔐 Production Mode
+        // ดึงข้อมูลจาก Database (รวม mock data ที่ seed ไว้)
         const customer = await prisma.customer.findUnique({
             where: { lineUid },
             include: {
