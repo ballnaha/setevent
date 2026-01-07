@@ -79,6 +79,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+import GoogleAnalytics from './components/GoogleAnalytics';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -90,6 +92,7 @@ export default function RootLayout({
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ margin: 0 }}
       >
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || ''} />
         <Providers>
           <AppRouterCacheProvider>
             <ThemeProvider theme={theme}>
