@@ -52,6 +52,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  password      String?   // เพิ่มสำหรับ Credentials Login
   role          String    @default("admin") // admin, staff
   accounts      Account[]
   sessions      Session[]

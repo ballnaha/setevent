@@ -79,24 +79,46 @@ export async function initializeLiff(): Promise<LiffProfile | null> {
         return null;
     }
 
-    if (!isInitialized) {
-        await liff.init({ liffId: process.env.NEXT_PUBLIC_LIFF_ID });
-        isInitialized = true;
-    }
+    try {
+        if (!isInitialized) {
+            await liff.init({
+                liffId: process.env.NEXT_PUBLIC_LIFF_ID,
+                withLoginOnExternalBrowser: true, // รองรับเปิดนอก LINE App
+            });
+            isInitialized = true;
 
-    if (!liff.isLoggedIn()) {
-        liff.login();
+            // ✅ Clear URL parameters หลัง login (ลบ code, state, etc.)
+            if (typeof window !== 'undefined' && window.location.search) {
+                const url = new URL(window.location.href);
+                const hasAuthParams = url.searchParams.has('code') ||
+                    url.searchParams.has('state') ||
+                    url.searchParams.has('liffClientId');
+
+                if (hasAuthParams && liff.isLoggedIn()) {
+                    // ลบ query parameters ออกจาก URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                    console.log('✅ Cleared LIFF auth parameters from URL');
+                }
+            }
+        }
+
+        if (!liff.isLoggedIn()) {
+            liff.login();
+            return null;
+        }
+
+        const profile = await liff.getProfile();
+
+        return {
+            userId: profile.userId,
+            displayName: profile.displayName,
+            pictureUrl: profile.pictureUrl,
+            statusMessage: profile.statusMessage,
+        };
+    } catch (error) {
+        console.error('LIFF initialization error:', error);
         return null;
     }
-
-    const profile = await liff.getProfile();
-
-    return {
-        userId: profile.userId,
-        displayName: profile.displayName,
-        pictureUrl: profile.pictureUrl,
-        statusMessage: profile.statusMessage,
-    };
 }
 
 export function closeLiff() {

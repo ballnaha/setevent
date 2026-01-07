@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Prompt, Comfortaa } from "next/font/google";
 import "./globals.css";
-import Header from "./components/Header";
-import Footer from "./components/Footer";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme';
 import { Providers } from "./providers";
 
 const prompt = Prompt({
@@ -87,15 +88,14 @@ export default function RootLayout({
     <html lang="th" translate="no">
       <body
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
-        style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }}
+        style={{ margin: 0 }}
       >
         <Providers>
           <AppRouterCacheProvider>
-            <Header />
-            <main style={{ flex: 1 }}>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
               {children}
-            </main>
-            <Footer />
+            </ThemeProvider>
           </AppRouterCacheProvider>
         </Providers>
       </body>

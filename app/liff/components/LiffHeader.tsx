@@ -31,7 +31,7 @@ export default function LiffHeader() {
                 position: 'sticky',
                 top: 0,
                 zIndex: 100,
-                bgcolor: 'white',
+                bgcolor: '#1a1a1a',
                 borderBottom: '1px solid rgba(0,0,0,0.08)',
                 px: 2,
                 py: 1.5,
@@ -61,7 +61,7 @@ export default function LiffHeader() {
                                         fontFamily: 'var(--font-prompt)',
                                         fontWeight: 600,
                                         fontSize: '0.95rem',
-                                        color: 'var(--foreground)',
+                                        color: '#fff',
                                         lineHeight: 1.2,
                                     }}
                                 >
@@ -108,17 +108,17 @@ export default function LiffHeader() {
                         href="/liff"
                         sx={{ color: 'var(--foreground)' }}
                     >
-                        <Home2 size={22} variant="Bold" color="var(--primary)" />
+                        <Home2 size={22} variant="Outline" color="#fff" />
                     </IconButton>
                     <IconButton sx={{ color: 'var(--foreground)' }}>
-                        <Notification size={22} variant="Bold" color="var(--primary)" />
+                        <Notification size={22} variant="Outline" color="#fff" />
                     </IconButton>
                     <IconButton
                         component={Link}
                         href="/liff/settings"
                         sx={{ color: 'var(--foreground)' }}
                     >
-                        <Setting2 size={22} variant="Bold" color="var(--primary)" />
+                        <Setting2 size={22} variant="Outline" color="#fff" />
                     </IconButton>
                 </Box>
             </Box>
