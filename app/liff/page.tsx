@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
     Box,
@@ -56,7 +56,7 @@ interface EventSummary {
 
 type PageStatus = 'loading' | 'new' | 'pending' | 'no-events' | 'select-event' | 'show-event' | 'not-found' | 'unauthorized';
 
-export default function LiffHomePage() {
+function LiffContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     // Default to 'LAUNCH002' if no code provided (Dev Mode)
@@ -1050,6 +1050,19 @@ export default function LiffHomePage() {
                 </Drawer.Portal>
             </Drawer.Root>
         </Container>
+    );
+}
+
+
+export default function LiffPage() {
+    return (
+        <Suspense fallback={
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+                <Skeleton variant="circular" width={40} height={40} />
+            </Box>
+        }>
+            <LiffContent />
+        </Suspense>
     );
 }
 
