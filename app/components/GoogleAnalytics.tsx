@@ -1,9 +1,23 @@
 'use client';
 
 import Script from 'next/script';
+import { usePathname } from 'next/navigation';
+
+// Routes to exclude from Google Analytics tracking
+const EXCLUDED_ROUTES = ['/admin', '/liff', '/auth'];
 
 export default function GoogleAnalytics({ gaId }: { gaId: string }) {
+    const pathname = usePathname();
+
+    // Don't track if no GA ID
     if (!gaId) return null;
+
+    // Don't track admin and liff routes
+    const shouldExclude = EXCLUDED_ROUTES.some(route =>
+        pathname?.startsWith(route)
+    );
+
+    if (shouldExclude) return null;
 
     return (
         <>
@@ -23,3 +37,4 @@ export default function GoogleAnalytics({ gaId }: { gaId: string }) {
         </>
     );
 }
+
