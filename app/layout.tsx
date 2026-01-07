@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { Providers } from "./providers";
 
 const prompt = Prompt({
   variable: "--font-prompt",
@@ -88,13 +89,15 @@ export default function RootLayout({
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', margin: 0 }}
       >
-        <AppRouterCacheProvider>
-          <Header />
-          <main style={{ flex: 1 }}>
-            {children}
-          </main>
-          <Footer />
-        </AppRouterCacheProvider>
+        <Providers>
+          <AppRouterCacheProvider>
+            <Header />
+            <main style={{ flex: 1 }}>
+              {children}
+            </main>
+            <Footer />
+          </AppRouterCacheProvider>
+        </Providers>
       </body>
     </html>
   );
