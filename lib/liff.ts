@@ -33,6 +33,24 @@ export const MOCK_CUSTOMER = {
     status: 'active',
 };
 
+// Mock Events สำหรับทดสอบ
+export const MOCK_EVENTS = [
+    {
+        eventName: 'งานแต่งงาน คุณสมชาย & คุณสมหญิง',
+        inviteCode: 'WEDDING001',
+        eventDate: new Date('2025-02-14'),
+        venue: 'โรงแรมเซ็นทารา แกรนด์',
+        status: 'confirmed',
+    },
+    {
+        eventName: 'งานเปิดตัวสินค้า XYZ',
+        inviteCode: 'LAUNCH002',
+        eventDate: new Date('2025-03-01'),
+        venue: 'สยามพารากอน ฮอลล์',
+        status: 'in-progress',
+    }
+];
+
 export async function initializeLiff(): Promise<LiffProfile | null> {
     // 🧪 Mock Mode - ใช้ข้อมูลจำลอง
     if (IS_MOCK) {
