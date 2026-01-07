@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <Box>
       <BannerSlider />
-      <ClientLogos />
+      {/* <ClientLogos /> */}
       <ServicesSection />
       <FeaturedEvents />
       <PortfolioGallery />

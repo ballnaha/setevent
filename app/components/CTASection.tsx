@@ -13,7 +13,7 @@ export default function CTASection() {
             {/* Full Width Background Image */}
             <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <Image
-                    src="/images/banner1-3.webp"
+                    src="/images/banner1-2.webp"
                     alt="CTA Background"
                     fill
                     style={{ objectFit: 'cover', objectPosition: 'center' }}

@@ -69,7 +69,7 @@ export default function WhyChooseUs() {
                             borderRadius: { xs: 2, md: 4 },
                             overflow: 'hidden',
                             position: 'relative',
-                            boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+
                         }}>
                             <Image
                                 src="/images/mobileapp.png"

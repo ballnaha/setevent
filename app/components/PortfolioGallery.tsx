@@ -6,54 +6,54 @@ import Image from "next/image";
 
 const works = [
     {
-        title: "Neon Light Concert",
-        category: "Concert & Festival",
+        title: "ให้เช่าอุปกรณ์จัดงาน",
+        category: "แสง สี เสียง ครบวงจร",
         image: "/images/concert.webp",
         height: { xs: '300px', md: '500px' }
     },
     {
-        title: "Private Wedding",
-        category: "Wedding & Party",
+        title: "รับจัดงานแต่งงาน",
+        category: "เนรมิตงานฝันให้เป็นจริง",
         image: "/images/wedding.webp",
         height: { xs: '300px', md: '350px' }
     },
     {
-        title: "Tech Innovation Summit",
-        category: "Corporate Event",
+        title: "งานสัมมนาและประชุม",
+        category: "พร้อมอุปกรณ์ทันสมัย",
         image: "/images/seminar.webp",
         height: { xs: '300px', md: '450px' }
     },
     {
-        title: "Grand Opening Gala",
-        category: "Launch Event",
-        image: "/images/banner_launch.png",
+        title: "งานจัดเลี้ยงอาหาร",
+        category: "สร้างภาพลักษณ์ที่โดดเด่น",
+        image: "/images/launch.webp",
         height: { xs: '300px', md: '400px' }
     },
     {
-        title: "Corporate Seminar",
-        category: "Business Meeting",
-        image: "/images/banner_event.png",
+        title: "อีเว้นท์องค์กร",
+        category: "กิจกรรมสร้างความสัมพันธ์",
+        image: "/images/seminar1.webp",
         height: { xs: '300px', md: '600px' }
     },
     {
-        title: "Wedding",
-        category: "Entertainment",
-        image: "/images/banner1.png",
-        height: { xs: '300px', md: '380px' }
+        title: "ปาร์ตี้และงานเลี้ยง",
+        category: "สนุกสุดเหวี่ยงทุกโจทย์",
+        image: "/images/party.webp",
+        height: { xs: '300px', md: '250px' }
     }
 ];
 
 export default function PortfolioGallery() {
     return (
-        <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)" }}>
+        <Box sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 8, md: 0 }, bgcolor: "var(--background)" }}>
             <Container maxWidth="lg">
-                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="end" mb={4} spacing={2}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="end" mb={{ xs: 4, md: 4 }} spacing={2}>
                     <Box>
-                        <Typography variant="h6" sx={{ color: "var(--secondary)", fontFamily: "var(--font-comfortaa)", fontWeight: "bold", mb: 1, letterSpacing: 1.5 }}>
-                            PORTFOLIO
+                        <Typography variant="h6" sx={{ color: "var(--secondary)", fontFamily: "var(--font-comfortaa)", fontWeight: "bold", mb: 1, letterSpacing: 1.5, fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
+                            OUR SERVICES
                         </Typography>
-                        <Typography variant="h3" sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", fontWeight: "bold" }}>
-                            ผลงานที่ผ่านมา
+                        <Typography variant="h3" sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", fontWeight: "bold", fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
+                            บริการของเรา
                         </Typography>
                     </Box>
                     <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>
@@ -63,10 +63,10 @@ export default function PortfolioGallery() {
 
                 <Box sx={{
                     columnCount: { xs: 1, sm: 2, md: 3 },
-                    columnGap: 1,
+                    columnGap: 0.5,
                     '& > div': {
                         breakInside: 'avoid',
-                        mb: 1
+                        mb: 0.5
                     }
                 }}>
                     {works.map((work, index) => (
@@ -75,7 +75,6 @@ export default function PortfolioGallery() {
                             sx={{
                                 position: 'relative',
                                 height: work.height,
-                                borderRadius: 2,
                                 overflow: 'hidden',
                                 cursor: 'pointer',
                                 '&:hover .overlay': {

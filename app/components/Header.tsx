@@ -63,8 +63,8 @@ export default function Header() {
     const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
 
     const pathname = usePathname();
-    // Check if we are on the home page
-    const isHome = pathname === "/";
+    // Check if we are on the home page or contact page
+    const isHome = pathname === "/" || pathname === "/contact";
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -296,9 +296,9 @@ export default function Header() {
                 color="transparent"
                 elevation={0}
                 sx={{
-                    bgcolor: isHome ? "transparent" : "var(--background)",
-                    boxShadow: isHome ? "none" : "0 4px 20px -10px rgba(0,0,0,0.1)",
-                    borderBottom: isHome ? "none" : "1px solid rgba(0,0,0,0.05)",
+                    bgcolor: isHome ? "transparent" : "#1a1a1a",
+                    boxShadow: isHome ? "none" : "0 4px 20px -10px rgba(0,0,0,0.3)",
+                    borderBottom: isHome ? "none" : "1px solid rgba(255,255,255,0.05)",
                     transition: "all 0.3s ease",
                     paddingTop: isHome ? 2 : 0,
                 }}
@@ -321,13 +321,13 @@ export default function Header() {
                             onClick={handleDrawerToggle}
                             sx={{
                                 display: { md: "none" },
-                                color: isHome ? "white" : "var(--foreground)",
+                                color: "white",
                                 position: { xs: 'absolute', md: 'static' },
                                 left: { xs: 0, md: 'auto' },
                                 zIndex: 1
                             }}
                         >
-                            <HambergerMenu size="32" color={isHome ? "white" : "var(--foreground)"} />
+                            <HambergerMenu size="32" color="white" />
                         </IconButton>
 
                         <Box
@@ -354,10 +354,10 @@ export default function Header() {
 
                         {/* Date/Location Text similar to reference - Hide on mobile, show on large screens */}
                         <Box sx={{ display: { xs: 'none', lg: 'block' }, ml: 3, borderLeft: '1px solid rgba(255,255,255,0.3)', pl: 3 }}>
-                            <Typography variant="caption" sx={{ color: isHome ? 'rgba(255,255,255,0.8)' : 'text.secondary', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
                                 PROFESSIONAL TEAM
                             </Typography>
-                            <Typography variant="caption" sx={{ color: isHome ? 'rgba(255,255,255,0.6)' : 'text.disabled', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
                                 ONE STOP SERVICE
                             </Typography>
                         </Box>
@@ -367,12 +367,9 @@ export default function Header() {
                     <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4, alignItems: 'center' }}>
                         {navItems.map((item) => {
                             const active = isActive(item.href) || (item.children && item.children.some(child => isActive(child.href)));
-                            const textColor = isHome && !active ? 'white' : (active ? 'var(--secondary)' : 'var(--foreground)');
 
-                            // Adjust text color for home page transparency
-                            const finalColor = isHome
-                                ? (active ? 'var(--secondary)' : 'rgba(255,255,255,0.9)')
-                                : (active ? 'var(--primary)' : 'var(--foreground)');
+                            // Always use light text logic since background is now always dark (transparent or #1a1a1a)
+                            const finalColor = active ? 'var(--secondary)' : 'rgba(255,255,255,0.9)';
 
                             if (item.children) {
                                 return (
@@ -519,8 +516,8 @@ export default function Header() {
                             variant="outlined"
                             onClick={handleContactClick}
                             sx={{
-                                color: isHome ? 'white' : 'var(--primary)',
-                                borderColor: isHome ? 'rgba(255,255,255,0.5)' : 'var(--primary)',
+                                color: 'white',
+                                borderColor: 'rgba(255,255,255,0.5)',
                                 borderRadius: '0',
                                 fontFamily: 'var(--font-prompt)',
                                 px: 3,

@@ -32,7 +32,7 @@ export default function BannerSlider() {
             {/* Background Image - Static for Single Hero Look */}
             <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <Image
-                    src="/images/banner1-2.webp"
+                    src="/images/banner1-3.webp"
                     alt="Event Background"
                     fill
                     priority
