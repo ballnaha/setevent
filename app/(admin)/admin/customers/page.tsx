@@ -36,7 +36,7 @@ import {
     useTheme,
     useMediaQuery,
 } from '@mui/material';
-import { SearchNormal1, User, Calendar, Edit2, Building, Call, Sms, ArrowRight2, CloseCircle } from 'iconsax-react';
+import { SearchNormal1, User, Calendar, Edit2, Building, Call, Sms, ArrowRight2, CloseCircle, Refresh2 } from 'iconsax-react';
 import TopSnackbar from '@/components/ui/TopSnackbar';
 
 // Swiper
@@ -192,20 +192,45 @@ export default function CustomersPage() {
         <Box sx={{ pb: { xs: 10, md: 4 }, maxWidth: '100%', overflowX: 'hidden' }}>
             {/* Header */}
             <Box sx={{ mb: 4 }}>
-                <Typography
-                    variant="h4"
-                    sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        mb: 1,
-                        color: '#1a1a1a',
-                    }}
-                >
-                    ลูกค้าทั้งหมด
-                </Typography>
-                <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
-                    จัดการข้อมูลลูกค้าจาก LINE • {customers.length} ลูกค้า
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
+                    <Box>
+                        <Typography
+                            variant="h4"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 700,
+                                mb: 1,
+                                color: '#1a1a1a',
+                            }}
+                        >
+                            ลูกค้าทั้งหมด
+                        </Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
+                            จัดการข้อมูลลูกค้าจาก LINE • {customers.length} ลูกค้า
+                        </Typography>
+                    </Box>
+                    <Tooltip title="รีเฟรชรายการลูกค้า" arrow>
+                        <Button
+                            variant="contained"
+                            onClick={() => { setLoading(true); fetchCustomers(); }}
+                            disabled={loading}
+                            startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <Refresh2 size={18} color="white" />}
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                bgcolor: '#1a1a1a',
+                                borderRadius: 2,
+                                px: 2.5,
+                                py: 1,
+                                textTransform: 'none',
+                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                '&:hover': { bgcolor: '#333' },
+                                '&:disabled': { bgcolor: '#ccc' },
+                            }}
+                        >
+                            รีเฟรช
+                        </Button>
+                    </Tooltip>
+                </Box>
             </Box>
 
             {/* Search & Stats */}
@@ -639,7 +664,7 @@ export default function CustomersPage() {
                                         {editingCustomer.displayName || 'ไม่ระบุชื่อ'}
                                     </Typography>
                                     <Typography sx={{ fontSize: '0.8rem', color: '#999' }}>
-                                        LINE UID: {editingCustomer.lineUid.slice(0, 20)}...
+                                        LINE UID: {editingCustomer.lineUid}
                                     </Typography>
                                 </Box>
                             </Box>
