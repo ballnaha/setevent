@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendText, sendImage, sendEventCard, sendStatusNotification, sendQuotation, sendAdminMessage, pushMessage, LineMessage } from '@/lib/line-messaging';
+import { sendText, sendImage, sendEventCard, sendStatusNotification, sendQuotation, sendAdminMessage, pushMessage, LineMessage, createStatusFlexMessage } from '@/lib/line-messaging';
 
 // POST /api/line/send-message
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { customerId, lineUid, type, ...data } = body;
+        const { customerId, lineUid, type, eventId, ...data } = body;
 
         // ถ้าส่ง customerId มา ให้หา lineUid จาก database
         let targetLineUid = lineUid;
@@ -35,9 +35,40 @@ export async function POST(request: NextRequest) {
                 break;
 
             case 'image':
-                // ส่งรูปภาพ
-                // body: { type: 'image', imageUrl: 'https://...', previewUrl?: 'https://...' }
-                result = await sendImage(targetLineUid, data.imageUrl, data.previewUrl);
+                // ส่งรูปภาพ (และข้อความถ้ามี)
+                // body: { type: 'image', imageUrl: 'https://...', previewUrl?: 'https://...', text?: 'คำอธิบาย...' }
+
+                const imageMessages: LineMessage[] = [];
+
+                if (data.imageUrls && Array.isArray(data.imageUrls)) {
+                    data.imageUrls.forEach((url: string) => {
+                        imageMessages.push({
+                            type: 'image',
+                            originalContentUrl: url,
+                            previewImageUrl: url,
+                        });
+                    });
+                } else if (data.imageUrl) {
+                    imageMessages.push({
+                        type: 'image',
+                        originalContentUrl: data.imageUrl,
+                        previewImageUrl: data.previewUrl || data.imageUrl,
+                    });
+                }
+
+                if (data.text) {
+                    imageMessages.push({
+                        type: 'text',
+                        text: data.text,
+                    });
+                }
+
+                if (imageMessages.length > 0) {
+                    // LINE allow max 5 messages
+                    result = await pushMessage(targetLineUid, imageMessages.slice(0, 5));
+                } else {
+                    return NextResponse.json({ error: 'No image or text provided' }, { status: 400 });
+                }
                 break;
 
             case 'event-card':
@@ -54,13 +85,46 @@ export async function POST(request: NextRequest) {
 
             case 'status':
                 // ส่งแจ้งเตือนสถานะ
-                // body: { type: 'status', eventName, status: 'confirmed'|'in-progress'|'completed', message? }
-                result = await sendStatusNotification(
-                    targetLineUid,
-                    data.eventName,
-                    data.status,
-                    data.message
-                );
+                // body: { type: 'status', eventName, status: 'confirmed'|'in-progress'|'completed', message?, imageUrls?: string[] }
+
+                // 1. Create Status Flex Message
+                const statusFlex = createStatusFlexMessage(data.eventName, data.status, data.message, data.progress, data.senderName);
+                const statusMessages: LineMessage[] = [statusFlex];
+
+                // 2. Add Images (if any)
+                if (data.imageUrls && Array.isArray(data.imageUrls)) {
+                    data.imageUrls.forEach((url: string) => {
+                        // Infer thumbnail URL (e.g. image.jpg -> image_thumb.jpg)
+                        const previewUrl = url.replace(/(\.[\w\d]+)$/, '_thumb$1');
+
+                        statusMessages.push({
+                            type: 'image',
+                            originalContentUrl: url,
+                            previewImageUrl: previewUrl,
+                        });
+                    });
+                } else if (data.imageUrl) {
+                    const previewUrl = data.imageUrl.replace(/(\.[\w\d]+)$/, '_thumb$1');
+                    statusMessages.push({
+                        type: 'image',
+                        originalContentUrl: data.imageUrl,
+                        previewImageUrl: previewUrl,
+                    });
+                }
+
+                // 3. Add Work Files (if any)
+                if (data.files && Array.isArray(data.files)) {
+                    data.files.forEach((file: { name: string, url: string }) => {
+                        // Send as text message with Link
+                        statusMessages.push({
+                            type: 'text',
+                            text: `📄 ส่งไฟล์งาน: ${file.name}\n${file.url}`
+                        });
+                    });
+                }
+
+                // 3. Push All Messages (Max 5)
+                result = await pushMessage(targetLineUid, statusMessages.slice(0, 5));
                 break;
 
             case 'quotation':
@@ -88,6 +152,48 @@ export async function POST(request: NextRequest) {
                 );
                 break;
 
+            case 'chat':
+                // ส่งข้อความโต้ตอบธรรมดา (ไม่มี status card)
+                // body: { type: 'chat', message: string, imageUrls?: string[], files?: array }
+                const chatMessages: LineMessage[] = [];
+
+                // Add text message
+                if (data.message) {
+                    chatMessages.push({
+                        type: 'text',
+                        text: data.message
+                    });
+                }
+
+                // Add images
+                if (data.imageUrls && Array.isArray(data.imageUrls)) {
+                    data.imageUrls.forEach((url: string) => {
+                        const previewUrl = url.replace(/(\.[\\w\\d]+)$/, '_thumb$1');
+                        chatMessages.push({
+                            type: 'image',
+                            originalContentUrl: url,
+                            previewImageUrl: previewUrl,
+                        });
+                    });
+                }
+
+                // Add files
+                if (data.files && Array.isArray(data.files)) {
+                    data.files.forEach((file: { name: string, url: string }) => {
+                        chatMessages.push({
+                            type: 'text',
+                            text: `📄 ไฟล์แนบ: ${file.name}\n${file.url}`
+                        });
+                    });
+                }
+
+                if (chatMessages.length === 0) {
+                    return NextResponse.json({ error: 'No message content' }, { status: 400 });
+                }
+
+                result = await pushMessage(targetLineUid, chatMessages.slice(0, 5));
+                break;
+
             case 'custom':
                 // ส่ง Custom Messages
                 // body: { type: 'custom', messages: LineMessage[] }
@@ -109,6 +215,7 @@ export async function POST(request: NextRequest) {
                 message: JSON.stringify({ type, ...data }),
                 direction: 'outbound',
                 messageType: type,
+                eventId: eventId || null,
             },
         }).catch(() => { }); // Ignore if customer doesn't exist
 

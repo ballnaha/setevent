@@ -1,32 +1,31 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
     Box,
     Typography,
     Card,
     CardContent,
     TextField,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
     Button,
     Chip,
     Stack,
     Avatar,
-    Divider,
     Alert,
     Snackbar,
     CircularProgress,
     InputAdornment,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
     IconButton,
+    Fade,
 } from '@mui/material';
-import { SearchNormal1, Send2, Calendar, Location, User, Message, TickCircle, Image, CloseCircle } from 'iconsax-react';
+import { SearchNormal1, Calendar, Location, User, Clock, TickCircle, AddCircle, ArrowRight2 } from 'iconsax-react';
+
+// Swiper
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/free-mode';
 
 interface Event {
     id: string;
@@ -39,41 +38,60 @@ interface Event {
         displayName: string | null;
         pictureUrl: string | null;
         lineUid: string;
+        companyName: string | null;
     };
 }
 
-const statusLabels: Record<string, { label: string; color: string; bgColor: string }> = {
-    draft: { label: 'แบบร่าง', color: '#6B7280', bgColor: 'rgba(107, 114, 128, 0.1)' },
-    confirmed: { label: 'ยืนยันแล้ว', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.1)' },
-    'in-progress': { label: 'กำลังดำเนินการ', color: '#F59E0B', bgColor: 'rgba(245, 158, 11, 0.1)' },
-    completed: { label: 'เสร็จสิ้น', color: '#3B82F6', bgColor: 'rgba(59, 130, 246, 0.1)' },
-    cancelled: { label: 'ยกเลิก', color: '#EF4444', bgColor: 'rgba(239, 68, 68, 0.1)' },
+const statusLabels: Record<string, { label: string; color: string; bgColor: string; gradient: string }> = {
+    draft: { label: 'ร่าง', color: '#6B7280', bgColor: 'rgba(107, 114, 128, 0.1)', gradient: 'linear-gradient(135deg, #6B7280, #4B5563)' },
+    confirmed: { label: 'ยืนยันแล้ว', color: '#3B82F6', bgColor: 'rgba(59, 130, 246, 0.1)', gradient: 'linear-gradient(135deg, #3B82F6, #2563EB)' },
+    'in-progress': { label: 'กำลังดำเนินการ', color: '#F59E0B', bgColor: 'rgba(245, 158, 11, 0.1)', gradient: 'linear-gradient(135deg, #F59E0B, #D97706)' },
+    completed: { label: 'ปิดงาน', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.1)', gradient: 'linear-gradient(135deg, #10B981, #059669)' },
+    cancelled: { label: 'ยกเลิก', color: '#EF4444', bgColor: 'rgba(239, 68, 68, 0.1)', gradient: 'linear-gradient(135deg, #EF4444, #DC2626)' },
 };
 
-const updateTypes = [
-    { value: 'status', label: 'อัพเดทสถานะ', icon: TickCircle },
-    { value: 'text', label: 'ส่งข้อความ', icon: Message },
-    { value: 'image', label: 'ส่งรูปภาพ', icon: Image },
+// Tab definitions
+const tabConfig = [
+    {
+        key: 'in-progress',
+        label: 'กำลังดำเนินการ',
+        shortLabel: 'ดำเนินการ',
+        icon: Clock,
+        color: '#F59E0B',
+        bgColor: 'rgba(245, 158, 11, 0.1)',
+        statuses: ['in-progress', 'confirmed']
+    },
+    {
+        key: 'new',
+        label: 'ลูกค้าใหม่',
+        shortLabel: 'ใหม่',
+        icon: AddCircle,
+        color: '#3B82F6',
+        bgColor: 'rgba(59, 130, 246, 0.1)',
+        statuses: ['draft']
+    },
+    {
+        key: 'completed',
+        label: 'จบงานแล้ว',
+        shortLabel: 'จบแล้ว',
+        icon: TickCircle,
+        color: '#10B981',
+        bgColor: 'rgba(16, 185, 129, 0.1)',
+        statuses: ['completed']
+    },
 ];
 
 export default function ProgressPage() {
+    const router = useRouter();
     const [events, setEvents] = useState<Event[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState<string>('all');
-
-    // Send Dialog State
-    const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-    const [updateType, setUpdateType] = useState('status');
-    const [message, setMessage] = useState('');
-    const [newStatus, setNewStatus] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
-    const [sending, setSending] = useState(false);
+    const [activeTab, setActiveTab] = useState(0);
+    const [selectedYear, setSelectedYear] = useState('2026');
 
     // Snackbar
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'warning' });
 
     useEffect(() => {
         fetchEvents();
@@ -81,7 +99,16 @@ export default function ProgressPage() {
 
     useEffect(() => {
         filterEvents();
-    }, [events, search, statusFilter]);
+    }, [events, search, activeTab, selectedYear]);
+
+    // Derived state for years
+    const availableYears = Array.from(new Set([
+        2026,
+        new Date().getFullYear(),
+        ...events
+            .map(e => e.eventDate ? new Date(e.eventDate).getFullYear() : 0)
+            .filter(y => y > 0)
+    ])).sort((a, b) => b - a).map(String);
 
     async function fetchEvents() {
         try {
@@ -96,523 +123,402 @@ export default function ProgressPage() {
     }
 
     function filterEvents() {
-        let result = events;
+        const currentTab = tabConfig[activeTab];
+        let result = events.filter(e => currentTab.statuses.includes(e.status));
+
+        // Filter by Year
+        if (selectedYear !== 'all') {
+            result = result.filter(e => {
+                if (!e.eventDate) return false;
+                return new Date(e.eventDate).getFullYear().toString() === selectedYear;
+            });
+        }
 
         if (search) {
             const searchLower = search.toLowerCase();
             result = result.filter(
                 (e) =>
                     e.eventName.toLowerCase().includes(searchLower) ||
-                    e.customer.displayName?.toLowerCase().includes(searchLower)
+                    e.customer.displayName?.toLowerCase().includes(searchLower) ||
+                    e.customer.companyName?.toLowerCase().includes(searchLower)
             );
-        }
-
-        if (statusFilter !== 'all') {
-            result = result.filter((e) => e.status === statusFilter);
         }
 
         setFilteredEvents(result);
     }
 
-    function openSendDialog(event: Event) {
-        setSelectedEvent(event);
-        setUpdateType('status');
-        setMessage('');
-        setNewStatus('');
-        setImageUrl('');
-        setDialogOpen(true);
-    }
-
-    async function handleSend() {
-        if (!selectedEvent) return;
-
-        setSending(true);
-        try {
-            let body: any = {
-                customerId: selectedEvent.customer.id,
-            };
-
-            if (updateType === 'status') {
-                body = {
-                    ...body,
-                    type: 'status',
-                    eventName: selectedEvent.eventName,
-                    status: newStatus,
-                    message: message || undefined,
-                };
-            } else if (updateType === 'text') {
-                body = {
-                    ...body,
-                    type: 'text',
-                    text: message,
-                };
-            } else if (updateType === 'image') {
-                body = {
-                    ...body,
-                    type: 'image',
-                    imageUrl,
-                    previewUrl: imageUrl,
-                };
-            }
-
-            const res = await fetch('/api/line/send-message', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            });
-
-            if (res.ok) {
-                setSnackbar({ open: true, message: 'ส่งข้อความสำเร็จ!', severity: 'success' });
-                setDialogOpen(false);
-            } else {
-                const data = await res.json();
-                setSnackbar({ open: true, message: `เกิดข้อผิดพลาด: ${data.error}`, severity: 'error' });
-            }
-        } catch (error) {
-            setSnackbar({ open: true, message: 'เกิดข้อผิดพลาดในการส่งข้อความ', severity: 'error' });
-        } finally {
-            setSending(false);
-        }
-    }
-
-    function canSend(): boolean {
-        if (updateType === 'status') return !!newStatus;
-        if (updateType === 'text') return !!message.trim();
-        if (updateType === 'image') return !!imageUrl.trim();
-        return false;
+    // Get count for each tab
+    function getTabCount(tabIndex: number) {
+        const tab = tabConfig[tabIndex];
+        return events.filter(e => tab.statuses.includes(e.status)).length;
     }
 
     return (
-        <Box>
-            {/* Header */}
-            <Box sx={{ mb: 4 }}>
+        <Box sx={{ pb: { xs: 10, md: 4 }, maxWidth: '100%', overflowX: 'hidden' }}>
+            {/* Header - Compact for mobile */}
+            <Box sx={{ mb: 2 }}>
                 <Typography
-                    variant="h4"
                     sx={{
                         fontFamily: 'var(--font-prompt)',
                         fontWeight: 700,
-                        mb: 1,
+                        fontSize: { xs: '1.5rem', md: '1.75rem' },
                         color: '#1a1a1a',
+                        mb: 0.5,
                     }}
                 >
-                    📤 ส่งความคืบหน้าให้ลูกค้า
+                    ส่งอัพเดทลูกค้า
                 </Typography>
-                <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
-                    เลือกงานและส่งอัพเดทความคืบหน้าผ่าน LINE
+                <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#999', fontSize: '0.9rem' }}>
+                    {events.length} งานทั้งหมด
                 </Typography>
             </Box>
 
-            {/* Filters */}
-            <Card sx={{ mb: 3, borderRadius: 2, boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-                <CardContent sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'center' }}>
-                        <Box sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)' } }}>
-                            <TextField
-                                fullWidth
-                                size="small"
-                                placeholder="ค้นหาชื่องาน หรือชื่อลูกค้า..."
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <SearchNormal1 size={18} color="gray" />
-                                        </InputAdornment>
-                                    ),
-                                    sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 },
-                                }}
-                            />
-                        </Box>
-                        <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 200px' } }}>
-                            <FormControl fullWidth size="small">
-                                <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>สถานะ</InputLabel>
-                                <Select
-                                    value={statusFilter}
-                                    label="สถานะ"
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                    sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+            {/* Tab Pills - Swiper for mobile/overflow */}
+            <Box
+                sx={{
+                    width: '100%',
+                    maxWidth: { xs: 'calc(100vw - 32px)', md: '100%' }, // Explicit constraint for mobile
+                    mx: 'auto',
+                    '& .swiper': {
+                        width: '100%',
+                        padding: '4px 4px 12px 4px !important',
+                    },
+                    '& .swiper-slide': {
+                        width: 'auto',
+                    }
+                }}
+            >
+                <Swiper
+                    slidesPerView="auto"
+                    spaceBetween={12}
+                    freeMode={true}
+                    modules={[FreeMode]}
+                    grabCursor={true}
+                    observer={true}
+                    observeParents={true}
+                >
+                    {tabConfig.map((tab, index) => {
+                        const Icon = tab.icon;
+                        const count = getTabCount(index);
+                        const isActive = activeTab === index;
+                        return (
+                            <SwiperSlide key={tab.key}>
+                                <Box
+                                    onClick={() => setActiveTab(index)}
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: { xs: 1, sm: 1.2 },
+                                        px: { xs: 2, sm: 2.5 },
+                                        py: { xs: 1, sm: 1.5 },
+                                        borderRadius: { xs: 3, sm: 4 },
+                                        cursor: 'pointer',
+                                        whiteSpace: 'nowrap',
+                                        bgcolor: isActive ? tab.color : 'white',
+                                        color: isActive ? 'white' : '#666',
+                                        boxShadow: isActive ? `0 8px 20px ${tab.color}40` : '0 2px 10px rgba(0,0,0,0.04)',
+                                        border: isActive ? 'none' : '1px solid #f0f0f0',
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        '&:hover': {
+                                            transform: 'translateY(-2px)',
+                                            boxShadow: isActive ? `0 10px 25px ${tab.color}50` : '0 4px 15px rgba(0,0,0,0.06)',
+                                        },
+                                        '&:active': {
+                                            transform: 'scale(0.95)',
+                                        }
+                                    }}
                                 >
-                                    <MenuItem value="all">ทั้งหมด</MenuItem>
-                                    {Object.entries(statusLabels).map(([key, val]) => (
-                                        <MenuItem key={key} value={key}>
-                                            {val.label}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                        <Box sx={{ flex: { xs: '1 1 100%', md: '0 0 auto' }, textAlign: { xs: 'left', md: 'right' } }}>
-                            <Typography
-                                sx={{
-                                    fontFamily: 'var(--font-prompt)',
-                                    fontSize: '0.85rem',
-                                    color: 'gray',
-                                }}
-                            >
-                                พบ {filteredEvents.length} งาน
-                            </Typography>
-                        </Box>
-                    </Box>
-                </CardContent>
-            </Card>
+                                    <Icon size={18} color={isActive ? 'white' : tab.color} variant={isActive ? 'Bold' : 'Outline'} />
+                                    <Typography sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontWeight: 600,
+                                        fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                        display: { xs: 'none', sm: 'block' }
+                                    }}>
+                                        {tab.label}
+                                    </Typography>
+                                    <Typography sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontWeight: 600,
+                                        fontSize: { xs: '0.8rem', sm: '0.9rem' },
+                                        display: { xs: 'block', sm: 'none' }
+                                    }}>
+                                        {tab.shortLabel}
+                                    </Typography>
+                                    <Box sx={{
+                                        bgcolor: isActive ? 'rgba(255,255,255,0.25)' : tab.bgColor,
+                                        color: isActive ? 'white' : tab.color,
+                                        px: { xs: 0.8, sm: 1.2 },
+                                        py: { xs: 0.2, sm: 0.4 },
+                                        borderRadius: 2,
+                                        fontSize: { xs: '0.7rem', sm: '0.8rem' },
+                                        fontWeight: 700,
+                                        minWidth: { xs: 20, sm: 24 },
+                                        textAlign: 'center'
+                                    }}>
+                                        {count}
+                                    </Box>
+                                </Box>
+                            </SwiperSlide>
+                        );
+                    })}
+                </Swiper>
+            </Box>
+
+            {/* Search and Year Filter */}
+            <Box sx={{ mb: 3, display: 'flex', gap: 1 }}>
+                <TextField
+                    fullWidth
+                    size="small"
+                    placeholder="ค้นหาชื่องาน หรือลูกค้า..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    sx={{
+                        flex: 1,
+                        '& .MuiOutlinedInput-root': {
+                            bgcolor: 'white',
+                            borderRadius: 3,
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                            border: 'none',
+                            '& fieldset': { border: '1px solid #f0f0f0' },
+                            '&:hover fieldset': { borderColor: '#ddd' },
+                            '&.Mui-focused fieldset': { borderColor: tabConfig[activeTab].color, borderWidth: 1 },
+                        }
+                    }}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchNormal1 size={20} color="#999" />
+                            </InputAdornment>
+                        ),
+                        sx: { fontFamily: 'var(--font-prompt)', py: 0.5 },
+                    }}
+                />
+
+                <TextField
+                    select
+                    size="small"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                    SelectProps={{ native: true }}
+                    sx={{
+                        width: 100,
+                        '& .MuiOutlinedInput-root': {
+                            bgcolor: 'white',
+                            borderRadius: 3,
+                            boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                            border: 'none',
+                            '& fieldset': { border: '1px solid #f0f0f0' },
+                            '&:hover fieldset': { borderColor: '#ddd' },
+                            '&.Mui-focused fieldset': { borderColor: tabConfig[activeTab].color, borderWidth: 1 },
+                        },
+                        '& select': {
+                            fontFamily: 'var(--font-prompt)',
+                            py: '10.5px !important'
+                        }
+                    }}
+                >
+                    <option value="all">ทุกปี</option>
+                    {availableYears.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                    ))}
+                </TextField>
+            </Box>
 
             {/* Events List */}
             {loading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', py: 6 }}>
-                    <CircularProgress sx={{ color: 'var(--primary)' }} />
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+                    <CircularProgress sx={{ color: tabConfig[activeTab].color }} />
                 </Box>
             ) : filteredEvents.length === 0 ? (
-                <Card sx={{ borderRadius: 2, textAlign: 'center', py: 6 }}>
-                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
-                        ไม่พบงานที่ตรงกับการค้นหา
-                    </Typography>
-                </Card>
+                <Fade in>
+                    <Card sx={{
+                        borderRadius: 4,
+                        textAlign: 'center',
+                        py: 8,
+                        px: 3,
+                        bgcolor: 'white',
+                        boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                    }}>
+                        <Box sx={{
+                            width: 80,
+                            height: 80,
+                            borderRadius: '50%',
+                            bgcolor: tabConfig[activeTab].bgColor,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mx: 'auto',
+                            mb: 2,
+                        }}>
+                            {activeTab === 0 && <Clock size={36} color={tabConfig[0].color} variant="Bulk" />}
+                            {activeTab === 1 && <AddCircle size={36} color={tabConfig[1].color} variant="Bulk" />}
+                            {activeTab === 2 && <TickCircle size={36} color={tabConfig[2].color} variant="Bulk" />}
+                        </Box>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#1a1a1a', fontSize: '1.1rem', fontWeight: 600, mb: 0.5 }}>
+                            {search ? 'ไม่พบงานที่ค้นหา' : 'ยังไม่มีงาน'}
+                        </Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#999', fontSize: '0.9rem' }}>
+                            {search ? 'ลองค้นหาด้วยคำอื่น' : `ในหมวด${tabConfig[activeTab].label}`}
+                        </Typography>
+                    </Card>
+                </Fade>
             ) : (
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
-                    {filteredEvents.map((event) => (
-                        <Box key={event.id} sx={{ flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)', lg: '1 1 calc(33.333% - 11px)' } }}>
+                <Stack spacing={{ xs: 1, md: 2 }}>
+                    {filteredEvents.map((event, index) => (
+                        <Fade in timeout={150 + index * 50} key={event.id}>
                             <Card
+                                onClick={() => router.push(`/admin/progress/${event.id}`)}
                                 sx={{
                                     borderRadius: 3,
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
-                                    border: '1px solid rgba(0,0,0,0.05)',
-                                    transition: 'transform 0.2s, box-shadow 0.2s',
+                                    boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+                                    border: '1px solid #f5f5f5',
+                                    overflow: 'hidden',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
                                     '&:hover': {
-                                        transform: 'translateY(-4px)',
-                                        boxShadow: '0 8px 30px rgba(0,0,0,0.1)',
+                                        transform: { xs: 'none', md: 'translateX(4px)' },
+                                        boxShadow: '0 8px 25px rgba(0,0,0,0.08)',
+                                        borderColor: tabConfig[activeTab].color + '40',
                                     },
+                                    '&:active': {
+                                        transform: 'scale(0.98)',
+                                    }
                                 }}
                             >
-                                <CardContent sx={{ p: 3 }}>
-                                    {/* Customer Info */}
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                                        <Avatar
-                                            src={event.customer.pictureUrl || undefined}
-                                            sx={{ width: 45, height: 45 }}
-                                        >
-                                            <User size={20} />
-                                        </Avatar>
-                                        <Box sx={{ flex: 1 }}>
-                                            <Typography
+                                <Box sx={{ display: 'flex' }}>
+                                    {/* Left color bar - match active tab color */}
+                                    <Box sx={{
+                                        width: 4,
+                                        bgcolor: tabConfig[activeTab].color,
+                                        flexShrink: 0,
+                                    }} />
+
+                                    <CardContent sx={{ flex: 1, p: 2.5, '&:last-child': { pb: 2.5 } }}>
+                                        {/* Top row: Customer + Status */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                                            <Avatar
+                                                src={event.customer.pictureUrl || undefined}
                                                 sx={{
-                                                    fontFamily: 'var(--font-prompt)',
-                                                    fontWeight: 600,
-                                                    fontSize: '0.9rem',
+                                                    width: 44,
+                                                    height: 44,
+                                                    border: '2px solid #f5f5f5',
+                                                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
                                                 }}
                                             >
-                                                {event.customer.displayName || 'ไม่ระบุชื่อ'}
-                                            </Typography>
-                                            <Typography sx={{ fontSize: '0.75rem', color: 'gray' }}>
-                                                LINE User
-                                            </Typography>
-                                        </Box>
-                                        <Chip
-                                            label={statusLabels[event.status]?.label || event.status}
-                                            size="small"
-                                            sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontSize: '0.7rem',
-                                                bgcolor: statusLabels[event.status]?.bgColor || 'rgba(0,0,0,0.05)',
-                                                color: statusLabels[event.status]?.color || '#666',
-                                            }}
-                                        />
-                                    </Box>
-
-                                    <Divider sx={{ my: 1.5 }} />
-
-                                    {/* Event Info */}
-                                    <Typography
-                                        sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontWeight: 600,
-                                            fontSize: '1rem',
-                                            mb: 1.5,
-                                            color: '#1a1a1a',
-                                        }}
-                                    >
-                                        {event.eventName}
-                                    </Typography>
-
-                                    <Stack spacing={1} sx={{ mb: 2 }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                            <Calendar size={16} color="gray" variant="Bold" />
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem', color: 'gray' }}>
-                                                {event.eventDate
-                                                    ? new Date(event.eventDate).toLocaleDateString('th-TH', {
-                                                        year: 'numeric',
-                                                        month: 'short',
-                                                        day: 'numeric',
-                                                    })
-                                                    : 'ยังไม่กำหนดวัน'}
-                                            </Typography>
-                                        </Box>
-                                        {event.venue && (
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Location size={16} color="gray" variant="Bold" />
+                                                <User size={20} />
+                                            </Avatar>
+                                            <Box sx={{ flex: 1, minWidth: 0 }}>
                                                 <Typography
                                                     sx={{
                                                         fontFamily: 'var(--font-prompt)',
-                                                        fontSize: '0.8rem',
-                                                        color: 'gray',
+                                                        fontWeight: 600,
+                                                        fontSize: '0.9rem',
+                                                        color: '#1a1a1a',
                                                         overflow: 'hidden',
                                                         textOverflow: 'ellipsis',
                                                         whiteSpace: 'nowrap',
                                                     }}
                                                 >
-                                                    {event.venue}
+                                                    {event.customer.displayName || 'ไม่ระบุชื่อ'}
                                                 </Typography>
+                                                {event.customer.companyName && (
+                                                    <Typography sx={{
+                                                        fontSize: '0.75rem',
+                                                        color: '#999',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap',
+                                                    }}>
+                                                        {event.customer.companyName}
+                                                    </Typography>
+                                                )}
                                             </Box>
-                                        )}
-                                    </Stack>
-
-                                    {/* Action Button */}
-                                    <Button
-                                        fullWidth
-                                        variant="contained"
-                                        startIcon={<Send2 size={18} />}
-                                        onClick={() => openSendDialog(event)}
-                                        sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontWeight: 600,
-                                            bgcolor: 'var(--primary)',
-                                            borderRadius: 2,
-                                            textTransform: 'none',
-                                            boxShadow: 'none',
-                                            '&:hover': {
-                                                bgcolor: '#0d7472',
-                                                boxShadow: '0 4px 15px rgba(10, 92, 90, 0.3)',
-                                            },
-                                        }}
-                                    >
-                                        ส่งอัพเดท
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        </Box>
-                    ))}
-                </Box>
-            )}
-
-            {/* Send Dialog */}
-            <Dialog
-                open={dialogOpen}
-                onClose={() => setDialogOpen(false)}
-                maxWidth="sm"
-                fullWidth
-                PaperProps={{
-                    sx: { borderRadius: 3 },
-                }}
-            >
-                <DialogTitle sx={{ pb: 1 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700 }}>
-                            📤 ส่งอัพเดทให้ลูกค้า
-                        </Typography>
-                        <IconButton onClick={() => setDialogOpen(false)} size="small">
-                            <CloseCircle size={22} />
-                        </IconButton>
-                    </Box>
-                </DialogTitle>
-
-                <DialogContent>
-                    {selectedEvent && (
-                        <Box>
-                            {/* Selected Event Info */}
-                            <Card sx={{ bgcolor: 'rgba(10, 92, 90, 0.05)', mb: 3, borderRadius: 2 }}>
-                                <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <Avatar
-                                            src={selectedEvent.customer.pictureUrl || undefined}
-                                            sx={{ width: 40, height: 40 }}
-                                        />
-                                        <Box>
-                                            <Typography
-                                                sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '0.9rem' }}
-                                            >
-                                                {selectedEvent.customer.displayName}
-                                            </Typography>
-                                            <Typography sx={{ fontSize: '0.8rem', color: 'gray' }}>
-                                                {selectedEvent.eventName}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
-                                </CardContent>
-                            </Card>
-
-                            {/* Update Type Selection */}
-                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, mb: 1.5, fontSize: '0.9rem' }}>
-                                ประเภทการอัพเดท
-                            </Typography>
-                            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-                                {updateTypes.map((type) => {
-                                    const Icon = type.icon;
-                                    const isSelected = updateType === type.value;
-                                    return (
-                                        <Chip
-                                            key={type.value}
-                                            icon={<Icon size={16} variant={isSelected ? 'Bold' : 'Outline'} />}
-                                            label={type.label}
-                                            onClick={() => setUpdateType(type.value)}
-                                            sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                bgcolor: isSelected ? 'var(--primary)' : 'transparent',
-                                                color: isSelected ? '#fff' : 'gray',
-                                                border: `1px solid ${isSelected ? 'var(--primary)' : 'rgba(0,0,0,0.1)'}`,
-                                                '&:hover': {
-                                                    bgcolor: isSelected ? 'var(--primary)' : 'rgba(0,0,0,0.05)',
-                                                },
-                                            }}
-                                        />
-                                    );
-                                })}
-                            </Stack>
-
-                            {/* Form Fields */}
-                            {updateType === 'status' && (
-                                <>
-                                    <FormControl fullWidth sx={{ mb: 2 }}>
-                                        <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>สถานะใหม่</InputLabel>
-                                        <Select
-                                            value={newStatus}
-                                            label="สถานะใหม่"
-                                            onChange={(e) => setNewStatus(e.target.value)}
-                                            sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
-                                        >
-                                            <MenuItem value="confirmed">✅ ยืนยันแล้ว</MenuItem>
-                                            <MenuItem value="in-progress">🔄 กำลังดำเนินการ</MenuItem>
-                                            <MenuItem value="completed">🎉 เสร็จสิ้น</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                    <TextField
-                                        fullWidth
-                                        multiline
-                                        rows={3}
-                                        label="ข้อความเพิ่มเติม (ไม่บังคับ)"
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="เช่น ทีมงานเริ่มติดตั้งอุปกรณ์แล้ว..."
-                                        InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
-                                        InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
-                                    />
-                                </>
-                            )}
-
-                            {updateType === 'text' && (
-                                <TextField
-                                    fullWidth
-                                    multiline
-                                    rows={4}
-                                    label="ข้อความ"
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="พิมพ์ข้อความที่ต้องการส่ง..."
-                                    InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
-                                    InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
-                                />
-                            )}
-
-                            {updateType === 'image' && (
-                                <>
-                                    <TextField
-                                        fullWidth
-                                        label="URL รูปภาพ"
-                                        value={imageUrl}
-                                        onChange={(e) => setImageUrl(e.target.value)}
-                                        placeholder="https://example.com/image.jpg"
-                                        InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
-                                        InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
-                                        sx={{ mb: 2 }}
-                                    />
-                                    {imageUrl && (
-                                        <Box
-                                            sx={{
-                                                borderRadius: 2,
-                                                overflow: 'hidden',
-                                                border: '1px solid rgba(0,0,0,0.1)',
-                                            }}
-                                        >
-                                            <img
-                                                src={imageUrl}
-                                                alt="Preview"
-                                                style={{ width: '100%', maxHeight: 200, objectFit: 'cover' }}
-                                                onError={(e) => (e.currentTarget.style.display = 'none')}
+                                            <Chip
+                                                label={statusLabels[event.status]?.label || event.status}
+                                                size="small"
+                                                sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 600,
+                                                    height: 24,
+                                                    bgcolor: tabConfig[activeTab].bgColor,
+                                                    color: tabConfig[activeTab].color,
+                                                }}
                                             />
                                         </Box>
-                                    )}
-                                </>
-                            )}
 
-                            {/* Preview */}
-                            {(updateType === 'status' && newStatus) || (updateType === 'text' && message) ? (
-                                <Box sx={{ mt: 3, p: 2, bgcolor: '#E7F8E9', borderRadius: 2, border: '1px solid #C6F0C9' }}>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: 'gray', mb: 1 }}>
-                                        💬 Preview ข้อความที่จะส่ง
-                                    </Typography>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', whiteSpace: 'pre-line' }}>
-                                        {updateType === 'status' ? (
-                                            <>
-                                                {newStatus === 'confirmed' && '✅ ยืนยันการจองแล้ว'}
-                                                {newStatus === 'in-progress' && '🔄 กำลังดำเนินการ'}
-                                                {newStatus === 'completed' && '🎉 งานเสร็จสิ้น'}
-                                                {'\n\n📋 งาน: '}
-                                                {selectedEvent.eventName}
-                                                {message && `\n\n${message}`}
-                                            </>
-                                        ) : (
-                                            message
-                                        )}
-                                    </Typography>
+                                        {/* Event name */}
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'var(--font-prompt)',
+                                                fontWeight: 600,
+                                                fontSize: '1rem',
+                                                color: '#1a1a1a',
+                                                mb: 1.5,
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        >
+                                            {event.eventName}
+                                        </Typography>
+
+                                        {/* Bottom row: Date & Venue */}
+                                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5, flex: 1, minWidth: 0 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                    <Calendar size={14} color="#bbb" variant="Bold" />
+                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#999' }}>
+                                                        {event.eventDate
+                                                            ? new Date(event.eventDate).toLocaleDateString('th-TH', {
+                                                                day: 'numeric',
+                                                                month: 'short',
+                                                            })
+                                                            : 'ไม่ระบุ'}
+                                                    </Typography>
+                                                </Box>
+                                                {event.venue && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flex: 1, minWidth: 0 }}>
+                                                        <Location size={14} color="#bbb" variant="Bold" />
+                                                        <Typography
+                                                            sx={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontSize: '0.75rem',
+                                                                color: '#999',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                whiteSpace: 'nowrap',
+                                                            }}
+                                                        >
+                                                            {event.venue}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                            <IconButton size="small" sx={{ ml: 1 }}>
+                                                <ArrowRight2 size={18} color="#ccc" />
+                                            </IconButton>
+                                        </Box>
+                                    </CardContent>
                                 </Box>
-                            ) : null}
-                        </Box>
-                    )}
-                </DialogContent>
+                            </Card>
+                        </Fade>
+                    ))}
+                </Stack>
+            )}
 
-                <DialogActions sx={{ p: 2.5, pt: 0 }}>
-                    <Button
-                        onClick={() => setDialogOpen(false)}
-                        sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            color: 'gray',
-                            textTransform: 'none',
-                        }}
-                    >
-                        ยกเลิก
-                    </Button>
-                    <Button
-                        variant="contained"
-                        startIcon={sending ? <CircularProgress size={18} color="inherit" /> : <Send2 size={18} />}
-                        onClick={handleSend}
-                        disabled={!canSend() || sending}
-                        sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            fontWeight: 600,
-                            bgcolor: 'var(--primary)',
-                            borderRadius: 2,
-                            textTransform: 'none',
-                            px: 3,
-                            '&:hover': {
-                                bgcolor: '#0d7472',
-                            },
-                        }}
-                    >
-                        ส่งข้อความ
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            {/* Snackbar */}
             <Snackbar
                 open={snackbar.open}
                 autoHideDuration={4000}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert
                     severity={snackbar.severity}
                     variant="filled"
                     onClose={() => setSnackbar({ ...snackbar, open: false })}
-                    sx={{ fontFamily: 'var(--font-prompt)' }}
+                    sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 3 }}
                 >
                     {snackbar.message}
                 </Alert>

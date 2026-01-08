@@ -53,9 +53,11 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?   // เพิ่มสำหรับ Credentials Login
-  role          String    @default("admin") // admin, staff
+  role          String    @default("admin") // admin, sales, user
+  position      String?   // ตำแหน่งเจ้าหน้าที่
   accounts      Account[]
   sessions      Session[]
+  customers     Customer[] // ลูกค้าที่ดูแล (sales)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -70,10 +72,12 @@ model Customer {
   email         String?
   companyName   String?
   status        String    @default("new") // new, pending, active
+  salesId       String?   // Sales ที่ดูแลลูกค้านี้
   firstMessageAt DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  sales         User?     @relation(fields: [salesId], references: [id], onDelete: SetNull)
   events        Event[]
   chatLogs      ChatLog[]
 }
@@ -96,6 +100,7 @@ model Event {
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   bookings    Booking[]
   timelines   EventTimeline[]
+  chatLogs    ChatLog[]
 }
 
 // EventTimeline - Timeline ของงาน (แจ้งความคืบหน้า)
@@ -137,7 +142,9 @@ model ChatLog {
   message     String   @db.Text
   direction   String   // inbound, outbound
   messageType String   @default("text") // text, image, sticker
+  eventId     String?  // Optional: Link chat to specific event
   createdAt   DateTime @default(now())
 
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  event       Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
 }

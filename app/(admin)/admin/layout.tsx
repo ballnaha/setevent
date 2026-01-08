@@ -1,88 +1,164 @@
 'use client';
 
-import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu } from 'iconsax-react';
+import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction, Tooltip } from '@mui/material';
+import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { signOut, useSession } from 'next-auth/react';
 
 const drawerWidth = 260;
 
-const menuItems = [
-    { label: 'Dashboard', href: '/admin', icon: Home3 },
-    { label: 'Events', href: '/admin/events', icon: Calendar },
-    { label: 'Customers', href: '/admin/customers', icon: People },
-    { label: 'ส่งอัพเดทลูกค้า', href: '/admin/progress', icon: Message },
-    { label: 'Settings', href: '/admin/settings', icon: Setting2 },
+// Menu items with allowed roles
+// Sidebar Menu Items
+const sidebarItems = [
+    { label: 'Dashboard', href: '/admin', icon: Home3, roles: ['admin'] },
+    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin'] },
+    { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
+    { label: 'ส่งอัพเดทลูกค้า', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
+    { label: 'จัดการผู้ใช้', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },
+    { label: 'Settings', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
+];
+
+// Bottom Navigation Items (Mobile) - Can be different from Sidebar
+const bottomNavItems = [
+    { label: 'Home', href: '/admin', icon: Home3, roles: ['admin'] },
+    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin'] },
+    { label: 'ลูกค้า', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
+    { label: 'แชท', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
+    { label: 'More', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const { data: session } = useSession();
+    const [userRole, setUserRole] = useState<string>('user');
+
+    // Fetch user role from API
+    useEffect(() => {
+        async function fetchUserRole() {
+            if (session?.user?.email) {
+                try {
+                    const res = await fetch('/api/admin/users');
+                    const users = await res.json();
+                    const currentUser = users.find((u: any) => u.email === session.user?.email);
+                    if (currentUser) {
+                        setUserRole(currentUser.role);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user role:', error);
+                }
+            }
+        }
+        fetchUserRole();
+    }, [session]);
+
+    // Filter menu items based on user role
+    const desktopMenuItems = sidebarItems.filter(item => item.roles.includes(userRole));
+    const mobileMenuItems = bottomNavItems.filter(item => item.roles.includes(userRole));
+
+    const handleLogout = () => {
+        signOut({ callbackUrl: '/admin/login' });
+    };
 
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
     };
 
     const drawer = (
-        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', bgcolor: '#0a0a0a' }}>
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', background: 'linear-gradient(180deg, #111827 0%, #000000 100%)' }}>
             {/* Nav Items */}
-            <List sx={{ flex: 1, px: 2, py: 2 }}>
-                {menuItems.map((item) => {
-                    const isActive = pathname === item.href;
-                    const Icon = item.icon;
-                    return (
-                        <ListItem key={item.href} disablePadding sx={{ mb: 0.5 }}>
-                            <ListItemButton
-                                component={Link}
-                                href={item.href}
-                                sx={{
-                                    borderRadius: 0,
-                                    borderLeft: isActive ? '4px solid #0A5C5A' : '4px solid transparent',
-                                    py: 1.5,
-                                    bgcolor: isActive ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                    '&:hover': {
-                                        bgcolor: 'rgba(255,255,255,0.08)',
-                                    },
-                                    transition: 'all 0.2s'
-                                }}
-                            >
-                                <ListItemIcon sx={{ minWidth: 40 }}>
-                                    <Icon
-                                        size={20}
-                                        color={isActive ? '#0A5C5A' : 'rgba(255,255,255,0.5)'}
-                                        variant={isActive ? 'Bold' : 'Outline'}
-                                    />
-                                </ListItemIcon>
-                                <ListItemText
-                                    primary={item.label}
-                                    primaryTypographyProps={{
-                                        fontFamily: 'var(--font-prompt)',
-                                        fontSize: '0.9rem',
-                                        fontWeight: isActive ? 600 : 400,
-                                        color: isActive ? '#fff' : 'rgba(255,255,255,0.7)',
-                                        letterSpacing: 0.5
+            <Box sx={{ p: 2 }}>
+                <Typography sx={{
+                    fontFamily: 'var(--font-prompt)',
+                    fontSize: '0.75rem',
+                    color: 'rgba(255,255,255,0.4)',
+                    mb: 1,
+                    pl: 1.5,
+                    textTransform: 'uppercase',
+                    fontWeight: 600,
+                    letterSpacing: 1
+                }}>
+                    Menu
+                </Typography>
+                <List sx={{ flex: 1 }}>
+                    {desktopMenuItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        const Icon = item.icon;
+                        return (
+                            <ListItem key={item.href} disablePadding sx={{ mb: 1 }}>
+                                <ListItemButton
+                                    component={Link}
+                                    href={item.href}
+                                    onClick={() => setMobileOpen(false)}
+                                    sx={{
+                                        borderRadius: 3,
+                                        mx: 1,
+                                        py: 1.2,
+                                        px: 2,
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        bgcolor: isActive ? '#0A5C5A' : 'transparent',
+                                        background: isActive ? 'linear-gradient(135deg, #0A5C5A 0%, #053b3a 100%)' : 'transparent',
+                                        boxShadow: isActive ? '0 8px 16px -4px rgba(10, 92, 90, 0.5)' : 'none',
+                                        '&:hover': {
+                                            bgcolor: isActive ? '#0A5C5A' : 'rgba(255,255,255,0.05)',
+                                        },
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        '&::before': isActive ? {
+                                            content: '""',
+                                            position: 'absolute',
+                                            left: 0,
+                                            top: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                            background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
+                                            pointerEvents: 'none'
+                                        } : {}
                                     }}
-                                />
-                            </ListItemButton>
-                        </ListItem>
-                    );
-                })}
-            </List>
+                                >
+                                    <ListItemIcon sx={{ minWidth: 36 }}>
+                                        <Icon
+                                            size={22}
+                                            color={isActive ? '#FFFFFF' : '#9CA3AF'}
+                                            variant={isActive ? 'Bold' : 'Outline'}
+                                        />
+                                    </ListItemIcon>
+                                    <ListItemText
+                                        primary={item.label}
+                                        primaryTypographyProps={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontSize: '0.9rem',
+                                            fontWeight: isActive ? 600 : 400,
+                                            color: isActive ? '#FFFFFF' : '#D1D5DB',
+                                            letterSpacing: 0.3
+                                        }}
+                                    />
+                                    {isActive && (
+                                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.8)' }} />
+                                    )}
+                                </ListItemButton>
+                            </ListItem>
+                        );
+                    })}
+                </List>
+            </Box>
         </Box>
     );
 
+
     return (
-        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#f8f9fa' }}>
+        <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#F3F4F6' }}>
             {/* Global AppBar (Header) */}
             <AppBar
                 position="fixed"
                 sx={{
                     zIndex: (theme) => theme.zIndex.drawer + 1,
-                    bgcolor: 'rgba(26, 26, 26, 0.9)',
+                    bgcolor: 'rgba(17, 24, 39, 0.95)', // Deep slate almost black
                     backdropFilter: 'blur(20px)',
-                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                    borderBottom: '1px solid rgba(255,255,255,0.1)'
+                    boxShadow: '0 4px 24px rgba(0,0,0,0.2)',
+                    borderBottom: '1px solid rgba(255,255,255,0.08)'
                 }}
             >
                 <Toolbar sx={{ justifyContent: 'space-between', minHeight: { xs: 64, md: 70 } }}>
@@ -93,20 +169,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             onClick={handleDrawerToggle}
                             sx={{ mr: 2, display: { md: 'none' }, color: '#FFF' }}
                         >
-                            <HambergerMenu size="32" color="#FFF" variant="TwoTone" />
+                            <HambergerMenu size="28" color="#FFF" />
                         </IconButton>
 
                         {/* Logo for Admin */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src="/images/logo_white.png" alt="Logo" style={{ height: 32 }} />
-                            <Box sx={{ height: 24, w: '1px', bgcolor: 'rgba(255,255,255,0.2)', mx: 2, display: { xs: 'none', sm: 'block' } }} />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <img src="/images/logo_white.png" alt="Logo" style={{ height: 32, filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+                            <Box sx={{ height: 24, width: '1px', bgcolor: 'rgba(255,255,255,0.15)', display: { xs: 'none', sm: 'block' } }} />
                             <Typography
                                 sx={{
                                     fontFamily: 'var(--font-prompt)',
                                     fontSize: '0.85rem',
-                                    color: 'rgba(255,255,255,0.5)',
-                                    letterSpacing: 1,
+                                    fontWeight: 500,
+                                    color: 'rgba(255,255,255,0.7)',
+                                    letterSpacing: 2,
                                     textTransform: 'uppercase',
                                     display: { xs: 'none', sm: 'block' }
                                 }}
@@ -117,16 +193,37 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     </Box>
 
                     {/* Right Side: User Profile */}
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
                         <Box sx={{ textAlign: 'right', display: { xs: 'none', sm: 'block' } }}>
-                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: '#fff', fontWeight: 500 }}>
-                                Admin
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem', color: '#fff', fontWeight: 500, lineHeight: 1.2 }}>
+                                {session?.user?.name || 'Admin'}
+                            </Typography>
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: 'rgba(255,255,255,0.5)', lineHeight: 1.2 }}>
+                                {userRole}
                             </Typography>
                         </Box>
-                        <Avatar sx={{ width: 38, height: 38, bgcolor: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)' }}>A</Avatar>
-                        <IconButton size="small" sx={{ color: 'rgba(255,255,255,0.6)', '&:hover': { color: '#fff' } }}>
-                            <Logout size={20} color="#FFFFFF" />
-                        </IconButton>
+                        <Avatar sx={{
+                            width: 40,
+                            height: 40,
+                            bgcolor: 'rgba(255,255,255,0.05)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            boxShadow: '0 0 15px rgba(255,255,255,0.05)'
+                        }}>
+                            {session?.user?.name?.charAt(0).toUpperCase() || 'A'}
+                        </Avatar>
+                        <Tooltip title="ออกจากระบบ" arrow>
+                            <IconButton
+                                size="small"
+                                onClick={handleLogout}
+                                sx={{
+                                    color: 'rgba(255,255,255,0.5)',
+                                    transition: 'all 0.2s',
+                                    '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' }
+                                }}
+                            >
+                                <Logout size={20} color="white" />
+                            </IconButton>
+                        </Tooltip>
                     </Box>
                 </Toolbar>
             </AppBar>
@@ -141,10 +238,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     display: { xs: 'block', md: 'none' },
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
-                        bgcolor: '#0a0a0a',
+                        bgcolor: '#111827',
                         backgroundImage: 'none',
                         boxSizing: 'border-box',
                         pt: '70px',
+                        borderRight: '1px solid rgba(255,255,255,0.05)'
                     },
                 }}
             >
@@ -158,18 +256,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     display: { xs: 'none', md: 'block' },
                     width: drawerWidth,
                     flexShrink: 0,
-                    zIndex: (theme) => theme.zIndex.drawer, // Lower than AppBar
+                    zIndex: (theme) => theme.zIndex.drawer,
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         boxSizing: 'border-box',
-                        bgcolor: '#0a0a0a',
-                        backgroundImage: 'none',
-                        border: 'none',
-                        borderRight: '1px solid rgba(255,255,255,0.1)',
+                        bgcolor: '#111827',
+                        borderRight: '1px solid rgba(255,255,255,0.05)',
                     },
                 }}
             >
-                <Toolbar sx={{ minHeight: { xs: 64, md: 70 } }} /> {/* Spacer for Header */}
+                <Toolbar sx={{ minHeight: { xs: 64, md: 70 } }} />
                 {drawer}
             </Drawer>
 
@@ -182,8 +278,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     display: 'flex',
                     flexDirection: 'column',
                     minHeight: '100vh',
-                    pt: { xs: '64px', md: '70px' }, // Space for Header
-                    pb: { xs: '65px', md: 0 }, // Space for Bottom Nav on Mobile
+                    pt: { xs: '64px', md: '70px' },
+                    pb: { xs: '80px', md: 0 },
+                    overflowX: 'hidden'
                 }}
             >
                 {/* Content Area */}
@@ -191,34 +288,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <Container maxWidth="xl" sx={{ py: 4 }}>
                         {children}
                     </Container>
-                </Box>
-
-                {/* Admin Footer (Copyright) */}
-                <Box
-                    component="footer"
-                    sx={{
-                        py: 3,
-                        px: 3,
-                        bgcolor: 'white',
-                        borderTop: '1px solid rgba(0,0,0,0.05)',
-                        mt: 'auto',
-                        mb: { xs: 2, md: 0 } // Lift up slightly on mobile
-                    }}
-                >
-                    <Box sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', sm: 'row' },
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        gap: 1
-                    }}>
-                        <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: '#666' }}>
-                            &copy; {new Date().getFullYear()} SetEvent Admin Panel
-                        </Typography>
-                        <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: '#999' }}>
-                            Version 1.0.0
-                        </Typography>
-                    </Box>
                 </Box>
             </Box>
 
@@ -229,11 +298,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    display: { xs: 'block', md: 'none' }, // Visible on Mobile Only
+                    display: { xs: 'block', md: 'none' },
                     zIndex: 1200,
-                    borderRadius: 0,
-                    boxShadow: '0 -4px 20px rgba(0,0,0,0.05)',
-                    borderTop: '1px solid rgba(0,0,0,0.05)'
+                    borderRadius: '20px 20px 0 0',
+                    boxShadow: '0 -4px 25px rgba(0,0,0,0.05)',
+                    borderTop: '1px solid rgba(0,0,0,0.03)',
+                    overflow: 'hidden'
                 }}
                 elevation={0}
             >
@@ -241,35 +311,46 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     showLabels
                     value={pathname}
                     sx={{
-                        height: 65,
-                        bgcolor: 'white',
+                        height: 60,
+                        bgcolor: 'rgba(255,255,255,0.95)',
+                        backdropFilter: 'blur(10px)',
                     }}
                 >
-                    {menuItems.map((item) => {
+                    {mobileMenuItems.map((item) => {
                         const isActive = pathname === item.href;
                         const Icon = item.icon;
-                        // Shorten label for mobile if needed
-                        let mobileLabel = item.label;
-                        if (item.label === 'ส่งอัพเดทลูกค้า') mobileLabel = 'แชท';
-
                         return (
                             <BottomNavigationAction
                                 key={item.href}
-                                label={mobileLabel}
+                                label={item.label}
                                 value={item.href}
                                 component={Link}
                                 href={item.href}
-                                icon={<Icon size={24} variant={isActive ? 'Bold' : 'Outline'} color={isActive ? '#0A5C5A' : '#A5A5A5'} />}
+                                icon={
+                                    <Box sx={{
+                                        p: 0.5,
+                                        borderRadius: '12px',
+                                        bgcolor: isActive ? '#0A5C5A' : 'transparent',
+                                        color: isActive ? 'white' : '#9CA3AF',
+                                        mb: 0.5,
+                                        transition: 'all 0.2s',
+                                        boxShadow: isActive ? '0 4px 12px rgba(10, 92, 90, 0.3)' : 'none'
+                                    }}>
+                                        <Icon size={22} variant={isActive ? 'Bold' : 'Outline'} color="currentColor" />
+                                    </Box>
+                                }
                                 sx={{
                                     fontFamily: 'var(--font-prompt)',
-                                    color: isActive ? 'var(--primary)' : '#999',
+                                    color: isActive ? '#0A5C5A' : '#9CA3AF',
+                                    minWidth: 'auto',
+                                    padding: '6px 0',
                                     '&.Mui-selected': {
-                                        color: 'var(--primary)',
+                                        color: '#0A5C5A',
                                     },
                                     '& .MuiBottomNavigationAction-label': {
                                         fontFamily: 'var(--font-prompt)',
-                                        fontSize: '0.7rem',
-                                        mt: 0.5
+                                        fontSize: '0.65rem',
+                                        fontWeight: isActive ? 600 : 500,
                                     }
                                 }}
                             />

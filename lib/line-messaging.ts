@@ -272,6 +272,187 @@ export async function sendEventCard(
 }
 
 /**
+ * สร้าง Flex Message สำหรับแจ้งเตือนสถานะ
+ */
+export function createStatusFlexMessage(
+    eventName: string,
+    status: 'confirmed' | 'in-progress' | 'completed' | 'cancelled',
+    message?: string,
+    progress?: number,
+    senderName?: string
+): FlexMessage {
+    const statusConfig: Record<string, any> = {
+        'in-progress': {
+            label: 'กำลังดำเนินการ',
+            color: '#F59E0B', // Orange
+            bgColor: '#FEF3C7'
+        },
+        'completed': {
+            label: 'ปิดงาน',
+            color: '#10B981', // Green
+            bgColor: '#D1FAE5'
+        },
+        'cancelled': {
+            label: 'ยกเลิก',
+            color: '#EF4444', // Red
+            bgColor: '#FEE2E2'
+        }
+    };
+
+    const config = statusConfig[status] || statusConfig['in-progress'];
+
+    // Ensure progress is within 0-100 if provided
+    const validProgress = progress !== undefined ? Math.max(0, Math.min(100, progress)) : undefined;
+
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
+    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+
+    const bubble: any = {
+        type: 'bubble',
+        size: 'mega',
+        body: {
+            type: 'box',
+            layout: 'vertical',
+            paddingAll: '20px',
+            backgroundColor: '#ffffff',
+            contents: [
+                // Header Row
+                {
+                    type: 'box',
+                    layout: 'horizontal',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    contents: [
+                        {
+                            type: 'text',
+                            text: 'UPDATE STATUS',
+                            weight: 'bold',
+                            color: config.color,
+                            size: 'xs'
+                        },
+                        {
+                            type: 'text',
+                            text: `${dateStr} • ${timeStr}`,
+                            size: 'xs',
+                            color: '#b0b0b0',
+                            align: 'end'
+                        }
+                    ],
+                },
+                // Main Status Title
+                {
+                    type: 'text',
+                    text: config.label,
+                    weight: 'bold',
+                    size: 'xl',
+                    color: '#1a1a1a',
+                    margin: 'sm',
+                    wrap: true
+                },
+                // Project Name
+                {
+                    type: 'text',
+                    text: eventName,
+                    size: 'sm',
+                    color: '#666666',
+                    wrap: true,
+                    margin: 'xs'
+                },
+                // Divider
+                {
+                    type: 'separator',
+                    color: '#f0f0f0',
+                    margin: 'lg'
+                }
+            ]
+        }
+    };
+
+    // Progress Section
+    if (validProgress !== undefined) {
+        const progressColor = validProgress === 100 ? '#10B981' : config.color;
+
+        bubble.body.contents.push({
+            type: 'box',
+            layout: 'vertical',
+            margin: 'lg',
+            contents: [
+                {
+                    type: 'box',
+                    layout: 'horizontal',
+                    justifyContent: 'space-between',
+                    contents: [
+                        { type: 'text', text: 'Progress', size: 'xs', color: '#aaaaaa', weight: 'bold' },
+                        { type: 'text', text: `${validProgress}%`, size: 'xs', weight: 'bold', color: progressColor }
+                    ]
+                },
+                {
+                    type: 'box',
+                    layout: 'vertical',
+                    width: '100%',
+                    backgroundColor: '#f5f5f5',
+                    height: '6px',
+                    cornerRadius: '3px',
+                    margin: 'sm',
+                    contents: [
+                        {
+                            type: 'box',
+                            layout: 'vertical',
+                            width: `${validProgress}%`,
+                            backgroundColor: progressColor,
+                            height: '6px',
+                            cornerRadius: '3px',
+                            contents: []
+                        }
+                    ]
+                }
+            ]
+        });
+    }
+
+    // Message Section
+    if (message) {
+        bubble.body.contents.push({
+            type: 'box',
+            layout: 'vertical',
+            margin: 'lg',
+            backgroundColor: '#f9f9f9',
+            cornerRadius: 'md',
+            paddingAll: 'md',
+            contents: [
+                {
+                    type: 'text',
+                    text: message,
+                    size: 'sm',
+                    color: '#555555',
+                    wrap: true,
+                    lineSpacing: '4px'
+                }
+            ]
+        });
+    }
+
+    // Sender Name Footer
+    if (senderName) {
+        bubble.body.contents.push({
+            type: 'text',
+            text: `— ${senderName}`,
+            size: 'xxs',
+            color: '#aaaaaa',
+            align: 'end',
+            margin: 'lg'
+        });
+    }
+
+    return {
+        type: 'flex',
+        altText: `แจ้งเตือนสถานะ: ${config.label}`,
+        contents: bubble
+    };
+}
+
+/**
  * ส่งข้อความแจ้งเตือนสถานะงาน
  */
 export async function sendStatusNotification(
@@ -280,21 +461,8 @@ export async function sendStatusNotification(
     status: 'confirmed' | 'in-progress' | 'completed',
     message?: string
 ) {
-    const statusEmoji = {
-        'confirmed': '✅',
-        'in-progress': '🔄',
-        'completed': '🎉',
-    };
-
-    const statusText = {
-        'confirmed': 'ยืนยันการจองแล้ว',
-        'in-progress': 'กำลังดำเนินการ',
-        'completed': 'งานเสร็จสิ้น',
-    };
-
-    const text = `${statusEmoji[status]} ${statusText[status]}\n\n📋 งาน: ${eventName}${message ? `\n\n${message}` : ''}`;
-
-    return sendText(lineUid, text);
+    const flexMessage = createStatusFlexMessage(eventName, status, message);
+    return pushMessage(lineUid, [flexMessage]);
 }
 
 /**

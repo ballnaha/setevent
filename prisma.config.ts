@@ -13,4 +13,8 @@ export default defineConfig({
   datasource: {
     url: env("DATABASE_URL"),
   },
+  // @ts-expect-error - seed property is supported but types might be outdated
+  seed: {
+    command: "tsx prisma/seed.ts",
+  },
 });
