@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { sendText, sendImage, sendEventCard, sendStatusNotification, sendQuotation, pushMessage, LineMessage } from '@/lib/line-messaging';
+import { sendText, sendImage, sendEventCard, sendStatusNotification, sendQuotation, sendAdminMessage, pushMessage, LineMessage } from '@/lib/line-messaging';
 
 // POST /api/line/send-message
 export async function POST(request: NextRequest) {
@@ -72,6 +72,19 @@ export async function POST(request: NextRequest) {
                     data.totalPrice,
                     data.pdfUrl,
                     data.liffUrl
+                );
+                break;
+
+            case 'admin-message':
+                // ส่งข้อความจากผู้ดูแล
+                // body: { type: 'admin-message', subject, message, imageUrl?, actionUrl?, actionLabel? }
+                result = await sendAdminMessage(
+                    targetLineUid,
+                    data.subject,
+                    data.message,
+                    data.imageUrl,
+                    data.actionUrl,
+                    data.actionLabel
                 );
                 break;
 

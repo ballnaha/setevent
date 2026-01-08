@@ -375,3 +375,104 @@ export async function sendQuotation(
         },
     }]);
 }
+
+/**
+ * ส่งข้อความจากผู้ดูแล (Admin Message)
+ * ออกแบบให้ดูเป็นทางการ (Professional Look)
+ */
+export async function sendAdminMessage(
+    lineUid: string,
+    subject: string,
+    message: string,
+    imageUrl?: string,
+    actionUrl?: string,
+    actionLabel: string = 'ดูรายละเอียด'
+) {
+    const bubble: any = {
+        type: 'bubble',
+        size: 'mega',
+        body: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+                {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                        {
+                            type: 'text',
+                            text: 'ADMIN MESSAGE',
+                            weight: 'bold',
+                            color: '#0A5C5A', // Primary Color
+                            size: 'xs',
+                            flex: 1
+                        }
+                    ],
+                    marginBottom: 'md'
+                },
+                {
+                    type: 'text',
+                    text: subject,
+                    weight: 'bold',
+                    size: 'xl',
+                    wrap: true,
+                    color: '#1a1a1a'
+                },
+                {
+                    type: 'separator',
+                    margin: 'lg',
+                    color: '#E5E7EB'
+                },
+                {
+                    type: 'text',
+                    text: message,
+                    size: 'sm',
+                    color: '#4B5563',
+                    margin: 'lg',
+                    wrap: true,
+                    lineSpacing: '4px'
+                }
+            ]
+        }
+    };
+
+    if (imageUrl) {
+        bubble.hero = {
+            type: 'image',
+            url: imageUrl,
+            size: 'full',
+            aspectRatio: '20:13',
+            aspectMode: 'cover',
+            action: actionUrl ? { type: 'uri', uri: actionUrl } : undefined
+        };
+    }
+
+    if (actionUrl) {
+        bubble.footer = {
+            type: 'box',
+            layout: 'vertical',
+            spacing: 'sm',
+            contents: [
+                {
+                    type: 'button',
+                    style: 'primary',
+                    height: 'sm',
+                    action: {
+                        type: 'uri',
+                        label: actionLabel,
+                        uri: actionUrl
+                    },
+                    color: '#0A5C5A'
+                }
+            ],
+            paddingAll: 'lg'
+        };
+    }
+
+    return pushMessage(lineUid, [{
+        type: 'flex',
+        altText: `ข้อความจากผู้ดูแล: ${subject}`,
+        contents: bubble
+    }]);
+}
+

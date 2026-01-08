@@ -1,7 +1,6 @@
 'use client';
 
 import { Box } from "@mui/material";
-import LiffHeader from "./components/LiffHeader";
 import LiffNavbar from "./components/LiffNavbar";
 
 export default function LiffLayout({
@@ -26,32 +25,18 @@ export default function LiffLayout({
       `}</style>
 
             <Box
+                component="main"
                 sx={{
-                    position: 'fixed',
-                    inset: 0,
-                    zIndex: 9999,
-                    bgcolor: '#ffffff',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
+                    flex: 1,
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    WebkitOverflowScrolling: 'touch',
                 }}
             >
-                <LiffHeader />
-                <Box
-                    component="main"
-                    sx={{
-                        flex: 1,
-                        pb: '75px',
-                        pt: '15px', // Space for curved header overlap
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
-                    }}
-                >
-                    {children}
-                </Box>
-                <LiffNavbar />
+                {children}
             </Box>
+            <LiffNavbar />
+
         </>
     );
 }
-
