@@ -72,6 +72,9 @@ export const metadata: Metadata = {
     },
   },
   manifest: "/manifest.json",
+  other: {
+    google: "notranslate",
+  },
 };
 
 export const viewport: Viewport = {
