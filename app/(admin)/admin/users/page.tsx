@@ -28,16 +28,20 @@ import {
     InputAdornment,
     Fade,
     Tooltip,
+    useTheme,
+    useMediaQuery,
 } from '@mui/material';
 import { Add, Edit2, Trash, UserSquare, ShieldSecurity, User as UserIcon, SearchNormal1, Warning2 } from 'iconsax-react';
 import TopSnackbar from '@/components/ui/TopSnackbar';
 
 interface User {
     id: string;
+    username: string | null;
     name: string | null;
     email: string | null;
     role: string;
     position: string | null;
+    status: string;
     createdAt: string;
 }
 
@@ -69,6 +73,8 @@ const roleConfig: Record<string, { label: string; color: string; bgColor: string
 };
 
 export default function UsersPage() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [users, setUsers] = useState<User[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
@@ -77,7 +83,7 @@ export default function UsersPage() {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deletingUser, setDeletingUser] = useState<User | null>(null);
     const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'user', position: '' });
+    const [formData, setFormData] = useState({ username: '', name: '', email: '', password: '', confirmPassword: '', role: 'user', position: '', status: 'active' });
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
@@ -116,16 +122,18 @@ export default function UsersPage() {
         if (user) {
             setEditingUser(user);
             setFormData({
+                username: user.username || '',
                 name: user.name || '',
                 email: user.email || '',
                 password: '',
                 confirmPassword: '',
                 role: user.role,
-                position: user.position || ''
+                position: user.position || '',
+                status: user.status || 'active'
             });
         } else {
             setEditingUser(null);
-            setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'user', position: '' });
+            setFormData({ username: '', name: '', email: '', password: '', confirmPassword: '', role: 'user', position: '', status: 'active' });
         }
         setDialogOpen(true);
     }
@@ -133,7 +141,7 @@ export default function UsersPage() {
     function handleCloseDialog() {
         setDialogOpen(false);
         setEditingUser(null);
-        setFormData({ name: '', email: '', password: '', confirmPassword: '', role: 'user', position: '' });
+        setFormData({ username: '', name: '', email: '', password: '', confirmPassword: '', role: 'user', position: '', status: 'active' });
     }
 
     async function handleSave() {
@@ -156,10 +164,12 @@ export default function UsersPage() {
             const method = editingUser ? 'PATCH' : 'POST';
 
             const body: any = {
+                username: formData.username,
                 name: formData.name,
                 email: formData.email,
                 role: formData.role,
                 position: formData.position || null,
+                status: formData.status,
             };
             if (formData.password) {
                 body.password = formData.password;
@@ -397,6 +407,21 @@ export default function UsersPage() {
                                         </Typography>
                                     )}
 
+                                    <Box sx={{ mt: 1 }}>
+                                        <Chip
+                                            label={user.status === 'active' ? 'ใช้งาน' : 'ระงับการใช้งาน'}
+                                            size="small"
+                                            sx={{
+                                                height: 22,
+                                                fontSize: '0.7rem',
+                                                bgcolor: user.status === 'active' ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                                                color: user.status === 'active' ? '#10B981' : '#EF4444',
+                                                fontFamily: 'var(--font-prompt)',
+                                                fontWeight: 500
+                                            }}
+                                        />
+                                    </Box>
+
                                     {/* Divider */}
                                     <Box sx={{ borderTop: '1px solid #f0f0f0', my: 2 }} />
 
@@ -462,17 +487,32 @@ export default function UsersPage() {
             <Dialog
                 open={dialogOpen}
                 onClose={handleCloseDialog}
+                fullScreen={isMobile}
                 maxWidth="sm"
                 fullWidth
                 PaperProps={{
-                    sx: { borderRadius: 3 }
+                    sx: { borderRadius: isMobile ? 0 : 3 }
                 }}
             >
-                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, pb: 1 }}>
-                    {editingUser ? '✏️ แก้ไขผู้ใช้' : '➕ เพิ่มผู้ใช้ใหม่'}
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ fontSize: '1.25rem', fontWeight: 600 }}>
+                        {editingUser ? '✏️ แก้ไขผู้ใช้' : '➕ เพิ่มผู้ใช้ใหม่'}
+                    </Box>
+                    <IconButton edge="end" color="inherit" onClick={handleCloseDialog} aria-label="close">
+                        <Add size={24} style={{ transform: 'rotate(45deg)' }} />
+                    </IconButton>
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
+                        <TextField
+                            label="ชื่อผู้ใช้ (Username)"
+                            fullWidth
+                            required
+                            value={formData.username}
+                            onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                            InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
+                            InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                        />
                         <TextField
                             label="ชื่อ-นามสกุล"
                             fullWidth
@@ -527,34 +567,49 @@ export default function UsersPage() {
                             />
                         </Box>
 
-                        <FormControl fullWidth>
-                            <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>บทบาท</InputLabel>
-                            <Select
-                                value={formData.role}
-                                label="บทบาท"
-                                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                                sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
-                            >
-                                {Object.entries(roleConfig).map(([key, config]) => (
-                                    <MenuItem key={key} value={key}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                            <Box sx={{
-                                                width: 28,
-                                                height: 28,
-                                                borderRadius: '50%',
-                                                bgcolor: config.bgColor,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}>
-                                                <config.icon size={16} color={config.color} />
+                        <Box sx={{ display: 'flex', gap: 2 }}>
+                            <FormControl fullWidth>
+                                <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>บทบาท</InputLabel>
+                                <Select
+                                    value={formData.role}
+                                    label="บทบาท"
+                                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                                    sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+                                >
+                                    {Object.entries(roleConfig).map(([key, config]) => (
+                                        <MenuItem key={key} value={key}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                <Box sx={{
+                                                    width: 28,
+                                                    height: 28,
+                                                    borderRadius: '50%',
+                                                    bgcolor: config.bgColor,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
+                                                }}>
+                                                    <config.icon size={16} color={config.color} />
+                                                </Box>
+                                                <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>{config.label}</Typography>
                                             </Box>
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>{config.label}</Typography>
-                                        </Box>
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+
+                            <FormControl fullWidth>
+                                <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>สถานะ</InputLabel>
+                                <Select
+                                    value={formData.status}
+                                    label="สถานะ"
+                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                    sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+                                >
+                                    <MenuItem value="active" sx={{ fontFamily: 'var(--font-prompt)' }}>เปิดใช้งาน (Active)</MenuItem>
+                                    <MenuItem value="disabled" sx={{ fontFamily: 'var(--font-prompt)' }}>ระงับการใช้งาน (Disabled)</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Box>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ p: 3, pt: 2 }}>

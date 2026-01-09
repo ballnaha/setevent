@@ -1,9 +1,29 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
 async function seedMockData() {
     console.log('🌱 Starting seed...');
+
+    // Create/Update Admin User
+    const adminPassword = await bcrypt.hash('password123', 10);
+    const admin = await prisma.user.upsert({
+        where: { email: 'admin@example.com' },
+        update: {
+            username: 'admin',
+            role: 'admin',
+            password: adminPassword,
+        },
+        create: {
+            email: 'admin@example.com',
+            username: 'admin',
+            name: 'Admin User',
+            role: 'admin',
+            password: adminPassword,
+        }
+    });
+    console.log('✅ Admin user ready:', admin.username);
 
     // Mock LINE UID (ใช้ตัวเดียวกับ mock mode ใน liff.ts)
     const mockLineUid = 'U28a72146890f8dfa7fbbac7560d3195e';

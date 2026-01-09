@@ -279,23 +279,28 @@ export function createStatusFlexMessage(
     status: 'confirmed' | 'in-progress' | 'completed' | 'cancelled',
     message?: string,
     progress?: number,
-    senderName?: string
+    senderName?: string,
+    venue?: string,
+    eventDate?: string
 ): FlexMessage {
     const statusConfig: Record<string, any> = {
         'in-progress': {
             label: 'กำลังดำเนินการ',
-            color: '#F59E0B', // Orange
-            bgColor: '#FEF3C7'
+            color: '#F59E0B',
+            bgColor: '#FFF7ED',
+            barColor: '#F59E0B'
         },
         'completed': {
             label: 'ปิดงาน',
-            color: '#10B981', // Green
-            bgColor: '#D1FAE5'
+            color: '#10B981',
+            bgColor: '#ECFDF5',
+            barColor: '#10B981'
         },
         'cancelled': {
             label: 'ยกเลิก',
-            color: '#EF4444', // Red
-            bgColor: '#FEE2E2'
+            color: '#EF4444',
+            bgColor: '#FEF2F2',
+            barColor: '#EF4444'
         }
     };
 
@@ -308,72 +313,107 @@ export function createStatusFlexMessage(
     const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
     const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
-    const bubble: any = {
-        type: 'bubble',
-        size: 'mega',
-        body: {
+    // 2. Main Content Area - Construct contents array dynamically to avoid spread issues
+    const mainContents: any[] = [
+        // Header: Status + Time
+        {
             type: 'box',
-            layout: 'vertical',
-            paddingAll: '20px',
-            backgroundColor: '#ffffff',
+            layout: 'horizontal',
+            alignItems: 'center',
+            justifyContent: 'space-between',
             contents: [
-                // Header Row
-                {
-                    type: 'box',
-                    layout: 'horizontal',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    contents: [
-                        {
-                            type: 'text',
-                            text: 'UPDATE STATUS',
-                            weight: 'bold',
-                            color: config.color,
-                            size: 'xs'
-                        },
-                        {
-                            type: 'text',
-                            text: `${dateStr} • ${timeStr}`,
-                            size: 'xs',
-                            color: '#b0b0b0',
-                            align: 'end'
-                        }
-                    ],
-                },
-                // Main Status Title
                 {
                     type: 'text',
-                    text: config.label,
+                    text: config.label.toUpperCase(),
                     weight: 'bold',
-                    size: 'xl',
-                    color: '#1a1a1a',
-                    margin: 'sm',
-                    wrap: true
+                    color: config.color,
+                    size: 'xs',
+                    flex: 1
                 },
-                // Project Name
                 {
                     type: 'text',
-                    text: eventName,
-                    size: 'sm',
-                    color: '#666666',
-                    wrap: true,
-                    margin: 'xs'
-                },
-                // Divider
-                {
-                    type: 'separator',
-                    color: '#f0f0f0',
-                    margin: 'lg'
+                    text: `${dateStr} ${timeStr}`,
+                    size: 'xs',
+                    color: '#bbbbbb',
+                    align: 'end',
+                    flex: 0
                 }
             ]
+        },
+        // Title: Event Name
+        {
+            type: 'text',
+            text: eventName,
+            weight: 'bold',
+            size: 'xl',
+            color: '#1a1a1a',
+            margin: 'md',
+            wrap: true
         }
-    };
+    ];
+
+    // Event Date & Time
+    if (eventDate) {
+        mainContents.push({
+            type: 'box',
+            layout: 'baseline',
+            spacing: 'sm',
+            margin: 'sm',
+            contents: [
+                {
+                    type: 'icon',
+                    url: 'https://img.icons8.com/fluency/48/calendar.png',
+                    size: 'xs',
+                    aspectRatio: '1:1'
+                },
+                {
+                    type: 'text',
+                    text: eventDate,
+                    size: 'xs',
+                    color: '#888888',
+                    flex: 1,
+                    wrap: true
+                }
+            ]
+        });
+    }
+
+    // Venue Row
+    if (venue) {
+        mainContents.push({
+            type: 'box',
+            layout: 'baseline',
+            spacing: 'sm',
+            margin: 'sm',
+            contents: [
+                {
+                    type: 'icon',
+                    url: 'https://img.icons8.com/fluency/48/place-marker.png',
+                    size: 'xs',
+                    aspectRatio: '1:1'
+                },
+                {
+                    type: 'text',
+                    text: venue,
+                    size: 'xs',
+                    color: '#888888',
+                    flex: 1,
+                    wrap: true
+                }
+            ]
+        });
+    }
+
+    // Separator
+    mainContents.push({
+        type: 'separator',
+        margin: 'xl',
+        color: '#f0f0f0'
+    });
 
     // Progress Section
     if (validProgress !== undefined) {
-        const progressColor = validProgress === 100 ? '#10B981' : config.color;
-
-        bubble.body.contents.push({
+        mainContents.push({
             type: 'box',
             layout: 'vertical',
             margin: 'lg',
@@ -384,7 +424,7 @@ export function createStatusFlexMessage(
                     justifyContent: 'space-between',
                     contents: [
                         { type: 'text', text: 'Progress', size: 'xs', color: '#aaaaaa', weight: 'bold' },
-                        { type: 'text', text: `${validProgress}%`, size: 'xs', weight: 'bold', color: progressColor }
+                        { type: 'text', text: `${validProgress}%`, size: 'xs', weight: 'bold', color: config.color }
                     ]
                 },
                 {
@@ -400,7 +440,7 @@ export function createStatusFlexMessage(
                             type: 'box',
                             layout: 'vertical',
                             width: `${validProgress}%`,
-                            backgroundColor: progressColor,
+                            backgroundColor: config.color,
                             height: '6px',
                             cornerRadius: '3px',
                             contents: []
@@ -413,7 +453,7 @@ export function createStatusFlexMessage(
 
     // Message Section
     if (message) {
-        bubble.body.contents.push({
+        mainContents.push({
             type: 'box',
             layout: 'vertical',
             margin: 'lg',
@@ -427,7 +467,7 @@ export function createStatusFlexMessage(
                     size: 'sm',
                     color: '#555555',
                     wrap: true,
-                    lineSpacing: '4px'
+                    lineSpacing: '5px'
                 }
             ]
         });
@@ -435,15 +475,49 @@ export function createStatusFlexMessage(
 
     // Sender Name Footer
     if (senderName) {
-        bubble.body.contents.push({
-            type: 'text',
-            text: `— ${senderName}`,
-            size: 'xxs',
-            color: '#aaaaaa',
-            align: 'end',
-            margin: 'lg'
+        mainContents.push({
+            type: 'box',
+            layout: 'baseline',
+            margin: 'xl',
+            contents: [
+                {
+                    type: 'text',
+                    text: `Updated by ${senderName}`,
+                    size: 'xxs',
+                    color: '#cccccc',
+                    align: 'center'
+                }
+            ]
         });
     }
+
+    // Use a vertical bar style design for professionalism
+    const bubble: any = {
+        type: 'bubble',
+        size: 'mega',
+        body: {
+            type: 'box',
+            layout: 'vertical',
+            paddingAll: '0px',
+            contents: [
+                // 1. Color Bar at Top
+                {
+                    type: 'box',
+                    layout: 'vertical',
+                    height: '6px',
+                    backgroundColor: config.barColor,
+                    contents: []
+                },
+                // 2. Main Content Area
+                {
+                    type: 'box',
+                    layout: 'vertical',
+                    paddingAll: '20px',
+                    contents: mainContents
+                }
+            ]
+        }
+    };
 
     return {
         type: 'flex',

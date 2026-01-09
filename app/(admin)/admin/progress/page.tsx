@@ -158,12 +158,12 @@ export default function ProgressPage() {
             {/* Header - Compact for mobile */}
             <Box sx={{ mb: 2 }}>
                 <Typography
+                    variant="h5"
                     sx={{
                         fontFamily: 'var(--font-prompt)',
                         fontWeight: 700,
-                        fontSize: { xs: '1.5rem', md: '1.75rem' },
+                        mb: 1,
                         color: '#1a1a1a',
-                        mb: 0.5,
                     }}
                 >
                     ส่งอัพเดทลูกค้า

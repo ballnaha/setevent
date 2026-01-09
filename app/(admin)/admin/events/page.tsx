@@ -24,9 +24,25 @@ import {
     MenuItem,
     IconButton,
     Tooltip,
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    useTheme,
+    useMediaQuery
 } from '@mui/material';
-import { SearchNormal1, Calendar, Location, User, Send2 } from 'iconsax-react';
+import { SearchNormal1, Calendar, Location, User, Send2, Add } from 'iconsax-react';
 import Link from 'next/link';
+import TopSnackbar from '@/components/ui/TopSnackbar';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/th';
+
+// ตั้งค่า locale ให้เป็นภาษาไทย
+dayjs.locale('th');
 
 interface Event {
     id: string;
@@ -42,6 +58,13 @@ interface Event {
     };
 }
 
+interface Customer {
+    id: string;
+    displayName: string | null;
+    companyName: string | null;
+    pictureUrl: string | null;
+}
+
 const statusLabels: Record<string, { label: string; color: string; bgColor: string }> = {
     draft: { label: 'แบบร่าง', color: '#6B7280', bgColor: 'rgba(107, 114, 128, 0.1)' },
     confirmed: { label: 'ยืนยันแล้ว', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.1)' },
@@ -51,11 +74,30 @@ const statusLabels: Record<string, { label: string; color: string; bgColor: stri
 };
 
 export default function EventsPage() {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
     const [events, setEvents] = useState<Event[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+
+    // Create Event States
+    const [dialogOpen, setDialogOpen] = useState(false);
+    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [fetchingCustomers, setFetchingCustomers] = useState(false);
+    const [saving, setSaving] = useState(false);
+
+    // Form Data
+    const [eventName, setEventName] = useState('');
+    const [customerId, setCustomerId] = useState('');
+    const [eventDate, setEventDate] = useState<Dayjs | null>(null);
+    const [venue, setVenue] = useState('');
+    const [description, setDescription] = useState('');
+    const [notes, setNotes] = useState('');
+
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
     useEffect(() => {
         fetchEvents();
@@ -74,6 +116,20 @@ export default function EventsPage() {
             console.error('Error fetching events:', error);
         } finally {
             setLoading(false);
+        }
+    }
+
+    async function fetchCustomers() {
+        if (customers.length > 0) return;
+        setFetchingCustomers(true);
+        try {
+            const res = await fetch('/api/admin/customers');
+            const data = await res.json();
+            setCustomers(data);
+        } catch (error) {
+            console.error('Failed to fetch customers', error);
+        } finally {
+            setFetchingCustomers(false);
         }
     }
 
@@ -97,24 +153,100 @@ export default function EventsPage() {
         setFilteredEvents(result);
     }
 
+    const handleOpenDialog = () => {
+        fetchCustomers();
+        setEventName('');
+        setCustomerId('');
+        setEventDate(null);
+        setVenue('');
+        setDescription('');
+        setNotes('');
+        setDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setDialogOpen(false);
+    };
+
+    const handleSave = async () => {
+        if (!eventName || !customerId) {
+            setSnackbar({ open: true, message: 'กรุณากรอกชื่องานและเลือกลูกค้า', severity: 'error' });
+            return;
+        }
+
+        setSaving(true);
+        try {
+            const payload = {
+                eventName,
+                customerId,
+                eventDate: eventDate ? eventDate.toISOString() : null,
+                venue,
+                description,
+                notes
+            };
+
+            const res = await fetch('/api/admin/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+                setSnackbar({ open: true, message: 'สร้างงาน Event สำเร็จ', severity: 'success' });
+                handleCloseDialog();
+                fetchEvents();
+            } else {
+                const error = await res.json();
+                throw new Error(error.error || 'Failed to create event');
+            }
+        } catch (error: any) {
+            setSnackbar({ open: true, message: error.message, severity: 'error' });
+        } finally {
+            setSaving(false);
+        }
+    };
+
     return (
         <Box>
             {/* Header */}
-            <Box sx={{ mb: 4 }}>
-                <Typography
-                    variant="h4"
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                <Box>
+                    <Typography
+                        variant="h4"
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontWeight: 700,
+                            mb: 1,
+                            color: '#1a1a1a',
+                        }}
+                    >
+                        📅 รายการ Events
+                    </Typography>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
+                        จัดการงาน Event ทั้งหมด
+                    </Typography>
+                </Box>
+                <Button
+                    variant="contained"
+                    startIcon={<Add size={20} color="white" />}
+                    onClick={handleOpenDialog}
                     sx={{
+                        bgcolor: '#1a1a1a',
                         fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        mb: 1,
-                        color: '#1a1a1a',
+                        borderRadius: 2,
+                        px: 3,
+                        py: 1.5,
+                        boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                        '&:hover': {
+                            bgcolor: '#333',
+                            transform: 'translateY(-1px)',
+                            boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+                        },
+                        transition: 'all 0.2s ease'
                     }}
                 >
-                    📅 รายการ Events
-                </Typography>
-                <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'gray' }}>
-                    จัดการงาน Event ทั้งหมด
-                </Typography>
+                    สร้างงานใหม่
+                </Button>
             </Box>
 
             {/* Filters */}
@@ -282,6 +414,157 @@ export default function EventsPage() {
                     </Table>
                 </TableContainer>
             )}
+
+            {/* Create Dialog */}
+            <Dialog
+                open={dialogOpen}
+                onClose={handleCloseDialog}
+                fullScreen={isMobile}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{
+                    sx: { borderRadius: isMobile ? 0 : 3 }
+                }}
+            >
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, pb: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Box sx={{ fontSize: '1.25rem', fontWeight: 600 }}>
+                        ➕ สร้างงานใหม่
+                    </Box>
+                    <IconButton edge="end" color="inherit" onClick={handleCloseDialog} aria-label="close">
+                        <Add size={24} style={{ transform: 'rotate(45deg)' }} />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Box>
+                            <TextField
+                                label="ชื่องาน Event"
+                                fullWidth
+                                required
+                                value={eventName}
+                                onChange={(e) => setEventName(e.target.value)}
+                                InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
+                                InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                            />
+                        </Box>
+
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
+                            <Box sx={{ flex: 1 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>ลูกค้า</InputLabel>
+                                    <Select
+                                        value={customerId}
+                                        label="ลูกค้า"
+                                        onChange={(e) => setCustomerId(e.target.value)}
+                                        sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+                                        disabled={fetchingCustomers}
+                                    >
+                                        {customers.map((c) => (
+                                            <MenuItem key={c.id} value={c.id} sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Avatar src={c.pictureUrl || undefined} sx={{ width: 24, height: 24 }} />
+                                                    {c.displayName || 'No Name'} {c.companyName ? `(${c.companyName})` : ''}
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
+                                    <DatePicker
+                                        label="วันที่จัดงาน"
+                                        value={eventDate}
+                                        onChange={(newValue) => setEventDate(newValue)}
+                                        sx={{ width: '100%' }}
+                                        slotProps={{
+                                            textField: {
+                                                fullWidth: true,
+                                                InputProps: { sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } },
+                                                InputLabelProps: { sx: { fontFamily: 'var(--font-prompt)' } }
+                                            }
+                                        }}
+                                    />
+                                </LocalizationProvider>
+                            </Box>
+                        </Box>
+
+                        <Box>
+                            <TextField
+                                label="สถานที่จัดงาน"
+                                fullWidth
+                                value={venue}
+                                onChange={(e) => setVenue(e.target.value)}
+                                InputProps={{
+                                    sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 },
+                                    startAdornment: (
+                                        <InputAdornment position="start">
+                                            <Location size={20} color="#999" />
+                                        </InputAdornment>
+                                    ),
+                                }}
+                                InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                            />
+                        </Box>
+
+                        <Box>
+                            <TextField
+                                label="รายละเอียดงาน"
+                                fullWidth
+                                multiline
+                                rows={3}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
+                                InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                            />
+                        </Box>
+
+                        <Box>
+                            <TextField
+                                label="หมายเหตุ (ภายใน)"
+                                fullWidth
+                                multiline
+                                rows={2}
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                                placeholder="บันทึกสำหรับทีมงาน (ลูกค้าไม่เห็น)"
+                                InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
+                                InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                            />
+                        </Box>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, pt: 0 }}>
+                    <Button
+                        onClick={handleCloseDialog}
+                        sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2, px: 3 }}
+                    >
+                        ยกเลิก
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSave}
+                        disabled={saving}
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            bgcolor: '#1a1a1a',
+                            borderRadius: 2,
+                            px: 4,
+                            '&:hover': { bgcolor: '#333' }
+                        }}
+                    >
+                        {saving ? 'กำลังบันทึก...' : 'สร้างงาน'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <TopSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+            />
         </Box>
     );
 }

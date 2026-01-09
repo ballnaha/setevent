@@ -88,27 +88,37 @@ export async function POST(request: NextRequest) {
                 // body: { type: 'status', eventName, status: 'confirmed'|'in-progress'|'completed', message?, imageUrls?: string[] }
 
                 // 1. Create Status Flex Message
-                const statusFlex = createStatusFlexMessage(data.eventName, data.status, data.message, data.progress, data.senderName);
+                // Ensure date is formatted if present
+                let formattedDate = data.eventDate;
+                if (data.eventDate && !data.eventDateNormalized) {
+                    try {
+                        const d = new Date(data.eventDate);
+                        formattedDate = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+                        if (d.getHours() > 0 || d.getMinutes() > 0) {
+                            formattedDate += ` ${d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+                        }
+                    } catch (e) { }
+                }
+
+                const statusFlex = createStatusFlexMessage(data.eventName, data.status, data.message, data.progress, data.senderName, data.venue, formattedDate);
                 const statusMessages: LineMessage[] = [statusFlex];
 
                 // 2. Add Images (if any)
                 if (data.imageUrls && Array.isArray(data.imageUrls)) {
                     data.imageUrls.forEach((url: string) => {
-                        // Infer thumbnail URL (e.g. image.jpg -> image_thumb.jpg)
-                        const previewUrl = url.replace(/(\.[\w\d]+)$/, '_thumb$1');
-
+                        // Use original URL for preview to avoid broken images on desktop
+                        // LINE Desktop sometimes has issues with specific thumbnail URLs if they don't exist
                         statusMessages.push({
                             type: 'image',
                             originalContentUrl: url,
-                            previewImageUrl: previewUrl,
+                            previewImageUrl: url,
                         });
                     });
                 } else if (data.imageUrl) {
-                    const previewUrl = data.imageUrl.replace(/(\.[\w\d]+)$/, '_thumb$1');
                     statusMessages.push({
                         type: 'image',
                         originalContentUrl: data.imageUrl,
-                        previewImageUrl: previewUrl,
+                        previewImageUrl: data.imageUrl,
                     });
                 }
 

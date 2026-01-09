@@ -90,12 +90,33 @@ export default function CustomersPage() {
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
     const [formData, setFormData] = useState({ displayName: '', companyName: '', phone: '', email: '', status: 'new', salesId: '' });
     const [saving, setSaving] = useState(false);
-    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+    const [syncing, setSyncing] = useState(false);
+    const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'info' });
 
     useEffect(() => {
         fetchCustomers();
         fetchSalesUsers();
     }, []);
+
+    async function handleSyncLine() {
+        setSyncing(true);
+        setSnackbar({ open: true, message: 'กำลังดึงข้อมูลจาก LINE OA...', severity: 'info' });
+        try {
+            const res = await fetch('/api/line/sync-followers', { method: 'POST' });
+            const data = await res.json();
+
+            if (res.ok) {
+                setSnackbar({ open: true, message: `ดึงข้อมูลสำเร็จ! เพิ่มลูกค้าใหม่ ${data.new} คน`, severity: 'success' });
+                fetchCustomers();
+            } else {
+                throw new Error(data.error || 'Failed to sync');
+            }
+        } catch (error: any) {
+            setSnackbar({ open: true, message: error.message || 'เกิดข้อผิดพลาดในการดึงข้อมูล', severity: 'error' });
+        } finally {
+            setSyncing(false);
+        }
+    }
 
     useEffect(() => {
         let filtered = customers;
@@ -195,7 +216,7 @@ export default function CustomersPage() {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
                     <Box>
                         <Typography
-                            variant="h4"
+                            variant="h5"
                             sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 700,
@@ -209,27 +230,50 @@ export default function CustomersPage() {
                             จัดการข้อมูลลูกค้าจาก LINE • {customers.length} ลูกค้า
                         </Typography>
                     </Box>
-                    <Tooltip title="รีเฟรชรายการลูกค้า" arrow>
-                        <Button
-                            variant="contained"
-                            onClick={() => { setLoading(true); fetchCustomers(); }}
-                            disabled={loading}
-                            startIcon={loading ? <CircularProgress size={18} color="inherit" /> : <Refresh2 size={18} color="white" />}
-                            sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                bgcolor: '#1a1a1a',
-                                borderRadius: 2,
-                                px: 2.5,
-                                py: 1,
-                                textTransform: 'none',
-                                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                                '&:hover': { bgcolor: '#333' },
-                                '&:disabled': { bgcolor: '#ccc' },
-                            }}
-                        >
-                            รีเฟรช
-                        </Button>
-                    </Tooltip>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Tooltip title="ดึงข้อมูลล่าสุดจาก LINE OA" arrow>
+                            <Button
+                                variant="outlined"
+                                onClick={handleSyncLine}
+                                disabled={loading || syncing}
+                                startIcon={syncing ? <CircularProgress size={18} color="inherit" /> : <Refresh2 size={18} color="#1a1a1a" />}
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    borderRadius: 2,
+                                    px: 2,
+                                    py: 1,
+                                    textTransform: 'none',
+                                    color: '#1a1a1a',
+                                    borderColor: '#ddd',
+                                    bgcolor: 'white',
+                                    '&:hover': { bgcolor: '#f5f5f5', borderColor: '#ccc' },
+                                }}
+                            >
+                                {syncing ? 'กำลังดึง...' : 'ดึงข้อมูล LINE'}
+                            </Button>
+                        </Tooltip>
+                        <Tooltip title="รีเฟรชรายการลูกค้า" arrow>
+                            <Button
+                                variant="contained"
+                                onClick={() => { setLoading(true); fetchCustomers(); }}
+                                disabled={loading || syncing}
+                                startIcon={loading && !syncing ? <CircularProgress size={18} color="inherit" /> : <Refresh2 size={18} color="white" />}
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    bgcolor: '#1a1a1a',
+                                    borderRadius: 2,
+                                    px: 2.5,
+                                    py: 1,
+                                    textTransform: 'none',
+                                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                                    '&:hover': { bgcolor: '#333' },
+                                    '&:disabled': { bgcolor: '#ccc' },
+                                }}
+                            >
+                                รีเฟรช
+                            </Button>
+                        </Tooltip>
+                    </Box>
                 </Box>
             </Box>
 

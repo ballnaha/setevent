@@ -36,28 +36,64 @@ const statusLabels: Record<string, { label: string; color: string; bgColor: stri
     cancelled: { label: 'ยกเลิก', color: '#EF4444', bgColor: 'rgba(239, 68, 68, 0.1)' },
 };
 
-function StatusFlexPreview({ eventName, status, message, imageUrls, progress, senderName }: { eventName: string, status: string, message: string, imageUrls: string[], progress?: number, senderName?: string }) {
+function StatusFlexPreview({ eventName, status, message, imageUrls, progress, senderName, venue, eventDate }: { eventName: string, status: string, message: string, imageUrls: string[], progress?: number, senderName?: string, venue?: string, eventDate?: string }) {
     const config = statusLabels[status] || statusLabels['in-progress'];
 
     const now = new Date();
     const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
     const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
 
+    // Format event date for preview
+    let formattedEventDate = eventDate;
+    if (eventDate) {
+        try {
+            const d = new Date(eventDate);
+            if (!isNaN(d.getTime())) {
+                formattedEventDate = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+                if (d.getHours() > 0 || d.getMinutes() > 0) {
+                    formattedEventDate += ` ${d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+                }
+            }
+        } catch (e) { }
+    }
+
     return (
         <Box sx={{ maxWidth: 320, mx: 'auto', pointerEvents: 'none' }}>
             <Box sx={{ border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden', bgcolor: '#fff', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', mb: 2 }}>
-                {/* Header Row */}
-                <Box sx={{ p: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
-                        <Typography sx={{ color: config.color, fontWeight: 'bold', fontSize: '0.65rem' }}>UPDATE STATUS</Typography>
-                        <Typography sx={{ color: '#b0b0b0', fontSize: '0.65rem' }}>{dateStr} • {timeStr}</Typography>
+                {/* 1. Color Bar at Top */}
+                <Box sx={{ height: 6, bgcolor: config.color }} />
+
+                {/* 2. Main Content Area */}
+                <Box sx={{ p: '20px' }}>
+                    {/* Header Row */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
+                        <Typography sx={{ color: config.color, fontWeight: 'bold', fontSize: '0.65rem', textTransform: 'uppercase' }}>{config.label}</Typography>
+                        <Typography sx={{ color: '#bbb', fontSize: '0.65rem' }}>{dateStr} {timeStr}</Typography>
                     </Box>
 
-                    <Typography sx={{ fontWeight: 'bold', fontSize: '1.25rem', color: '#1a1a1a', mb: 0.5 }}>{config.label}</Typography>
-                    <Typography sx={{ fontSize: '0.8rem', color: '#666' }}>{eventName}</Typography>
+                    {/* Title */}
+                    <Typography sx={{ fontWeight: 'bold', fontSize: '1.25rem', color: '#1a1a1a', mb: 2, lineHeight: 1.2 }}>{eventName}</Typography>
 
-                    <Divider sx={{ my: 2, borderColor: '#f0f0f0' }} />
+                    {/* Event Date */}
+                    {formattedEventDate && (
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
+                            <img src="https://img.icons8.com/fluency/48/calendar.png" style={{ width: 14, height: 14, marginTop: 2 }} alt="date" />
+                            <Typography sx={{ fontSize: '0.75rem', color: '#888', lineHeight: 1.4 }}>{formattedEventDate}</Typography>
+                        </Box>
+                    )}
 
+                    {/* Venue */}
+                    {venue && (
+                        <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
+                            <img src="https://img.icons8.com/fluency/48/place-marker.png" style={{ width: 14, height: 14, marginTop: 2 }} alt="location" />
+                            <Typography sx={{ fontSize: '0.75rem', color: '#888', lineHeight: 1.4 }}>{venue}</Typography>
+                        </Box>
+                    )}
+
+                    {/* Separator - Matching backend 'lg' margin (approx 24px) */}
+                    <Divider sx={{ my: 3, borderColor: '#f0f0f0' }} />
+
+                    {/* Progress */}
                     {progress !== undefined && (
                         <Box sx={{ mb: 2 }}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
@@ -70,15 +106,17 @@ function StatusFlexPreview({ eventName, status, message, imageUrls, progress, se
                         </Box>
                     )}
 
+                    {/* Message */}
                     {message && (
                         <Box sx={{ bgcolor: '#f9f9f9', p: 1.5, borderRadius: 2 }}>
                             <Typography sx={{ fontSize: '0.85rem', color: '#555', lineHeight: 1.6 }}>{message}</Typography>
                         </Box>
                     )}
 
+                    {/* Footer */}
                     {senderName && (
-                        <Typography sx={{ fontSize: '0.6rem', color: '#aaa', textAlign: 'right', mt: 1.5 }}>
-                            — {senderName}
+                        <Typography sx={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', mt: 3 }}>
+                            Updated by {senderName}
                         </Typography>
                     )}
                 </Box>
@@ -273,6 +311,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     imageUrls: finalImageUrls.length > 0 ? finalImageUrls : undefined,
                     files: finalFiles.length > 0 ? finalFiles : undefined,
                     senderName: session?.user?.name || 'Admin',
+                    venue: event.venue, // Pass venue
+                    eventDate: event.eventDate // Pass eventDate
                 };
             } else {
                 // Chat mode - plain text message
@@ -284,6 +324,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     imageUrls: finalImageUrls.length > 0 ? finalImageUrls : undefined,
                     files: finalFiles.length > 0 ? finalFiles : undefined,
                     senderName: session?.user?.name || 'Admin',
+                    venue: event.venue, // Venue context
+                    eventDate: event.eventDate // Date context
                 };
             }
 
@@ -427,6 +469,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                                 value={progress}
                                                 onChange={(_, val) => setProgress(val as number)}
                                                 valueLabelDisplay="auto"
+                                                step={10}
+                                                marks
+                                                min={0}
+                                                max={100}
                                                 sx={{ color: statusLabels[newStatus]?.color }}
                                             />
                                         </Box>
@@ -601,6 +647,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                             progress={newStatus === 'in-progress' ? progress : undefined}
                                             imageUrls={selectedImages.map(img => img.url)}
                                             senderName={session?.user?.name || 'Admin'}
+                                            venue={event.venue}
                                         />
                                     </Box>
                                 )}

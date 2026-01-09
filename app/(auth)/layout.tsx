@@ -27,10 +27,10 @@ export default function AuthLayout({
                 sx={{
                     position: 'absolute',
                     inset: 0,
-                    backgroundImage: 'url("https://images.unsplash.com/photo-1511578314322-379afb476865?q=80&w=2069&auto=format&fit=crop")',
+                    backgroundImage: 'url("/images/party.webp")',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
-                    opacity: 0.3,
+                    opacity: 0.5,
                     filter: 'blur(8px)',
                 }}
             />

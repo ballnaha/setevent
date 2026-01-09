@@ -4,11 +4,11 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Box, Card, CardContent, Typography, TextField, Button, InputAdornment, Alert, CircularProgress } from '@mui/material';
-import { Sms, Lock, LoginCurve } from 'iconsax-react';
+import { Sms, Lock, LoginCurve, User } from 'iconsax-react';
 
 export default function LoginPage() {
     const router = useRouter();
-    const [credentials, setCredentials] = useState({ email: '', password: '' });
+    const [credentials, setCredentials] = useState({ username: '', password: '' });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -23,13 +23,13 @@ export default function LoginPage() {
 
         try {
             const result = await signIn('credentials', {
-                email: credentials.email,
+                username: credentials.username,
                 password: credentials.password,
                 redirect: false,
             });
 
             if (result?.error) {
-                setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+                setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
             } else {
                 router.push('/admin');
                 router.refresh();
@@ -85,9 +85,9 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit}>
                     <TextField
                         fullWidth
-                        name="email"
-                        placeholder="อีเมล"
-                        value={credentials.email}
+                        name="username"
+                        placeholder="ชื่อผู้ใช้"
+                        value={credentials.username}
                         onChange={handleChange}
                         sx={{
                             mb: 2.5,
@@ -103,7 +103,7 @@ export default function LoginPage() {
                         InputProps={{
                             startAdornment: (
                                 <InputAdornment position="start">
-                                    <Sms size={20} color="rgba(255,255,255,0.6)" />
+                                    <User size={20} color="rgba(255,255,255,0.6)" />
                                 </InputAdornment>
                             ),
                         }}

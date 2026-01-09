@@ -14,9 +14,11 @@ export async function GET(
             where: { id },
             select: {
                 id: true,
+                username: true,
                 name: true,
                 email: true,
                 role: true,
+                status: true,
                 createdAt: true,
             },
         });
@@ -40,12 +42,20 @@ export async function PATCH(
     try {
         const { id } = await params;
         const body = await request.json();
-        const { name, email, password, role, position } = body;
+        const { username, name, email, password, role, position, status } = body;
 
         // Check if user exists
         const existingUser = await prisma.user.findUnique({ where: { id } });
         if (!existingUser) {
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        // Check if username is changing and available
+        if (username && username !== existingUser.username) {
+            const usernameTaken = await prisma.user.findUnique({ where: { username } });
+            if (usernameTaken) {
+                return NextResponse.json({ error: 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว' }, { status: 400 });
+            }
         }
 
         // If email is changing, check if it's already taken
@@ -58,9 +68,16 @@ export async function PATCH(
 
         // Build update data
         const updateData: any = {};
+        if (username !== undefined) updateData.username = username;
         if (name !== undefined) updateData.name = name;
         if (email !== undefined) updateData.email = email;
         if (position !== undefined) updateData.position = position;
+        if (status !== undefined) {
+            const validStatuses = ['active', 'disabled'];
+            if (validStatuses.includes(status)) {
+                updateData.status = status;
+            }
+        }
         if (role !== undefined) {
             const validRoles = ['admin', 'sales', 'user'];
             if (validRoles.includes(role)) {

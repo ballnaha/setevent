@@ -52,9 +52,11 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  username      String?   @unique // เพิ่มสำหรับ Username Login
   password      String?   // เพิ่มสำหรับ Credentials Login
   role          String    @default("admin") // admin, sales, user
   position      String?   // ตำแหน่งเจ้าหน้าที่
+  status        String    @default("active") // active, disabled
   accounts      Account[]
   sessions      Session[]
   customers     Customer[] // ลูกค้าที่ดูแล (sales)

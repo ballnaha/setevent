@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction, Tooltip } from '@mui/material';
+import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction, Tooltip, Menu, MenuItem, Divider } from '@mui/material';
 import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,6 +32,7 @@ const bottomNavItems = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const { data: session } = useSession();
     const [userRole, setUserRole] = useState<string>('user');
 
@@ -202,28 +203,68 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                 {userRole}
                             </Typography>
                         </Box>
-                        <Avatar sx={{
-                            width: 40,
-                            height: 40,
-                            bgcolor: 'rgba(255,255,255,0.05)',
-                            border: '1px solid rgba(255,255,255,0.1)',
-                            boxShadow: '0 0 15px rgba(255,255,255,0.05)'
-                        }}>
-                            {session?.user?.name?.charAt(0).toUpperCase() || 'A'}
-                        </Avatar>
-                        <Tooltip title="ออกจากระบบ" arrow>
-                            <IconButton
-                                size="small"
-                                onClick={handleLogout}
-                                sx={{
-                                    color: 'rgba(255,255,255,0.5)',
-                                    transition: 'all 0.2s',
-                                    '&:hover': { color: '#EF4444', bgcolor: 'rgba(239, 68, 68, 0.1)' }
-                                }}
-                            >
-                                <Logout size={20} color="white" />
-                            </IconButton>
-                        </Tooltip>
+
+                        <IconButton
+                            onClick={(e) => setAnchorEl(e.currentTarget)}
+                            sx={{ p: 0 }}
+                        >
+                            <Avatar sx={{
+                                width: 40,
+                                height: 40,
+                                bgcolor: 'rgba(255,255,255,0.05)',
+                                border: '1px solid rgba(255,255,255,0.1)',
+                                boxShadow: '0 0 15px rgba(255,255,255,0.05)',
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                                '&:hover': {
+                                    bgcolor: 'rgba(255,255,255,0.1)',
+                                    borderColor: 'rgba(255,255,255,0.3)'
+                                }
+                            }}>
+                                {session?.user?.name?.charAt(0).toUpperCase() || 'A'}
+                            </Avatar>
+                        </IconButton>
+
+                        <Menu
+                            anchorEl={anchorEl}
+                            open={Boolean(anchorEl)}
+                            onClose={() => setAnchorEl(null)}
+                            PaperProps={{
+                                sx: {
+                                    mt: 1.5,
+                                    bgcolor: '#1f2937',
+                                    color: '#fff',
+                                    borderRadius: 2,
+                                    minWidth: 180,
+                                    border: '1px solid rgba(255,255,255,0.1)',
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+                                    '& .MuiMenuItem-root': {
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontSize: '0.9rem',
+                                        py: 1.5,
+                                        '&:hover': {
+                                            bgcolor: 'rgba(255,255,255,0.05)'
+                                        }
+                                    }
+                                }
+                            }}
+                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                        >
+                            <MenuItem onClick={() => { setAnchorEl(null); window.location.href = '/admin/profile'; }}>
+                                <ListItemIcon>
+                                    <ProfileCircle size={20} color="#fff" variant="Bulk" />
+                                </ListItemIcon>
+                                <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>My Profile</Typography>
+                            </MenuItem>
+                            <Divider sx={{ my: 1, borderColor: 'rgba(255,255,255,0.1)' }} />
+                            <MenuItem onClick={() => { setAnchorEl(null); handleLogout(); }} sx={{ color: '#EF4444' }}>
+                                <ListItemIcon>
+                                    <Logout size={20} color="#EF4444" />
+                                </ListItemIcon>
+                                <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>ออกจากระบบ</Typography>
+                            </MenuItem>
+                        </Menu>
                     </Box>
                 </Toolbar>
             </AppBar>

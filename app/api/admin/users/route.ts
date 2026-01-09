@@ -8,10 +8,12 @@ export async function GET() {
         const users = await prisma.user.findMany({
             select: {
                 id: true,
+                username: true,
                 name: true,
                 email: true,
                 role: true,
                 position: true,
+                status: true,
                 createdAt: true,
             },
             orderBy: { createdAt: 'desc' },
@@ -28,10 +30,16 @@ export async function GET() {
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const { name, email, password, role, position } = body;
+        const { username, name, email, password, role, position, status } = body;
 
-        if (!email || !password) {
-            return NextResponse.json({ error: 'Email and password are required' }, { status: 400 });
+        if (!username || !email || !password) {
+            return NextResponse.json({ error: 'Username, Email and Password are required' }, { status: 400 });
+        }
+
+        // Check if username already exists
+        const existingUsername = await prisma.user.findUnique({ where: { username } });
+        if (existingUsername) {
+            return NextResponse.json({ error: 'ชื่อผู้ใช้นี้ถูกใช้งานแล้ว' }, { status: 400 });
         }
 
         // Check if email already exists
@@ -47,20 +55,28 @@ export async function POST(request: NextRequest) {
         const validRoles = ['admin', 'sales', 'user'];
         const userRole = validRoles.includes(role) ? role : 'user';
 
+        // Validate status
+        const validStatuses = ['active', 'disabled'];
+        const userStatus = validStatuses.includes(status) ? status : 'active';
+
         const user = await prisma.user.create({
             data: {
+                username,
                 name,
                 email,
                 password: hashedPassword,
                 role: userRole,
                 position,
+                status: userStatus,
             },
             select: {
                 id: true,
+                username: true,
                 name: true,
                 email: true,
                 role: true,
                 position: true,
+                status: true,
                 createdAt: true,
             },
         });
