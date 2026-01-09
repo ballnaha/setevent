@@ -583,7 +583,7 @@ export default function Header() {
                                 PROFESSIONAL TEAM
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
-                                ONE STOP SERVICE
+                                End-to-End Event Solution
                             </Typography>
                         </Box>
                     </Box>

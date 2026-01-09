@@ -40,7 +40,7 @@ export default function CTASection() {
                     boxShadow: '0 0 20px rgba(0,194,203,0.5)'
                 }}>
                     <Typography variant="subtitle2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', letterSpacing: 1 }}>
-                        ONE STOP SERVICE
+                        End-to-End Event Solution
                     </Typography>
                 </Box>
 

@@ -152,7 +152,7 @@ export default function BannerSlider() {
                         fontWeight: 600,
                         letterSpacing: 1
                     }}>
-                        ONE STOP SERVICE
+                        End-to-End Event Solution
                     </Typography>
                     <Typography variant="body1" sx={{
                         fontFamily: 'var(--font-prompt)',
