@@ -17,41 +17,122 @@ import {
     MenuItem,
     Collapse,
     Fade,
-    Stack
+    Stack,
+    Divider
 } from "@mui/material";
-import { HambergerMenu, ArrowDown2, ArrowRight2, Speaker, Monitor, LampOn, Layer, Call, Message } from "iconsax-react";
+import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Map1, Gift } from "iconsax-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
-const navItems = [
+// ---- Data Structures ----
+
+type SubItem = {
+    label: string;
+    href: string;
+    children?: SubItem[];
+    icon?: React.ReactNode;
+};
+
+type NavItem = {
+    label: string;
+    href: string;
+    children?: SubItem[]; // Simple dropdown
+    isMega?: boolean; // For Products complex menu
+    sections?: { title: string; items: SubItem[] }[];
+};
+
+const productSections = [
+    {
+        title: "Rental",
+        items: [
+            {
+                label: "LED Screen",
+                href: "/products/rental/led-screen",
+                icon: <Monitor size="20" color="var(--primary)" variant="Bulk" />,
+                children: [
+                    {
+                        label: "Indoor",
+                        href: "/products/rental/led-screen/indoor"
+                    },
+                    {
+                        label: "Outdoor",
+                        href: "/products/rental/led-screen/outdoor"
+                    },
+                ]
+            },
+            { label: "Lighting Systems", href: "/products/rental/lighting", icon: <LampOn size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Sound Systems", href: "/products/rental/sound", icon: <Speaker size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Stage", href: "/products/rental/stage", icon: <Layer size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Motion Graphic", href: "/products/rental/motion-graphic", icon: <VideoCircle size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Interactive", href: "/products/rental/interactive", icon: <MagicStar size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Laser", href: "/products/rental/laser", icon: <Sun1 size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Mapping", href: "/products/rental/mapping", icon: <Map1 size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Flower & Souvenirs", href: "/products/rental/flower-souvenirs", icon: <Gift size="20" color="var(--primary)" variant="Bulk" /> },
+        ]
+    },
+    {
+        title: "Fixed Installation",
+        items: [
+            { label: "LED Screen", href: "/products/fixed/led-screen", icon: <Monitor size="20" color="var(--primary)" variant="Bulk" /> }
+        ]
+    }
+];
+
+const navItems: NavItem[] = [
     { label: "HOME", href: "/" },
     {
         label: "PRODUCTS",
         href: "/products",
-        children: [
-            { label: "Audio System", href: "/products/audio", icon: <Speaker size="20" color="currentColor" variant="Bulk" /> },
-            { label: "Visual System", href: "/products/visual", icon: <Monitor size="20" color="currentColor" variant="Bulk" /> },
-            { label: "Lighting", href: "/products/lighting", icon: <LampOn size="20" color="currentColor" variant="Bulk" /> },
-            { label: "Structure & Stage", href: "/products/structure", icon: <Layer size="20" color="currentColor" variant="Bulk" /> },
-        ]
+        isMega: true,
+        sections: productSections
     },
     { label: "SERVICES", href: "/services" },
-    { label: "PORTFOLIO", href: "/portfolio" },
+    {
+        label: "PORTFOLIO",
+        href: "/portfolio",
+        children: [
+            { label: "Marketing Event", href: "/portfolio/marketing-event" },
+            { label: "Seminar & Conference", href: "/portfolio/seminar-conference" },
+            { label: "Exhibition", href: "/portfolio/exhibition" },
+            { label: "Concert", href: "/portfolio/concert" },
+            { label: "Wedding", href: "/portfolio/wedding" },
+            { label: "Fixed Installation", href: "/portfolio/fixed-installation" },
+        ]
+    },
     { label: "RENTAL", href: "/rental" },
     { label: "CONTACT", href: "/contact" },
 ];
 
 export default function Header() {
     const [mobileOpen, setMobileOpen] = useState(false);
-    // State for Products Dropdown
+
+    // Desktop Menu States
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [activeMenu, setActiveMenu] = useState<string | null>(null);
     const openDropdown = Boolean(anchorEl);
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+    // Mobile States
+    // Track expanded items by ID/Label path
+    // Track expanded items by ID/Label path
+    const [expandedItems, setExpandedItems] = useState<string[]>([]);
+    // Track expanded items for Desktop Mega Menu
+    const [desktopExpandedItems, setDesktopExpandedItems] = useState<string[]>([]);
 
     // State for Contact Menu
     const [contactAnchorEl, setContactAnchorEl] = useState<null | HTMLElement>(null);
     const openContact = Boolean(contactAnchorEl);
+
+    const pathname = usePathname();
+    const isHome = pathname === "/" || pathname === "/contact";
+
+    // ---- Handlers ----
+
+    const handleDrawerToggle = () => {
+        setMobileOpen(!mobileOpen);
+    };
+
     const handleContactClick = (event: React.MouseEvent<HTMLElement>) => {
         setContactAnchorEl(event.currentTarget);
     };
@@ -59,28 +140,20 @@ export default function Header() {
         setContactAnchorEl(null);
     };
 
-    // State for Mobile Products Collapse
-    const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
-
-    const pathname = usePathname();
-    // Check if we are on the home page or contact page
-    const isHome = pathname === "/" || pathname === "/contact";
-
-    const handleDrawerToggle = () => {
-        setMobileOpen(!mobileOpen);
-    };
-
-    const handleHoverOpen = (event: React.MouseEvent<HTMLElement>) => {
+    // Desktop Hover Handlers
+    const handleHoverOpen = (event: React.MouseEvent<HTMLElement>, menuName: string) => {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
+        setActiveMenu(menuName);
         setAnchorEl(event.currentTarget);
     };
 
     const handleHoverClose = () => {
         timeoutRef.current = setTimeout(() => {
             setAnchorEl(null);
-        }, 150); // Small delay to allow moving to menu
+            setActiveMenu(null);
+        }, 150);
     };
 
     const handleMenuEnter = () => {
@@ -97,6 +170,212 @@ export default function Header() {
         if (href === "/") return pathname === "/";
         return pathname.startsWith(href);
     };
+
+    // Mobile Expand/Collapse Handler
+    const handleMobileExpand = (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        setExpandedItems(prev =>
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleDesktopExpand = (id: string, e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDesktopExpandedItems(prev =>
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    // ---- Renderers ----
+
+    // Recursive helper for Mobile List
+    const renderMobileTree = (items: SubItem[] | undefined, level: number = 0, parentId: string) => {
+        if (!items) return null;
+
+        return items.map((child, index) => {
+            const childId = `${parentId}-${child.label}`;
+            const hasChildren = child.children && child.children.length > 0;
+            const isExpanded = expandedItems.includes(childId);
+
+            return (
+                <React.Fragment key={childId}>
+                    <ListItem disablePadding>
+                        <ListItemButton
+                            component={hasChildren ? "div" : Link}
+                            href={hasChildren ? "#" : child.href}
+                            onClick={hasChildren ? (e) => handleMobileExpand(childId, e) : handleDrawerToggle}
+                            sx={{
+                                pl: 4 + (level * 2),
+                                py: 1.5,
+                                '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
+                            }}
+                        >
+                            <ListItemText
+                                primary={child.label}
+                                primaryTypographyProps={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.9rem',
+                                    fontWeight: isActive(child.href) ? 600 : 400,
+                                    color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
+                                }}
+                            />
+                            {hasChildren && (
+                                <ArrowDown2
+                                    size="16"
+                                    color="rgba(255,255,255,0.5)"
+                                    style={{
+                                        transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                        transition: 'transform 0.3s'
+                                    }}
+                                />
+                            )}
+                        </ListItemButton>
+                    </ListItem>
+                    {hasChildren && (
+                        <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                            <List component="div" disablePadding>
+                                {renderMobileTree(child.children, level + 1, childId)}
+                            </List>
+                        </Collapse>
+                    )}
+                </React.Fragment>
+            );
+        });
+    };
+
+    // Recursive helper for Desktop Mega Menu Item
+    // We basically list them, if deeper, we can indent or show simple list
+    // Designed to match the visual: Indented lists
+    const renderDesktopTree = (items: SubItem[] | undefined, level: number = 0, parentId: string = 'root') => {
+        if (!items) return null;
+        return (
+            <Box component="ul" sx={{ listStyle: 'none', m: 0, p: 0, pl: level > 0 ? 1.5 : 0 }}>
+                {items.map((child) => {
+                    const hasChildren = child.children && child.children.length > 0;
+                    const childId = `${parentId}-${child.label}`;
+                    const isExpanded = desktopExpandedItems.includes(childId);
+
+                    return (
+                        <Box component="li" key={child.label} sx={{ mb: 0.5, position: 'relative' }}>
+                            {/* Connector line for nested items - cleaner look */}
+                            {level > 0 && (
+                                <Box sx={{
+                                    position: 'absolute',
+                                    left: -12,
+                                    top: 15,
+                                    width: 8,
+                                    height: 1,
+                                    bgcolor: isActive(child.href) ? 'var(--primary)' : 'rgba(0,0,0,0.1)'
+                                }} />
+                            )}
+
+                            <Box
+                                component={hasChildren ? "div" : Link}
+                                href={hasChildren ? undefined : child.href}
+                                onClick={hasChildren ? (e: React.MouseEvent) => handleDesktopExpand(childId, e) : undefined}
+                                sx={{
+                                    textDecoration: 'none',
+                                    cursor: 'pointer',
+                                    display: 'block',
+                                    position: 'relative'
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        py: 0.8,
+                                        px: 1.5,
+                                        borderRadius: 1.5,
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between',
+                                        width: '100%',
+                                        bgcolor: isActive(child.href) ? 'rgba(10, 92, 90, 0.06)' : 'transparent',
+                                        border: '1px solid',
+                                        borderColor: isActive(child.href) ? 'rgba(10, 92, 90, 0.1)' : 'transparent',
+                                        '&:hover': {
+                                            bgcolor: 'rgba(0,0,0,0.03)',
+                                            transform: 'translateX(3px)',
+                                            borderColor: 'rgba(0,0,0,0.05)'
+                                        }
+                                    }}
+                                >
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        {/* Icon Indication based on type or explicit icon */}
+                                        {child.icon ? (
+                                            <Box sx={{ display: 'flex', color: isActive(child.href) ? 'var(--primary)' : 'inherit' }}>
+                                                {child.icon}
+                                            </Box>
+                                        ) : hasChildren ? (
+                                            <Box sx={{
+                                                width: 6,
+                                                height: 6,
+                                                borderRadius: '1px',
+                                                bgcolor: isExpanded ? 'var(--primary)' : 'rgba(0,0,0,0.3)',
+                                                transform: 'rotate(45deg)',
+                                                transition: 'background-color 0.3s'
+                                            }} />
+                                        ) : (
+                                            <Box sx={{
+                                                width: 4,
+                                                height: 4,
+                                                borderRadius: '50%',
+                                                bgcolor: isActive(child.href) ? 'var(--primary)' : 'rgba(0,0,0,0.2)'
+                                            }} />
+                                        )}
+
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'var(--font-prompt)',
+                                                fontSize: level === 0 ? '0.95rem' : '0.9rem',
+                                                fontWeight: isActive(child.href) || hasChildren ? 600 : 400,
+                                                color: isActive(child.href) ? 'var(--primary)' : 'var(--foreground)',
+                                                letterSpacing: 0.3
+                                            }}
+                                        >
+                                            {child.label}
+                                        </Typography>
+                                    </Box>
+
+                                    {hasChildren && (
+                                        <Box sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            width: 22,
+                                            height: 22,
+                                            borderRadius: '6px',
+                                            bgcolor: isExpanded ? 'rgba(10, 92, 90, 0.1)' : 'transparent',
+                                            color: isExpanded ? 'var(--primary)' : 'rgba(0,0,0,0.3)',
+                                            transition: 'all 0.3s ease',
+                                            border: '1px solid',
+                                            borderColor: isExpanded ? 'rgba(10, 92, 90, 0.2)' : 'rgba(0,0,0,0.05)'
+                                        }}>
+                                            {isExpanded ? (
+                                                <Minus size="12" variant="Linear" />
+                                            ) : (
+                                                <Add size="12" variant="Linear" />
+                                            )}
+                                        </Box>
+                                    )}
+                                </Box>
+                            </Box>
+                            {hasChildren && (
+                                <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                    <Box sx={{ position: 'relative', ml: 1, borderLeft: '1px solid rgba(0,0,0,0.05)', mt: 0.5, mb: 0.5 }}>
+                                        {renderDesktopTree(child.children, level + 1, childId)}
+                                    </Box>
+                                </Collapse>
+                            )}
+                        </Box>
+                    );
+                })}
+            </Box>
+        );
+    };
+
+    // ---- Drawer Content ----
 
     const drawer = (
         <Box sx={{
@@ -133,113 +412,60 @@ export default function Header() {
                 flexGrow: 1,
                 overflowY: 'auto',
                 pt: 1,
-                '&::-webkit-scrollbar': {
-                    width: '4px',
-                },
-                '&::-webkit-scrollbar-track': {
-                    background: 'transparent',
-                },
-                '&::-webkit-scrollbar-thumb': {
-                    background: 'rgba(255,255,255,0.1)',
-                    borderRadius: '10px',
-                },
+                '&::-webkit-scrollbar': { width: '4px' },
+                '&::-webkit-scrollbar-thumb': { background: 'rgba(255,255,255,0.1)', borderRadius: '10px' },
             }}>
                 <List>
-                    {navItems.map((item) => (
-                        <React.Fragment key={item.label}>
-                            {item.children ? (
-                                <>
-                                    <ListItem disablePadding>
-                                        <ListItemButton
-                                            onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
-                                            sx={{
-                                                textAlign: "left",
-                                                px: 4,
-                                                py: 2,
-                                                bgcolor: isActive(item.href) ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                                borderLeft: isActive(item.href) ? '4px solid var(--primary)' : '4px solid transparent',
-                                            }}
-                                        >
-                                            <ListItemText
-                                                primary={
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', color: isActive(item.href) ? 'var(--primary)' : 'inherit' }}>
-                                                            {item.label}
-                                                        </Typography>
-                                                        <ArrowDown2 size="18" color={isActive(item.href) ? 'var(--primary)' : 'rgba(255,255,255,0.5)'} style={{ transform: mobileProductsOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />
-                                                    </Box>
-                                                }
-                                            />
-                                        </ListItemButton>
-                                    </ListItem>
-                                    <Collapse in={mobileProductsOpen} timeout="auto" unmountOnExit>
-                                        <List component="div" disablePadding sx={{ bgcolor: 'rgba(255,255,255,0.03)', mx: 2, my: 1, borderRadius: 1 }}>
-                                            {item.children.map((child) => (
-                                                <ListItem key={child.label} disablePadding>
-                                                    <ListItemButton
-                                                        component={Link}
-                                                        href={child.href}
-                                                        onClick={handleDrawerToggle}
-                                                        sx={{
-                                                            pl: 4,
-                                                            py: 1.5,
-                                                            '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
-                                                        }}
-                                                    >
-                                                        <Box sx={{
-                                                            mr: 2,
-                                                            display: 'flex',
-                                                            color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)'
-                                                        }}>
-                                                            {child.icon}
-                                                        </Box>
-                                                        <ListItemText
-                                                            primary={child.label}
-                                                            primaryTypographyProps={{
-                                                                fontFamily: 'var(--font-prompt)',
-                                                                fontSize: '0.9rem',
-                                                                fontWeight: isActive(child.href) ? 600 : 400,
-                                                                color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
-                                                            }}
-                                                        />
-                                                    </ListItemButton>
-                                                </ListItem>
-                                            ))}
-                                        </List>
-                                    </Collapse>
-                                </>
-                            ) : (
+                    {navItems.map((item) => {
+                        const hasChildren = !!item.children || !!item.sections;
+                        const itemId = `root-${item.label}`;
+                        const isExpanded = expandedItems.includes(itemId);
+
+                        return (
+                            <React.Fragment key={item.label}>
                                 <ListItem disablePadding>
                                     <ListItemButton
+                                        onClick={hasChildren ? (e) => handleMobileExpand(itemId, e) : handleDrawerToggle}
+                                        component={hasChildren ? "div" : Link}
+                                        href={hasChildren ? "#" : item.href}
                                         sx={{
                                             textAlign: "left",
                                             px: 4,
                                             py: 2,
                                             bgcolor: isActive(item.href) ? 'rgba(255,255,255,0.05)' : 'transparent',
                                             borderLeft: isActive(item.href) ? '4px solid var(--primary)' : '4px solid transparent',
-                                            '&:hover': {
-                                                bgcolor: 'rgba(255,255,255,0.08)',
-                                            }
                                         }}
-                                        component={Link}
-                                        href={item.href}
-                                        onClick={handleDrawerToggle}
                                     >
                                         <ListItemText
-                                            primary={item.label}
-                                            primaryTypographyProps={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                color: isActive(item.href) ? 'var(--primary)' : 'inherit',
-                                                fontWeight: isActive(item.href) ? 700 : 500,
-                                                fontSize: '1rem',
-                                                letterSpacing: 1
-                                            }}
+                                            primary={
+                                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
+                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', color: isActive(item.href) ? 'var(--primary)' : 'inherit' }}>
+                                                        {item.label}
+                                                    </Typography>
+                                                    {hasChildren && <ArrowDown2 size="18" color={isActive(item.href) ? 'var(--primary)' : 'rgba(255,255,255,0.5)'} style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />}
+                                                </Box>
+                                            }
                                         />
                                     </ListItemButton>
                                 </ListItem>
-                            )}
-                        </React.Fragment>
-                    ))}
+                                {hasChildren && (
+                                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                        <List component="div" disablePadding sx={{ bgcolor: 'rgba(255,255,255,0.03)', mx: 0 }}>
+                                            {item.children && renderMobileTree(item.children, 0, itemId)}
+                                            {item.sections && item.sections.map((section, idx) => (
+                                                <Box key={section.title} sx={{ mb: 1 }}>
+                                                    <Typography variant="overline" sx={{ display: 'block', px: 4, pt: 2, color: 'rgba(255,255,255,0.4)', fontWeight: 'bold' }}>
+                                                        {section.title}
+                                                    </Typography>
+                                                    {renderMobileTree(section.items, 0, `${itemId}-sec-${idx}`)}
+                                                </Box>
+                                            ))}
+                                        </List>
+                                    </Collapse>
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
                 </List>
             </Box>
 
@@ -305,7 +531,6 @@ export default function Header() {
             >
                 <Toolbar sx={{ justifyContent: "space-between", height: '90px' }}>
 
-
                     {/* Brand / Logo */}
                     <Box sx={{
                         display: 'flex',
@@ -352,7 +577,7 @@ export default function Header() {
                             />
                         </Box>
 
-                        {/* Date/Location Text similar to reference - Hide on mobile, show on large screens */}
+                        {/* Date/Location Text - Hide on mobile */}
                         <Box sx={{ display: { xs: 'none', lg: 'block' }, ml: 3, borderLeft: '1px solid rgba(255,255,255,0.3)', pl: 3 }}>
                             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
                                 PROFESSIONAL TEAM
@@ -366,17 +591,16 @@ export default function Header() {
                     {/* Navigation */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4, alignItems: 'center' }}>
                         {navItems.map((item) => {
-                            const active = isActive(item.href) || (item.children && item.children.some(child => isActive(child.href)));
-
-                            // Always use light text logic since background is now always dark (transparent or #1a1a1a)
+                            const hasDropdown = !!item.children || !!item.isMega;
+                            const active = isActive(item.href);
                             const finalColor = active ? 'var(--secondary)' : 'rgba(255,255,255,0.9)';
 
-                            if (item.children) {
+                            if (hasDropdown) {
                                 return (
                                     <Box
                                         key={item.label}
                                         onMouseLeave={handleHoverClose}
-                                        onMouseEnter={handleHoverOpen}
+                                        onMouseEnter={(e) => handleHoverOpen(e, item.label)}
                                     >
                                         <Box
                                             component={Link}
@@ -399,9 +623,7 @@ export default function Header() {
                                                     transition: 'color 0.3s ease',
                                                     textTransform: 'uppercase',
                                                     letterSpacing: 1,
-                                                    '&:hover': {
-                                                        color: 'var(--secondary)',
-                                                    }
+                                                    '&:hover': { color: 'var(--secondary)' }
                                                 }}
                                             >
                                                 {item.label}
@@ -411,69 +633,81 @@ export default function Header() {
                                                 color={finalColor}
                                                 variant="Bold"
                                                 style={{
-                                                    transform: openDropdown ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                    transform: openDropdown && activeMenu === item.label ? 'rotate(180deg)' : 'rotate(0deg)',
                                                     transition: 'transform 0.3s'
                                                 }}
                                             />
                                         </Box>
+
                                         <Menu
                                             anchorEl={anchorEl}
-                                            open={openDropdown}
+                                            open={openDropdown && activeMenu === item.label}
                                             onClose={handleHoverClose}
                                             TransitionComponent={Fade}
                                             disableScrollLock={true}
                                             MenuListProps={{
                                                 onMouseEnter: handleMenuEnter,
                                                 onMouseLeave: handleMenuLeave,
-                                                sx: { py: 1 }
+                                                sx: { py: 0 }
                                             }}
                                             PaperProps={{
                                                 elevation: 0,
                                                 sx: {
                                                     mt: 2,
                                                     overflow: 'visible',
-                                                    filter: 'drop-shadow(0px 20px 50px rgba(0,0,0,0.1))',
-                                                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                                    backdropFilter: 'blur(20px)',
+                                                    filter: 'drop-shadow(0px 30px 60px rgba(0,0,0,0.15))',
+                                                    bgcolor: 'rgba(255, 255, 255, 0.96)', // Slightly more opaque for premium feel
+                                                    backdropFilter: 'blur(40px)', // Heavier blur
                                                     border: '1px solid rgba(255, 255, 255, 0.8)',
-                                                    borderRadius: 1, // Sharper corners for modern look
-                                                    minWidth: 260,
+                                                    borderRadius: 2,
+                                                    minWidth: item.isMega ? 700 : 260, // Wider for mega menu
                                                 },
                                             }}
                                             transformOrigin={{ horizontal: 'left', vertical: 'top' }}
                                             anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
                                         >
-                                            {item.children.map((child) => (
-                                                <MenuItem
-                                                    key={child.label}
-                                                    onClick={handleHoverClose}
-                                                    component={Link}
-                                                    href={child.href}
-                                                    sx={{
-                                                        fontFamily: 'var(--font-prompt)',
-                                                        color: 'var(--foreground)',
-                                                        py: 1.5,
-                                                        px: 2,
-                                                        mx: 1,
-                                                        my: 0.5,
-                                                        borderRadius: 1,
-                                                        gap: 2,
-                                                        transition: 'all 0.3s ease',
-                                                        '&:hover': {
-                                                            bgcolor: 'rgba(10, 92, 90, 0.04)',
-                                                            transform: 'translateX(4px)',
-                                                        }
-                                                    }}
-                                                >
-                                                    <Box
-                                                        className="menu-icon"
-                                                        sx={{ p: 0.5, borderRadius: 1, bgcolor: 'rgba(0,0,0,0.05)' }}
-                                                    >
-                                                        {child.icon}
-                                                    </Box>
-                                                    <Typography variant="body2" sx={{ fontWeight: 600, fontSize: '0.95rem', fontFamily: 'var(--font-prompt)' }}>{child.label}</Typography>
-                                                </MenuItem>
-                                            ))}
+                                            {/* If Single List (Portfolio) */}
+                                            {item.children && !item.isMega && (
+                                                <Box sx={{ p: 2 }}>
+                                                    {renderDesktopTree(item.children, 0, item.label)}
+                                                </Box>
+                                            )}
+
+                                            {/* If Mega Menu (Products) */}
+                                            {item.isMega && item.sections && (
+                                                <Box sx={{ display: 'flex', p: 0 }}>
+                                                    {item.sections?.map((section, idx) => (
+                                                        <Box
+                                                            key={section.title}
+                                                            sx={{
+                                                                p: 4,
+                                                                flex: idx === 0 ? '1 1 auto' : '0 0 250px', // Rental gets more space, Fixed gets fixed width
+                                                                borderRight: idx !== (item.sections?.length ?? 0) - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                                                                bgcolor: idx === 0 ? 'transparent' : 'rgba(0,0,0,0.02)' // Subtle distinction
+                                                            }}
+                                                        >
+                                                            <Typography variant="overline" sx={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontWeight: 800,
+                                                                mb: 3,
+                                                                color: 'var(--primary)',
+                                                                letterSpacing: 1.5,
+                                                                display: 'block',
+                                                                borderBottom: '2px solid var(--primary)',
+                                                                pb: 1,
+                                                                width: 'fit-content'
+                                                            }}>
+                                                                {section.title}
+                                                            </Typography>
+
+                                                            {/* Custom Layout for Rental to split widely if needed, or just standard tree */}
+                                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                                {renderDesktopTree(section.items)}
+                                                            </Box>
+                                                        </Box>
+                                                    ))}
+                                                </Box>
+                                            )}
                                         </Menu>
                                     </Box>
                                 );
@@ -491,9 +725,7 @@ export default function Header() {
                                                 transition: 'color 0.3s ease',
                                                 textTransform: 'uppercase',
                                                 letterSpacing: 1,
-                                                '&:hover': {
-                                                    color: 'var(--secondary)',
-                                                }
+                                                '&:hover': { color: 'var(--secondary)' }
                                             }}
                                         >
                                             {item.label}
@@ -506,12 +738,6 @@ export default function Header() {
 
                     {/* Right Action Area */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: 'center', gap: 3 }}>
-                        {/* Social Icons Placeholder - matching reference layout */}
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%', opacity: 0.5 }} />
-                            <Box component="span" sx={{ width: 8, height: 8, bgcolor: 'white', borderRadius: '50%', opacity: 0.5 }} />
-                        </Box>
-
                         <Button
                             variant="outlined"
                             onClick={handleContactClick}
@@ -641,4 +867,3 @@ export default function Header() {
         </Box>
     );
 }
-
