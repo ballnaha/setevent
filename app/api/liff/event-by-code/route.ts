@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
-        const inviteCode = searchParams.get('code');
+        const inviteCode = searchParams.get('inviteCode');
         const lineUid = searchParams.get('lineUid');
 
         if (!inviteCode) {
@@ -30,6 +30,9 @@ export async function GET(request: NextRequest) {
                     }
                 },
                 timelines: {
+                    orderBy: { createdAt: 'desc' }
+                },
+                chatLogs: {
                     orderBy: { createdAt: 'desc' }
                 },
                 bookings: true,
@@ -69,13 +72,27 @@ export async function GET(request: NextRequest) {
                 where: { id: event.id },
                 include: {
                     timelines: { orderBy: { createdAt: 'desc' } },
+                    chatLogs: { orderBy: { createdAt: 'desc' } },
                     bookings: true,
+                    customer: {
+                        select: {
+                            displayName: true
+                        }
+                    }
                 }
             });
 
+            if (!updatedEvent) return NextResponse.json({ error: 'Event not found after update' }, { status: 404 });
+
             return NextResponse.json({
                 success: true,
-                event: updatedEvent,
+                event: {
+                    ...updatedEvent,
+                    chatLogs: updatedEvent.chatLogs.map(log => ({
+                        ...log,
+                        senderName: log.direction === 'inbound' ? (updatedEvent.customer.displayName || 'Customer') : 'Admin'
+                    }))
+                },
             });
         }
 
@@ -91,6 +108,10 @@ export async function GET(request: NextRequest) {
                 status: event.status,
                 totalPrice: event.totalPrice,
                 timelines: event.timelines,
+                chatLogs: event.chatLogs.map(log => ({
+                    ...log,
+                    senderName: log.direction === 'inbound' ? (event.customer.displayName || 'Customer') : 'Admin'
+                })),
                 bookings: event.bookings,
             },
         });

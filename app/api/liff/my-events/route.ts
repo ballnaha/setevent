@@ -33,6 +33,21 @@ export async function GET(request: NextRequest) {
                         eventDate: true,
                         venue: true,
                         status: true,
+                        _count: {
+                            select: { chatLogs: true }
+                        },
+                        // Fetch recent chat logs to find an image sent to customer
+                        chatLogs: {
+                            where: {
+                                direction: 'outbound'
+                            },
+                            orderBy: { createdAt: 'desc' },
+                            take: 10,
+                            select: {
+                                message: true,
+                                messageType: true
+                            }
+                        }
                     }
                 }
             }
@@ -43,22 +58,45 @@ export async function GET(request: NextRequest) {
                 success: true,
                 customer: null,
                 events: [],
-                status: 'new', // ลูกค้าใหม่ ยังไม่เคยทักแชท
+                status: 'new',
             });
         }
 
-        // Check customer status
-        if (customer.status === 'pending') {
-            return NextResponse.json({
-                success: true,
-                customer: {
-                    id: customer.id,
-                    displayName: customer.displayName,
-                },
-                events: [],
-                status: 'pending', // รอทีมงานติดต่อกลับ
-            });
-        }
+        // ...
+
+        // Map events to include task count and find latest image
+        const eventsWithDetails = customer.events.map((evt: any) => {
+            let latestImageUrl = null;
+
+            // Find first image in chat logs
+            for (const log of evt.chatLogs) {
+                try {
+                    // Check if it's a status message with images
+                    if (log.message.trim().startsWith('{')) {
+                        const parsed = JSON.parse(log.message);
+                        if (parsed.imageUrls && Array.isArray(parsed.imageUrls) && parsed.imageUrls.length > 0) {
+                            latestImageUrl = parsed.imageUrls[0];
+                            break;
+                        }
+                    }
+                    // Add other image checks if needed
+                } catch (e) {
+                    continue;
+                }
+            }
+
+            return {
+                id: evt.id,
+                eventName: evt.eventName,
+                inviteCode: evt.inviteCode,
+                eventDate: evt.eventDate,
+                venue: evt.venue,
+                status: evt.status,
+                tasksCount: evt._count.chatLogs,
+                // Use latest image found, or fallback to a default event placeholder (not customer pic)
+                customerPictureUrl: latestImageUrl
+            };
+        });
 
         // Return events
         return NextResponse.json({
@@ -66,9 +104,10 @@ export async function GET(request: NextRequest) {
             customer: {
                 id: customer.id,
                 displayName: customer.displayName,
+                pictureUrl: customer.pictureUrl,
             },
-            events: customer.events,
-            status: customer.events.length > 0 ? 'has-events' : 'no-events',
+            events: eventsWithDetails,
+            status: eventsWithDetails.length > 0 ? 'has-events' : 'no-events',
         });
 
     } catch (error) {

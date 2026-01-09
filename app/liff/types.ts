@@ -11,6 +11,15 @@ export interface EventTimeline {
     createdAt: string;
 }
 
+export interface ChatLog {
+    id: string;
+    message: string;
+    direction: string;
+    messageType: string;
+    createdAt: string;
+    senderName?: string;
+}
+
 export interface EventData {
     id: string;
     eventName: string;
@@ -20,6 +29,7 @@ export interface EventData {
     description: string | null;
     status: string;
     timelines: EventTimeline[];
+    chatLogs: ChatLog[];
 }
 
 export interface EventSummary {
@@ -29,4 +39,6 @@ export interface EventSummary {
     eventDate: string | null;
     venue: string | null;
     status: string;
+    tasksCount?: number;
+    customerPictureUrl?: string | null;
 }

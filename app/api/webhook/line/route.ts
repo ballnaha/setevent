@@ -71,11 +71,25 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
         },
     });
 
-    // บันทึก Chat Log
+    // หา Event ล่าสุดที่ยังไม่จบ (ไม่ใช่ completed/cancelled) เพื่อ link ข้อความ
+    const latestActiveEvent = await prisma.event.findFirst({
+        where: {
+            customerId: customer.id,
+            status: {
+                notIn: ['completed', 'cancelled']
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    });
+
+    const eventIdToLink = latestActiveEvent?.id || null;
+
+    // บันทึก Chat Log พร้อม link กับ Event (ถ้ามี)
     if (message.type === 'text') {
         await prisma.chatLog.create({
             data: {
                 customerId: customer.id,
+                eventId: eventIdToLink,
                 message: message.text,
                 direction: 'inbound',
                 messageType: 'text',
@@ -85,6 +99,7 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
         await prisma.chatLog.create({
             data: {
                 customerId: customer.id,
+                eventId: eventIdToLink,
                 message: `[รูปภาพ: ${message.id}]`,
                 direction: 'inbound',
                 messageType: 'image',
@@ -94,6 +109,7 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
         await prisma.chatLog.create({
             data: {
                 customerId: customer.id,
+                eventId: eventIdToLink,
                 message: `[สติกเกอร์: ${message.packageId}/${message.stickerId}]`,
                 direction: 'inbound',
                 messageType: 'sticker',
@@ -101,7 +117,7 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
         });
     }
 
-    console.log(`📩 New message from ${profile?.displayName || lineUid}: ${message.text || message.type}`);
+    console.log(`📩 New message from ${profile?.displayName || lineUid}: ${message.text || message.type}${eventIdToLink ? ` (linked to event ${eventIdToLink})` : ''}`);
 }
 
 async function handleFollow(lineUid: string) {

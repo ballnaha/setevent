@@ -37,18 +37,27 @@ export async function GET(
     }
 }
 
-export async function PATCH(
+// Update Event (Full Update)
+export async function PUT(
     request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+    context: { params: Promise<{ id: string }> }
 ) {
     try {
-        const { id } = await params;
+        const { id } = await context.params;
         const body = await request.json();
-        const { status } = body;
+        const { eventName, customerId, eventDate, venue, description, notes, status } = body;
 
         const updatedEvent = await prisma.event.update({
             where: { id },
-            data: { status },
+            data: {
+                eventName,
+                customerId,
+                eventDate: eventDate ? new Date(eventDate) : null,
+                venue,
+                description,
+                notes,
+                ...(status && { status }) // Update status if provided
+            },
         });
 
         return NextResponse.json(updatedEvent);
@@ -57,3 +66,44 @@ export async function PATCH(
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
+
+// PATCH Event (Partial Update)
+export async function PATCH(
+    request: NextRequest,
+    context: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await context.params;
+        const body = await request.json();
+
+        // Allow updating any field, but typically used for status
+        const updatedEvent = await prisma.event.update({
+            where: { id },
+            data: body,
+        });
+
+        return NextResponse.json(updatedEvent);
+    } catch (error) {
+        console.error('Error patching event:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
+
+// Delete Event
+export async function DELETE(
+    request: NextRequest,
+    context: { params: Promise<{ id: string }> }
+) {
+    try {
+        const { id } = await context.params;
+        await prisma.event.delete({
+            where: { id },
+        });
+
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        console.error('Error deleting event:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}
+

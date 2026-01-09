@@ -1,0 +1,261 @@
+============================================================
+Event: งานรับปริญญา
+Event ID: cmk6h5nh7000d9h1g47otuilj
+Customer: บอล
+Customer LINE UID: U28a72146890f8dfa7fbbac7560d3195e
+============================================================
+
+Chat Logs linked to this event: 4
+
+--- Chat Log 1 ---
+ID: cmk6lcave00019hws68o22bam
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 15:04:59 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"test","progress":20,"imageUrls":["https://e2c1cc3bb0b8.ngrok-free.app/uploads/cmk6h5nh7000d9h1g47otuilj/1767945899029-ChatGPTImageAug23202503_02_40PM.jpg"],"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T19:00:00.000Z"}
+
+--- Chat Log 2 ---
+ID: cmk6iltkt000l9h1g3ki7m75h
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:48:25 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"555","progress":20,"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T19:00:00.000Z"}
+
+--- Chat Log 3 ---
+ID: cmk6hmtfs000j9h1gxe1ggbwb
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:21:11 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"test","progress":20,"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T19:00:00.000Z"}
+
+--- Chat Log 4 ---
+ID: cmk6h6uqf000f9h1gfviua2v8
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:08:47 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"ไปหน้างานแล้ว","progress":10,"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T17:00:00.000Z"}
+
+============================================================
+ALL Chat Logs for this customer: 18
+
+--- Customer Chat 1 ---
+ID: cmk6lcave00019hws68o22bam
+Event ID: cmk6h5nh7000d9h1g47otuilj
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 15:04:59 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"test","progress":20,"imageUrls":["https://e2c1cc3bb0b8.ngrok-free.app/uploads/cmk6h5nh7000d9h1g47otuilj/1767945899029-ChatGPTImageAug23202503_02_40PM.jpg"],"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T19:00:00.000Z"}
+
+--- Customer Chat 2 ---
+ID: cmk6kl1lz000u9h1g6lewopxs
+Event ID: NOT LINKED
+Direction: inbound
+Type: text
+Created: Fri Jan 09 2026 14:43:48 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+## Error Type
+Console Error
+
+## Error Message
+A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+https://react.dev/link/hydration-mismatch
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/liff" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="/event/app...">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html
+                          lang="th"
+                          translate="no"
+-                         style={{--android-safe-area-inset-top:"0.0px"}}
+                        >
+                  ...
+
+
+
+    at html (<anonymous>:null:null)
+    at RootLayout (app\layout.tsx:94:5)
+
+## Code Frame
+  92 | }>) {
+  93 |   return (
+> 94 |     <html lang="th" translate="no">
+     |     ^
+  95 |       <body
+  96 |         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
+  97 |         style={{ margin: 0 }}
+
+Next.js version: 16.1.1 (Turbopack)
+
+
+--- Customer Chat 3 ---
+ID: cmk6iltkt000l9h1g3ki7m75h
+Event ID: cmk6h5nh7000d9h1g47otuilj
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:48:25 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"555","progress":20,"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T19:00:00.000Z"}
+
+--- Customer Chat 4 ---
+ID: cmk6hmtfs000j9h1gxe1ggbwb
+Event ID: cmk6h5nh7000d9h1g47otuilj
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:21:11 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"test","progress":20,"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T19:00:00.000Z"}
+
+--- Customer Chat 5 ---
+ID: cmk6h7nh1000h9h1ghhahag0x
+Event ID: cmk6g75dl00019h1gk26iimei
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:09:24 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"HappyBirthday Connect","status":"completed","message":"เสร็จสิ้น","senderName":"Admin User","venue":"บ้านรัตนาวงศ์ไชยา","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 6 ---
+ID: cmk6h6uqf000f9h1gfviua2v8
+Event ID: cmk6h5nh7000d9h1g47otuilj
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:08:47 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานรับปริญญา","status":"in-progress","message":"ไปหน้างานแล้ว","progress":10,"senderName":"Admin User","venue":"ม.เกษตรศาสตร์","eventDate":"2026-01-11T17:00:00.000Z"}
+
+--- Customer Chat 7 ---
+ID: cmk6h3iaj000b9h1gv8s9ji5f
+Event ID: cmk6g75dl00019h1gk26iimei
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:06:11 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"HappyBirthday Connect","status":"in-progress","message":"ลองดูสี","progress":100,"senderName":"Admin User","venue":"บ้านรัตนาวงศ์ไชยา","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 8 ---
+ID: cmk6h1pqi00099h1g5ycqr26w
+Event ID: cmk6g75dl00019h1gk26iimei
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:04:47 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"HappyBirthday Connect","status":"in-progress","message":"ติดตั้งจอสำเร็จ","progress":100,"senderName":"Admin User","venue":"บ้านรัตนาวงศ์ไชยา","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 9 ---
+ID: cmk6gz5xd00079h1gt283h7h3
+Event ID: cmk6g75dl00019h1gk26iimei
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 13:02:48 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"HappyBirthday Connect","status":"in-progress","message":"test","progress":30,"senderName":"Admin User","venue":"บ้านรัตนาวงศ์ไชยา","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 10 ---
+ID: cmk6gqblz00059h1gsgzkcjvl
+Event ID: cmk6g75dl00019h1gk26iimei
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 12:55:55 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"HappyBirthday Connect","status":"in-progress","message":"ถถถถ","progress":10,"senderName":"Admin User","venue":"บ้านรัตนาวงศ์ไชยา","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 11 ---
+ID: cmk6glsy600039h1gi0gjzggr
+Event ID: cmk6g75dl00019h1gk26iimei
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 12:52:25 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"HappyBirthday Connect","status":"in-progress","message":"test","senderName":"Admin User","venue":"บ้านรัตนาวงศ์ไชยา","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 12 ---
+ID: cmk6b52mz000b9hr4pbl94mfw
+Event ID: NOT LINKED
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 10:19:26 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานบวชลูกชาย","status":"in-progress","message":"กกกกก","progress":20,"imageUrls":["https://6e3011f9e142.ngrok-free.app/uploads/cmk6afzlm00019hr4xnhsm6su/1767928765389-Gemini_Generated_Image_755e7k755e7k755e.jpg"],"senderName":"Admin User","venue":"วัดห้วยจรเข้","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 13 ---
+ID: cmk6b2e5y00099hr4bnuszcnr
+Event ID: NOT LINKED
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 10:17:21 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานบวชลูกชาย","status":"in-progress","message":"ทดสอบ","progress":20,"imageUrls":["https://6e3011f9e142.ngrok-free.app/uploads/cmk6afzlm00019hr4xnhsm6su/1767928640658-270d76bf66bfb22a458c1ed139c346847b7e3bcc1.jpg"],"senderName":"Admin User","venue":"วัดห้วยจรเข้","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 14 ---
+ID: cmk6azt3000079hr45gf4aui6
+Event ID: NOT LINKED
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 10:15:20 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานบวชลูกชาย","status":"in-progress","message":"test","progress":20,"senderName":"Admin User","venue":"วัดห้วยจรเข้","eventDate":"2026-01-08T17:00:00.000Z"}
+
+--- Customer Chat 15 ---
+ID: cmk6aop5u00059hr472wbnary
+Event ID: NOT LINKED
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 10:06:42 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานบวชลูกชาย","status":"in-progress","message":"20% แล้วค่ะ","progress":20,"imageUrls":["https://6e3011f9e142.ngrok-free.app/uploads/cmk6afzlm00019hr4xnhsm6su/1767928001687-Gemini_Generated_Image_mgbvj7mgbvj7mgbv.jpg"],"senderName":"Admin User","venue":"วัดห้วยจรเข้"}
+
+--- Customer Chat 16 ---
+ID: cmk6agtxk00039hr4r0f4lj3q
+Event ID: NOT LINKED
+Direction: outbound
+Type: status
+Created: Fri Jan 09 2026 10:00:35 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+{"type":"status","eventName":"งานบวชลูกชาย","status":"in-progress","message":"เริ่มตั้งจอแล้วนะคะ","progress":10,"imageUrls":["https://6e3011f9e142.ngrok-free.app/uploads/cmk6afzlm00019hr4xnhsm6su/1767927634643-ChatGPTImageAug23202503_02_40PM.jpg"],"senderName":"Admin User"}
+
+--- Customer Chat 17 ---
+ID: cmk681m1y00059hbcmiaz3gl7
+Event ID: NOT LINKED
+Direction: inbound
+Type: image
+Created: Fri Jan 09 2026 08:52:46 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+[รูปภาพ: 595745955819815067]
+
+--- Customer Chat 18 ---
+ID: cmk67zkb300029hbce6d4eafl
+Event ID: NOT LINKED
+Direction: inbound
+Type: text
+Created: Fri Jan 09 2026 08:51:10 GMT+0700 (เวลาอินโดจีน)
+Full Message:
+Test

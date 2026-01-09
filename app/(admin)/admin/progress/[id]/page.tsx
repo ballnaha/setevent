@@ -24,9 +24,16 @@ import {
     Stack,
     Chip,
     FormControlLabel,
-    Checkbox
+    Checkbox,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    useMediaQuery,
+    useTheme,
+    Paper
 } from '@mui/material';
-import { ArrowLeft, Trash, Image as ImageIcon, FolderOpen } from 'iconsax-react';
+import { ArrowLeft, Trash, Image as ImageIcon, FolderOpen, User, Location, Calendar } from 'iconsax-react';
 import TopSnackbar from '@/components/ui/TopSnackbar';
 
 // Status Configuration
@@ -40,8 +47,8 @@ function StatusFlexPreview({ eventName, status, message, imageUrls, progress, se
     const config = statusLabels[status] || statusLabels['in-progress'];
 
     const now = new Date();
-    const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
-    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: '2-digit' });
+    const timeStr = now.toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
 
     // Format event date for preview
     let formattedEventDate = eventDate;
@@ -49,9 +56,13 @@ function StatusFlexPreview({ eventName, status, message, imageUrls, progress, se
         try {
             const d = new Date(eventDate);
             if (!isNaN(d.getTime())) {
-                formattedEventDate = d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
-                if (d.getHours() > 0 || d.getMinutes() > 0) {
-                    formattedEventDate += ` ${d.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}`;
+                formattedEventDate = d.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: 'numeric' });
+                // Check if time is non-zero (assuming 00:00 is "no time")
+                // Note: handling timezone conversion carefully.
+                // If we want to show time only if it was set:
+                const timePart = d.toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
+                if (timePart !== '00:00') {
+                    formattedEventDate += ` ${timePart}`;
                 }
             }
         } catch (e) { }
@@ -77,16 +88,16 @@ function StatusFlexPreview({ eventName, status, message, imageUrls, progress, se
                     {/* Event Date */}
                     {formattedEventDate && (
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 1 }}>
-                            <img src="https://img.icons8.com/fluency/48/calendar.png" style={{ width: 14, height: 14, marginTop: 2 }} alt="date" />
-                            <Typography sx={{ fontSize: '0.75rem', color: '#888', lineHeight: 1.4 }}>{formattedEventDate}</Typography>
+                            <Typography sx={{ fontSize: '0.75rem', color: '#1a1a1a', fontWeight: 'bold', minWidth: '80px' }}>วันที่เริ่มงาน :</Typography>
+                            <Typography sx={{ fontSize: '0.75rem', color: '#666', lineHeight: 1.4 }}>{formattedEventDate}</Typography>
                         </Box>
                     )}
 
                     {/* Venue */}
                     {venue && (
                         <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, mb: 2 }}>
-                            <img src="https://img.icons8.com/fluency/48/place-marker.png" style={{ width: 14, height: 14, marginTop: 2 }} alt="location" />
-                            <Typography sx={{ fontSize: '0.75rem', color: '#888', lineHeight: 1.4 }}>{venue}</Typography>
+                            <Typography sx={{ fontSize: '0.75rem', color: '#1a1a1a', fontWeight: 'bold', minWidth: '80px' }}>สถานที่จัดงาน :</Typography>
+                            <Typography sx={{ fontSize: '0.75rem', color: '#666', lineHeight: 1.4 }}>{venue}</Typography>
                         </Box>
                     )}
 
@@ -140,6 +151,8 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     const router = useRouter();
     const { data: session } = useSession();
     const [event, setEvent] = useState<any>(null);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const [chatLogs, setChatLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -151,7 +164,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     const [selectedImages, setSelectedImages] = useState<{ file: File, url: string }[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<{ file: File, name: string, size: number }[]>([]);
     const [sending, setSending] = useState(false);
-    const [notifyLine, setNotifyLine] = useState(true);
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'warning' });
 
     useEffect(() => {
@@ -227,17 +240,23 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     }
 
 
-    async function handleSend() {
-        if (!event) return;
-
-        // Validate: must have message or images or files
-        const hasContent = message.trim() || selectedImages.length > 0 || selectedFiles.length > 0;
-        if (!hasContent) {
-            setSnackbar({ open: true, message: 'กรุณาใส่ข้อความ หรือเลือกรูปภาพ/ไฟล์', severity: 'error' });
+    function handleSendClick() {
+        // Validate: MUST have a message
+        if (!message.trim()) {
+            setSnackbar({ open: true, message: 'กรุณาใส่ข้อความ', severity: 'error' });
             return;
         }
 
+        setConfirmDialogOpen(true);
+    }
+
+    async function executeSend() {
+        if (!event) return;
+
+        // Only set sending true here if we are NOT skipping dialog (or we handle it)
+        // But since executeSend does async work, it's fine.
         setSending(true);
+        setConfirmDialogOpen(false);
 
         try {
             // 0. Update Status in DB (If Status Mode)
@@ -248,14 +267,6 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     body: JSON.stringify({ status: newStatus })
                 });
                 if (!res.ok) throw new Error('Failed to update status');
-            }
-
-            // If only updating status without LINE notification
-            if (sendMode === 'status' && !notifyLine) {
-                setSnackbar({ open: true, message: 'บันทึกสถานะเรียบร้อยแล้ว', severity: 'success' });
-                fetchEventDetails();
-                setSending(false);
-                return;
             }
 
             // 1. Upload Images
@@ -358,7 +369,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     if (!event) return <Box sx={{ p: 4 }}>Event not found</Box>;
 
     return (
-        <Box>
+        <Box sx={{ pb: 12 }}>
             {/* Header */}
             <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ xs: 'flex-start', md: 'center' }} spacing={2} sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', width: '100%' }}>
@@ -369,10 +380,29 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                         <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, fontSize: { xs: '1.25rem', md: '1.5rem' }, lineHeight: 1.3 }}>
                             {event.eventName}
                         </Typography>
+
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: { xs: 2, md: 3 }, mt: 1.5, mb: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <User size={18} color="#666" />
+                                <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: '#444' }}>
+                                    {event.customer?.displayName} {event.customer?.companyName && <span style={{ opacity: 0.7 }}>({event.customer.companyName})</span>}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Location size={18} color="#666" />
+                                <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: '#444' }}>
+                                    {event.venue || '-'}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Calendar size={18} color="#666" />
+                                <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: '#444' }}>
+                                    {event.eventDate ? new Date(event.eventDate).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) : '-'}
+                                </Typography>
+                            </Box>
+                        </Box>
                         <Stack direction="row" spacing={1} alignItems="center">
-                            <Typography variant="caption" sx={{ color: '#999', fontFamily: 'var(--font-prompt)' }}>
-                                ID: {event.id}
-                            </Typography>
+
                             <Box sx={{ display: { xs: 'block', md: 'none' } }}>
                                 <Chip
                                     label={statusLabels[event.status]?.label || event.status}
@@ -482,7 +512,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
 
                             <TextField
                                 fullWidth multiline rows={3}
-                                label="ข้อความถึงลูกค้า (ไม่บังคับ)"
+                                label="ข้อความถึงลูกค้า *"
                                 value={message}
                                 onChange={(e) => setMessage(e.target.value)}
                                 sx={{ mb: 3 }}
@@ -592,51 +622,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                 )}
                             </Box>
 
-                            <Divider sx={{ my: 3 }} />
-
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                {sendMode === 'status' && (
-                                    <FormControlLabel
-                                        control={
-                                            <Checkbox
-                                                checked={notifyLine}
-                                                onChange={(e) => setNotifyLine(e.target.checked)}
-                                                color="primary"
-                                            />
-                                        }
-                                        label={
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.95rem' }}>
-                                                แจ้งเตือนลูกค้าทาง LINE
-                                            </Typography>
-                                        }
-                                        sx={{ mb: 1 }}
-                                    />
-                                )}
-
-                                <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                                    <Button
-                                        variant="contained"
-                                        fullWidth
-                                        size="large"
-                                        onClick={handleSend}
-                                        disabled={sending}
-                                        sx={{
-                                            py: 2,
-                                            bgcolor: 'var(--primary)',
-                                            boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontSize: '1.1rem'
-                                        }}
-                                    >
-                                        {sending ? 'กำลังบันทึก...' : sendMode === 'status' ? (notifyLine ? 'บันทึกและส่งอัพเดท' : 'บันทึกสถานะ') : 'ส่งข้อความ'}
-                                    </Button>
-                                    {sendMode === 'status' && notifyLine && (
-                                        <Typography sx={{ textAlign: 'center', mt: 2, fontSize: '0.8rem', color: '#999' }}>
-                                            * ลูกค้าจะได้รับแจ้งเตือนทาง LINE ทันที
-                                        </Typography>
-                                    )}
-                                </Box>
-
                                 {sendMode === 'status' && (
                                     <Box sx={{ flex: 1, bgcolor: '#fafafa', borderRadius: 2, p: 2 }}>
                                         <Typography sx={{ fontSize: '0.8rem', color: '#888', mb: 1, textAlign: 'center' }}>ตัวอย่าง</Typography>
@@ -758,6 +744,110 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 severity={snackbar.severity as any}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
             />
+
+            {/* Sticky Action Footer */}
+            <Paper
+                elevation={0}
+                sx={{
+                    position: 'fixed',
+                    bottom: 0,
+                    left: { xs: 0, md: 260 }, // 260 is drawerWidth
+                    right: 0,
+                    p: 2,
+                    borderTop: '1px solid #eee',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    zIndex: 1300, // Higher than global bottom nav (1200)
+                    bgcolor: 'rgba(255,255,255,0.9)',
+                    backdropFilter: 'blur(10px)',
+                }}
+            >
+                <Button
+                    variant="outlined"
+                    onClick={() => router.back()}
+                    disabled={sending}
+                    sx={{
+                        fontFamily: 'var(--font-prompt)',
+                        borderRadius: 2,
+                        minWidth: 100
+                    }}
+                >
+                    ย้อนกลับ
+                </Button>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleSendClick}
+                        disabled={sending}
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            borderRadius: 2,
+                            px: 4,
+                            bgcolor: 'var(--primary)',
+                            boxShadow: '0 4px 15px rgba(220, 38, 38, 0.3)',
+                        }}
+                    >
+                        {sending ? 'กำลังบันทึก...' : sendMode === 'status' ? 'บันทึกและส่งอัพเดท' : 'ส่งข้อความ'}
+                    </Button>
+                </Box>
+            </Paper>
+
+            {/* Confirmation Dialog */}
+            <Dialog
+                open={confirmDialogOpen}
+                onClose={() => setConfirmDialogOpen(false)}
+                maxWidth="sm"
+                fullWidth
+                fullScreen={isMobile}
+                PaperProps={{
+                    sx: { borderRadius: isMobile ? 0 : 3 }
+                }}
+            >
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>
+                    ยืนยันการส่งอัพเดท
+                </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)', mb: 2, color: '#666' }}>
+                        กรุณาตรวจสอบรายละเอียดก่อนส่ง ข้อความนี้จะถูกส่งไปยังลูกค้าทาง LINE ทันที
+                    </Typography>
+
+                    <Box sx={{ bgcolor: '#f0f0f0', p: 3, borderRadius: 3, display: 'flex', justifyContent: 'center' }}>
+                        <StatusFlexPreview
+                            eventName={event.eventName}
+                            status={sendMode === 'status' ? newStatus : event.status}
+                            message={message}
+                            progress={sendMode === 'status' && newStatus === 'in-progress' ? progress : undefined}
+                            imageUrls={selectedImages.map(img => img.url)}
+                            senderName={session?.user?.name || 'Admin'}
+                            venue={event.venue}
+                            eventDate={event.eventDate}
+                        />
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 3 }}>
+                    <Button
+                        onClick={() => setConfirmDialogOpen(false)}
+                        sx={{ fontFamily: 'var(--font-prompt)', color: '#666' }}
+                    >
+                        ยกเลิก
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={executeSend}
+                        autoFocus
+                        disabled={sending}
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            bgcolor: 'var(--primary)',
+                            px: 3
+                        }}
+                    >
+                        {sending ? 'กำลังส่ง...' : 'ยืนยันและส่ง'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }

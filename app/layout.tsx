@@ -91,7 +91,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="th" translate="no">
+    <html lang="th" translate="no" suppressHydrationWarning>
       <body
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ margin: 0 }}
@@ -105,6 +105,52 @@ export default function RootLayout({
             </ThemeProvider>
           </AppRouterCacheProvider>
         </Providers>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "name": "SetEvent",
+              "image": "https://seteventthailand.com/images/logo1.png",
+              "description": "บริการให้เช่าอุปกรณ์จัดงานครบวงจร และรับจัดงานอีเว้นท์ งานแต่งงาน งานสัมมนา งานเปิดตัวสินค้า งานปาร์ตี้ ด้วยทีมงานมืออาชีพ",
+              "@id": "https://seteventthailand.com",
+              "url": "https://seteventthailand.com",
+              "telephone": "",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "",
+                "addressLocality": "",
+                "postalCode": "",
+                "addressCountry": "TH"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": "",
+                "longitude": ""
+              },
+              "openingHoursSpecification": {
+                "@type": "OpeningHoursSpecification",
+                "dayOfWeek": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "opens": "09:00",
+                "closes": "18:00"
+              },
+              "sameAs": [
+                "https://facebook.com/SetEvent",
+                "https://instagram.com/SetEvent",
+                "https://youtube.com/SetEvent"
+              ]
+            })
+          }}
+        />
       </body>
     </html>
   );

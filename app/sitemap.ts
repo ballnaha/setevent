@@ -3,19 +3,53 @@ import { MetadataRoute } from 'next';
 export default function sitemap(): MetadataRoute.Sitemap {
     const baseUrl = 'https://seteventthailand.com';
 
-    // Future: Fetch dynamic categories or services from DB
-    const serviceRoutes = [
-        '/services/equipment-rental',
-        '/services/event-organizer',
-        '/services/wedding-organizer',
-    ];
-
-    const routes = ['', '/services', '/contact', ...serviceRoutes].map((route) => ({
+    // Base routes
+    const routes = [
+        '',
+        '/products',
+        '/services',
+        '/portfolio',
+        '/contact',
+    ].map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: new Date(),
-        changeFrequency: 'daily' as const,
+        changeFrequency: 'weekly' as const,
         priority: route === '' ? 1 : 0.8,
     }));
 
-    return routes;
+    // Product routes
+    const productRoutes = [
+        '/products/rental/led-screen',
+        '/products/rental/lighting',
+        '/products/rental/sound',
+        '/products/rental/stage',
+        '/products/rental/motion-graphic',
+        '/products/rental/interactive',
+        '/products/rental/laser',
+        '/products/rental/mapping',
+        '/products/rental/flower-souvenirs',
+        '/products/fixed/led-screen',
+    ].map((route) => ({
+        url: `${baseUrl}${route}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+    }));
+
+    // Portfolio routes
+    const portfolioRoutes = [
+        '/portfolio/marketing-event',
+        '/portfolio/seminar-conference',
+        '/portfolio/exhibition',
+        '/portfolio/concert',
+        '/portfolio/wedding',
+        '/portfolio/fixed-installation',
+    ].map((route) => ({
+        url: `${baseUrl}${route}`,
+        lastModified: new Date(),
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+    }));
+
+    return [...routes, ...productRoutes, ...portfolioRoutes];
 }

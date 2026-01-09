@@ -52,12 +52,25 @@ export const MOCK_EVENTS = [
 ];
 
 export async function initializeLiff(): Promise<LiffProfile | null> {
+
     // 🧪 Mock Mode - ใช้ข้อมูลจำลอง
     if (IS_MOCK) {
         console.log('🧪 LIFF Mock Mode: Using mock profile');
+
+        // Allow overriding via URL param
+        let mockProfile = { ...MOCK_PROFILE };
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const overrideUid = params.get('lineUid') || params.get('mockId');
+            if (overrideUid) {
+                mockProfile.userId = overrideUid;
+                mockProfile.displayName = `Mock User (${overrideUid.slice(0, 4)}..)`;
+            }
+        }
+
         // จำลอง delay เหมือน LIFF จริง
         await new Promise(resolve => setTimeout(resolve, 500));
-        return MOCK_PROFILE;
+        return mockProfile;
     }
 
     // 🔐 Production Mode - ใช้ LIFF จริง

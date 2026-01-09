@@ -310,8 +310,8 @@ export function createStatusFlexMessage(
     const validProgress = progress !== undefined ? Math.max(0, Math.min(100, progress)) : undefined;
 
     const now = new Date();
-    const dateStr = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' });
-    const timeStr = now.toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = now.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: '2-digit' });
+    const timeStr = now.toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
 
     // 2. Main Content Area - Construct contents array dynamically to avoid spread issues
     const mainContents: any[] = [
@@ -332,7 +332,7 @@ export function createStatusFlexMessage(
                 },
                 {
                     type: 'text',
-                    text: `${dateStr} ${timeStr}`,
+                    text: dateStr,
                     size: 'xs',
                     color: '#bbbbbb',
                     align: 'end',
@@ -353,6 +353,7 @@ export function createStatusFlexMessage(
     ];
 
     // Event Date & Time
+    // Event Date & Time
     if (eventDate) {
         mainContents.push({
             type: 'box',
@@ -361,23 +362,28 @@ export function createStatusFlexMessage(
             margin: 'sm',
             contents: [
                 {
-                    type: 'icon',
-                    url: 'https://img.icons8.com/fluency/48/calendar.png',
+                    type: 'text',
+                    text: 'วันที่เริ่มงาน :',
                     size: 'xs',
-                    aspectRatio: '1:1'
+                    color: '#1a1a1a',
+                    weight: 'bold',
+                    flex: 0,
+                    margin: 'none'
                 },
                 {
                     type: 'text',
                     text: eventDate,
                     size: 'xs',
-                    color: '#888888',
+                    color: '#666666',
                     flex: 1,
-                    wrap: true
+                    wrap: true,
+                    margin: 'md'
                 }
             ]
         });
     }
 
+    // Venue Row
     // Venue Row
     if (venue) {
         mainContents.push({
@@ -387,18 +393,22 @@ export function createStatusFlexMessage(
             margin: 'sm',
             contents: [
                 {
-                    type: 'icon',
-                    url: 'https://img.icons8.com/fluency/48/place-marker.png',
+                    type: 'text',
+                    text: 'สถานที่จัดงาน :',
                     size: 'xs',
-                    aspectRatio: '1:1'
+                    color: '#1a1a1a',
+                    weight: 'bold',
+                    flex: 0,
+                    margin: 'none'
                 },
                 {
                     type: 'text',
                     text: venue,
                     size: 'xs',
-                    color: '#888888',
+                    color: '#666666',
                     flex: 1,
-                    wrap: true
+                    wrap: true,
+                    margin: 'md'
                 }
             ]
         });
@@ -413,6 +423,8 @@ export function createStatusFlexMessage(
 
     // Progress Section
     if (validProgress !== undefined) {
+        const progressColor = validProgress === 100 ? '#10B981' : config.color;
+
         mainContents.push({
             type: 'box',
             layout: 'vertical',
@@ -424,7 +436,7 @@ export function createStatusFlexMessage(
                     justifyContent: 'space-between',
                     contents: [
                         { type: 'text', text: 'Progress', size: 'xs', color: '#aaaaaa', weight: 'bold' },
-                        { type: 'text', text: `${validProgress}%`, size: 'xs', weight: 'bold', color: config.color }
+                        { type: 'text', text: `${validProgress}%`, size: 'xs', weight: 'bold', color: progressColor, align: 'end' }
                     ]
                 },
                 {
@@ -440,7 +452,7 @@ export function createStatusFlexMessage(
                             type: 'box',
                             layout: 'vertical',
                             width: `${validProgress}%`,
-                            backgroundColor: config.color,
+                            backgroundColor: progressColor,
                             height: '6px',
                             cornerRadius: '3px',
                             contents: []
