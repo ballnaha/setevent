@@ -1,15 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Avatar, Typography, Skeleton, Chip, IconButton } from '@mui/material';
-import { initializeLiff, LiffProfile, isMockMode } from '@/lib/liff';
-import { Notification, Setting2 } from 'iconsax-react';
+import { Box, Avatar, Typography, Skeleton, IconButton } from '@mui/material';
+import { initializeLiff, LiffProfile } from '@/lib/liff';
+import { Setting2, CloseCircle } from 'iconsax-react';
 
 interface LiffHeaderProps {
     onSearch?: (query: string) => void;
+    searchValue?: string;
+    onClear?: () => void;
 }
 
-export default function LiffHeader({ onSearch }: LiffHeaderProps) {
+export default function LiffHeader({ onSearch, searchValue = '', onClear }: LiffHeaderProps) {
     const [profile, setProfile] = useState<LiffProfile | null>(null);
     const [loading, setLoading] = useState(true);
 
@@ -54,32 +56,13 @@ export default function LiffHeader({ onSearch }: LiffHeaderProps) {
                                 sx={{ width: 50, height: 50, border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
                             />
                         )}
-                        {/* Plus Badge */}
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                right: -4,
-                                width: 20,
-                                height: 20,
-                                bgcolor: '#3B82F6',
-                                borderRadius: '50%',
-                                border: '2px solid #fff',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'white',
-                                fontSize: '12px'
-                            }}
-                        >
-                            +
-                        </Box>
+
                     </Box>
 
                     {/* Greeting & Name */}
                     <Box>
                         <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.875rem', color: '#94A3B8' }}>
-                            Good Day 👋
+                            สวัสดี คุณ
                         </Typography>
                         {loading ? (
                             <Skeleton variant="text" width={100} height={32} />
@@ -108,7 +91,6 @@ export default function LiffHeader({ onSearch }: LiffHeaderProps) {
                     }}
                 >
                     <Setting2 size={24} color="#94A3B8" />
-                    {/* Only iconsax Notification was imported, using it as placeholder for settings/bell */}
                 </IconButton>
             </Box>
 
@@ -121,14 +103,17 @@ export default function LiffHeader({ onSearch }: LiffHeaderProps) {
                     py: 1.5,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 1.5
+                    gap: 1.5,
+                    border: searchValue ? '1px solid #3B82F6' : '1px solid transparent',
+                    transition: 'border-color 0.2s',
                 }}
             >
-                {/* Search Icon placeholder */}
+                {/* Search Icon */}
                 <Typography sx={{ color: '#94A3B8', fontSize: '1.2rem' }}>🔍</Typography>
                 <input
                     type="text"
-                    placeholder="Search Project ..."
+                    placeholder="ค้นหาโปรเจกต์..."
+                    value={searchValue}
                     onChange={(e) => onSearch?.(e.target.value)}
                     style={{
                         border: 'none',
@@ -140,6 +125,24 @@ export default function LiffHeader({ onSearch }: LiffHeaderProps) {
                         outline: 'none'
                     }}
                 />
+                {/* Clear Button */}
+                {searchValue && (
+                    <IconButton
+                        size="small"
+                        onClick={onClear}
+                        sx={{
+                            p: 0.5,
+                            color: '#3B82F6',
+                            transition: 'all 0.2s',
+                            '&:hover': {
+                                color: '#2563EB',
+                                bgcolor: 'rgba(59, 130, 246, 0.1)',
+                            }
+                        }}
+                    >
+                        <CloseCircle size={20} variant="Bold" color="#3B82F6" />
+                    </IconButton>
+                )}
             </Box>
         </Box>
     );

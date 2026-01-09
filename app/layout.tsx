@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "SetEvent - บริการให้เช่าอุปกรณ์จัดงาน และรับจัดงานอีเว้นท์ครบวงจร",
     description: "ผู้นำด้านอีเว้นท์ ให้เช่าอุปกรณ์และรับจัดงานครบวงจร",
-    images: ["/images/logo.png"],
+    images: ["/images/icon-512x512.png"],
   },
   robots: {
     index: true,

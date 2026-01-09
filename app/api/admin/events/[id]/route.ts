@@ -1,6 +1,30 @@
-
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+
+async function checkEventAuth(eventId: string) {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) return { error: 'Unauthorized', status: 401 };
+
+    const currentUser = await prisma.user.findUnique({
+        where: { email: session.user.email! },
+        select: { id: true, role: true }
+    });
+    if (!currentUser) return { error: 'User not found', status: 404 };
+
+    const event = await prisma.event.findUnique({
+        where: { id: eventId },
+        include: { customer: { select: { salesId: true } } }
+    });
+    if (!event) return { error: 'Event not found', status: 404 };
+
+    if (currentUser.role === 'sales' && event.customer.salesId !== currentUser.id) {
+        return { error: 'Forbidden', status: 403 };
+    }
+
+    return { success: true, user: currentUser };
+}
 
 export async function GET(
     request: NextRequest,
@@ -8,6 +32,9 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
+        const auth = await checkEventAuth(id);
+        if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
         const event = await prisma.event.findUnique({
             where: { id },
             include: {
@@ -44,8 +71,19 @@ export async function PUT(
 ) {
     try {
         const { id } = await context.params;
+        const auth = await checkEventAuth(id);
+        if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
         const body = await request.json();
         const { eventName, customerId, eventDate, venue, description, notes, status } = body;
+
+        // If customer is being changed, verify access to new customer if sales
+        if (customerId && auth.user?.role === 'sales') {
+            const newCustomer = await prisma.customer.findUnique({ where: { id: customerId } });
+            if (!newCustomer || newCustomer.salesId !== auth.user.id) {
+                return NextResponse.json({ error: 'Forbidden change to another customer' }, { status: 403 });
+            }
+        }
 
         const updatedEvent = await prisma.event.update({
             where: { id },
@@ -74,6 +112,9 @@ export async function PATCH(
 ) {
     try {
         const { id } = await context.params;
+        const auth = await checkEventAuth(id);
+        if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
         const body = await request.json();
 
         // Allow updating any field, but typically used for status
@@ -96,6 +137,9 @@ export async function DELETE(
 ) {
     try {
         const { id } = await context.params;
+        const auth = await checkEventAuth(id);
+        if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
+
         await prisma.event.delete({
             where: { id },
         });

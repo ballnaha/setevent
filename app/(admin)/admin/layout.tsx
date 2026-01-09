@@ -13,7 +13,7 @@ const drawerWidth = 260;
 // Sidebar Menu Items
 const sidebarItems = [
     { label: 'Dashboard', href: '/admin', icon: Home3, roles: ['admin'] },
-    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin'] },
+    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
     { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
     { label: 'ส่งอัพเดทลูกค้า', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
     { label: 'จัดการผู้ใช้', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },
@@ -23,9 +23,9 @@ const sidebarItems = [
 // Bottom Navigation Items (Mobile) - Can be different from Sidebar
 const bottomNavItems = [
     { label: 'Home', href: '/admin', icon: Home3, roles: ['admin'] },
-    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin'] },
-    { label: 'ลูกค้า', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
-    { label: 'แชท', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
+    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
+    { label: 'Customer', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
+    { label: 'ส่งอัพเดตลูกค้า', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
     { label: 'More', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
 ];
 
@@ -36,23 +36,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const { data: session } = useSession();
     const [userRole, setUserRole] = useState<string>('user');
 
-    // Fetch user role from API
+    // Update user role from session
     useEffect(() => {
-        async function fetchUserRole() {
-            if (session?.user?.email) {
-                try {
-                    const res = await fetch('/api/admin/users');
-                    const users = await res.json();
-                    const currentUser = users.find((u: any) => u.email === session.user?.email);
-                    if (currentUser) {
-                        setUserRole(currentUser.role);
-                    }
-                } catch (error) {
-                    console.error('Error fetching user role:', error);
-                }
-            }
+        if (session?.user) {
+            setUserRole((session.user as any).role || 'user');
         }
-        fetchUserRole();
     }, [session]);
 
     // Filter menu items based on user role

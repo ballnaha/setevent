@@ -14,7 +14,11 @@ export async function POST(request: NextRequest) {
             where: { lineUid },
             include: {
                 events: {
-                    where: { status: { not: 'cancelled' } },
+                    where: {
+                        status: {
+                            notIn: ['completed', 'cancelled']
+                        }
+                    },
                     orderBy: { eventDate: 'desc' },
                     select: {
                         id: true,

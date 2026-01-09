@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 // GET /api/admin/customers/[id] - Get single customer
 export async function GET(
@@ -7,7 +9,22 @@ export async function GET(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { id } = await params;
+
+        // Get user for role check
+        const currentUser = await prisma.user.findUnique({
+            where: { email: session.user.email! },
+            select: { id: true, role: true }
+        });
+
+        if (!currentUser) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
 
         const customer = await prisma.customer.findUnique({
             where: { id },
@@ -20,6 +37,11 @@ export async function GET(
 
         if (!customer) {
             return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
+        }
+
+        // Check if sales is allowed to see this customer
+        if (currentUser.role === 'sales' && customer.salesId !== currentUser.id) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         return NextResponse.json(customer);
@@ -35,14 +57,34 @@ export async function PATCH(
     { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const session = await getServerSession(authOptions);
+        if (!session?.user) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
         const { id } = await params;
         const body = await request.json();
         const { displayName, companyName, phone, email, status, salesId } = body;
+
+        // Get user for role check
+        const currentUser = await prisma.user.findUnique({
+            where: { email: session.user.email! },
+            select: { id: true, role: true }
+        });
+
+        if (!currentUser) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
 
         // Check if customer exists
         const existingCustomer = await prisma.customer.findUnique({ where: { id } });
         if (!existingCustomer) {
             return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
+        }
+
+        // Check if sales is allowed to update this customer
+        if (currentUser.role === 'sales' && existingCustomer.salesId !== currentUser.id) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
         }
 
         // Build update data
@@ -51,7 +93,12 @@ export async function PATCH(
         if (companyName !== undefined) updateData.companyName = companyName;
         if (phone !== undefined) updateData.phone = phone;
         if (email !== undefined) updateData.email = email;
-        if (salesId !== undefined) updateData.salesId = salesId || null; // Allow unsetting
+
+        // Sales cannot reassign themselves or others unless they are admin
+        if (currentUser.role === 'admin' && salesId !== undefined) {
+            updateData.salesId = salesId || null;
+        }
+
         if (status !== undefined) {
             const validStatuses = ['new', 'pending', 'active'];
             if (validStatuses.includes(status)) {

@@ -27,6 +27,11 @@ export async function GET(request: NextRequest) {
                         id: true,
                         lineUid: true,
                         displayName: true,
+                        sales: {
+                            select: {
+                                name: true
+                            }
+                        }
                     }
                 },
                 timelines: {
@@ -47,6 +52,30 @@ export async function GET(request: NextRequest) {
         if (event.customer.lineUid !== lineUid) {
             return NextResponse.json({ error: 'Unauthorized access' }, { status: 403 });
         }
+
+        // Fallback names
+        const customerFallback = event.customer.displayName || 'Customer';
+        const staffFallback = (event.customer as any).sales?.name || 'Admin';
+
+        // Functional helper for mapping logs
+        const mapChatLogs = (logs: any[], customerName: string, staffName: string) => {
+            return logs.map(log => {
+                let senderName = log.direction === 'inbound' ? customerName : staffName;
+
+                if (log.direction === 'outbound') {
+                    try {
+                        const parsed = JSON.parse(log.message);
+                        if (parsed.senderName) {
+                            senderName = parsed.senderName;
+                        }
+                    } catch (e) {
+                        // Not a JSON message, use fallback
+                    }
+                }
+
+                return { ...log, senderName };
+            });
+        };
 
         // If no timelines exist, create default ones
         if (event.timelines.length === 0) {
@@ -76,7 +105,12 @@ export async function GET(request: NextRequest) {
                     bookings: true,
                     customer: {
                         select: {
-                            displayName: true
+                            displayName: true,
+                            sales: {
+                                select: {
+                                    name: true
+                                }
+                            }
                         }
                     }
                 }
@@ -84,14 +118,14 @@ export async function GET(request: NextRequest) {
 
             if (!updatedEvent) return NextResponse.json({ error: 'Event not found after update' }, { status: 404 });
 
+            const customerName = updatedEvent.customer.displayName || 'Customer';
+            const staffName = (updatedEvent.customer as any).sales?.name || 'Admin';
+
             return NextResponse.json({
                 success: true,
                 event: {
                     ...updatedEvent,
-                    chatLogs: updatedEvent.chatLogs.map(log => ({
-                        ...log,
-                        senderName: log.direction === 'inbound' ? (updatedEvent.customer.displayName || 'Customer') : 'Admin'
-                    }))
+                    chatLogs: mapChatLogs(updatedEvent.chatLogs, customerName, staffName)
                 },
             });
         }
@@ -108,10 +142,7 @@ export async function GET(request: NextRequest) {
                 status: event.status,
                 totalPrice: event.totalPrice,
                 timelines: event.timelines,
-                chatLogs: event.chatLogs.map(log => ({
-                    ...log,
-                    senderName: log.direction === 'inbound' ? (event.customer.displayName || 'Customer') : 'Admin'
-                })),
+                chatLogs: mapChatLogs(event.chatLogs, customerFallback, staffFallback),
                 bookings: event.bookings,
             },
         });

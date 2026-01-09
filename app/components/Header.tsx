@@ -559,8 +559,8 @@ export default function Header() {
                             href="/"
                             sx={{
                                 position: 'relative',
-                                width: { xs: 110, sm: 140, md: 180 },
-                                height: { xs: 35, md: 50 },
+                                width: { xs: 140, sm: 160, md: 180 },
+                                height: { xs: 40, sm: 50, md: 60 },
                                 display: 'block',
                                 mx: { xs: 'auto', md: 0 }
                             }}

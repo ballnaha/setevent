@@ -114,9 +114,16 @@ export default function ProgressPage() {
         try {
             const res = await fetch('/api/admin/events');
             const data = await res.json();
-            setEvents(data);
+            // Ensure data is an array before setting state
+            if (Array.isArray(data)) {
+                setEvents(data);
+            } else {
+                console.warn('API response is not an array:', data);
+                setEvents([]);
+            }
         } catch (error) {
             console.error('Error fetching events:', error);
+            setEvents([]);
         } finally {
             setLoading(false);
         }
@@ -268,6 +275,7 @@ export default function ProgressPage() {
             {/* Search and Year Filter */}
             <Box sx={{ mb: 3, display: 'flex', gap: 1 }}>
                 <TextField
+                    id="progress-search-input"
                     fullWidth
                     size="small"
                     placeholder="ค้นหาชื่องาน หรือลูกค้า..."
@@ -296,6 +304,7 @@ export default function ProgressPage() {
                 />
 
                 <TextField
+                    id="progress-year-select"
                     select
                     size="small"
                     value={selectedYear}

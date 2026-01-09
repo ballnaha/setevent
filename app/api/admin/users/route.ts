@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { username, name, email, password, role, position, status } = body;
 
-        if (!username || !email || !password) {
-            return NextResponse.json({ error: 'Username, Email and Password are required' }, { status: 400 });
+        if (!username || !password) {
+            return NextResponse.json({ error: 'Username and Password are required' }, { status: 400 });
         }
 
         // Check if username already exists

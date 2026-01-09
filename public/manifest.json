@@ -1,6 +1,6 @@
 {
-    "name": "Event Management Admin",
-    "short_name": "EventAdmin",
+    "name": "SetEvent Admin",
+    "short_name": "SetEventAdmin",
     "description": "Admin panel for Event Management System",
     "start_url": "/admin",
     "display": "standalone",

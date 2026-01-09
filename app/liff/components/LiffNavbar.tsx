@@ -1,17 +1,15 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import { Home2, User, Calendar, Notification, Add } from 'iconsax-react';
+import { Home2, User, Calendar, Notification, FolderOpen } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function LiffNavbar() {
     const pathname = usePathname();
 
-    // Custom shape using clip-path or just clever positioning. 
-    // For simplicity and robustness, we'll use a standard bar with a floating button 
-    // that overlaps the top edge, which is a common implementation of this design.
-    // If a true "cutout" is needed, SVG is better, but this usually looks good enough.
+    // Check if on main liff page (my projects)
+    const isMyProjectActive = pathname === '/liff' || pathname === '/liff/';
 
     return (
         <Box
@@ -23,8 +21,8 @@ export default function LiffNavbar() {
                 right: 0,
                 zIndex: 100,
                 bgcolor: 'transparent',
-                pointerEvents: 'none', // Allow clicking through the empty space above
-                height: 100, // Reserve space
+                pointerEvents: 'none',
+                height: 100,
                 display: 'flex',
                 alignItems: 'flex-end'
             }}
@@ -42,75 +40,128 @@ export default function LiffNavbar() {
                     borderTopRightRadius: 30,
                     boxShadow: '0 -10px 40px rgba(0,0,0,0.08)',
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)', // 5 equal columns
+                    gridTemplateColumns: 'repeat(5, 1fr)',
                     alignItems: 'center',
-                    justifyItems: 'center', // Center items horizontally in their grid cells
-                    px: 1, // Minimal padding as grid handles spacing
+                    justifyItems: 'center',
+                    px: 1,
                     pointerEvents: 'auto',
                 }}
             >
-                <NavItem icon={Home2} label="Home" href="/liff" isActive={pathname === '/liff'} />
-                <NavItem icon={User} label="Profile" href="/liff/profile" isActive={pathname === '/liff/profile'} />
+                <NavItem icon={Home2} label="หน้าแรก" href="/liff" isActive={isMyProjectActive} />
+                <NavItem icon={Calendar} label="กำหนดการ" href="/liff/events" isActive={pathname?.startsWith('/liff/events')} />
 
-                {/* Empty Middle Column for Button */}
+                {/* Empty Middle Column for Floating Button */}
                 <Box />
 
-                <NavItem icon={Calendar} label="Calendar" href="/liff/events" isActive={pathname?.startsWith('/liff/events')} />
-                <NavItem icon={Notification} label="Alert" href="/liff/notifications" isActive={pathname === '/liff/notifications'} />
+                <NavItem icon={Notification} label="แจ้งเตือน" href="/liff/notifications" isActive={pathname === '/liff/notifications'} />
+                <NavItem icon={User} label="โปรไฟล์" href="/liff/profile" isActive={pathname === '/liff/profile'} />
             </Box>
 
-            {/* Center Floating Button */}
+            {/* Center Floating Button - My Project */}
             <Box
                 component={Link}
-                href="/liff/create" // Or wherever the plus button goes
+                href="/liff"
                 sx={{
                     position: 'absolute',
-                    bottom: 30, // Push it up to overlap half
+                    bottom: 20,
                     left: '50%',
                     transform: 'translateX(-50%)',
                     width: 64,
                     height: 64,
-                    bgcolor: '#3B82F6',
+                    background: isMyProjectActive
+                        ? 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)'
+                        : 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
                     borderRadius: '50%',
                     display: 'flex',
+                    flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4)',
+                    boxShadow: isMyProjectActive
+                        ? '0 8px 24px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.2)'
+                        : '0 8px 24px rgba(59, 130, 246, 0.4)',
                     pointerEvents: 'auto',
                     color: 'white',
-                    border: '4px solid #F8FAFC', // Match page bg to fake a gap/cutout if needed, or white if bar is white
+                    border: '4px solid white',
                     zIndex: 101,
-                    transition: 'transform 0.2s',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    textDecoration: 'none',
                     '&:hover': {
                         transform: 'translateX(-50%) scale(1.05)',
+                    },
+                    '&:active': {
+                        transform: 'translateX(-50%) scale(0.95)',
                     }
                 }}
             >
-                <Add size={32} color="white" />
+                <FolderOpen size={26} color="white" variant="Bold" />
+                <Typography
+                    sx={{
+                        fontFamily: 'var(--font-prompt)',
+                        fontSize: '0.55rem',
+                        fontWeight: 600,
+                        color: 'white',
+                        mt: 0.25,
+                        lineHeight: 1,
+                    }}
+                >
+                    โปรเจกต์
+                </Typography>
             </Box>
         </Box>
     );
 }
 
-// Sub-component for Nav Items to keep it clean
+// Sub-component for Nav Items
 function NavItem({ icon: Icon, label, href, isActive }: { icon: any, label: string, href: string, isActive: boolean }) {
-    const activeColor = '#1E293B'; // Dark Slate
-    const inactiveColor = '#94A3B8'; // Slate 400
+    const activeColor = '#3B82F6';
+    const inactiveColor = '#94A3B8';
 
     return (
         <Link href={href} style={{ textDecoration: 'none' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
-                <Icon
-                    size={24}
-                    variant={isActive ? 'Bold' : 'Linear'}
-                    color={isActive ? activeColor : inactiveColor}
-                />
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 0.3,
+                    transition: 'transform 0.2s',
+                    '&:active': {
+                        transform: 'scale(0.9)',
+                    }
+                }}
+            >
+                <Box
+                    sx={{
+                        position: 'relative',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    {isActive && (
+                        <Box
+                            sx={{
+                                position: 'absolute',
+                                width: 32,
+                                height: 32,
+                                borderRadius: '50%',
+                                bgcolor: 'rgba(59, 130, 246, 0.1)',
+                            }}
+                        />
+                    )}
+                    <Icon
+                        size={22}
+                        variant={isActive ? 'Bold' : 'Linear'}
+                        color={isActive ? activeColor : inactiveColor}
+                    />
+                </Box>
                 <Typography
                     sx={{
                         fontFamily: 'var(--font-prompt)',
-                        fontSize: '0.7rem',
+                        fontSize: '0.65rem',
                         fontWeight: isActive ? 600 : 500,
-                        color: isActive ? activeColor : inactiveColor
+                        color: isActive ? activeColor : inactiveColor,
+                        lineHeight: 1,
                     }}
                 >
                     {label}

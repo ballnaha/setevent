@@ -145,10 +145,7 @@ export default function UsersPage() {
     }
 
     async function handleSave() {
-        if (!formData.email) {
-            setSnackbar({ open: true, message: 'กรุณากรอกอีเมล', severity: 'error' });
-            return;
-        }
+
         if (!editingUser && !formData.password) {
             setSnackbar({ open: true, message: 'กรุณากรอกรหัสผ่าน', severity: 'error' });
             return;
@@ -400,6 +397,7 @@ export default function UsersPage() {
                                     </Typography>
                                     <Typography sx={{ color: '#666', fontSize: '0.85rem', mb: 0.5 }}>
                                         {user.email}
+
                                     </Typography>
                                     {user.position && (
                                         <Typography sx={{ color: '#999', fontSize: '0.8rem' }}>
@@ -525,7 +523,6 @@ export default function UsersPage() {
                             label="อีเมล"
                             type="email"
                             fullWidth
-                            required
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             InputProps={{ sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } }}
