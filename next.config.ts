@@ -33,4 +33,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPWA(nextConfig);
+// ในโหมด Development ให้ส่งออก nextConfig โดยตรงเพื่อให้ Turbopack ทำงานได้ (เพราะ Turbopack ไม่รองรับ Webpack Plugin ของ PWA)
+// ในโหมดอื่น (Production/Build) ให้ครอบด้วย withPWA เพื่อสร้าง Service Worker
+export default process.env.NODE_ENV === "development" ? nextConfig : withPWA(nextConfig);

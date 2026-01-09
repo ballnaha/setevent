@@ -160,7 +160,7 @@ export default function BannerSlider() {
                         opacity: 0.8,
                         mt: 0.5
                     }}>
-                        บริการจัดงานครบวงจร พร้อมอุปกรณ์ทันสมัย
+                        ดูแลครบทุกขั้นตอน พร้อมอุปกรณ์ทันสมัย
                     </Typography>
                 </Box>
             </Box>

@@ -49,7 +49,6 @@ const productSections = [
             {
                 label: "LED Screen",
                 href: "/products/rental/led-screen",
-                icon: <Monitor size="20" color="var(--primary)" variant="Bulk" />,
                 children: [
                     {
                         label: "Indoor",
@@ -61,20 +60,20 @@ const productSections = [
                     },
                 ]
             },
-            { label: "Lighting Systems", href: "/products/rental/lighting", icon: <LampOn size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Sound Systems", href: "/products/rental/sound", icon: <Speaker size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Stage", href: "/products/rental/stage", icon: <Layer size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Motion Graphic", href: "/products/rental/motion-graphic", icon: <VideoCircle size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Interactive", href: "/products/rental/interactive", icon: <MagicStar size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Laser", href: "/products/rental/laser", icon: <Sun1 size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Mapping", href: "/products/rental/mapping", icon: <Map1 size="20" color="var(--primary)" variant="Bulk" /> },
-            { label: "Flower & Souvenirs", href: "/products/rental/flower-souvenirs", icon: <Gift size="20" color="var(--primary)" variant="Bulk" /> },
+            { label: "Lighting Systems", href: "/products/rental/lighting" },
+            { label: "Sound Systems", href: "/products/rental/sound" },
+            { label: "Stage", href: "/products/rental/stage" },
+            { label: "Motion Graphic", href: "/products/rental/motion-graphic" },
+            { label: "Interactive", href: "/products/rental/interactive" },
+            { label: "Laser", href: "/products/rental/laser" },
+            { label: "Mapping", href: "/products/rental/mapping" },
+            { label: "Flower & Souvenirs", href: "/products/rental/flower-souvenirs" },
         ]
     },
     {
         title: "Fixed Installation",
         items: [
-            { label: "LED Screen", href: "/products/fixed/led-screen", icon: <Monitor size="20" color="var(--primary)" variant="Bulk" /> }
+            { label: "LED Screen", href: "/products/fixed/led-screen" }
         ]
     }
 ];
@@ -353,9 +352,9 @@ export default function Header() {
                                             borderColor: isExpanded ? 'rgba(10, 92, 90, 0.2)' : 'rgba(0,0,0,0.05)'
                                         }}>
                                             {isExpanded ? (
-                                                <Minus size="12" variant="Linear" />
+                                                <Minus size="12" variant="Linear" color="var(--primary)" />
                                             ) : (
-                                                <Add size="12" variant="Linear" />
+                                                <Add size="12" variant="Linear" color="var(--primary)" />
                                             )}
                                         </Box>
                                     )}
@@ -599,12 +598,23 @@ export default function Header() {
                                 return (
                                     <Box
                                         key={item.label}
-                                        onMouseLeave={handleHoverClose}
-                                        onMouseEnter={(e) => handleHoverOpen(e, item.label)}
+                                        onMouseLeave={['PRODUCTS', 'PORTFOLIO'].includes(item.label) ? undefined : handleHoverClose}
+                                        onMouseEnter={(e) => ['PRODUCTS', 'PORTFOLIO'].includes(item.label) ? undefined : handleHoverOpen(e, item.label)}
                                     >
                                         <Box
                                             component={Link}
                                             href={item.href}
+                                            onClick={(e) => {
+                                                if (['PRODUCTS', 'PORTFOLIO'].includes(item.label)) {
+                                                    e.preventDefault();
+                                                    if (openDropdown && activeMenu === item.label) {
+                                                        setAnchorEl(null);
+                                                        setActiveMenu(null);
+                                                    } else {
+                                                        handleHoverOpen(e, item.label);
+                                                    }
+                                                }
+                                            }}
                                             sx={{
                                                 position: 'relative',
                                                 cursor: 'pointer',
