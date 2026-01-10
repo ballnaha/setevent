@@ -6,31 +6,29 @@ import { Monitor, MagicStar, Music } from "iconsax-react";
 
 const services = [
     {
-        title: "RENTAL",
-        subtitle: "เช่าอุปกรณ์ครบวงจร",
+        title: "บริการเช่าอุปกรณ์",
+        subtitle: "One-Stop Rental Service",
         desc: "บริการให้เช่าเวที แสง สี เสียง และจอ LED คุณภาพสูง พร้อมทีมงานติดตั้งมืออาชีพที่พร้อมดูแลทุกขั้นตอน",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
         buttonText: "เช่าอุปกรณ์"
     },
     {
-        title: "ORGANIZER",
-        subtitle: "รับจัดงาน Event",
+        title: "บริการรับจัดงาน",
+        subtitle: "Event Organizer",
         desc: "รับจัดงานอีเว้นท์ งานแต่งงาน งานเปิดตัวสินค้า ดูแลตั้งแต่วางแผนจนจบงาน ให้งานของคุณออกมาสมบูรณ์แบบ",
         icon: <MagicStar size="50" color="currentColor" variant="Outline" />,
         color: "#F2A900", // Tertiary (Gold/Yellow adjusted for visibility)
         buttonText: "บริการจัดงาน"
     },
     {
-        title: "PRODUCTION",
-        subtitle: "ระบบแสง สี เสียงครบวงจร",
+        title: "ระบบแสงสีเสียง",
+        subtitle: "Full Scale Production",
         desc: "ระบบแสง สี เสียงมาตรฐานสากล ผสานเทคโนโลยีทันสมัย ให้ภาพ แสง และเสียงสมจริง คมชัด รองรับทุกประเภทงาน",
         icon: <Music size="50" color="currentColor" variant="Outline" />,
         color: "#00C2CB", // Primary
         buttonText: "ระบบแสง สี เสียง"
-
     },
-
 ];
 
 export default function ServicesSection() {
@@ -53,7 +51,20 @@ export default function ServicesSection() {
             </Box>
 
             <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-                <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: 8, textAlign: "center" }}>
+                <Box sx={{
+                    display: { xs: 'flex', md: 'grid' },
+                    gridTemplateColumns: { md: '1fr 1fr 1fr' },
+                    gap: { xs: 2, md: 8 },
+                    textAlign: "center",
+                    overflowX: { xs: 'auto', md: 'visible' },
+                    scrollSnapType: { xs: 'x mandatory', md: 'none' },
+                    scrollPaddingLeft: { xs: '16px', md: 0 },
+                    pb: { xs: 2, md: 0 },
+                    mx: { xs: -2, md: 0 },
+                    px: { xs: 2, md: 0 },
+                    scrollbarWidth: 'none', // Hide scrollbar Firefox
+                    '&::-webkit-scrollbar': { display: 'none' } // Hide scrollbar Chrome/Safari
+                }}>
                     {services.map((service, index) => (
                         <Box
                             key={index}
@@ -62,16 +73,20 @@ export default function ServicesSection() {
                                 flexDirection: 'column',
                                 alignItems: 'center',
                                 transition: 'transform 0.3s ease',
+                                minWidth: { xs: '80vw', sm: '350px', md: 'auto' }, // Card width for overflow
+                                scrollSnapAlign: { xs: 'start', md: 'center' },
+                                position: 'relative',
                                 '&:hover': {
-                                    transform: 'translateY(-10px)'
+                                    transform: { md: 'translateY(-10px)' }
                                 }
                             }}
                         >
                             {/* Icon */}
                             <Box sx={{
-                                mb: 3,
+                                mb: { xs: 2, md: 3 },
                                 color: service.color,
-                                '& svg': { strokeWidth: 1.5 }
+                                '& svg': { strokeWidth: 1.5 },
+                                transform: { xs: 'scale(0.9)', md: 'scale(1)' }
                             }}>
                                 {service.icon}
                             </Box>
@@ -83,7 +98,8 @@ export default function ServicesSection() {
                                 mb: 1,
                                 color: service.color,
                                 textTransform: 'uppercase',
-                                letterSpacing: 1
+                                letterSpacing: 0.5,
+                                fontSize: { xs: '1.5rem', md: '2.125rem' }
                             }}>
                                 {service.title}
                             </Typography>
@@ -92,9 +108,10 @@ export default function ServicesSection() {
                             <Typography variant="h6" sx={{
                                 fontFamily: "var(--font-prompt)",
                                 fontWeight: 600,
-                                mb: 3,
+                                mb: { xs: 1.5, md: 3 },
                                 color: 'var(--foreground)',
-                                opacity: 0.8
+                                opacity: 0.8,
+                                fontSize: { xs: '1rem', md: '1.25rem' }
                             }}>
                                 {service.subtitle}
                             </Typography>
@@ -104,9 +121,14 @@ export default function ServicesSection() {
                                 fontFamily: "var(--font-prompt)",
                                 color: 'var(--foreground)',
                                 opacity: 0.6,
-                                lineHeight: 1.8,
-                                mb: 5,
-                                maxWidth: '300px'
+                                lineHeight: 1.6,
+                                mb: { xs: 3, md: 5 },
+                                maxWidth: '300px',
+                                fontSize: { xs: '0.9rem', md: '1rem' },
+                                display: '-webkit-box',
+                                WebkitLineClamp: { xs: 3, md: 'unset' }, // Limit lines on mobile
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden'
                             }}>
                                 {service.desc}
                             </Typography>
@@ -118,12 +140,12 @@ export default function ServicesSection() {
                                     bgcolor: service.color,
                                     color: 'white',
                                     border: 'none',
-                                    px: 4,
-                                    py: 1.5,
+                                    px: { xs: 3, md: 4 },
+                                    py: { xs: 1.2, md: 1.5 },
                                     borderRadius: 1,
                                     fontFamily: "var(--font-prompt)",
                                     fontWeight: "bold",
-                                    fontSize: '0.9rem',
+                                    fontSize: { xs: '0.85rem', md: '0.9rem' },
                                     cursor: 'pointer',
                                     transition: 'all 0.3s ease',
                                     boxShadow: `0 4px 15px ${service.color}66`,

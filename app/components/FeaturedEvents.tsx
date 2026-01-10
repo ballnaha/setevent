@@ -8,65 +8,64 @@ import Link from "next/link";
 
 const events = [
     {
-        title: "CONCERTS & FESTIVALS",
+        title: "บริการจอ LED คุณภาพสูง",
         items: [
-            "FULL SCALE LIGHTING SYSTEM",
-            "PROFESSIONAL SOUND SYSTEM",
-            "LED VISUAL & MAPPING",
-            "STAGE DESIGN & STRUCTURE",
-            "ARTIST MANAGEMENT",
-            "LIVE STREAMING PRODUCTION"
+            "จอ LED ภายใน (P1.5 - P3.9)",
+            "จอ LED ภายนอก (P3.9 - P10)",
+            "จอโค้งและรูปทรงพิเศษ",
+            "ปรับจูนสีมาตรฐานระดับโปร",
+            "ดูแลระบบครบวงจร"
         ],
-        link: "/services/concert"
+        link: "/products/rental/led-screen"
     },
     {
-        title: "CORPORATE EVENTS",
+        title: "จัดดอกไม้และของชำร่วย",
         items: [
-            "PRODUCT LAUNCH",
-            "GRAND OPENING",
-            "GALA DINNER & PARTY",
-            "PRESS CONFERENCE",
-            "SEMINAR & WORKSHOP",
-            "BOOTH & EXHIBITION"
+            "ออกแบบและจัดดอกไม้ในงาน",
+            "Backdrop และซุ้มถ่ายภาพ",
+            "ช่อดอกไม้และพวงมาลัย",
+            "ของชำร่วยและกิ๊ฟเซ็ต",
+            "การ์ดเชิญและป้ายชื่อ",
+            "ตกแต่งสถานที่ตามธีมงาน"
         ],
-        link: "/services/corporate"
+        link: "/products/rental/flower-souvenirs"
     },
     {
-        title: "WEDDING & PARTIES",
+        title: "งานติดตั้ง",
         items: [
-            "WEDDING PLANNER",
-            "DECORATION & FLOWER",
-            "AFTER PARTY SYSTEM",
-            "PRIVATE PARTY",
-            "LIGHTING AMBIENCE",
-            "SPECIAL EFFECT"
+            "ระบบห้องประชุมครบวงจร",
+            "ระบบป้ายโฆษณาดิจิทัล",
+            "ภาพและเสียงหอประชุม",
+            "ออกแบบห้องควบคุม (Control Room)",
+            "ห้องเรียนอัจฉริยะ (Smart Classroom)",
+            "บริการหลังการขายและดูแลระบบ"
         ],
-        link: "/services/wedding"
+        link: "/products/fixed/led-screen"
     }
 ];
 
 const infoBlocks = [
     {
-        icon: <Location size="40" color="white" variant="Outline" />,
-        title: "SERVICE AREA",
+        icon: <Location size="32" color="white" variant="Outline" />,
+        title: "พื้นที่ให้บริการ",
         subtitle: "ทั่วประเทศไทย",
         color: "#F2A900", // Gold/Yellow
     },
     {
-        icon: <Note size="40" color="white" variant="Outline" />,
-        title: "BOOKING",
+        icon: <Note size="32" color="white" variant="Outline" />,
+        title: "จองอัพเดทงาน",
         subtitle: "จองคิวงาน / ปรึกษาฟรี",
         color: "#E94560", // Red
     },
     {
-        icon: <Car size="40" color="white" variant="Outline" />,
-        title: "LOGISTICS",
+        icon: <Car size="32" color="white" variant="Outline" />,
+        title: "ขนส่งและติดตั้ง",
         subtitle: "บริการขนส่งติดตั้ง",
         color: "#00C2CB", // Teal
     },
     {
-        icon: <ImageIcon size="40" color="white" variant="Outline" />,
-        title: "PORTFOLIO",
+        icon: <ImageIcon size="32" color="white" variant="Outline" />,
+        title: "ผลงานของเรา",
         subtitle: "ผลงานที่ผ่านมา",
         color: "#1A5F7A", // Blue
     }
@@ -101,20 +100,37 @@ export default function FeaturedEvents() {
 
                 <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
                     <Box sx={{
-                        display: "grid",
-                        gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, // Keep 1 col for tablet portrait for better readability
-                        gap: { xs: 6, sm: 8, md: 4 } // Increase gap on tablet to separate sections clearly
+                        display: { xs: 'flex', md: 'grid' },
+                        gridTemplateColumns: { md: '1fr 1fr 1fr' },
+                        gap: { xs: 2, md: 4 },
+                        overflowX: { xs: 'auto', md: 'visible' },
+                        scrollSnapType: { xs: 'x mandatory', md: 'none' },
+                        pb: { xs: 4, md: 0 }, // Add padding bottom for scrollbar space on mobile
+                        '::-webkit-scrollbar': { display: 'none' }, // Hide scrollbar
+                        mx: { xs: -2, md: 0 }, // Negative margin to allow full-width scroll on mobile
+                        px: { xs: 2, md: 0 }, // Padding to compensate negative margin
                     }}>
                         {events.map((event, index) => (
-                            <Box key={index} sx={{ textAlign: 'left' }}>
+                            <Box key={index} sx={{
+                                textAlign: 'left',
+                                minWidth: { xs: '85vw', sm: '350px', md: 'auto' }, // Fixed width for mobile cards
+                                scrollSnapAlign: 'center',
+                                bgcolor: { xs: 'rgba(255,255,255,0.03)', md: 'transparent' }, // Subtle background on mobile
+                                p: { xs: 3, md: 0 },
+                                borderRadius: { xs: 2, md: 0 },
+                                border: { xs: '1px solid rgba(255,255,255,0.1)', md: 'none' }
+                            }}>
                                 <Typography variant="h4" sx={{
                                     fontFamily: "var(--font-prompt)",
-                                    fontWeight: 800,
+                                    fontWeight: 700,
                                     color: "white",
-                                    mb: 3,
+                                    mb: 2,
                                     textTransform: 'uppercase',
-                                    letterSpacing: 1,
-                                    fontSize: { xs: '1.8rem', md: '2rem' }
+                                    letterSpacing: 0.5,
+                                    fontSize: { xs: '1.4rem', md: '1.8rem' }, // Smaller font on mobile
+                                    height: { md: '60px' }, // Fixed height for alignment
+                                    display: 'flex',
+                                    alignItems: 'end'
                                 }}>
                                     {event.title}
                                 </Typography>
@@ -123,22 +139,22 @@ export default function FeaturedEvents() {
                                     listStyle: 'none',
                                     p: 0,
                                     m: 0,
-                                    mb: 4,
+                                    mb: 3,
                                     minHeight: { md: '180px' }
                                 }}>
                                     {event.items.map((item, i) => (
                                         <Box component="li" key={i} sx={{
                                             color: 'rgba(255,255,255,0.7)',
                                             fontFamily: "var(--font-prompt)",
-                                            fontSize: '0.9rem',
+                                            fontSize: { xs: '0.85rem', md: '0.9rem' },
                                             mb: 1,
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: 1,
+                                            gap: 1.5,
                                             fontWeight: 300,
-                                            letterSpacing: 0.5
+                                            letterSpacing: 0.3
                                         }}>
-                                            <Box sx={{ width: 4, height: 4, bgcolor: 'var(--primary)', borderRadius: '50%' }} />
+                                            <Box sx={{ width: 4, height: 4, bgcolor: 'var(--primary)', borderRadius: '50%', flexShrink: 0 }} />
                                             {item}
                                         </Box>
                                     ))}
@@ -148,18 +164,22 @@ export default function FeaturedEvents() {
                                     variant="outlined"
                                     component={Link}
                                     href={event.link}
+                                    fullWidth={true} // Full width button on mobile
                                     sx={{
                                         color: 'white',
-                                        borderColor: 'rgba(255,255,255,0.5)',
-                                        borderRadius: 0,
+                                        borderColor: 'rgba(255,255,255,0.3)',
+                                        borderRadius: 2, // Rounded button
                                         px: 4,
-                                        py: 1,
+                                        py: 1.2,
                                         fontFamily: "var(--font-prompt)",
                                         fontSize: '0.9rem',
-                                        fontWeight: 600,
+                                        fontWeight: 500,
+                                        transition: 'all 0.3s ease',
+                                        width: { md: 'auto' }, // Auto width on desktop
                                         '&:hover': {
                                             borderColor: 'white',
-                                            bgcolor: 'rgba(255,255,255,0.1)'
+                                            bgcolor: 'rgba(255,255,255,0.1)',
+                                            transform: 'translateY(-2px)'
                                         }
                                     }}
                                 >
@@ -172,14 +192,17 @@ export default function FeaturedEvents() {
             </Box>
 
             {/* Bottom Info Bar */}
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: 'repeat(4, 1fr)' } }}>
+            <Box sx={{
+                display: 'grid',
+                gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' } // 2 columns on mobile
+            }}>
                 {infoBlocks.map((block, index) => (
                     <Box
                         key={index}
                         sx={{
                             bgcolor: block.color,
-                            py: 6,
-                            px: 3,
+                            py: { xs: 4, md: 6 }, // Reduce padding on mobile
+                            px: 2,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
@@ -187,27 +210,30 @@ export default function FeaturedEvents() {
                             textAlign: 'center',
                             transition: 'filter 0.3s ease',
                             cursor: 'pointer',
+                            minHeight: { xs: '160px', md: 'auto' }, // Ensure touch target size
                             '&:hover': {
                                 filter: 'brightness(1.1)'
                             }
                         }}
                     >
-                        <Box sx={{ mb: 2 }}>
+                        <Box sx={{ mb: 1.5 }}>
                             {block.icon}
                         </Box>
-                        <Typography variant="h5" sx={{
+                        <Typography variant="h6" sx={{
                             fontFamily: "var(--font-prompt)",
-                            fontWeight: 800,
+                            fontWeight: 700,
                             color: "white",
                             textTransform: 'uppercase',
-                            mb: 0.5
+                            mb: 0.5,
+                            fontSize: { xs: '0.9rem', md: '1.1rem' } // Responsive font size
                         }}>
                             {block.title}
                         </Typography>
-                        <Typography variant="body1" sx={{
+                        <Typography variant="body2" sx={{
                             fontFamily: "var(--font-prompt)",
                             fontWeight: 400,
                             color: "rgba(255,255,255,0.9)",
+                            fontSize: { xs: '0.8rem', md: '1rem' }
                         }}>
                             {block.subtitle}
                         </Typography>
