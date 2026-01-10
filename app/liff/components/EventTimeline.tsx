@@ -298,6 +298,14 @@ export default function EventTimeline({ event }: Props) {
                             const isSelected = date.getDate() === selectedDate.getDate() && date.getMonth() === selectedDate.getMonth();
                             const isToday = new Date().toDateString() === date.toDateString();
 
+                            // Check if there are chats on this day
+                            const hasChat = sortedChatLogs.some(log => {
+                                const logDate = new Date(log.createdAt);
+                                return logDate.getDate() === date.getDate() &&
+                                    logDate.getMonth() === date.getMonth() &&
+                                    logDate.getFullYear() === date.getFullYear();
+                            });
+
                             return (
                                 <Stack
                                     key={index}
@@ -332,11 +340,23 @@ export default function EventTimeline({ event }: Props) {
                                             fontFamily: 'var(--font-prompt)',
                                             fontWeight: 700,
                                             color: isSelected ? '#3B82F6' : '#fff',
-                                            fontSize: '0.95rem'
+                                            fontSize: '0.95rem',
+                                            lineHeight: 1
                                         }}
                                     >
                                         {format(date, 'd')}
                                     </Typography>
+
+                                    {/* Chat Dot Indicator */}
+                                    <Box
+                                        sx={{
+                                            width: 4,
+                                            height: 4,
+                                            borderRadius: '50%',
+                                            bgcolor: hasChat ? (isSelected ? '#3B82F6' : '#fff') : 'transparent',
+                                            mt: 0.5
+                                        }}
+                                    />
                                 </Stack>
                             );
                         })}

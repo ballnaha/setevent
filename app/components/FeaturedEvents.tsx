@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Box, Typography, Container, Button, Stack } from "@mui/material";
-import { ArrowRight, Map, Calendar, Truck, Gallery, Location, Note, Car, Image as ImageIcon } from "iconsax-react";
+import { ArrowRight, Map, Calendar, Truck, Gallery, Location, Note, Car, Image as ImageIcon, MedalStar, Monitor } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,6 +19,28 @@ const events = [
         link: "/products/rental/led-screen"
     },
     {
+        title: "Visual & Interactive",
+        items: [
+            "3D Projection Mapping",
+            "ระบบ Interactive (Wall/Floor)",
+            "ออกแบบ Motion Graphic",
+            "Laser และ Special Effects",
+            "Immersive Experience"
+        ],
+        link: "/products/rental/mapping"
+    },
+    {
+        title: "งานติดตั้งและโครงสร้าง",
+        items: [
+            "ติดตั้งจอ LED (Indoor/Outdoor)",
+            "ระบบเสียง (Sound System)",
+            "ระบบแสง (Lighting System)",
+            "เวทีและสเตจ (Stage Platform)",
+            "โครงทรัสและหลังคา (Truss & Roof)",
+        ],
+        link: "/products/fixed/led-screen"
+    },
+    {
         title: "จัดดอกไม้และของชำร่วย",
         items: [
             "ออกแบบและจัดดอกไม้ในงาน",
@@ -29,44 +51,32 @@ const events = [
             "ตกแต่งสถานที่ตามธีมงาน"
         ],
         link: "/products/rental/flower-souvenirs"
-    },
-    {
-        title: "งานติดตั้ง",
-        items: [
-            "ระบบห้องประชุมครบวงจร",
-            "ระบบป้ายโฆษณาดิจิทัล",
-            "ภาพและเสียงหอประชุม",
-            "ออกแบบห้องควบคุม (Control Room)",
-            "ห้องเรียนอัจฉริยะ (Smart Classroom)",
-            "บริการหลังการขายและดูแลระบบ"
-        ],
-        link: "/products/fixed/led-screen"
     }
 ];
 
 const infoBlocks = [
     {
-        icon: <Location size="32" color="white" variant="Outline" />,
-        title: "พื้นที่ให้บริการ",
-        subtitle: "ทั่วประเทศไทย",
-        color: "#F2A900", // Gold/Yellow
-    },
-    {
         icon: <Note size="32" color="white" variant="Outline" />,
-        title: "จองอัพเดทงาน",
-        subtitle: "จองคิวงาน / ปรึกษาฟรี",
+        title: "ปรึกษาและออกแบบฟรี",
+        subtitle: "ประเมินราคาตามงบประมาณ",
         color: "#E94560", // Red
     },
     {
-        icon: <Car size="32" color="white" variant="Outline" />,
-        title: "ขนส่งและติดตั้ง",
-        subtitle: "บริการขนส่งติดตั้ง",
+        icon: <MedalStar size="32" color="white" variant="Outline" />,
+        title: "ทีมงานมืออาชีพ",
+        subtitle: "ประสบการณ์กว่า 10 ปี",
+        color: "#F2A900", // Gold/Yellow
+    },
+    {
+        icon: <Monitor size="32" color="white" variant="Outline" />,
+        title: "อุปกรณ์มาตรฐานสากล",
+        subtitle: "จอ LED และระบบเสียง High-End",
         color: "#00C2CB", // Teal
     },
     {
-        icon: <ImageIcon size="32" color="white" variant="Outline" />,
-        title: "ผลงานของเรา",
-        subtitle: "ผลงานที่ผ่านมา",
+        icon: <Location size="32" color="white" variant="Outline" />,
+        title: "บริการทั่วประเทศ",
+        subtitle: "พร้อมทีมติดตั้งหน้างาน",
         color: "#1A5F7A", // Blue
     }
 ];
@@ -101,7 +111,7 @@ export default function FeaturedEvents() {
                 <Container maxWidth="lg" sx={{ position: "relative", zIndex: 2 }}>
                     <Box sx={{
                         display: { xs: 'flex', md: 'grid' },
-                        gridTemplateColumns: { md: '1fr 1fr 1fr' },
+                        gridTemplateColumns: { md: 'repeat(2, 1fr)', lg: 'repeat(4, 1fr)' },
                         gap: { xs: 2, md: 4 },
                         overflowX: { xs: 'auto', md: 'visible' },
                         scrollSnapType: { xs: 'x mandatory', md: 'none' },

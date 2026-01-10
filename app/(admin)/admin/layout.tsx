@@ -15,7 +15,7 @@ const sidebarItems = [
     { label: 'Dashboard', href: '/admin', icon: Home3, roles: ['admin'] },
     { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
     { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
-    { label: 'ส่งอัพเดทลูกค้า', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
+    { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
     { label: 'จัดการผู้ใช้', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },
     { label: 'Settings', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
 ];
@@ -25,8 +25,7 @@ const bottomNavItems = [
     { label: 'Home', href: '/admin', icon: Home3, roles: ['admin'] },
     { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
     { label: 'Customer', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
-    { label: 'ส่งอัพเดตลูกค้า', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
-    { label: 'More', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
+    { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -265,6 +264,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 ModalProps={{ keepMounted: true }}
                 sx={{
                     display: { xs: 'block', md: 'none' },
+                    zIndex: 1300, // Ensure it covers Sticky Footer (1250)
                     '& .MuiDrawer-paper': {
                         width: drawerWidth,
                         bgcolor: '#111827',

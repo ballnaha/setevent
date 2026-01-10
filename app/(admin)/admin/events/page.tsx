@@ -106,6 +106,7 @@ export default function EventsPage() {
     const [customerId, setCustomerId] = useState('');
     const [eventDate, setEventDate] = useState<Dayjs | null>(null);
     const [venue, setVenue] = useState('');
+    const [status, setStatus] = useState('draft');
     const [description, setDescription] = useState('');
     const [notes, setNotes] = useState('');
 
@@ -178,7 +179,9 @@ export default function EventsPage() {
         setEventName('');
         setCustomerId('');
         setEventDate(null);
+        setEventDate(null);
         setVenue('');
+        setStatus('draft');
         setDescription('');
         setNotes('');
         setDialogOpen(true);
@@ -191,6 +194,7 @@ export default function EventsPage() {
         setCustomerId(event.customer.id);
         setEventDate(event.eventDate ? dayjs(event.eventDate) : null);
         setVenue(event.venue || '');
+        setStatus(event.status || 'draft');
         setDescription(event.description || '');
         setNotes(event.notes || '');
         setDialogOpen(true);
@@ -223,6 +227,7 @@ export default function EventsPage() {
                 customerId,
                 eventDate: eventDate ? eventDate.toISOString() : null,
                 venue,
+                status,
                 description,
                 notes
             };
@@ -920,22 +925,46 @@ export default function EventsPage() {
                             </Box>
                         </Box>
 
-                        <Box>
-                            <TextField
-                                label="สถานที่จัดงาน"
-                                fullWidth
-                                value={venue}
-                                onChange={(e) => setVenue(e.target.value)}
-                                InputProps={{
-                                    sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 },
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <Location size={20} color="#999" />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
-                            />
+
+
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
+                            <Box sx={{ flex: 1 }}>
+                                <TextField
+                                    label="สถานที่จัดงาน"
+                                    fullWidth
+                                    value={venue}
+                                    onChange={(e) => setVenue(e.target.value)}
+                                    InputProps={{
+                                        sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 },
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Location size={20} color="#999" />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                    InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                                />
+                            </Box>
+                            <Box sx={{ flex: 1 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>สถานะ</InputLabel>
+                                    <Select
+                                        value={status}
+                                        label="สถานะ"
+                                        onChange={(e) => setStatus(e.target.value)}
+                                        sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+                                    >
+                                        {Object.entries(statusLabels).map(([key, val]) => (
+                                            <MenuItem key={key} value={key} sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: val.color }} />
+                                                    {val.label}
+                                                </Box>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
                         </Box>
 
                         <Box>
@@ -1029,6 +1058,6 @@ export default function EventsPage() {
                 severity={snackbar.severity}
                 onClose={() => setSnackbar({ ...snackbar, open: false })}
             />
-        </Box>
+        </Box >
     );
 }

@@ -12,7 +12,7 @@ import {
     Chip,
     Stack,
 } from '@mui/material';
-import { ArrowRight2, Clock, ArrowUp2, Instagram } from 'iconsax-react';
+import { ArrowRight2, Clock, ArrowUp2, Instagram, DocumentText, Call, Gallery, User, Music, MagicStar, Monitor } from 'iconsax-react';
 import Link from 'next/link';
 import { initializeLiff, LiffProfile } from '@/lib/liff';
 import LiffHeader from './components/LiffHeader';
@@ -394,7 +394,7 @@ function LiffContent() {
                                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94A3B8' }}>
                                                                 <Clock size={14} variant="Outline" color="#94A3B8" />
                                                                 <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1 }}>
-                                                                    {evt.tasksCount || 0} Task
+                                                                    {evt.tasksCount || 0} Messages
                                                                 </Typography>
                                                             </Box>
                                                         </Box>
@@ -408,98 +408,140 @@ function LiffContent() {
                         )}
                     </Box>
 
-                    {/* Progress Section */}
-                    <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
-                            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
-                                Progress
-                            </Typography>
-                            <Stack direction="row" alignItems="center" spacing={0.5} sx={{ cursor: 'pointer' }}>
-                                <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: '#64748B' }}>
-                                    All Stats
-                                </Typography>
-                                <ArrowRight2 size={14} color="#64748B" />
-                            </Stack>
-                        </Box>
-
-                        {/* Featured Card */}
-                        <Card
+                    {/* Quick Services Menu - NEW Section */}
+                    <Box sx={{ mb: 4, px: 2 }}>
+                        <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B', mb: 2, px: 1 }}>
+                            Quick Actions
+                        </Typography>
+                        <Box
                             sx={{
-                                borderRadius: 5,
-                                boxShadow: 'none',
-                                // Try to match the blurry/glassy look in image if possible, but simple gradient is safer
-                                background: 'linear-gradient(160deg, #F0F4FF 0%, #FFFFFF 60%, #FFF1F2 100%)',
-                                mb: 4,
-                                p: 1
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(4, 1fr)',
+                                gap: 2,
+                                bgcolor: 'white',
+                                p: 2,
+                                borderRadius: 4,
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
                             }}
                         >
-                            <CardContent sx={{ p: 2 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 1 }}>
-                                    <ArrowUp2 size={24} color="#CBD5E1" variant="Bold" />
+                            {[
+                                { icon: <DocumentText size={24} variant="Bulk" color="#3B82F6" />, label: 'ขอใบเสนอราคา', bg: '#EFF6FF' },
+                                { icon: <Call size={24} variant="Bulk" color="#10B981" />, label: 'ติดต่อเรา', bg: '#ECFDF5' },
+                                { icon: <Gallery size={24} variant="Bulk" color="#F59E0B" />, label: 'ผลงาน', bg: '#FFFBEB' },
+                                { icon: <User size={24} variant="Bulk" color="#8B5CF6" />, label: 'โปรไฟล์', bg: '#F5F3FF' },
+                            ].map((item, idx) => (
+                                <Box
+                                    key={idx}
+                                    sx={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        cursor: 'pointer',
+                                        transition: 'transform 0.2s',
+                                        '&:active': { transform: 'scale(0.95)' }
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 48,
+                                            height: 48,
+                                            borderRadius: 3,
+                                            bgcolor: item.bg,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mb: 0.5
+                                        }}
+                                    >
+                                        {item.icon}
+                                    </Box>
+                                    <Typography
+                                        sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontSize: '0.7rem',
+                                            color: '#64748B',
+                                            textAlign: 'center',
+                                            lineHeight: 1.2
+                                        }}
+                                    >
+                                        {item.label}
+                                    </Typography>
                                 </Box>
-                                <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B', mb: 1 }}>
-                                    Create and Check<br />Daily Task
-                                </Typography>
-                                <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: '#94A3B8', mb: 3, maxWidth: '90%', lineHeight: 1.5 }}>
-                                    You can control the execution of a task by a command in the application
-                                </Typography>
-
-                                <Box sx={{ height: 1, bgcolor: '#F1F5F9', my: 3 }} />
-
-                                {/* Calendar Strip (Pills) */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mb: 3 }}>
-                                    {days.map((date, i) => {
-                                        const isSelected = i === 0; // Select first day as example
-                                        return (
-                                            <Box
-                                                key={i}
-                                                sx={{
-                                                    flex: 1,
-                                                    bgcolor: isSelected ? '#3B82F6' : '#FFFFFF',
-                                                    borderRadius: 4,
-                                                    py: 1.5,
-                                                    textAlign: 'center',
-                                                    boxShadow: isSelected ? '0 8px 16px rgba(59, 130, 246, 0.25)' : 'none',
-                                                    color: isSelected ? 'white' : '#1E293B',
-                                                    border: isSelected ? 'none' : '1px solid #F8FAFC'
-                                                }}
-                                            >
-                                                <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, display: 'block', mb: 0.5, opacity: isSelected ? 0.9 : 0.5, fontSize: '0.65rem' }}>
-                                                    {format(date, 'EEE').toUpperCase()}
-                                                </Typography>
-                                                <Box sx={{ width: 12, height: 2, bgcolor: isSelected ? 'rgba(255,255,255,0.4)' : '#F1F5F9', mx: 'auto', mb: 0.5, borderRadius: 1 }} />
-                                                <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, lineHeight: 1 }}>
-                                                    {format(date, 'd')}
-                                                </Typography>
-                                            </Box>
-                                        );
-                                    })}
-                                </Box>
-
-                                {/* Avatar Footer */}
-                                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                                    {['#F472B6', '#FB923C', '#2DD4BF', '#A78BFA', '#F87171'].map((bg, i) => (
-                                        <Box
-                                            key={i}
-                                            sx={{
-                                                width: 36,
-                                                height: 36,
-                                                borderRadius: '50%',
-                                                bgcolor: bg,
-                                                border: '2px solid white',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
-                                            }}
-                                        >
-                                            <Box component="img" src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i + 15}`} sx={{ width: 24, height: 24 }} />
-                                        </Box>
-                                    ))}
-                                </Box>
-                            </CardContent>
-                        </Card>
+                            ))}
+                        </Box>
                     </Box>
+
+                    {/* Service Highlights - NEW Section */}
+                    <Box sx={{ mb: 4 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 3 }}>
+                            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
+                                Our Services
+                            </Typography>
+                            <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: '#3B82F6', fontWeight: 600 }}>
+                                View All &gt;
+                            </Typography>
+                        </Box>
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                gap: 2,
+                                overflowX: 'auto',
+                                px: 3,
+                                mx: -2,
+                                pb: 2,
+                                '::-webkit-scrollbar': { display: 'none' },
+                                scrollbarWidth: 'none'
+                            }}
+                        >
+                            {[
+                                { title: 'Sound System', desc: 'เครื่องเสียงคุณภาพสูง', icon: <Music size={24} color="white" />, color: '#00C2CB' },
+                                { title: 'Lighting', desc: 'ระบบแสง สี เสียง', icon: <MagicStar size={24} color="white" />, color: '#F2A900' },
+                                { title: 'LED Screen', desc: 'จอภาพคมชัด', icon: <Monitor size={24} color="white" />, color: '#E94560' },
+                            ].map((service, idx) => (
+                                <Box
+                                    key={idx}
+                                    sx={{
+                                        minWidth: 160,
+                                        p: 2,
+                                        borderRadius: 4,
+                                        bgcolor: 'white',
+                                        boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: 1.5,
+                                        cursor: 'pointer',
+                                        border: '1px solid #F8FAFC'
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: 2,
+                                            bgcolor: service.color,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: `0 4px 10px ${service.color}40`
+                                        }}
+                                    >
+                                        {service.icon}
+                                    </Box>
+                                    <Box>
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, fontSize: '0.9rem', color: '#1E293B' }}>
+                                            {service.title}
+                                        </Typography>
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#94A3B8' }}>
+                                            {service.desc}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            ))}
+                        </Box>
+                    </Box>
+
                 </Container>
             </>
         );
@@ -1102,6 +1144,141 @@ function LiffContent() {
             </>
         );
     }
+
+
+    {/* Quick Services Menu - NEW Section */ }
+    <Box sx={{ mb: 4, px: 2 }}>
+        <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B', mb: 2, px: 1 }}>
+            Quick Actions
+        </Typography>
+        <Box
+            sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                gap: 2,
+                bgcolor: 'white',
+                p: 2,
+                borderRadius: 4,
+                boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
+            }}
+        >
+            {[
+                { icon: <DocumentText size={24} variant="Bulk" color="#3B82F6" />, label: 'ขอใบเสนอราคา', bg: '#EFF6FF' },
+                { icon: <Call size={24} variant="Bulk" color="#10B981" />, label: 'ติดต่อเรา', bg: '#ECFDF5' },
+                { icon: <Gallery size={24} variant="Bulk" color="#F59E0B" />, label: 'ผลงาน', bg: '#FFFBEB' },
+                { icon: <User size={24} variant="Bulk" color="#8B5CF6" />, label: 'โปรไฟล์', bg: '#F5F3FF' },
+            ].map((item, idx) => (
+                <Box
+                    key={idx}
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 1,
+                        cursor: 'pointer',
+                        transition: 'transform 0.2s',
+                        '&:active': { transform: 'scale(0.95)' }
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 48,
+                            height: 48,
+                            borderRadius: 3,
+                            bgcolor: item.bg,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mb: 0.5
+                        }}
+                    >
+                        {item.icon}
+                    </Box>
+                    <Typography
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontSize: '0.7rem',
+                            color: '#64748B',
+                            textAlign: 'center',
+                            lineHeight: 1.2
+                        }}
+                    >
+                        {item.label}
+                    </Typography>
+                </Box>
+            ))}
+        </Box>
+    </Box>
+
+    {/* Service Highlights - NEW Section */ }
+    <Box sx={{ mb: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 3 }}>
+            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
+                Our Services
+            </Typography>
+            <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: '#3B82F6', fontWeight: 600 }}>
+                View All &gt;
+            </Typography>
+        </Box>
+
+        <Box
+            sx={{
+                display: 'flex',
+                gap: 2,
+                overflowX: 'auto',
+                px: 3,
+                mx: -2,
+                pb: 2,
+                '::-webkit-scrollbar': { display: 'none' },
+                scrollbarWidth: 'none'
+            }}
+        >
+            {[
+                { title: 'Sound System', desc: 'เครื่องเสียงคุณภาพสูง', icon: <Music size={24} color="white" />, color: '#00C2CB' },
+                { title: 'Lighting', desc: 'ระบบแสง สี เสียง', icon: <MagicStar size={24} color="white" />, color: '#F2A900' },
+                { title: 'LED Screen', desc: 'จอภาพคมชัด', icon: <Monitor size={24} color="white" />, color: '#E94560' },
+            ].map((service, idx) => (
+                <Box
+                    key={idx}
+                    sx={{
+                        minWidth: 160,
+                        p: 2,
+                        borderRadius: 4,
+                        bgcolor: 'white',
+                        boxShadow: '0 4px 15px rgba(0,0,0,0.04)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 1.5,
+                        cursor: 'pointer',
+                        border: '1px solid #F8FAFC'
+                    }}
+                >
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 2,
+                            bgcolor: service.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: `0 4px 10px ${service.color}40`
+                        }}
+                    >
+                        {service.icon}
+                    </Box>
+                    <Box>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, fontSize: '0.9rem', color: '#1E293B' }}>
+                            {service.title}
+                        </Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#94A3B8' }}>
+                            {service.desc}
+                        </Typography>
+                    </Box>
+                </Box>
+            ))}
+        </Box>
+    </Box>
 
     return null;
 }
