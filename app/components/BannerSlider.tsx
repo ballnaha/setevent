@@ -32,7 +32,7 @@ export default function BannerSlider() {
             {/* Background Image - Static for Single Hero Look */}
             <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <Image
-                    src="/images/banner1-3.webp"
+                    src="/images/banner1-4.webp"
                     alt="Event Background"
                     fill
                     priority
@@ -112,6 +112,7 @@ export default function BannerSlider() {
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} mt={{ xs: 3, md: 4 }}>
                     <Button
                         variant="contained"
+                        href="/products"
                         sx={{
                             bgcolor: '#E94560',
                             color: 'white',
@@ -128,6 +129,7 @@ export default function BannerSlider() {
                     </Button>
                     <Button
                         variant="contained"
+                        href="/contact"
                         sx={{
                             bgcolor: '#1A5F7A',
                             color: 'white',

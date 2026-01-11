@@ -20,6 +20,16 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Image configuration
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
+
   // Compiler options
   compiler: {
     // Remove console.log in production

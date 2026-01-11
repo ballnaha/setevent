@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction, Tooltip, Menu, MenuItem, Divider } from '@mui/material';
-import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle } from 'iconsax-react';
+import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle, Box1, Category2, Ticket, Gallery, Brush2 } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -11,13 +11,40 @@ const drawerWidth = 260;
 
 // Menu items with allowed roles
 // Sidebar Menu Items
-const sidebarItems = [
-    { label: 'Dashboard', href: '/admin', icon: Home3, roles: ['admin'] },
-    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
-    { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
-    { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
-    { label: 'จัดการผู้ใช้', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },
-    { label: 'Settings', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
+// Sidebar Menu Groups
+const sidebarGroups = [
+    {
+        title: 'Overview',
+        items: [
+            { label: 'Dashboard', href: '/admin', icon: Home3, roles: ['admin'] },
+        ]
+    },
+    {
+        title: 'Management',
+        items: [
+            { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
+            { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
+            { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
+        ]
+    },
+    {
+        title: 'Product & Service',
+        items: [
+            { label: 'Portfolio', href: '/admin/portfolio', icon: Gallery, roles: ['admin', 'sales'] },
+            { label: 'Designs', href: '/admin/designs', icon: Brush2, roles: ['admin', 'sales'] },
+            { label: 'Promotions', href: '/admin/promotions', icon: Ticket, roles: ['admin', 'sales'] },
+            { label: 'Products', href: '/admin/products', icon: Box1, roles: ['admin'] },
+            { label: 'Categories', href: '/admin/products/categories', icon: Category2, roles: ['admin'] },
+        ]
+    },
+    {
+        title: 'System',
+        items: [
+            { label: 'Contact', href: '/admin/contact', icon: Message, roles: ['admin'] },
+            { label: 'Users', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },
+            { label: 'Settings', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
+        ]
+    }
 ];
 
 // Bottom Navigation Items (Mobile) - Can be different from Sidebar
@@ -43,7 +70,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }, [session]);
 
     // Filter menu items based on user role
-    const desktopMenuItems = sidebarItems.filter(item => item.roles.includes(userRole));
+    const desktopMenuGroups = sidebarGroups.map(group => ({
+        ...group,
+        items: group.items.filter(item => item.roles.includes(userRole))
+    })).filter(group => group.items.length > 0);
+
     const mobileMenuItems = bottomNavItems.filter(item => item.roles.includes(userRole));
 
     const handleLogout = () => {
@@ -57,80 +88,78 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const drawer = (
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', overflowX: 'hidden', background: 'linear-gradient(180deg, #111827 0%, #000000 100%)' }}>
             {/* Nav Items */}
-            <Box sx={{ p: 2 }}>
-                <Typography sx={{
-                    fontFamily: 'var(--font-prompt)',
-                    fontSize: '0.75rem',
-                    color: 'rgba(255,255,255,0.4)',
-                    mb: 1,
-                    pl: 1.5,
-                    textTransform: 'uppercase',
-                    fontWeight: 600,
-                    letterSpacing: 1
-                }}>
-                    Menu
-                </Typography>
-                <List sx={{ flex: 1 }}>
-                    {desktopMenuItems.map((item) => {
-                        const isActive = pathname === item.href;
-                        const Icon = item.icon;
-                        return (
-                            <ListItem key={item.href} disablePadding sx={{ mb: 1 }}>
-                                <ListItemButton
-                                    component={Link}
-                                    href={item.href}
-                                    onClick={() => setMobileOpen(false)}
-                                    sx={{
-                                        borderRadius: 3,
-                                        mx: 1,
-                                        py: 1.2,
-                                        px: 2,
-                                        position: 'relative',
-                                        overflow: 'hidden',
-                                        bgcolor: isActive ? '#0A5C5A' : 'transparent',
-                                        background: isActive ? 'linear-gradient(135deg, #0A5C5A 0%, #053b3a 100%)' : 'transparent',
-                                        boxShadow: isActive ? '0 8px 16px -4px rgba(10, 92, 90, 0.5)' : 'none',
-                                        '&:hover': {
-                                            bgcolor: isActive ? '#0A5C5A' : 'rgba(255,255,255,0.05)',
-                                        },
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                        '&::before': isActive ? {
-                                            content: '""',
-                                            position: 'absolute',
-                                            left: 0,
-                                            top: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                            background: 'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%)',
-                                            pointerEvents: 'none'
-                                        } : {}
-                                    }}
-                                >
-                                    <ListItemIcon sx={{ minWidth: 36 }}>
-                                        <Icon
-                                            size={22}
-                                            color={isActive ? '#FFFFFF' : '#9CA3AF'}
-                                            variant={isActive ? 'Bold' : 'Outline'}
-                                        />
-                                    </ListItemIcon>
-                                    <ListItemText
-                                        primary={item.label}
-                                        primaryTypographyProps={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontSize: '0.9rem',
-                                            fontWeight: isActive ? 600 : 400,
-                                            color: isActive ? '#FFFFFF' : '#D1D5DB',
-                                            letterSpacing: 0.3
-                                        }}
-                                    />
-                                    {isActive && (
-                                        <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.8)' }} />
-                                    )}
-                                </ListItemButton>
-                            </ListItem>
-                        );
-                    })}
-                </List>
+            <Box sx={{ p: 2, pb: 4 }}>
+                {desktopMenuGroups.map((group, index) => (
+                    <Box key={group.title} sx={{ mb: index !== desktopMenuGroups.length - 1 ? 3 : 0 }}>
+                        <Typography sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontSize: '0.7rem',
+                            color: 'rgba(255,255,255,0.4)',
+                            mb: 1.5,
+                            pl: 2.5,
+                            textTransform: 'uppercase',
+                            fontWeight: 700,
+                            letterSpacing: 1.2
+                        }}>
+                            {group.title}
+                        </Typography>
+                        <List disablePadding>
+                            {group.items.map((item) => {
+                                const isActive = pathname === item.href;
+                                const Icon = item.icon;
+                                return (
+                                    <ListItem key={item.href} disablePadding sx={{ mb: 0.8 }}>
+                                        <ListItemButton
+                                            component={Link}
+                                            href={item.href}
+                                            onClick={() => setMobileOpen(false)}
+                                            sx={{
+                                                borderRadius: 2.5,
+                                                mx: 1.5,
+                                                py: 1,
+                                                px: 2,
+                                                position: 'relative',
+                                                overflow: 'hidden',
+                                                bgcolor: isActive ? '#0A5C5A' : 'transparent',
+                                                background: isActive ? 'linear-gradient(135deg, #0A5C5A 0%, #053b3a 100%)' : 'transparent',
+                                                boxShadow: isActive ? '0 8px 16px -4px rgba(10, 92, 90, 0.5)' : 'none',
+                                                '&:hover': {
+                                                    bgcolor: isActive ? '#0A5C5A' : 'rgba(255,255,255,0.05)',
+                                                    transform: 'translateX(4px)'
+                                                },
+                                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            }}
+                                        >
+                                            <ListItemIcon sx={{ minWidth: 34 }}>
+                                                <Icon
+                                                    size={20}
+                                                    color={isActive ? '#FFFFFF' : '#9CA3AF'}
+                                                    variant={isActive ? 'Bold' : 'Outline'}
+                                                />
+                                            </ListItemIcon>
+                                            <ListItemText
+                                                primary={item.label}
+                                                primaryTypographyProps={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontSize: '0.85rem',
+                                                    fontWeight: isActive ? 600 : 400,
+                                                    color: isActive ? '#FFFFFF' : '#D1D5DB',
+                                                }}
+                                            />
+                                            {isActive && (
+                                                <Box sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: 'rgba(255,255,255,0.8)' }} />
+                                            )}
+                                        </ListItemButton>
+                                    </ListItem>
+                                );
+                            })}
+                        </List>
+                        {/* Divider between groups, but not at the end */}
+                        {index !== desktopMenuGroups.length - 1 && (
+                            <Box sx={{ mt: 2, mx: 3, height: '1px', bgcolor: 'rgba(255,255,255,0.05)' }} />
+                        )}
+                    </Box>
+                ))}
             </Box>
         </Box>
     );

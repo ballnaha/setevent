@@ -150,3 +150,94 @@ model ChatLog {
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   event       Event?   @relation(fields: [eventId], references: [id], onDelete: SetNull)
 }
+
+// Category - หมวดหมู่สินค้า (รองรับ Submenu)
+model Category {
+  id          String     @id @default(cuid())
+  name        String
+  slug        String     @unique // for url e.g. rental, lighting
+  description String?    @db.Text
+  image       String?    // Image for the category card or submenu
+  parentId    String?    // For nested structure
+  order       Int        @default(0)
+  status      String     @default("active") // active, inactive
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  parent      Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryHierarchy")
+  products    Product[]
+}
+
+// Product - สินค้า
+model Product {
+  id          String   @id @default(cuid())
+  categoryId  String
+  name        String
+  slug        String   @unique
+  description String?  @db.Text
+  price       Decimal? @db.Decimal(12, 2)
+  priceUnit   String?  // e.g. "ต่อตร.ม.", "/ชิ้น", "/วัน"
+  status      String   @default("active")
+  images      String?  @db.Text // JSON Array of image URLs
+  features    String?  @db.Text // JSON Array of features
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+}
+
+// Promotion - โปรโมชั่น
+model Promotion {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  image       String?  // Main display image
+  price       String?  // Display text for price (e.g. "฿59,000", "Start ฿9,900")
+  period      String?  // e.g. "Jan - Mar 2026"
+  features    String?  @db.Text // JSON Array of objects: [{"label": "Guests", "value": "Up to 200"}]
+  status      String   @default("active") // active, inactive
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Portfolio - ผลงาน
+model Portfolio {
+  id          String   @id @default(cuid())
+  title       String
+  category    String   // Marketing Event, Seminar & Conference, Exhibition, Concert, Wedding, Fixed Installation
+  image       String?  // Main display image
+  description String?  @db.Text
+  likes       Int      @default(0)
+  views       Int      @default(0)
+  status      String   @default("active") // active, inactive
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Design - ดีไซน์งานอีเวนต์
+model Design {
+  id          String   @id @default(cuid())
+  title       String
+  category    String   // Wedding, Corporate, Dinner, Party, Concert, Fashion
+  image       String?  // Main display image
+  description String?  @db.Text
+  likes       Int      @default(0)
+  views       Int      @default(0)
+  status      String   @default("active") // active, inactive
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// SiteSettings - ข้อมูลติดต่อและ settings ของเว็บ
+model SiteSettings {
+  id          String   @id @default(cuid())
+  key         String   @unique  // e.g., "contact", "social"
+  value       String   @db.Text // JSON string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

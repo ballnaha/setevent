@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
     AppBar,
     Box,
@@ -24,6 +24,7 @@ import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Moni
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { useMenuData } from "@/app/hooks/useMenuData";
 
 // ---- Data Structures ----
 
@@ -42,69 +43,28 @@ type NavItem = {
     sections?: { title: string; items: SubItem[] }[];
 };
 
-const productSections = [
-    {
-        title: "Rental",
-        items: [
-            {
-                label: "LED Screen",
-                href: "/products/rental/led-screen",
-                children: [
-                    {
-                        label: "Indoor",
-                        href: "/products/rental/led-screen/indoor"
-                    },
-                    {
-                        label: "Outdoor",
-                        href: "/products/rental/led-screen/outdoor"
-                    },
-                ]
-            },
-            { label: "Lighting Systems", href: "/products/rental/lighting" },
-            { label: "Sound Systems", href: "/products/rental/sound" },
-            { label: "Stage", href: "/products/rental/stage" },
-            { label: "Motion Graphic", href: "/products/rental/motion-graphic" },
-            { label: "Interactive", href: "/products/rental/interactive" },
-            { label: "Laser", href: "/products/rental/laser" },
-            { label: "Mapping", href: "/products/rental/mapping" },
-            { label: "Flower & Souvenirs", href: "/products/rental/flower-souvenirs" },
-        ]
-    },
-    {
-        title: "Fixed Installation",
-        items: [
-            { label: "LED Screen", href: "/products/fixed/led-screen" }
-        ]
-    }
-];
-
-const navItems: NavItem[] = [
-    { label: "HOME", href: "/" },
-    {
-        label: "PRODUCTS",
-        href: "/products",
-        isMega: true,
-        sections: productSections
-    },
-    { label: "SERVICES", href: "/services" },
-    {
-        label: "PORTFOLIO",
-        href: "/portfolio",
-        children: [
-            { label: "Marketing Event", href: "/portfolio/marketing-event" },
-            { label: "Seminar & Conference", href: "/portfolio/seminar-conference" },
-            { label: "Exhibition", href: "/portfolio/exhibition" },
-            { label: "Concert", href: "/portfolio/concert" },
-            { label: "Wedding", href: "/portfolio/wedding" },
-            { label: "Fixed Installation", href: "/portfolio/fixed-installation" },
-        ]
-    },
-    { label: "RENTAL", href: "/rental" },
-    { label: "CONTACT", href: "/contact" },
-];
+// Note: Portfolio submenu has been moved to tabs in the portfolio page
 
 export default function Header() {
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    // Fetch product menu from database
+    const { sections: productSections } = useMenuData();
+
+    // Build navItems dynamically based on fetched sections
+    const navItems: NavItem[] = useMemo(() => [
+        { label: "HOME", href: "/" },
+        {
+            label: "PRODUCTS",
+            href: "/products",
+            isMega: true,
+            sections: productSections
+        },
+        { label: "PROMOTIONS", href: "/promotions" },
+        { label: "PORTFOLIO", href: "/portfolio" },
+        { label: "NEW DESIGN", href: "/designs" },
+        { label: "CONTACT", href: "/contact" },
+    ], [productSections]);
 
     // Desktop Menu States
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -113,7 +73,6 @@ export default function Header() {
     const timeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
     // Mobile States
-    // Track expanded items by ID/Label path
     // Track expanded items by ID/Label path
     const [expandedItems, setExpandedItems] = useState<string[]>([]);
     // Track expanded items for Desktop Mega Menu
@@ -124,7 +83,7 @@ export default function Header() {
     const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
-    const isHome = pathname === "/" || pathname === "/contact";
+    const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products");
 
     // ---- Handlers ----
 
@@ -602,17 +561,13 @@ export default function Header() {
                                         onMouseEnter={(e) => ['PRODUCTS', 'PORTFOLIO'].includes(item.label) ? undefined : handleHoverOpen(e, item.label)}
                                     >
                                         <Box
-                                            component={Link}
-                                            href={item.href}
                                             onClick={(e) => {
-                                                if (['PRODUCTS', 'PORTFOLIO'].includes(item.label)) {
-                                                    e.preventDefault();
-                                                    if (openDropdown && activeMenu === item.label) {
-                                                        setAnchorEl(null);
-                                                        setActiveMenu(null);
-                                                    } else {
-                                                        handleHoverOpen(e, item.label);
-                                                    }
+                                                e.preventDefault();
+                                                if (openDropdown && activeMenu === item.label) {
+                                                    setAnchorEl(null);
+                                                    setActiveMenu(null);
+                                                } else {
+                                                    handleHoverOpen(e, item.label);
                                                 }
                                             }}
                                             sx={{
@@ -685,37 +640,75 @@ export default function Header() {
 
                                             {/* If Mega Menu (Products) */}
                                             {item.isMega && item.sections && (
-                                                <Box sx={{ display: 'flex', p: 0 }}>
-                                                    {item.sections?.map((section, idx) => (
+                                                <Box>
+                                                    <Box sx={{ display: 'flex', p: 0 }}>
+                                                        {item.sections?.map((section, idx) => (
+                                                            <Box
+                                                                key={section.title}
+                                                                sx={{
+                                                                    p: 4,
+                                                                    flex: idx === 0 ? '1 1 auto' : '0 0 250px',
+                                                                    borderRight: idx !== (item.sections?.length ?? 0) - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+                                                                    bgcolor: idx === 0 ? 'transparent' : 'rgba(0,0,0,0.02)'
+                                                                }}
+                                                            >
+                                                                <Typography variant="overline" sx={{
+                                                                    fontFamily: 'var(--font-prompt)',
+                                                                    fontWeight: 800,
+                                                                    mb: 3,
+                                                                    color: 'var(--primary)',
+                                                                    letterSpacing: 1.5,
+                                                                    display: 'block',
+                                                                    borderBottom: '2px solid var(--primary)',
+                                                                    pb: 1,
+                                                                    width: 'fit-content'
+                                                                }}>
+                                                                    {section.title}
+                                                                </Typography>
+                                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                                    {renderDesktopTree(section.items)}
+                                                                </Box>
+                                                            </Box>
+                                                        ))}
+                                                    </Box>
+                                                    {/* View All Link */}
+                                                    <Box sx={{
+                                                        p: 2,
+                                                        borderTop: '1px solid rgba(0,0,0,0.08)',
+                                                        textAlign: 'center',
+                                                        bgcolor: 'rgba(0,0,0,0.02)'
+                                                    }}>
                                                         <Box
-                                                            key={section.title}
+                                                            component={Link}
+                                                            href="/products"
+                                                            onClick={() => {
+                                                                setAnchorEl(null);
+                                                                setActiveMenu(null);
+                                                            }}
                                                             sx={{
-                                                                p: 4,
-                                                                flex: idx === 0 ? '1 1 auto' : '0 0 250px', // Rental gets more space, Fixed gets fixed width
-                                                                borderRight: idx !== (item.sections?.length ?? 0) - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
-                                                                bgcolor: idx === 0 ? 'transparent' : 'rgba(0,0,0,0.02)' // Subtle distinction
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: 1,
+                                                                textDecoration: 'none',
+                                                                color: 'var(--primary)',
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontWeight: 600,
+                                                                fontSize: '0.9rem',
+                                                                py: 1,
+                                                                px: 3,
+                                                                borderRadius: 2,
+                                                                bgcolor: 'rgba(10, 92, 90, 0.08)',
+                                                                transition: 'all 0.2s',
+                                                                '&:hover': {
+                                                                    bgcolor: 'rgba(10, 92, 90, 0.15)',
+                                                                    transform: 'translateY(-1px)'
+                                                                }
                                                             }}
                                                         >
-                                                            <Typography variant="overline" sx={{
-                                                                fontFamily: 'var(--font-prompt)',
-                                                                fontWeight: 800,
-                                                                mb: 3,
-                                                                color: 'var(--primary)',
-                                                                letterSpacing: 1.5,
-                                                                display: 'block',
-                                                                borderBottom: '2px solid var(--primary)',
-                                                                pb: 1,
-                                                                width: 'fit-content'
-                                                            }}>
-                                                                {section.title}
-                                                            </Typography>
-
-                                                            {/* Custom Layout for Rental to split widely if needed, or just standard tree */}
-                                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                                                {renderDesktopTree(section.items)}
-                                                            </Box>
+                                                            ดูสินค้าทั้งหมด
+                                                            <ArrowRight2 size="16" color="var(--primary)" />
                                                         </Box>
-                                                    ))}
+                                                    </Box>
                                                 </Box>
                                             )}
                                         </Menu>
@@ -874,6 +867,6 @@ export default function Header() {
                     {drawer}
                 </Drawer>
             </nav>
-        </Box>
+        </Box >
     );
 }

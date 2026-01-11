@@ -7,23 +7,23 @@ import { Monitor, MagicStar, Music } from "iconsax-react";
 const services = [
     {
         title: "บริการเช่าอุปกรณ์",
-        subtitle: "One-Stop Rental Service",
-        desc: "บริการให้เช่าเวที แสง สี เสียง และจอ LED คุณภาพสูง พร้อมทีมงานติดตั้งมืออาชีพที่พร้อมดูแลทุกขั้นตอน",
+        subtitle: "All-in-One Rental Solutions",
+        desc: "บริการจำหน่ายและให้เช่าจอ LED , TV , Pointer คุณภาพสูง พร้อมทีมงานติดตั้งมืออาชีพที่พร้อมดูแลทุกขั้นตอน",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
         buttonText: "เช่าอุปกรณ์"
     },
     {
-        title: "บริการรับจัดงาน",
-        subtitle: "Event Organizer",
-        desc: "รับจัดงานอีเว้นท์ งานแต่งงาน งานเปิดตัวสินค้า ดูแลตั้งแต่วางแผนจนจบงาน ให้งานของคุณออกมาสมบูรณ์แบบ",
+        title: "บริการรับจัดดอกไม้ & Souvenir",
+        subtitle: "Floral & Souvenir Arrangements",
+        desc: "บริการจัดดอกไม้ตกแต่งสถานที่และของที่ระลึกดีไซน์เอกลักษณ์ ประณีตในทุกรายละเอียด เพื่อมอบความทรงจำอันล้ำค่าให้แก่แขกคนสำคัญของคุณ และของที่ระลึก",
         icon: <MagicStar size="50" color="currentColor" variant="Outline" />,
         color: "#F2A900", // Tertiary (Gold/Yellow adjusted for visibility)
         buttonText: "บริการจัดงาน"
     },
     {
         title: "ระบบแสงสีเสียง",
-        subtitle: "Full Scale Production",
+        subtitle: "Lighting & Sound Production",
         desc: "ระบบแสง สี เสียงมาตรฐานสากล ผสานเทคโนโลยีทันสมัย ให้ภาพ แสง และเสียงสมจริง คมชัด รองรับทุกประเภทงาน",
         icon: <Music size="50" color="currentColor" variant="Outline" />,
         color: "#00C2CB", // Primary
@@ -99,7 +99,7 @@ export default function ServicesSection() {
                                 color: service.color,
                                 textTransform: 'uppercase',
                                 letterSpacing: 0.5,
-                                fontSize: { xs: '1.5rem', md: '2.125rem' }
+                                fontSize: { xs: '1.5rem', md: '2rem' }
                             }}>
                                 {service.title}
                             </Typography>
@@ -133,31 +133,7 @@ export default function ServicesSection() {
                                 {service.desc}
                             </Typography>
 
-                            {/* Button */}
-                            <Box
-                                component="button"
-                                sx={{
-                                    bgcolor: service.color,
-                                    color: 'white',
-                                    border: 'none',
-                                    px: { xs: 3, md: 4 },
-                                    py: { xs: 1.2, md: 1.5 },
-                                    borderRadius: 1,
-                                    fontFamily: "var(--font-prompt)",
-                                    fontWeight: "bold",
-                                    fontSize: { xs: '0.85rem', md: '0.9rem' },
-                                    cursor: 'pointer',
-                                    transition: 'all 0.3s ease',
-                                    boxShadow: `0 4px 15px ${service.color}66`,
-                                    '&:hover': {
-                                        filter: 'brightness(1.1)',
-                                        transform: 'scale(1.05)',
-                                        boxShadow: `0 8px 25px ${service.color}88`,
-                                    }
-                                }}
-                            >
-                                {service.buttonText}
-                            </Box>
+
                         </Box>
                     ))}
                 </Box>
