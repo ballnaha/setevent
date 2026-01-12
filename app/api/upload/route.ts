@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import path from "path";
 import fs from "fs/promises";
+import sharp from "sharp";
 
 export async function POST(req: NextRequest) {
     try {
@@ -13,9 +14,33 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+        let buffer: Buffer = Buffer.from(await file.arrayBuffer());
+
+        // Resize logic using sharp
+        let isWebP = false;
+        if (file.type.startsWith("image/")) {
+            try {
+                buffer = await sharp(buffer)
+                    .resize(1920, 1920, {
+                        fit: 'inside',
+                        withoutEnlargement: true
+                    })
+                    .webp({ quality: 80 })
+                    .toBuffer();
+                isWebP = true;
+            } catch (err) {
+                console.error("Image processing error:", err);
+                // Continue with original buffer if resizing fails
+            }
+        }
+
         // Create a safe filename
-        const filename = Date.now() + "_" + file.name.replace(/\s+/g, "_");
+        let filename = Date.now() + "_" + file.name.replace(/\s+/g, "_");
+
+        // If converted to WebP, change extension
+        if (isWebP) {
+            filename = filename.replace(/\.[^/.]+$/, "") + ".webp";
+        }
 
         // Sanitize folder name (allow simple alphanumeric and hyphens/underscores)
         const safeFolder = folder.replace(/[^a-zA-Z0-9\-_]/g, "_").toLowerCase();

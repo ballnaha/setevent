@@ -89,9 +89,10 @@ export default function ContactContent() {
     return (
         <React.Fragment>
             {/* Hero Section - Soft Dark */}
+            {/* Hero Section - Soft Dark */}
             <Box sx={{
                 position: 'relative',
-                minHeight: { xs: '280px', md: '400px' },
+                minHeight: { xs: 'auto', md: '400px' },
                 bgcolor: '#1a1a1a',
                 display: 'flex',
                 alignItems: 'center',
@@ -120,11 +121,12 @@ export default function ContactContent() {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: { xs: '300px', md: '600px' },
-                    height: { xs: '300px', md: '600px' },
+                    width: '600px',
+                    height: '600px',
                     borderRadius: '50%',
                     background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, transparent 70%)',
                     filter: 'blur(40px)',
+                    display: { xs: 'none', md: 'block' }
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
@@ -132,9 +134,10 @@ export default function ContactContent() {
                         fontFamily: 'var(--font-prompt)',
                         fontWeight: 700,
                         color: 'white',
-                        fontSize: { xs: '2.5rem', md: '4rem' },
+                        fontSize: { xs: '1.2rem', md: '4rem' },
                         lineHeight: 1.2,
-                        mb: 2
+                        mb: { xs: 1, md: 2 },
+                        pt: { xs: 5, md: 0 }
                     }}>
                         CONTACT US
                     </Typography>
@@ -142,7 +145,7 @@ export default function ContactContent() {
                         fontFamily: 'var(--font-prompt)',
                         color: 'rgba(255,255,255,0.7)',
                         fontWeight: 300,
-                        fontSize: { xs: '1rem', md: '1.25rem' },
+                        fontSize: { xs: '0.85rem', md: '1.25rem' },
                         maxWidth: '500px',
                         mx: 'auto'
                     }}>

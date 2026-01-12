@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Box, Avatar, Typography, Skeleton, IconButton } from '@mui/material';
+import { Box, Avatar, Typography, Skeleton, IconButton, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { initializeLiff, LiffProfile } from '@/lib/liff';
-import { Setting2, CloseCircle } from 'iconsax-react';
+import { Setting2, CloseCircle, User, LogoutCurve } from 'iconsax-react';
+import { useRouter } from 'next/navigation';
 
 interface LiffHeaderProps {
     onSearch?: (query: string) => void;
@@ -14,6 +15,21 @@ interface LiffHeaderProps {
 export default function LiffHeader({ onSearch, searchValue = '', onClear }: LiffHeaderProps) {
     const [profile, setProfile] = useState<LiffProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const open = Boolean(anchorEl);
+    const router = useRouter();
+
+    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+        setAnchorEl(event.currentTarget);
+    };
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleNavigate = (path: string) => {
+        handleClose();
+        router.push(path);
+    };
 
     useEffect(() => {
         async function init() {
@@ -84,6 +100,7 @@ export default function LiffHeader({ onSearch, searchValue = '', onClear }: Liff
 
                 {/* Settings Icon */}
                 <IconButton
+                    onClick={handleClick}
                     sx={{
                         border: '1px solid #F1F5F9',
                         borderRadius: '50%',
@@ -92,6 +109,50 @@ export default function LiffHeader({ onSearch, searchValue = '', onClear }: Liff
                 >
                     <Setting2 size={24} color="#94A3B8" />
                 </IconButton>
+
+                <Menu
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleClose}
+                    onClick={handleClose}
+                    PaperProps={{
+                        elevation: 0,
+                        sx: {
+                            overflow: 'visible',
+                            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
+                            mt: 1.5,
+                            borderRadius: 3,
+                            minWidth: 180,
+                            '&:before': {
+                                content: '""',
+                                display: 'block',
+                                position: 'absolute',
+                                top: 0,
+                                right: 14,
+                                width: 10,
+                                height: 10,
+                                bgcolor: 'background: paper',
+                                transform: 'translateY(-50%) rotate(45deg)',
+                                zIndex: 0,
+                            },
+                        },
+                    }}
+                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                >
+                    <MenuItem
+                        onClick={() => handleNavigate('/liff/profile')}
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            py: 1.2
+                        }}
+                    >
+                        <ListItemIcon>
+                            <User size={20} variant="Bulk" color="#3B82F6" />
+                        </ListItemIcon>
+                        โปรไฟล์ของฉัน
+                    </MenuItem>
+                </Menu>
             </Box>
 
             {/* Search Bar */}

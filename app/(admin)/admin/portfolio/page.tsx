@@ -259,7 +259,7 @@ export default function PortfolioAdminPage() {
     };
 
     return (
-        <Box sx={{ p: 4 }}>
+        <Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                 <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700 }}>
                     Manage Portfolio
@@ -433,13 +433,15 @@ export default function PortfolioAdminPage() {
                                                 position: 'absolute',
                                                 top: 8,
                                                 right: 8,
-                                                bgcolor: 'rgba(0,0,0,0.6)',
-                                                color: 'white',
-                                                '&:hover': { bgcolor: 'rgba(220,38,38,0.9)' }
+                                                zIndex: 10,
+                                                bgcolor: 'white',
+                                                color: '#ef4444',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                                '&:hover': { bgcolor: '#fef2f2' }
                                             }}
                                             size="small"
                                         >
-                                            <CloseCircle size="18" />
+                                            <Trash size="20" variant="Outline" color="#ef4444" />
                                         </IconButton>
                                     </>
                                 ) : (

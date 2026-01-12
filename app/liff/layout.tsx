@@ -22,6 +22,28 @@ export default function LiffLayout({
         body {
           display: block !important;
         }
+        
+        /* Vaul specific styles */
+        [vaul-drawer] {
+          touch-action: none;
+        }
+        [vaul-drawer][vaul-drawer-direction="bottom"] {
+          transform: translate3d(0, 100%, 0);
+        }
+        [vaul-drawer][vaul-drawer-visible="true"][vaul-drawer-direction="bottom"] {
+          transform: translate3d(0, 0, 0);
+        }
+        .sr-only {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          padding: 0;
+          margin: -1px;
+          overflow: hidden;
+          clip: rect(0, 0, 0, 0);
+          white-space: nowrap;
+          border-width: 0;
+        }
       `}</style>
 
             <Box

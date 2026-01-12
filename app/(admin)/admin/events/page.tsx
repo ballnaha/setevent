@@ -72,8 +72,7 @@ interface Customer {
 }
 
 const statusLabels: Record<string, { label: string; color: string; bgColor: string }> = {
-    draft: { label: 'แบบร่าง', color: '#6B7280', bgColor: 'rgba(107, 114, 128, 0.1)' },
-    confirmed: { label: 'ยืนยันแล้ว', color: '#3B82F6', bgColor: 'rgba(59, 130, 246, 0.1)' },
+    draft: { label: 'งานใหม่', color: '#6B7280', bgColor: 'rgba(107, 114, 128, 0.1)' },
     'in-progress': { label: 'กำลังดำเนินการ', color: '#F59E0B', bgColor: 'rgba(245, 158, 11, 0.1)' },
     completed: { label: 'เสร็จสิ้น', color: '#10B981', bgColor: 'rgba(16, 185, 129, 0.1)' },
     cancelled: { label: 'ยกเลิก', color: '#EF4444', bgColor: 'rgba(239, 68, 68, 0.1)' },
@@ -953,15 +952,25 @@ export default function EventsPage() {
                                         label="สถานะ"
                                         onChange={(e) => setStatus(e.target.value)}
                                         sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+                                        disabled={!selectedEvent}
                                     >
-                                        {Object.entries(statusLabels).map(([key, val]) => (
-                                            <MenuItem key={key} value={key} sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                        {!selectedEvent ? (
+                                            <MenuItem value="draft" sx={{ fontFamily: 'var(--font-prompt)' }}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: val.color }} />
-                                                    {val.label}
+                                                    <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusLabels['draft'].color }} />
+                                                    {statusLabels['draft'].label}
                                                 </Box>
                                             </MenuItem>
-                                        ))}
+                                        ) : (
+                                            Object.entries(statusLabels).map(([key, val]) => (
+                                                <MenuItem key={key} value={key} sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: val.color }} />
+                                                        {val.label}
+                                                    </Box>
+                                                </MenuItem>
+                                            ))
+                                        )}
                                     </Select>
                                 </FormControl>
                             </Box>

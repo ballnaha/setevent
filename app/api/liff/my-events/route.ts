@@ -18,9 +18,9 @@ export async function GET(request: NextRequest) {
             include: {
                 events: {
                     where: {
-                        // เฉพาะงานที่ยังไม่ปิด
+                        // Show all events except cancelled
                         status: {
-                            notIn: ['completed', 'cancelled']
+                            notIn: ['cancelled']
                         }
                     },
                     orderBy: { createdAt: 'desc' },
@@ -44,6 +44,12 @@ export async function GET(request: NextRequest) {
                             select: {
                                 message: true,
                                 messageType: true
+                            }
+                        },
+                        review: {
+                            select: {
+                                id: true,
+                                rating: true
                             }
                         }
                     }
@@ -92,7 +98,8 @@ export async function GET(request: NextRequest) {
                 status: evt.status,
                 tasksCount: evt._count.chatLogs,
                 // Use latest image found, or fallback to a default event placeholder (not customer pic)
-                customerPictureUrl: latestImageUrl
+                customerPictureUrl: latestImageUrl,
+                isReviewed: !!evt.review
             };
         });
 

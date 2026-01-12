@@ -1,15 +1,15 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import { Home2, User, Calendar, Notification, FolderOpen } from 'iconsax-react';
+import { Home2, User, FolderOpen } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function LiffNavbar() {
     const pathname = usePathname();
 
-    // Check if on main liff page (my projects)
-    const isMyProjectActive = pathname === '/liff' || pathname === '/liff/';
+    // Check if Home is active
+    const isHomeActive = pathname === '/liff' || pathname === '/liff/';
 
     return (
         <Box
@@ -40,43 +40,51 @@ export default function LiffNavbar() {
                     borderTopRightRadius: 30,
                     boxShadow: '0 -10px 40px rgba(0,0,0,0.08)',
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(5, 1fr)',
+                    gridTemplateColumns: '1fr 1fr 1fr',
                     alignItems: 'center',
                     justifyItems: 'center',
-                    px: 1,
+                    px: 3,
                     pointerEvents: 'auto',
                 }}
             >
-                <NavItem icon={Home2} label="หน้าแรก" href="/liff" isActive={isMyProjectActive} />
-                <NavItem icon={Calendar} label="กำหนดการ" href="/liff/events" isActive={pathname?.startsWith('/liff/events')} />
+                <NavItem
+                    icon={FolderOpen}
+                    label="โปรเจกต์"
+                    href="/liff/events"
+                    isActive={pathname?.startsWith('/liff/events')}
+                />
 
-                {/* Empty Middle Column for Floating Button */}
+                {/* Empty Middle Column */}
                 <Box />
 
-                <NavItem icon={Notification} label="แจ้งเตือน" href="/liff/notifications" isActive={pathname === '/liff/notifications'} />
-                <NavItem icon={User} label="โปรไฟล์" href="/liff/profile" isActive={pathname === '/liff/profile'} />
+                <NavItem
+                    icon={User}
+                    label="โปรไฟล์"
+                    href="/liff/profile"
+                    isActive={pathname?.startsWith('/liff/profile')}
+                />
             </Box>
 
-            {/* Center Floating Button - My Project */}
+            {/* Center Floating Button - Home */}
             <Box
                 component={Link}
                 href="/liff"
                 sx={{
                     position: 'absolute',
-                    bottom: 20,
+                    bottom: 10,
                     left: '50%',
                     transform: 'translateX(-50%)',
                     width: 64,
                     height: 64,
-                    background: isMyProjectActive
+                    background: isHomeActive
                         ? 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)'
-                        : 'linear-gradient(135deg, #3B82F6 0%, #60A5FA 100%)',
+                        : 'linear-gradient(135deg, #94A3B8 0%, #64748B 100%)',
                     borderRadius: '50%',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: isMyProjectActive
+                    boxShadow: isHomeActive
                         ? '0 8px 24px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.2)'
                         : '0 8px 24px rgba(59, 130, 246, 0.4)',
                     pointerEvents: 'auto',
@@ -93,7 +101,7 @@ export default function LiffNavbar() {
                     }
                 }}
             >
-                <FolderOpen size={26} color="white" variant="Bold" />
+                <Home2 size={26} color="white" variant="Bold" />
                 <Typography
                     sx={{
                         fontFamily: 'var(--font-prompt)',
@@ -104,7 +112,7 @@ export default function LiffNavbar() {
                         lineHeight: 1,
                     }}
                 >
-                    โปรเจกต์
+                    หน้าแรก
                 </Typography>
             </Box>
         </Box>

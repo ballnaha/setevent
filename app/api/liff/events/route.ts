@@ -14,11 +14,11 @@ export async function POST(request: NextRequest) {
             where: { lineUid },
             include: {
                 events: {
-                    where: {
-                        status: {
-                            notIn: ['completed', 'cancelled']
-                        }
-                    },
+                    // where: {
+                    //    status: {
+                    //        notIn: ['completed', 'cancelled']
+                    //    }
+                    // },
                     orderBy: { eventDate: 'desc' },
                     select: {
                         id: true,
@@ -29,6 +29,13 @@ export async function POST(request: NextRequest) {
                         status: true,
                         totalPrice: true,
                         createdAt: true,
+                        review: {
+                            select: {
+                                id: true,
+                                rating: true,
+                                comment: true
+                            }
+                        }
                     },
                 },
             },
@@ -38,7 +45,14 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ events: [] });
         }
 
-        return NextResponse.json({ events: customer.events });
+        const events = customer.events.map((evt: any) => ({
+            ...evt,
+            isReviewed: !!evt.review,
+            reviewRating: evt.review?.rating,
+            reviewComment: evt.review?.comment
+        }));
+
+        return NextResponse.json({ events });
     } catch (error) {
         console.error('Events fetch error:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

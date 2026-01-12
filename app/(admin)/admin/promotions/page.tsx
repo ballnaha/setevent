@@ -222,7 +222,7 @@ export default function PromotionsAdminPage() {
     };
 
     return (
-        <Box sx={{ p: 4 }}>
+        <Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                 <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700 }}>
                     Manage Promotions
@@ -346,12 +346,13 @@ export default function PromotionsAdminPage() {
                                                 top: 8,
                                                 right: 8,
                                                 bgcolor: 'rgba(0,0,0,0.6)',
+                                                zIndex: 10,
                                                 color: 'white',
                                                 '&:hover': { bgcolor: 'rgba(220,38,38,0.9)' }
                                             }}
                                             size="small"
                                         >
-                                            <CloseCircle size="18" />
+                                            <Trash size="18" color="white" />
                                         </IconButton>
                                     </>
                                 ) : (

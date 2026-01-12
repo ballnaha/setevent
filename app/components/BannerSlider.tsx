@@ -28,15 +28,24 @@ const slides = [
 
 export default function BannerSlider() {
     return (
-        <Box sx={{ width: "100%", minHeight: "100vh", position: "relative", top: 0, left: 0, overflow: 'hidden' }}>
+        <Box sx={{ width: "100%", minHeight: { xs: '60vh', md: '100vh' }, position: "relative", top: 0, left: 0, overflow: 'hidden' }}>
             {/* Background Image - Static for Single Hero Look */}
-            <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <Box sx={{
+                position: 'absolute',
+                inset: 0,
+                zIndex: 0,
+                bgcolor: '#000',
+                '& img': {
+                    objectFit: { xs: 'contain', md: 'cover' },
+                    objectPosition: 'center',
+                }
+            }}>
                 <Image
                     src="/images/banner1-4.webp"
                     alt="Event Background"
                     fill
                     priority
-                    style={{ objectFit: "cover", filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
+                    style={{ filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
                 />
             </Box>
 
@@ -63,7 +72,7 @@ export default function BannerSlider() {
             <Box sx={{
                 position: 'relative',
                 zIndex: 2,
-                minHeight: '100vh',
+                minHeight: { xs: '60vh', md: '100vh' },
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -109,7 +118,7 @@ export default function BannerSlider() {
                     รับจัดงานอีเว้นท์ · เช่าอุปกรณ์ครบวงจร · งานแต่งงาน · งานสัมมนา
                 </Typography>
 
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 2, sm: 3 }} mt={{ xs: 3, md: 4 }}>
+                <Stack direction="row" spacing={2} mt={{ xs: 3, md: 4 }} justifyContent="center">
                     <Button
                         variant="contained"
                         href="/products"
@@ -118,10 +127,10 @@ export default function BannerSlider() {
                             color: 'white',
                             fontWeight: 700,
                             fontFamily: 'var(--font-prompt)',
-                            px: { xs: 3, md: 4 },
-                            py: 1.5,
+                            px: { xs: 2, md: 4 },
+                            py: { xs: 1, md: 1.5 },
                             borderRadius: 1,
-                            fontSize: '1rem',
+                            fontSize: { xs: '0.85rem', md: '1rem' },
                             '&:hover': { bgcolor: '#c32f4b' }
                         }}
                     >
@@ -135,10 +144,10 @@ export default function BannerSlider() {
                             color: 'white',
                             fontWeight: 700,
                             fontFamily: 'var(--font-prompt)',
-                            px: { xs: 3, md: 4 },
-                            py: 1.5,
+                            px: { xs: 2, md: 4 },
+                            py: { xs: 1, md: 1.5 },
                             borderRadius: 1,
-                            fontSize: '1rem',
+                            fontSize: { xs: '0.85rem', md: '1rem' },
                             '&:hover': { bgcolor: '#134b61' }
                         }}
                     >

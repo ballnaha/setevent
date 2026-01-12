@@ -36,6 +36,29 @@ export async function PUT(
         const body = await req.json();
         const { title, category, image, description, status, order } = body;
 
+        // Fetch existing portfolio to handle image cleanup
+        const oldPortfolio = await prisma.portfolio.findUnique({
+            where: { id }
+        });
+
+        if (oldPortfolio?.image && oldPortfolio.image !== image) {
+            // Image has changed or been removed, delete old file if it's local
+            if (oldPortfolio.image.startsWith('/uploads')) {
+                try {
+                    const fs = require('fs/promises');
+                    const path = require('path');
+                    const relativePath = oldPortfolio.image.substring(1);
+                    const filepath = path.join(process.cwd(), 'public', relativePath);
+
+                    await fs.unlink(filepath).catch((err: any) => {
+                        if (err.code !== 'ENOENT') console.error("Error deleting old file:", err);
+                    });
+                } catch (err) {
+                    console.error("File deletion logic error:", err);
+                }
+            }
+        }
+
         const portfolio = await prisma.portfolio.update({
             where: { id },
             data: {
@@ -62,6 +85,31 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
+
+        // Get portfolio to find image path
+        const portfolio = await prisma.portfolio.findUnique({
+            where: { id }
+        });
+
+        if (portfolio?.image) {
+            // Check if it's a local file (starts with /uploads)
+            if (portfolio.image.startsWith('/uploads')) {
+                try {
+                    const fs = require('fs/promises');
+                    const path = require('path');
+                    // Remove leading slash for path joining
+                    const relativePath = portfolio.image.substring(1);
+                    const filepath = path.join(process.cwd(), 'public', relativePath);
+
+                    await fs.unlink(filepath).catch((err: any) => {
+                        // Ignore if file doesn't exist
+                        if (err.code !== 'ENOENT') console.error("Error deleting file:", err);
+                    });
+                } catch (err) {
+                    console.error("File deletion logic error:", err);
+                }
+            }
+        }
 
         await prisma.portfolio.delete({
             where: { id }

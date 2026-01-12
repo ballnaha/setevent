@@ -50,7 +50,7 @@ export default function CTASection() {
                     color: 'white',
                     mb: 3,
                     lineHeight: 1.2,
-                    fontSize: { xs: '2.5rem', md: '3.5rem' },
+                    fontSize: { xs: '2rem', md: '3.5rem' },
                     textShadow: '0 10px 30px rgba(0,0,0,0.5)'
                 }}>
                     เปลี่ยนไอเดียงานในฝัน<br />
@@ -64,13 +64,14 @@ export default function CTASection() {
                     lineHeight: 1.8,
                     mb: 6,
                     maxWidth: '800px',
-                    mx: 'auto'
+                    mx: 'auto',
+                    fontSize: { xs: '1rem', md: '1.5rem' },
                 }}>
                     ไม่ว่างานเล็กหรือใหญ่ ทีมงานมืออาชีพของเราพร้อมดูแลทุกขั้นตอน<br className="hidden md:block" />
                     ตั้งแต่การวางแผน ออกแบบ ติดตั้ง จนจบงาน เพื่อให้งานของคุณออกมาสมบูรณ์แบบที่สุด
                 </Typography>
 
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
+                <Stack direction="row" spacing={2} justifyContent="center">
                     <Button
                         component={Link}
                         href="/contact"
@@ -82,9 +83,9 @@ export default function CTASection() {
                             color: "white",
                             fontFamily: "var(--font-prompt)",
                             borderRadius: '50px',
-                            px: 5,
-                            py: 2,
-                            fontSize: "1.1rem",
+                            px: { xs: 2.5, md: 5 },
+                            py: { xs: 1.5, md: 2 },
+                            fontSize: { xs: "0.9rem", md: "1.1rem" },
                             fontWeight: 600,
                             boxShadow: '0 0 30px rgba(0, 194, 203, 0.4)',
                             border: '2px solid var(--primary)',
@@ -110,9 +111,9 @@ export default function CTASection() {
                             color: "white",
                             fontFamily: "var(--font-prompt)",
                             borderRadius: '50px',
-                            px: 5,
-                            py: 2,
-                            fontSize: "1.1rem",
+                            px: { xs: 2.5, md: 5 },
+                            py: { xs: 1.5, md: 2 },
+                            fontSize: { xs: "0.9rem", md: "1.1rem" },
                             fontWeight: 600,
                             borderWidth: '2px',
                             '&:hover': {

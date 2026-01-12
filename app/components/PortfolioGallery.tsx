@@ -30,9 +30,9 @@ const works = [
         height: { xs: '300px', md: '400px' }
     },
     {
-        title: "อีเว้นท์องค์กร",
-        category: "กิจกรรมสร้างความสัมพันธ์",
-        image: "/images/seminar1.webp",
+        title: "ของชำร่วยงานแต่งงาน",
+        category: "สร้างความประทับใจให้จดจำ",
+        image: "/images/gift.webp",
         height: { xs: '300px', md: '600px' }
     },
     {
@@ -62,11 +62,21 @@ export default function PortfolioGallery() {
                 </Stack>
 
                 <Box sx={{
-                    columnCount: { xs: 1, sm: 2, md: 3 },
-                    columnGap: 0.5,
+                    display: { xs: 'flex', md: 'block' },
+                    overflowX: { xs: 'auto', md: 'visible' },
+                    scrollSnapType: { xs: 'x mandatory', md: 'none' },
+                    columnCount: { md: 3 },
+                    columnGap: 0,
+                    gap: { xs: 2, md: 0 },
+                    mx: { xs: -2, md: 0 },
+                    px: { xs: 2, md: 0 },
+                    pb: { xs: 2, md: 0 }, // Space for potential scrollbar
+                    '::-webkit-scrollbar': { display: 'none' },
                     '& > div': {
                         breakInside: 'avoid',
-                        mb: 0.5
+                        mb: { xs: 0, md: 0 },
+                        minWidth: { xs: '85vw', sm: '350px', md: 'auto' },
+                        scrollSnapAlign: { xs: 'center', md: 'none' }
                     }
                 }}>
                     {works.map((work, index) => (
@@ -77,9 +87,7 @@ export default function PortfolioGallery() {
                                 height: work.height,
                                 overflow: 'hidden',
                                 cursor: 'pointer',
-                                '&:hover .overlay': {
-                                    opacity: 1
-                                },
+                                borderRadius: { xs: 2, md: 0 },
                                 '&:hover img': {
                                     transform: 'scale(1.1)'
                                 }
@@ -90,12 +98,13 @@ export default function PortfolioGallery() {
                                 alt={work.title}
                                 fill
                                 style={{ objectFit: 'cover', transition: 'transform 0.5s ease' }}
+
                             />
                             <Box className="overlay" sx={{
                                 position: 'absolute',
                                 inset: 0,
-                                bgcolor: 'rgba(0,0,0,0.6)',
-                                opacity: 0,
+                                background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+                                opacity: 1,
                                 transition: 'opacity 0.3s ease',
                                 display: 'flex',
                                 flexDirection: 'column',

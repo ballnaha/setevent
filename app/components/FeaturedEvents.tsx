@@ -38,7 +38,7 @@ const events = [
             "เวทีและสเตจ (Stage Platform)",
             "โครงทรัสและหลังคา (Truss & Roof)",
         ],
-        link: "/products/fixed/led-screen"
+        link: "/products/fixed-installation/fixed-led-screen"
     },
     {
         title: "จัดดอกไม้และของชำร่วย",

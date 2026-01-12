@@ -41,4 +41,5 @@ export interface EventSummary {
     status: string;
     tasksCount?: number;
     customerPictureUrl?: string | null;
+    isReviewed?: boolean;
 }

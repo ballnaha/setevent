@@ -259,7 +259,7 @@ export default function DesignsAdminPage() {
     };
 
     return (
-        <Box sx={{ p: 4 }}>
+        <Box>
             <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 4 }}>
                 <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700 }}>
                     Manage Designs

@@ -85,7 +85,7 @@ export default function PortfolioContent() {
             {/* Hero Section - Soft Dark (Same as contact page) */}
             <Box sx={{
                 position: 'relative',
-                minHeight: { xs: '280px', md: '400px' },
+                minHeight: { xs: 'auto', md: '400px' },
                 bgcolor: '#1a1a1a',
                 display: 'flex',
                 alignItems: 'center',
@@ -114,8 +114,8 @@ export default function PortfolioContent() {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: { xs: '300px', md: '600px' },
-                    height: { xs: '300px', md: '600px' },
+                    width: { xs: '250px', md: '600px' },
+                    height: { xs: '250px', md: '600px' },
                     borderRadius: '50%',
                     background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, transparent 70%)',
                     filter: 'blur(40px)',
@@ -126,9 +126,10 @@ export default function PortfolioContent() {
                         fontFamily: 'var(--font-prompt)',
                         fontWeight: 700,
                         color: 'white',
-                        fontSize: { xs: '2.5rem', md: '4rem' },
+                        fontSize: { xs: '1.2rem', md: '4rem' },
                         lineHeight: 1.2,
-                        mb: 2
+                        mb: { xs: 1, md: 2 },
+                        pt: { xs: 5, md: 0 }
                     }}>
                         PORTFOLIO
                     </Typography>
@@ -136,7 +137,7 @@ export default function PortfolioContent() {
                         fontFamily: 'var(--font-prompt)',
                         color: 'rgba(255,255,255,0.7)',
                         fontWeight: 300,
-                        fontSize: { xs: '1rem', md: '1.25rem' },
+                        fontSize: { xs: '0.85rem', md: '1.25rem' },
                         maxWidth: '500px',
                         mx: 'auto'
                     }}>
@@ -146,13 +147,13 @@ export default function PortfolioContent() {
             </Box>
 
             {/* Category Filter */}
-            <Container maxWidth="lg" sx={{ mt: 5 }}>
+            <Container maxWidth="lg" sx={{ mt: { xs: 3, md: 5 } }}>
                 <Box sx={{
                     display: 'flex',
                     gap: 1.5,
                     flexWrap: 'wrap',
                     justifyContent: 'center',
-                    mb: 5
+                    mb: { xs: 3, md: 5 }
                 }}>
                     {allCategories.map((cat: string) => (
                         <Chip
@@ -160,17 +161,18 @@ export default function PortfolioContent() {
                             label={cat}
                             onClick={() => setSelectedCategory(cat)}
                             sx={{
-                                px: 2,
+                                px: 1,
                                 py: 2.5,
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 500,
                                 fontSize: '0.9rem',
-                                bgcolor: selectedCategory === cat ? 'var(--primary)' : 'rgba(0,0,0,0.04)',
-                                color: selectedCategory === cat ? 'white' : 'text.secondary',
-                                border: selectedCategory === cat ? 'none' : '1px solid rgba(0,0,0,0.08)',
+                                bgcolor: selectedCategory === cat ? 'var(--primary)' : 'white',
+                                color: selectedCategory === cat ? 'white' : 'text.primary',
+                                border: selectedCategory === cat ? 'none' : '1px solid #e0e0e0',
+                                boxShadow: selectedCategory === cat ? '0 4px 12px rgba(10, 92, 90, 0.3)' : '0 1px 3px rgba(0,0,0,0.05)',
                                 transition: 'all 0.3s ease',
                                 '&:hover': {
-                                    bgcolor: selectedCategory === cat ? 'var(--primary)' : 'rgba(0,0,0,0.08)',
+                                    bgcolor: selectedCategory === cat ? 'var(--primary)' : '#f5f5f5',
                                     transform: 'translateY(-2px)',
                                 }
                             }}
@@ -178,11 +180,11 @@ export default function PortfolioContent() {
                     ))}
                 </Box>
 
-                {/* Swiper Gallery */}
+                {/* Masonry Gallery */}
                 {loading ? (
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                        {[1, 2, 3].map((i) => (
-                            <Skeleton key={i} variant="rounded" width={350} height={280} sx={{ borderRadius: 3 }} />
+                    <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, gap: 2 }}>
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <Skeleton key={i} variant="rounded" height={300} sx={{ mb: 2, borderRadius: 3, width: '100%' }} />
                         ))}
                     </Box>
                 ) : filteredItems.length === 0 ? (
@@ -209,156 +211,111 @@ export default function PortfolioContent() {
                         </Typography>
                     </Box>
                 ) : (
-                    <Box sx={{ position: 'relative', px: { xs: 0, md: 6 } }}>
-                        {/* Custom Navigation Buttons */}
-                        <IconButton
-                            onClick={() => swiperRef.current?.slidePrev()}
-                            sx={{
-                                position: 'absolute',
-                                left: { xs: -8, md: 0 },
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                zIndex: 10,
-                                bgcolor: 'white',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                                '&:hover': { bgcolor: 'var(--primary)', color: 'white' },
-                            }}
-                        >
-                            <ArrowLeft2 size="24" />
-                        </IconButton>
-                        <IconButton
-                            onClick={() => swiperRef.current?.slideNext()}
-                            sx={{
-                                position: 'absolute',
-                                right: { xs: -8, md: 0 },
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                zIndex: 10,
-                                bgcolor: 'white',
-                                boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-                                '&:hover': { bgcolor: 'var(--primary)', color: 'white' },
-                            }}
-                        >
-                            <ArrowRight2 size="24" />
-                        </IconButton>
+                    <Box sx={{
+                        columnCount: { xs: 1, sm: 2, md: 3 },
+                        columnGap: 2,
+                        '& > div': {
+                            breakInside: 'avoid',
+                            mb: 2
+                        }
+                    }}>
+                        {filteredItems.map((item, idx) => (
+                            <Box
+                                key={item.id}
+                                onClick={() => openLightbox(item, idx)}
+                                sx={{
+                                    position: 'relative',
+                                    borderRadius: 3,
+                                    overflow: 'hidden',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                                    transition: 'all 0.4s ease',
+                                    '&:hover': {
+                                        transform: 'translateY(-5px)',
+                                        boxShadow: '0 12px 30px rgba(0,0,0,0.2)',
+                                    },
+                                    '&:hover img': {
+                                        transform: 'scale(1.1)',
+                                    },
+                                    '&:hover .overlay': {
+                                        opacity: 1
+                                    }
+                                }}
+                            >
+                                <Box sx={{ position: 'relative', width: '100%', lineHeight: 0 }}>
+                                    <img
+                                        src={item.image || '/images/placeholder.jpg'}
+                                        alt={item.title}
+                                        loading="lazy"
+                                        style={{
+                                            width: '100%',
+                                            height: 'auto',
+                                            display: 'block',
+                                            transition: 'transform 0.6s ease'
+                                        }}
+                                    />
+                                </Box>
 
-                        <Swiper
-                            onSwiper={(swiper) => { swiperRef.current = swiper; }}
-                            modules={[Navigation, Pagination, Autoplay, EffectCoverflow]}
-                            effect="coverflow"
-                            grabCursor={true}
-                            centeredSlides={true}
-                            slidesPerView="auto"
-                            coverflowEffect={{
-                                rotate: 0,
-                                stretch: 0,
-                                depth: 100,
-                                modifier: 2.5,
-                                slideShadows: false,
-                            }}
-                            autoplay={{
-                                delay: 4000,
-                                disableOnInteraction: false,
-                            }}
-                            pagination={{
-                                clickable: true,
-                                dynamicBullets: true,
-                            }}
-                            loop={filteredItems.length > 3}
-                            spaceBetween={30}
-                            style={{ paddingBottom: 50, paddingTop: 20 }}
-                        >
-                            {filteredItems.map((item, idx) => (
-                                <SwiperSlide key={item.id} style={{ width: 350, maxWidth: '90vw' }}>
-                                    <Paper
-                                        onClick={() => openLightbox(item, idx)}
+                                {/* Gradient Overlay - Desktop: Hover, Mobile: Gradient */}
+                                <Box className="overlay" sx={{
+                                    position: 'absolute',
+                                    inset: 0,
+                                    background: {
+                                        xs: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
+                                        md: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%)' // Full overlay on hover for desktop
+                                    },
+                                    opacity: { xs: 1, md: 0 },
+                                    transition: 'opacity 0.3s ease',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'flex-end',
+                                    p: { xs: 2, md: 3 }
+                                }}>
+                                    <Chip
+                                        label={item.category}
+                                        size="small"
                                         sx={{
-                                            position: 'relative',
-                                            height: 280,
-                                            borderRadius: 3,
-                                            overflow: 'hidden',
-                                            cursor: 'pointer',
-                                            boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
-                                            transition: 'all 0.4s ease',
-                                            '&:hover': {
-                                                transform: 'translateY(-8px)',
-                                                boxShadow: '0 20px 50px rgba(0,0,0,0.2)',
-                                            },
-                                            '&:hover img': {
-                                                transform: 'scale(1.1)',
-                                            },
+                                            alignSelf: 'flex-start',
+                                            mb: 1,
+                                            bgcolor: 'var(--primary)',
+                                            color: 'white',
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontWeight: 600,
+                                            fontSize: { xs: '0.7rem', md: '0.75rem' },
+                                            height: { xs: 24, md: 28 }
+                                        }}
+                                    />
+                                    <Typography
+                                        sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontWeight: 600,
+                                            fontSize: { xs: '1rem', md: '1.25rem' },
+                                            color: 'white',
+                                            lineHeight: 1.3,
+                                            mb: 1,
+                                            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                                         }}
                                     >
-                                        <Box sx={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
-                                            <Image
-                                                src={item.image || '/images/placeholder.jpg'}
-                                                alt={item.title}
-                                                fill
-                                                style={{ objectFit: 'cover', transition: 'transform 0.6s ease' }}
-                                            />
-                                        </Box>
+                                        {item.title}
+                                    </Typography>
 
-                                        {/* Gradient Overlay */}
-                                        <Box sx={{
-                                            position: 'absolute',
-                                            inset: 0,
-                                            background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
-                                        }} />
-
-                                        {/* Category Badge */}
-                                        <Chip
-                                            label={item.category}
-                                            size="small"
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 16,
-                                                left: 16,
-                                                bgcolor: 'rgba(255,255,255,0.95)',
-                                                color: 'var(--primary)',
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontWeight: 600,
-                                                fontSize: '0.75rem',
-                                            }}
-                                        />
-
-                                        {/* Content */}
-                                        <Box sx={{
-                                            position: 'absolute',
-                                            bottom: 0,
-                                            left: 0,
-                                            right: 0,
-                                            p: 2.5,
-                                        }}>
-                                            <Typography
-                                                sx={{
-                                                    fontFamily: 'var(--font-prompt)',
-                                                    fontWeight: 600,
-                                                    fontSize: '1.1rem',
-                                                    color: 'white',
-                                                    mb: 1,
-                                                }}
-                                            >
-                                                {item.title}
+                                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Heart size="16" color="#ef4444" variant="Bold" />
+                                            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
+                                                {item.likes}
                                             </Typography>
-                                            <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Heart size="16" color="#ef4444" variant="Bold" />
-                                                    <Typography sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
-                                                        {item.likes}
-                                                    </Typography>
-                                                </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Eye size="16" color="rgba(255,255,255,0.8)" />
-                                                    <Typography sx={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.85rem' }}>
-                                                        {item.views}
-                                                    </Typography>
-                                                </Box>
-                                            </Box>
                                         </Box>
-                                    </Paper>
-                                </SwiperSlide>
-                            ))}
-                        </Swiper>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Eye size="16" color="rgba(255,255,255,0.9)" />
+                                            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
+                                                {item.views}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </Box>
+                        ))}
                     </Box>
                 )}
             </Container>
@@ -394,7 +351,7 @@ export default function PortfolioContent() {
                             '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
                         }}
                     >
-                        <CloseCircle size="28" />
+                        <CloseCircle size="28" color="white" />
                     </IconButton>
 
                     {/* Lightbox Swiper */}

@@ -103,6 +103,19 @@ model Event {
   bookings    Booking[]
   timelines   EventTimeline[]
   chatLogs    ChatLog[]
+  review      Review?
+}
+
+// Review - รีวิวงานจากลูกค้า
+model Review {
+  id        String   @id @default(cuid())
+  rating    Int      // 1-5
+  comment   String?  @db.Text
+  eventId   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 // EventTimeline - Timeline ของงาน (แจ้งความคืบหน้า)
