@@ -64,15 +64,13 @@ export default function WhyChooseUs() {
                         width: '100%'
                     }}>
                         <Box sx={{
-                            height: { xs: '350px', sm: '450px', md: '550px' },
+                            height: { xs: '300px', sm: '400px', md: '450px' },
                             width: '100%',
-                            borderRadius: { xs: 2, md: 4 },
-                            overflow: 'hidden',
                             position: 'relative',
 
                         }}>
                             <Image
-                                src="/images/mobileapp.png"
+                                src="/images/app_screen1.webp"
                                 alt="Event Management Mockup"
                                 fill
                                 style={{ objectFit: 'cover' }}
