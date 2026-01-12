@@ -70,7 +70,7 @@ export default function WhyChooseUs() {
 
                         }}>
                             <Image
-                                src="/images/app_screen1.webp"
+                                src="/images/app_screen3.png"
                                 alt="Event Management Mockup"
                                 fill
                                 style={{ objectFit: 'cover' }}
