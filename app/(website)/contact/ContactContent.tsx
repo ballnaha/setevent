@@ -167,7 +167,7 @@ export default function ContactContent() {
             </Box>
 
             {/* Contact Info Section */}
-            <Box id="contact-info" sx={{ py: { xs: 2, md: 0 }, bgcolor: 'var(--background)' }}>
+            <Box id="contact-info" sx={{ py: { xs: 2, md: 0 }, pb: { xs: 8, md: 12 }, bgcolor: 'var(--background)' }}>
                 <Container maxWidth="lg">
                     {/* Section Header */}
                     <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
