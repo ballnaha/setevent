@@ -31,8 +31,10 @@ const DEFAULT_SETTINGS: ContactSettings = {
 export default function ContactContent() {
     const [settings, setSettings] = useState<ContactSettings>(DEFAULT_SETTINGS);
     const [loading, setLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
+        setMounted(true);
         fetchSettings();
     }, []);
 
@@ -86,14 +88,22 @@ export default function ContactContent() {
         }] : [])
     ];
 
+    // Prevent hydration mismatch - show minimal placeholder until mounted
+    if (!mounted) {
+        return (
+            <Box sx={{ minHeight: '100vh', bgcolor: 'var(--background)' }} />
+        );
+    }
+
     return (
-        <React.Fragment>
-            {/* Hero Section - Light Theme with Gradient Blobs */}
+        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh' }}>
+            {/* Hero Section */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                bgcolor: 'var(--background)'
             }}>
                 {/* Background Decor - Teal/Emerald gradients */}
                 <Box sx={{
@@ -102,7 +112,7 @@ export default function ContactContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -112,7 +122,7 @@ export default function ContactContent() {
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.1) 0%, rgba(10, 92, 90, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -120,7 +130,6 @@ export default function ContactContent() {
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
                     <Stack spacing={3} alignItems="center">
                         <Chip
-
                             label="Get in Touch"
                             sx={{
                                 bgcolor: 'rgba(16, 185, 129, 0.1)',
@@ -132,6 +141,7 @@ export default function ContactContent() {
                         />
                         <Typography
                             component="h1"
+                            suppressHydrationWarning
                             sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 800,
@@ -141,14 +151,12 @@ export default function ContactContent() {
                                 letterSpacing: '-1px'
                             }}
                         >
-                            CONTACT <br />
+                            CONTACT<br />
                             <span style={{
                                 background: 'linear-gradient(90deg, #10B981 0%, #0A5C5A 100%)',
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
-                            }}>
-                                US
-                            </span>
+                            }}>US</span>
                         </Typography>
                         <Typography
                             sx={{
@@ -198,10 +206,10 @@ export default function ContactContent() {
                         gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' },
                         gap: { xs: 2, md: 3 }
                     }}>
-                        {loading ? (
+                        {(!mounted || loading) ? (
                             // Loading Skeletons
                             [1, 2, 3, 4].map((i) => (
-                                <Box key={i} sx={{ p: { xs: 3, md: 4 }, borderRadius: '16px', bgcolor: 'rgba(0,0,0,0.02)' }}>
+                                <Box key={i} sx={{ p: { xs: 3, md: 4 }, borderRadius: '16px', bgcolor: 'rgba(128,128,128,0.08)' }}>
                                     <Skeleton variant="circular" width={56} height={56} sx={{ mx: 'auto', mb: 2 }} />
                                     <Skeleton variant="text" width="60%" sx={{ mx: 'auto', mb: 1 }} />
                                     <Skeleton variant="text" width="80%" sx={{ mx: 'auto' }} />
@@ -212,12 +220,12 @@ export default function ContactContent() {
                                 <Box key={index} sx={{
                                     p: { xs: 3, md: 4 },
                                     borderRadius: '16px',
-                                    bgcolor: 'rgba(0, 0, 0, 0.02)',
-                                    border: '1px solid rgba(0, 0, 0, 0.05)',
+                                    bgcolor: 'rgba(128, 128, 128, 0.08)',
+                                    border: '1px solid rgba(128, 128, 128, 0.2)',
                                     textAlign: 'center',
                                     transition: 'all 0.2s ease',
                                     '&:hover': {
-                                        bgcolor: 'rgba(10, 92, 90, 0.05)',
+                                        bgcolor: 'rgba(10, 92, 90, 0.1)',
                                         borderColor: 'var(--primary)',
                                         transform: 'translateY(-2px)'
                                     }
@@ -226,13 +234,14 @@ export default function ContactContent() {
                                         width: '56px',
                                         height: '56px',
                                         borderRadius: '12px',
-                                        bgcolor: 'white',
+                                        bgcolor: 'var(--background)',
+                                        border: '1px solid rgba(128,128,128,0.2)',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
                                         mx: 'auto',
                                         mb: 2,
-                                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)'
+                                        boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
                                     }}>
                                         {item.icon}
                                     </Box>
@@ -279,7 +288,7 @@ export default function ContactContent() {
                     </Box>
 
                     {/* Social Media */}
-                    {socialItems.length > 0 && (
+                    {mounted && socialItems.length > 0 && (
                         <Stack direction="row" spacing={1.5} justifyContent="center" sx={{ mt: { xs: 4, md: 6 } }}>
                             {socialItems.map((social, index) => (
                                 <Button
@@ -294,12 +303,12 @@ export default function ContactContent() {
                                         height: '44px',
                                         p: 0,
                                         borderRadius: '12px',
-                                        borderColor: 'rgba(0,0,0,0.1)',
+                                        borderColor: 'rgba(128,128,128,0.4)',
                                         color: 'var(--foreground)',
                                         '&:hover': {
                                             borderColor: 'var(--primary)',
                                             color: 'var(--primary)',
-                                            bgcolor: 'rgba(10, 92, 90, 0.05)'
+                                            bgcolor: 'rgba(10, 92, 90, 0.1)'
                                         }
                                     }}
                                 >
@@ -310,14 +319,15 @@ export default function ContactContent() {
                     )}
 
                     {/* Google Map */}
-                    {settings.mapUrl && (
+                    {mounted && settings.mapUrl && (
                         <Box sx={{
                             mt: { xs: 6, md: 8 },
                             borderRadius: '24px',
                             overflow: 'hidden',
-                            boxShadow: '0 4px 20px rgba(0,0,0,0.05)',
+                            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
                             height: { xs: '300px', md: '450px' },
-                            bgcolor: 'rgba(0,0,0,0.05)'
+                            bgcolor: 'rgba(128,128,128,0.1)',
+                            border: '1px solid rgba(128,128,128,0.2)'
                         }}>
                             <iframe
                                 src={settings.mapUrl}
@@ -332,6 +342,6 @@ export default function ContactContent() {
                     )}
                 </Container>
             </Box>
-        </React.Fragment>
+        </Box>
     );
 }

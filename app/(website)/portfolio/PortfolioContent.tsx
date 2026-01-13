@@ -33,18 +33,26 @@ const DEFAULT_CATEGORIES = [
     "Fixed Installation",
 ];
 
-export default function PortfolioContent() {
-    const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function PortfolioContent({ initialData = [] }: { initialData?: PortfolioItem[] }) {
+    const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(initialData);
+    const [loading, setLoading] = useState(initialData.length === 0);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
     const swiperRef = useRef<SwiperType | null>(null);
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
 
     useEffect(() => {
-        fetchPortfolios();
-    }, []);
+        if (initialData.length === 0) {
+            fetchPortfolios();
+        }
+        // Load liked items from local storage
+        const savedLikes = localStorage.getItem('likedPortfolios');
+        if (savedLikes) {
+            setLikedItems(new Set(JSON.parse(savedLikes)));
+        }
+    }, [initialData]);
 
     const fetchPortfolios = async () => {
         try {
@@ -71,9 +79,51 @@ export default function PortfolioContent() {
         ? portfolioItems
         : portfolioItems.filter((d: PortfolioItem) => d.category === selectedCategory);
 
+    const handleView = async (id: string) => {
+        try {
+            await fetch(`/api/portfolios/${id}/view`, { method: 'POST' });
+            // Update local state for view count
+            setPortfolioItems(prev => prev.map(p =>
+                p.id === id ? { ...p, views: p.views + 1 } : p
+            ));
+        } catch (error) {
+            console.error("Failed to count view", error);
+        }
+    };
+
+    const handleLike = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation(); // Prevent opening lightbox
+
+        const isLiked = likedItems.has(id);
+        const action = isLiked ? 'unlike' : 'like';
+        const incrementValue = isLiked ? -1 : 1;
+
+        // Optimistic update status
+        const newLikedItems = new Set(likedItems);
+        if (isLiked) {
+            newLikedItems.delete(id);
+        } else {
+            newLikedItems.add(id);
+        }
+        setLikedItems(newLikedItems);
+        localStorage.setItem('likedPortfolios', JSON.stringify(Array.from(newLikedItems)));
+
+        // Optimistic update count
+        setPortfolioItems(prev => prev.map(p =>
+            p.id === id ? { ...p, likes: Math.max(0, p.likes + incrementValue) } : p
+        ));
+
+        try {
+            await fetch(`/api/portfolios/${id}/like?action=${action}`, { method: 'POST' });
+        } catch (error) {
+            console.error("Failed to toggle like", error);
+        }
+    };
+
     const openLightbox = (item: PortfolioItem, index: number) => {
         setLightboxIndex(index);
         setSelectedItem(item);
+        handleView(item.id);
     };
 
     const closeLightbox = () => {
@@ -96,7 +146,7 @@ export default function PortfolioContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, rgba(10, 92, 90, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -106,7 +156,7 @@ export default function PortfolioContent() {
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -259,11 +309,12 @@ export default function PortfolioContent() {
                                     }
                                 }}
                             >
-                                <Box sx={{ position: 'relative', width: '100%', lineHeight: 0 }}>
-                                    <img
+                                <Box sx={{ position: 'relative', width: '100%', borderRadius: 'inherit' }}>
+                                    <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
-                                        loading="lazy"
+                                        width={500}
+                                        height={500}
                                         style={{
                                             width: '100%',
                                             height: 'auto',
@@ -317,8 +368,22 @@ export default function PortfolioContent() {
                                     </Typography>
 
                                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <Heart size="16" color="#ef4444" variant="Bold" />
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                                cursor: 'pointer',
+                                                transition: 'transform 0.2s',
+                                                '&:hover': { transform: 'scale(1.1)' }
+                                            }}
+                                            onClick={(e) => handleLike(e, item.id)}
+                                        >
+                                            <Heart
+                                                size="16"
+                                                color={likedItems.has(item.id) ? "#ef4444" : "white"}
+                                                variant={likedItems.has(item.id) ? "Bold" : "Linear"}
+                                            />
                                             <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
                                                 {item.likes}
                                             </Typography>

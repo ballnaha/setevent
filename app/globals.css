@@ -55,3 +55,51 @@ body {
     transform: translate(0, 0);
   }
 }
+
+/* Logo container fixed dimensions to prevent layout shift */
+.logo-container {
+  display: block;
+  position: relative;
+  width: 140px !important;
+  height: 40px !important;
+  flex: none !important;
+}
+
+@media (min-width: 600px) {
+  .logo-container {
+    width: 160px !important;
+    height: 50px !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .logo-container {
+    width: 180px !important;
+    height: 60px !important;
+  }
+}
+
+.logo-container img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+}
+
+/* Logo dark mode switching */
+.logo-light {
+  display: block;
+}
+
+.logo-dark {
+  display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .logo-light {
+    display: none !important;
+  }
+
+  .logo-dark {
+    display: block !important;
+  }
+}

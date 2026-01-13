@@ -18,8 +18,7 @@ import {
     Collapse,
     Fade,
     Stack,
-    Divider,
-    useMediaQuery
+    Divider
 } from "@mui/material";
 import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Map1, Gift } from "iconsax-react";
 import Link from "next/link";
@@ -86,9 +85,6 @@ export default function Header() {
     const pathname = usePathname();
     const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq");
     const isDarkText = pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact";
-
-    // Check system dark mode preference
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true });
 
     // ---- Handlers ----
 
@@ -521,23 +517,47 @@ export default function Header() {
                         <Box
                             component={Link}
                             href="/"
+                            className="logo-container"
                             sx={{
                                 position: 'relative',
                                 width: { xs: 140, sm: 160, md: 180 },
                                 height: { xs: 40, sm: 50, md: 60 },
                                 display: 'block',
+                                flex: 'none',
                                 mx: { xs: 'auto', md: 0 }
                             }}
                         >
-                            <Image
-                                src={prefersDarkMode ? "/images/logo_white.png" : (isDarkText ? "/images/logo_black.png" : "/images/logo_white.png")}
-                                alt="SETEVENT"
-                                fill
-                                style={{
-                                    objectFit: 'contain',
-                                }}
-                                priority
-                            />
+                            {/* Home page: always white logo */}
+                            {!isDarkText && (
+                                <Image
+                                    src="/images/logo_white.png"
+                                    alt="SETEVENT"
+                                    fill
+                                    style={{ objectFit: 'contain' }}
+                                    priority
+                                />
+                            )}
+                            {/* Other pages: black logo in light mode, white in dark mode */}
+                            {isDarkText && (
+                                <>
+                                    <Image
+                                        src="/images/logo_black1.png"
+                                        alt="SETEVENT"
+                                        fill
+                                        style={{ objectFit: 'contain' }}
+                                        priority
+                                        className="logo-light"
+                                    />
+                                    <Image
+                                        src="/images/logo_white.png"
+                                        alt="SETEVENT"
+                                        fill
+                                        style={{ objectFit: 'contain' }}
+                                        priority
+                                        className="logo-dark"
+                                    />
+                                </>
+                            )}
                         </Box>
 
                         {/* Date/Location Text - Hide on mobile */}

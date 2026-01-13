@@ -320,7 +320,7 @@ export default function PromotionsContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, rgba(233, 69, 96, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -330,7 +330,7 @@ export default function PromotionsContent() {
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />

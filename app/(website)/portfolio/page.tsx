@@ -1,7 +1,9 @@
 import { Metadata } from 'next';
 import PortfolioContent from './PortfolioContent';
+import prisma from '@/lib/prisma';
 
 export const metadata: Metadata = {
+    // ... metadata content (keep as is)
     title: 'ผลงาน Portfolio | SET EVENT Thailand',
     description: 'ชมผลงานที่ผ่านมาของ SET EVENT Thailand - งาน Marketing Event, Seminar, นิทรรศการ, คอนเสิร์ต, งานแต่งงาน และ Fixed Installation ด้วยทีมงานมืออาชีพ',
     keywords: [
@@ -27,6 +29,29 @@ export const metadata: Metadata = {
     },
 };
 
-export default function PortfolioPage() {
-    return <PortfolioContent />;
+export default async function PortfolioPage() {
+    // Fetch data on the server
+    const portfolios = await prisma.portfolio.findMany({
+        where: { status: 'active' },
+        orderBy: [
+            { order: 'asc' },
+            { createdAt: 'desc' }
+        ],
+        select: {
+            id: true,
+            title: true,
+            category: true,
+            image: true,
+            likes: true,
+            views: true,
+        }
+    });
+
+    // Convert Decimal/Date if necessary (though findMany here doesn't return them in select)
+    const initialData = portfolios.map(p => ({
+        ...p,
+        image: p.image || '/images/placeholder.jpg'
+    }));
+
+    return <PortfolioContent initialData={initialData} />;
 }

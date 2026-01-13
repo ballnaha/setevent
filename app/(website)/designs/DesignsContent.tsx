@@ -33,9 +33,9 @@ const DEFAULT_CATEGORIES = [
     "Fashion",
 ];
 
-export default function DesignsContent() {
-    const [designs, setDesigns] = useState<Design[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function DesignsContent({ initialData = [] }: { initialData?: Design[] }) {
+    const [designs, setDesigns] = useState<Design[]>(initialData);
+    const [loading, setLoading] = useState(initialData.length === 0);
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedItem, setSelectedItem] = useState<Design | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -44,13 +44,15 @@ export default function DesignsContent() {
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
 
     useEffect(() => {
-        fetchDesigns();
+        if (initialData.length === 0) {
+            fetchDesigns();
+        }
         // Load liked items from local storage
         const savedLikes = localStorage.getItem('likedDesigns');
         if (savedLikes) {
             setLikedItems(new Set(JSON.parse(savedLikes)));
         }
-    }, []);
+    }, [initialData]);
 
     const fetchDesigns = async () => {
         try {
@@ -144,7 +146,7 @@ export default function DesignsContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -154,7 +156,7 @@ export default function DesignsContent() {
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -307,11 +309,12 @@ export default function DesignsContent() {
                                     }
                                 }}
                             >
-                                <Box sx={{ position: 'relative', width: '100%', lineHeight: 0 }}>
-                                    <img
+                                <Box sx={{ position: 'relative', width: '100%', borderRadius: 'inherit' }}>
+                                    <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
-                                        loading="lazy"
+                                        width={500}
+                                        height={500}
                                         style={{
                                             width: '100%',
                                             height: 'auto',

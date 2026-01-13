@@ -245,11 +245,22 @@ export default function BlogContent() {
                         ))}
                     </Box>
                 ) : filteredBlogs.length === 0 ? (
-                    <Box sx={{ textAlign: 'center', py: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                        <Book size="60" color="gray" variant="Bulk" style={{ opacity: 0.5, marginBottom: 16 }} />
-                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
-                            ไม่พบข้อมูลที่คุณค้นหา
+                    <Box sx={{ textAlign: 'center', py: 15, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <Book size="64" color="var(--primary)" variant="Bulk" style={{ opacity: 0.3, marginBottom: 20 }} />
+                        <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontWeight: 600, mb: 1 }}>
+                            {searchTerm || selectedCategory !== "All" ? "ไม่พบสิ่งที่คุณค้นหา" : "ยังไม่มีบทความในขณะนี้"}
                         </Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6 }}>
+                            {searchTerm || selectedCategory !== "All" ? "ลองค้นหาด้วยคำอื่นหรือเปลี่ยนหมวดหมู่ดูนะคะ" : "ทีมงานกำลังเตรียมเนื้อหาน่าสนใจมาให้อ่าน เร็วๆ นี้แน่นอนค่ะ"}
+                        </Typography>
+                        {(searchTerm || selectedCategory !== "All") && (
+                            <Button
+                                onClick={() => { setSearchTerm(''); setSelectedCategory('All'); }}
+                                sx={{ mt: 3, fontFamily: 'var(--font-prompt)', color: 'var(--primary)' }}
+                            >
+                                ล้างการค้นหาทั้งหมด
+                            </Button>
+                        )}
                     </Box>
                 ) : (
                     <>
