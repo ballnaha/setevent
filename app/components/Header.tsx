@@ -43,13 +43,44 @@ type NavItem = {
     sections?: { title: string; items: SubItem[] }[];
 };
 
-// Note: Portfolio submenu has been moved to tabs in the portfolio page
+// Interface for settings
+interface ContactSettings {
+    phone: string;
+    line: string;
+    lineUrl: string;
+}
+
+const DEFAULT_SETTINGS: ContactSettings = {
+    phone: "081-234-5678",
+    line: "@setevent",
+    lineUrl: "https://line.me/ti/p/~@setevent",
+};
 
 export default function Header() {
     const [mobileOpen, setMobileOpen] = useState(false);
+    const [settings, setSettings] = useState<ContactSettings>(DEFAULT_SETTINGS);
 
     // Fetch product menu from database
     const { sections: productSections } = useMenuData();
+
+    React.useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings/contact');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        phone: data.phone,
+                        line: data.line,
+                        lineUrl: data.lineUrl
+                    });
+                }
+            } catch (error) {
+                console.error('Error fetching contact settings:', error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     // Build navItems dynamically based on fetched sections
     const navItems: NavItem[] = useMemo(() => [
@@ -435,7 +466,7 @@ export default function Header() {
                         fullWidth
                         variant="contained"
                         startIcon={<Message size="18" variant="Bold" color="currentColor" />}
-                        href="https://line.me/ti/p/~@setevent"
+                        href={settings.lineUrl}
                         target="_blank"
                         sx={{
                             bgcolor: '#06C755',
@@ -446,13 +477,13 @@ export default function Header() {
                             '&:hover': { bgcolor: '#05b04a' }
                         }}
                     >
-                        LINE: @setevent
+                        LINE: {settings.line}
                     </Button>
                     <Button
                         fullWidth
                         variant="outlined"
                         startIcon={<Call size="18" variant="Bold" color="currentColor" />}
-                        href="tel:0812345678"
+                        href={`tel:${settings.phone.replace(/[^0-9]/g, '')}`}
                         sx={{
                             color: 'white',
                             borderColor: 'rgba(255,255,255,0.3)',
@@ -463,11 +494,11 @@ export default function Header() {
                             '&:hover': { borderColor: 'white', bgcolor: 'rgba(255,255,255,0.05)' }
                         }}
                     >
-                        081-234-5678
+                        {settings.phone}
                     </Button>
                 </Stack>
                 <Typography variant="caption" sx={{ display: 'block', textAlign: 'center', mt: 1.5, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-prompt)', fontSize: '0.7rem' }}>
-                    © 2024 SETEVENT ALL RIGHTS RESERVED
+                    © {new Date().getFullYear()} SETEVENT ALL RIGHTS RESERVED
                 </Typography>
             </Box>
         </Box>
@@ -828,7 +859,7 @@ export default function Header() {
                             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                         >
-                            <MenuItem onClick={handleContactClose} component="a" href="https://line.me/ti/p/~@setevent" target="_blank">
+                            <MenuItem onClick={handleContactClose} component="a" href={settings.lineUrl} target="_blank">
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <Box sx={{
                                         width: 36,
@@ -843,7 +874,7 @@ export default function Header() {
                                     </Box>
                                     <Box>
                                         <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>
-                                            @setevent
+                                            {settings.line}
                                         </Typography>
                                         <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
                                             Line Official
@@ -851,7 +882,7 @@ export default function Header() {
                                     </Box>
                                 </Box>
                             </MenuItem>
-                            <MenuItem onClick={handleContactClose} component="a" href="tel:0812345678">
+                            <MenuItem onClick={handleContactClose} component="a" href={`tel:${settings.phone.replace(/[^0-9]/g, '')}`}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <Box sx={{
                                         width: 36,
@@ -866,7 +897,7 @@ export default function Header() {
                                     </Box>
                                     <Box>
                                         <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>
-                                            093-726-5055
+                                            {settings.phone}
                                         </Typography>
                                         <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
                                             ติดต่อด่วน
