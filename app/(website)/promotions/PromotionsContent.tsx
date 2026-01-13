@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Box, Container, Typography, Paper, IconButton, Stack, Chip, Modal, CircularProgress, Skeleton } from "@mui/material";
+import { Box, Container, Typography, Paper, IconButton, Stack, Chip, Modal, CircularProgress, Skeleton, Button } from "@mui/material";
 import { ArrowRight2, Gallery, CloseCircle, ArrowLeft2, Calendar, Ticket, User, Maximize4 } from "iconsax-react";
 import Image from "next/image";
 
@@ -398,15 +398,22 @@ export default function PromotionsContent() {
                     </Box>
                 ) : promotions.length === 0 ? (
                     <Box sx={{
+                        textAlign: 'center',
+                        py: 15,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        py: 10
+                        bgcolor: 'rgba(255,255,255,0.02)',
+                        borderRadius: 4,
+                        border: '1px dashed rgba(128,128,128,0.2)'
                     }}>
-                        <Gallery size="64" color="rgba(0,0,0,0.2)" variant="Bulk" />
-                        <Typography sx={{ mt: 2, fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
+                        <Ticket size="64" color="var(--primary)" variant="Bulk" style={{ opacity: 0.3, marginBottom: 20 }} />
+                        <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontWeight: 600, mb: 1 }}>
                             ยังไม่มีโปรโมชั่นในขณะนี้
+                        </Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6 }}>
+                            เรากำลังจัดเตรียมข้อเสนอสุดพิเศษสำหรับคุณ อดใจรอนิดนะคะ
                         </Typography>
                     </Box>
                 ) : (

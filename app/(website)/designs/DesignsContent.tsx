@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack } from "@mui/material";
+import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack, Button } from "@mui/material";
 import { CloseCircle, Gallery, Heart, Eye, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -256,26 +256,31 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     </Box>
                 ) : filteredItems.length === 0 ? (
                     <Box sx={{
-                        py: 12,
+                        textAlign: 'center',
+                        py: 15,
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        textAlign: 'center',
-                        bgcolor: 'rgba(0,0,0,0.02)',
+                        bgcolor: 'rgba(255,255,255,0.02)',
                         borderRadius: 4,
+                        border: '1px dashed rgba(128,128,128,0.2)'
                     }}>
-                        <Gallery size="64" color="rgba(0,0,0,0.15)" variant="Bulk" />
-                        <Typography
-                            sx={{
-                                mt: 2,
-                                fontFamily: 'var(--font-prompt)',
-                                color: 'text.secondary',
-                                fontSize: '1.1rem',
-                            }}
-                        >
-                            ไม่พบดีไซน์ในหมวดหมู่นี้
+                        <Gallery size="64" color="#8B5CF6" variant="Bulk" style={{ opacity: 0.3, marginBottom: 20 }} />
+                        <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontWeight: 600, mb: 1 }}>
+                            {selectedCategory !== "All" ? "ไม่พบดีไซน์ในหมวดหมู่นี้" : "ยังไม่มีดีไซน์ในขณะนี้"}
                         </Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6 }}>
+                            {selectedCategory !== "All" ? "ลองเลือกหมวดหมู่户外อื่นๆ ดูนะคะ" : "ทีมงานกำลังออกแบบไอเดียใหม่ๆ มาให้ชม เร็วๆ นี้แน่นอนค่ะ"}
+                        </Typography>
+                        {selectedCategory !== "All" && (
+                            <Button
+                                onClick={() => setSelectedCategory('All')}
+                                sx={{ mt: 3, fontFamily: 'var(--font-prompt)', color: '#8B5CF6' }}
+                            >
+                                ดูดีไซน์ทั้งหมด
+                            </Button>
+                        )}
                     </Box>
                 ) : (
                     <Box sx={{
