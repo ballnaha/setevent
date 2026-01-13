@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function GET() {
     try {
         const promotions = await prisma.promotion.findMany({
-            orderBy: { createdAt: 'desc' }
+            orderBy: { order: 'asc' }
         });
         return NextResponse.json(promotions);
     } catch (error) {

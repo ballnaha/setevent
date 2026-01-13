@@ -2,9 +2,29 @@ import { Metadata } from 'next';
 import PortfolioContent from './PortfolioContent';
 
 export const metadata: Metadata = {
-    title: 'Portfolio | SET EVENT',
-    description: 'ผลงานที่ผ่านมาของ SET EVENT - Marketing Event, Seminar, Exhibition, Concert, Wedding และ Fixed Installation',
-    keywords: ['Portfolio', 'ผลงาน', 'Event', 'อีเวนต์', 'งานแต่งงาน', 'คอนเสิร์ต', 'สัมมนา', 'นิทรรศการ']
+    title: 'ผลงาน Portfolio | SET EVENT Thailand',
+    description: 'ชมผลงานที่ผ่านมาของ SET EVENT Thailand - งาน Marketing Event, Seminar, นิทรรศการ, คอนเสิร์ต, งานแต่งงาน และ Fixed Installation ด้วยทีมงานมืออาชีพ',
+    keywords: [
+        'Portfolio SET EVENT',
+        'ผลงานจัดอีเวนต์',
+        'งาน Marketing Event',
+        'คอนเสิร์ต',
+        'งานแต่งงาน',
+        'สัมมนา',
+        'นิทรรศการ',
+        'Fixed Installation'
+    ],
+    openGraph: {
+        title: 'ผลงาน Portfolio | SET EVENT Thailand',
+        description: 'ชมผลงานจัดงานอีเวนต์ที่ผ่านมาของ SET EVENT Thailand',
+        url: 'https://seteventthailand.com/portfolio',
+        siteName: 'SET EVENT Thailand',
+        locale: 'th_TH',
+        type: 'website',
+    },
+    alternates: {
+        canonical: 'https://seteventthailand.com/portfolio',
+    },
 };
 
 export default function PortfolioPage() {

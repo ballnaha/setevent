@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton } from "@mui/material";
+import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack } from "@mui/material";
 import { CloseCircle, Gallery, Heart, Eye, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -81,69 +81,82 @@ export default function DesignsContent() {
     };
 
     return (
-        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
-            {/* Hero Section - Soft Dark (Same as contact page) */}
+        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10 }}>
+            {/* Header Section with Geometric background */}
             <Box sx={{
+                pt: { xs: 15, md: 22 },
+                pb: { xs: 8, md: 10 },
                 position: 'relative',
-                minHeight: { xs: 'auto', md: '400px' },
-                bgcolor: '#1a1a1a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                py: { xs: 8, md: 0 }
+                overflow: 'hidden'
             }}>
-                {/* Soft Dark Gradient Background */}
+                {/* Background Decor */}
                 <Box sx={{
                     position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
-                }} />
-
-                {/* Diagonal Lines Pattern */}
-                <Box sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    opacity: 0.08,
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 11px)',
-                }} />
-
-                {/* Subtle Accent */}
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    top: '-20%',
+                    right: '-10%',
                     width: '600px',
                     height: '600px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, transparent 70%)',
-                    filter: 'blur(40px)',
-                    display: { xs: 'none', md: 'block' }
+                    background: 'radial-gradient(circle, rgba(139, 92, 246, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
+                }} />
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: '-10%',
+                    left: '-10%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        color: 'white',
-                        fontSize: { xs: '1.2rem', md: '4rem' },
-                        lineHeight: 1.2,
-                        mb: { xs: 1, md: 2 },
-                        pt: { xs: 5, md: 0 }
-                    }}>
-                        NEW DESIGN
-                    </Typography>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        color: 'rgba(255,255,255,0.7)',
-                        fontWeight: 300,
-                        fontSize: { xs: '0.85rem', md: '1.25rem' },
-                        maxWidth: '500px',
-                        mx: 'auto'
-                    }}>
-                        ดีไซน์เวทีและงานอีเวนต์ที่สร้างสรรค์ พร้อมไอเดียใหม่ๆ
-                    </Typography>
+                    <Stack spacing={3} alignItems="center">
+                        <Chip
+                            label="SetEvent Gallery"
+                            sx={{
+                                bgcolor: 'rgba(139, 92, 246, 0.1)',
+                                color: '#8B5CF6',
+                                border: '1px solid rgba(139, 92, 246, 0.2)',
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 600
+                            }}
+                        />
+                        <Typography
+                            component="h1"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '4.5rem' },
+                                color: 'var(--foreground)',
+                                lineHeight: 1.1,
+                                letterSpacing: '-1px'
+                            }}
+                        >
+                            CREATIVE <br />
+                            <span style={{
+                                background: 'linear-gradient(90deg, #8B5CF6 0%, #3B82F6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
+                            }}>
+                                DESIGNS
+                            </span>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                color: 'var(--foreground)',
+                                opacity: 0.7,
+                                fontSize: { xs: '1rem', md: '1.2rem' },
+                                maxWidth: 600,
+                                lineHeight: 1.8,
+                                mx: 'auto'
+                            }}
+                        >
+                            รวบรวมไอเดียการออกแบบเวที แสง สี เสียง และโครงสร้างสำหรับงานอีเวนต์ทุกรูปแบบ เพื่อสร้างแรงบันดาลใจให้กับงานของคุณ
+                        </Typography>
+                    </Stack>
                 </Container>
             </Box>
 

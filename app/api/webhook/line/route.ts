@@ -71,18 +71,71 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
         },
     });
 
-    // หา Event ล่าสุดที่ยังไม่จบ (ไม่ใช่ completed/cancelled) เพื่อ link ข้อความ
-    const latestActiveEvent = await prisma.event.findFirst({
-        where: {
-            customerId: customer.id,
-            status: {
-                notIn: ['completed', 'cancelled']
-            }
-        },
-        orderBy: { createdAt: 'desc' }
-    });
+    // 1. ตรวจสอบว่าในข้อความมีการระบุรหัสงาน (Ref: INVITE_CODE) หรือไม่
+    let eventIdToLink = null;
+    let shouldUpdateContext = false;
 
-    const eventIdToLink = latestActiveEvent?.id || null;
+    if (message.type === 'text') {
+        const refMatch = message.text.match(/\(Ref:\s*([A-Z0-9]+)\)/i);
+        if (refMatch) {
+            const inviteCode = refMatch[1].toUpperCase(); // Ensure uppercase for DB lookup
+            console.log(`🔍 Found Ref in message: ${inviteCode}`);
+            const eventByRef = await prisma.event.findUnique({
+                where: { inviteCode },
+                select: { id: true }
+            });
+            if (eventByRef) {
+                eventIdToLink = eventByRef.id;
+                shouldUpdateContext = true; // ลูกค้าเปลี่ยนบริบทเป็นงานนี้
+                console.log(`✅ Matched event: ${eventIdToLink}`);
+            } else {
+                console.log(`❌ No event found for inviteCode: ${inviteCode}`);
+            }
+        }
+    }
+
+    // 2. ถ้าไม่มี Ref ให้ใช้บริบทล่าสุดที่ลูกค้าเคยคุย (lastActiveEventId)
+    if (!eventIdToLink && customer.lastActiveEventId) {
+        // ตรวจสอบว่า event นั้นยังไม่จบ
+        const lastEvent = await prisma.event.findFirst({
+            where: {
+                id: customer.lastActiveEventId,
+                status: { notIn: ['completed', 'cancelled'] }
+            },
+            select: { id: true }
+        });
+        if (lastEvent) {
+            eventIdToLink = lastEvent.id;
+            console.log(`📌 Using last context: ${eventIdToLink}`);
+        }
+    }
+
+    // 3. ถ้ายังไม่มี ให้หาจาก Event ล่าสุดที่ยังไม่จบ (ไม่ใช่ completed/cancelled)
+    if (!eventIdToLink) {
+        const latestActiveEvent = await prisma.event.findFirst({
+            where: {
+                customerId: customer.id,
+                status: {
+                    notIn: ['completed', 'cancelled']
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        eventIdToLink = latestActiveEvent?.id || null;
+        if (eventIdToLink) {
+            shouldUpdateContext = true; // เซ็ตงานนี้เป็นบริบทใหม่
+            console.log(`🎯 Fallback to latest active event: ${eventIdToLink}`);
+        }
+    }
+
+    // อัพเดท lastActiveEventId ถ้ามีการเปลี่ยนบริบท
+    if (shouldUpdateContext && eventIdToLink) {
+        await prisma.customer.update({
+            where: { id: customer.id },
+            data: { lastActiveEventId: eventIdToLink }
+        });
+        console.log(`💾 Updated customer context to event: ${eventIdToLink}`);
+    }
 
     // บันทึก Chat Log พร้อม link กับ Event (ถ้ามี)
     if (message.type === 'text') {

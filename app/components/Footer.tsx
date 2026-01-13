@@ -38,6 +38,7 @@ const mainLinks = [
     { label: "ผลงานของเรา", href: "/portfolio" },
     { label: "โปรโมชั่น", href: "/promotions" },
     { label: "ออกแบบใหม่", href: "/designs" },
+    { label: "บทความ", href: "/blog" },
     { label: "ติดต่อเรา", href: "/contact" },
 ];
 

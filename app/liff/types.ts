@@ -30,6 +30,7 @@ export interface EventData {
     status: string;
     timelines: EventTimeline[];
     chatLogs: ChatLog[];
+    customerDisplayName?: string | null;
 }
 
 export interface EventSummary {

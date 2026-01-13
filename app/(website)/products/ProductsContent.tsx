@@ -55,74 +55,86 @@ export default function ProductsContent() {
 
     return (
         <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh' }}>
-            {/* Hero Section - Same as Contact */}
-            {/* Hero Section - Same as Contact */}
+            {/* Header Section with Geometric background */}
             <Box sx={{
+                pt: { xs: 15, md: 22 },
+                pb: { xs: 8, md: 10 },
                 position: 'relative',
-                minHeight: { xs: 'auto', md: '400px' },
-                bgcolor: '#1a1a1a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                py: { xs: 8, md: 0 }
+                overflow: 'hidden'
             }}>
-                {/* Soft Dark Gradient Background */}
+                {/* Background Decor */}
                 <Box sx={{
                     position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
-                }} />
-
-                {/* Diagonal Lines Pattern */}
-                <Box sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    opacity: 0.08,
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 11px)',
-                }} />
-
-                {/* Subtle Accent */}
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    top: '-20%',
+                    right: '-10%',
                     width: '600px',
                     height: '600px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, transparent 70%)',
-                    filter: 'blur(40px)',
-                    display: { xs: 'none', md: 'block' }
+                    background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
+                }} />
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: '-10%',
+                    left: '-10%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        color: 'white',
-                        fontSize: { xs: '1.2rem', md: '4rem' },
-                        lineHeight: 1.2,
-                        mb: { xs: 1, md: 2 },
-                        pt: { xs: 5, md: 0 }
-                    }}>
-                        PRODUCTS
-                    </Typography>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        color: 'rgba(255,255,255,0.7)',
-                        fontWeight: 300,
-                        fontSize: { xs: '0.85rem', md: '1.25rem' },
-                        maxWidth: '600px',
-                        mx: 'auto'
-                    }}>
-                        สินค้าและบริการครบวงจร สำหรับงาน Event ทุกรูปแบบ
-                    </Typography>
+                    <Stack spacing={3} alignItems="center">
+                        <Chip
+                            label="Our Products & Services"
+                            sx={{
+                                bgcolor: 'rgba(16, 185, 129, 0.1)',
+                                color: '#10B981',
+                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 600
+                            }}
+                        />
+                        <Typography
+                            component="h1"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '4.5rem' },
+                                color: 'var(--foreground)',
+                                lineHeight: 1.1,
+                                letterSpacing: '-1px'
+                            }}
+                        >
+                            PRODUCTS <br />
+                            <span style={{
+                                background: 'linear-gradient(90deg, #10B981 0%, #3B82F6 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
+                            }}>
+                                & SERVICES
+                            </span>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                color: 'var(--foreground)',
+                                opacity: 0.7,
+                                fontSize: { xs: '1rem', md: '1.2rem' },
+                                maxWidth: 600,
+                                lineHeight: 1.8,
+                                mx: 'auto'
+                            }}
+                        >
+                            บริการครบวงจรด้านระบบภาพ เสียง แสง และโครงสร้าง พร้อมทีมงานมืออาชีพ
+                        </Typography>
+                    </Stack>
                 </Container>
             </Box>
 
             {/* Categories Section */}
-            <Box sx={{ py: { xs: 6, md: 10 } }}>
+            <Box sx={{ py: { xs: 2, md: 0 } }}>
                 <Container maxWidth="lg">
                     {/* Section Header */}
                     <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
@@ -164,7 +176,7 @@ export default function ProductsContent() {
                                                 variant="rounded"
                                                 width={48}
                                                 height={48}
-                                                sx={{ borderRadius: 2, bgcolor: 'rgba(10, 92, 90, 0.1)' }}
+                                                sx={{ borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.1)' }}
                                             />
                                             <Box>
                                                 <Skeleton
@@ -185,7 +197,7 @@ export default function ProductsContent() {
                                             variant="rounded"
                                             width={100}
                                             height={28}
-                                            sx={{ borderRadius: 4, bgcolor: 'rgba(10, 92, 90, 0.08)' }}
+                                            sx={{ borderRadius: 4, bgcolor: 'rgba(16, 185, 129, 0.08)' }}
                                         />
                                     </Box>
 
@@ -226,7 +238,7 @@ export default function ProductsContent() {
                                                             variant="circular"
                                                             width={18}
                                                             height={18}
-                                                            sx={{ bgcolor: 'rgba(10, 92, 90, 0.15)' }}
+                                                            sx={{ bgcolor: 'rgba(16, 185, 129, 0.15)' }}
                                                         />
                                                     </Box>
                                                     <Skeleton
@@ -293,7 +305,8 @@ export default function ProductsContent() {
                                                 {category.description && (
                                                     <Typography sx={{
                                                         fontFamily: 'var(--font-prompt)',
-                                                        color: 'rgba(0,0,0,0.6)',
+                                                        color: 'var(--foreground)',
+                                                        opacity: 0.6,
                                                         fontSize: '0.9rem'
                                                     }}>
                                                         {category.description}
@@ -326,10 +339,12 @@ export default function ProductsContent() {
                                                 sx={{
                                                     borderRadius: 3,
                                                     overflow: 'hidden',
+                                                    bgcolor: 'rgba(128,128,128,0.03)', // Light transparent bg for both modes
                                                     textDecoration: 'none',
                                                     color: 'inherit',
                                                     transition: 'all 0.3s ease',
-                                                    border: '1px solid rgba(0,0,0,0.06)',
+                                                    border: '1px solid',
+                                                    borderColor: 'rgba(128,128,128,0.2)',
                                                     '&:hover': {
                                                         transform: 'translateY(-5px)',
                                                         boxShadow: '0 15px 40px rgba(0,0,0,0.12)',
@@ -342,7 +357,7 @@ export default function ProductsContent() {
                                                     position: 'relative',
                                                     width: '100%',
                                                     height: 160,
-                                                    bgcolor: '#f5f5f5',
+                                                    bgcolor: 'rgba(128,128,128,0.1)', // Adaptive placeholder bg
                                                     overflow: 'hidden'
                                                 }}>
                                                     {child.image ? (
@@ -359,7 +374,7 @@ export default function ProductsContent() {
                                                             display: 'flex',
                                                             alignItems: 'center',
                                                             justifyContent: 'center',
-                                                            background: 'linear-gradient(135deg, #f8f8f8 0%, #e8e8e8 100%)'
+                                                            background: 'linear-gradient(135deg, rgba(128,128,128,0.05) 0%, rgba(128,128,128,0.1) 100%)'
                                                         }}>
                                                             <Box1 size="40" color="rgba(0,0,0,0.15)" variant="Bold" />
                                                         </Box>
@@ -383,7 +398,8 @@ export default function ProductsContent() {
                                                         <Typography sx={{
                                                             fontFamily: 'var(--font-prompt)',
                                                             fontSize: '0.8rem',
-                                                            color: 'rgba(0,0,0,0.5)',
+                                                            color: 'var(--foreground)',
+                                                            opacity: 0.5,
                                                             mt: 0.5
                                                         }}>
                                                             {child._count.products} สินค้า

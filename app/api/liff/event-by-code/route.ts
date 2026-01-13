@@ -125,7 +125,8 @@ export async function GET(request: NextRequest) {
                 success: true,
                 event: {
                     ...updatedEvent,
-                    chatLogs: mapChatLogs(updatedEvent.chatLogs, customerName, staffName)
+                    chatLogs: mapChatLogs(updatedEvent.chatLogs, customerName, staffName),
+                    customerDisplayName: updatedEvent.customer.displayName,
                 },
             });
         }
@@ -144,6 +145,7 @@ export async function GET(request: NextRequest) {
                 timelines: event.timelines,
                 chatLogs: mapChatLogs(event.chatLogs, customerFallback, staffFallback),
                 bookings: event.bookings,
+                customerDisplayName: event.customer.displayName,
             },
         });
 

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Box, Container, Typography, Stack, Button, Skeleton } from "@mui/material";
-import { Call, Message, Location, Instagram, Facebook, Sms } from "iconsax-react";
+import { Box, Container, Typography, Stack, Button, Skeleton, Chip } from "@mui/material";
+import { Call, Message, Location, Instagram, Facebook, Sms, MessageText } from "iconsax-react";
 
 interface ContactSettings {
     address: string;
@@ -88,74 +88,86 @@ export default function ContactContent() {
 
     return (
         <React.Fragment>
-            {/* Hero Section - Soft Dark */}
-            {/* Hero Section - Soft Dark */}
+            {/* Hero Section - Light Theme with Gradient Blobs */}
             <Box sx={{
+                pt: { xs: 15, md: 22 },
+                pb: { xs: 8, md: 10 },
                 position: 'relative',
-                minHeight: { xs: 'auto', md: '400px' },
-                bgcolor: '#1a1a1a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                py: { xs: 8, md: 0 }
+                overflow: 'hidden'
             }}>
-                {/* Soft Dark Gradient Background */}
+                {/* Background Decor - Teal/Emerald gradients */}
                 <Box sx={{
                     position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
-                }} />
-
-                {/* Diagonal Lines Pattern */}
-                <Box sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    opacity: 0.08,
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 11px)',
-                }} />
-
-                {/* Subtle Accent */}
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    top: '-20%',
+                    right: '-10%',
                     width: '600px',
                     height: '600px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, transparent 70%)',
-                    filter: 'blur(40px)',
-                    display: { xs: 'none', md: 'block' }
+                    background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
+                }} />
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: '-10%',
+                    left: '-10%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        color: 'white',
-                        fontSize: { xs: '1.2rem', md: '4rem' },
-                        lineHeight: 1.2,
-                        mb: { xs: 1, md: 2 },
-                        pt: { xs: 5, md: 0 }
-                    }}>
-                        CONTACT US
-                    </Typography>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        color: 'rgba(255,255,255,0.7)',
-                        fontWeight: 300,
-                        fontSize: { xs: '0.85rem', md: '1.25rem' },
-                        maxWidth: '500px',
-                        mx: 'auto'
-                    }}>
-                        พร้อมให้บริการและคำปรึกษา
-                    </Typography>
+                    <Stack spacing={3} alignItems="center">
+                        <Chip
+
+                            label="Get in Touch"
+                            sx={{
+                                bgcolor: 'rgba(16, 185, 129, 0.1)',
+                                color: '#10B981',
+                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 500
+                            }}
+                        />
+                        <Typography
+                            component="h1"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '4rem' },
+                                color: 'var(--foreground)',
+                                lineHeight: 1.1,
+                                letterSpacing: '-1px'
+                            }}
+                        >
+                            CONTACT <br />
+                            <span style={{
+                                background: 'linear-gradient(90deg, #10B981 0%, #0A5C5A 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
+                            }}>
+                                US
+                            </span>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                color: 'var(--foreground)',
+                                opacity: 0.7,
+                                fontSize: { xs: '1rem', md: '1.2rem' },
+                                maxWidth: 500,
+                                lineHeight: 1.8
+                            }}
+                        >
+                            พร้อมให้บริการและคำปรึกษา สำหรับงานอีเวนต์ทุกรูปแบบ
+                        </Typography>
+                    </Stack>
                 </Container>
             </Box>
 
             {/* Contact Info Section */}
-            <Box id="contact-info" sx={{ py: { xs: 6, md: 8 }, bgcolor: 'var(--background)' }}>
+            <Box id="contact-info" sx={{ py: { xs: 2, md: 0 }, bgcolor: 'var(--background)' }}>
                 <Container maxWidth="lg">
                     {/* Section Header */}
                     <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>

@@ -662,9 +662,19 @@ export default function ProductCategoryContent() {
     if (loading) {
         return (
             <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
-                {/* Hero Skeleton */}
-                <Box sx={{ height: "40vh", bgcolor: "#1a1a1a", display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Skeleton variant="text" width={400} height={80} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
+                {/* Hero Skeleton - Light Theme */}
+                <Box sx={{
+                    pt: { xs: 15, md: 22 },
+                    pb: { xs: 8, md: 10 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 3
+                }}>
+                    <Skeleton variant="rounded" width={140} height={32} sx={{ borderRadius: 10, bgcolor: 'rgba(0,0,0,0.05)' }} />
+                    <Skeleton variant="text" width={300} height={60} sx={{ bgcolor: 'rgba(0,0,0,0.08)' }} />
+                    <Skeleton variant="text" width={500} height={24} sx={{ maxWidth: '90%', bgcolor: 'rgba(0,0,0,0.05)' }} />
                 </Box>
                 <Container maxWidth="lg" sx={{ mt: 4 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
@@ -708,69 +718,77 @@ export default function ProductCategoryContent() {
         <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
             {/* Hero Section - Same as Contact */}
             {/* Hero Section - Same as Contact */}
+            {/* Header Section with Geometric background */}
             <Box sx={{
+                pt: { xs: 15, md: 22 },
+                pb: { xs: 8, md: 10 },
                 position: 'relative',
-                minHeight: { xs: 'auto', md: '400px' },
-                bgcolor: '#1a1a1a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                py: { xs: 8, md: 0 }
+                overflow: 'hidden'
             }}>
-                {/* Soft Dark Gradient Background */}
+                {/* Background Decor */}
                 <Box sx={{
                     position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
-                }} />
-
-                {/* Diagonal Lines Pattern */}
-                <Box sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    opacity: 0.08,
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 11px)',
-                }} />
-
-                {/* Subtle Accent */}
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
+                    top: '-20%',
+                    right: '-10%',
                     width: '600px',
                     height: '600px',
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, transparent 70%)',
-                    filter: 'blur(40px)',
-                    display: { xs: 'none', md: 'block' }
+                    background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
+                }} />
+                <Box sx={{
+                    position: 'absolute',
+                    bottom: '-10%',
+                    left: '-10%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        color: 'white',
-                        fontSize: { xs: '1.2rem', md: '4rem' },
-                        lineHeight: 1.2,
-                        mb: { xs: 1, md: 2 },
-                        pt: { xs: 5, md: 0 }
-                    }}>
-                        {category.name}
-                    </Typography>
-                    {category.description && (
-                        <Typography sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            color: 'rgba(255,255,255,0.7)',
-                            fontWeight: 300,
-                            fontSize: { xs: '0.85rem', md: '1.25rem' },
-                            maxWidth: '600px',
-                            mx: 'auto'
-                        }}>
-                            {category.description}
+                    <Stack spacing={3} alignItems="center">
+                        <Chip
+                            label="Products Category"
+                            sx={{
+                                bgcolor: 'rgba(16, 185, 129, 0.1)',
+                                color: '#10B981',
+                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 600
+                            }}
+                        />
+                        <Typography
+                            component="h1"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '4.5rem' },
+                                color: 'var(--foreground)',
+                                lineHeight: 1.1,
+                                letterSpacing: '-1px',
+                                textTransform: 'uppercase'
+                            }}
+                        >
+                            {category.name}
                         </Typography>
-                    )}
+                        {category.description && (
+                            <Typography
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    color: 'var(--foreground)',
+                                    opacity: 0.7,
+                                    fontSize: { xs: '1rem', md: '1.2rem' },
+                                    maxWidth: 600,
+                                    lineHeight: 1.8,
+                                    mx: 'auto'
+                                }}
+                            >
+                                {category.description}
+                            </Typography>
+                        )}
+                    </Stack>
                 </Container>
             </Box>
 
@@ -793,7 +811,7 @@ export default function ProductCategoryContent() {
                                     href={`/products/${slugPath}/${child.slug}`}
                                     sx={{
                                         p: { xs: 3, md: 4 },
-                                        bgcolor: 'white',
+                                        bgcolor: 'rgba(128,128,128,0.03)',
                                         borderRadius: 3,
                                         textDecoration: 'none',
                                         color: 'inherit',
@@ -801,7 +819,8 @@ export default function ProductCategoryContent() {
                                         alignItems: 'center',
                                         gap: 3,
                                         transition: 'all 0.3s ease',
-                                        border: '1px solid rgba(0,0,0,0.08)',
+                                        border: '1px solid',
+                                        borderColor: 'rgba(128,128,128,0.2)',
                                         boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
                                         '&:hover': {
                                             transform: 'translateY(-4px)',
@@ -828,7 +847,7 @@ export default function ProductCategoryContent() {
                                             width: 56,
                                             height: 56,
                                             borderRadius: 2,
-                                            bgcolor: 'rgba(10, 92, 90, 0.08)',
+                                            bgcolor: 'rgba(16, 185, 129, 0.1)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -863,7 +882,8 @@ export default function ProductCategoryContent() {
                                         <Typography sx={{
                                             fontFamily: 'var(--font-prompt)',
                                             fontSize: '0.9rem',
-                                            color: 'rgba(0,0,0,0.5)'
+                                            color: 'var(--foreground)',
+                                            opacity: 0.6
                                         }}>
                                             {isIndoor ? 'สำหรับงานในร่ม' : isOutdoor ? 'สำหรับงานกลางแจ้ง' : 'ดูรายละเอียด'}
                                         </Typography>
@@ -872,7 +892,7 @@ export default function ProductCategoryContent() {
                                             size="small"
                                             sx={{
                                                 mt: 1.5,
-                                                bgcolor: 'rgba(10, 92, 90, 0.08)',
+                                                bgcolor: 'rgba(16, 185, 129, 0.08)',
                                                 color: 'var(--primary)',
                                                 fontFamily: 'var(--font-prompt)',
                                                 fontSize: '0.75rem',

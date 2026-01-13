@@ -18,7 +18,8 @@ import {
     Collapse,
     Fade,
     Stack,
-    Divider
+    Divider,
+    useMediaQuery
 } from "@mui/material";
 import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Map1, Gift } from "iconsax-react";
 import Link from "next/link";
@@ -63,7 +64,7 @@ export default function Header() {
         { label: "PROMOTIONS", href: "/promotions" },
         { label: "PORTFOLIO", href: "/portfolio" },
         { label: "NEW DESIGN", href: "/designs" },
-        { label: "CONTACT", href: "/contact" },
+        { label: "FAQ", href: "/faq" },
     ], [productSections]);
 
     // Desktop Menu States
@@ -83,7 +84,11 @@ export default function Header() {
     const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
-    const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products");
+    const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq");
+    const isDarkText = pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact";
+
+    // Check system dark mode preference
+    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)', { noSsr: true });
 
     // ---- Handlers ----
 
@@ -504,13 +509,13 @@ export default function Header() {
                             onClick={handleDrawerToggle}
                             sx={{
                                 display: { md: "none" },
-                                color: "white",
+                                color: isDarkText ? "var(--foreground)" : "white",
                                 position: { xs: 'absolute', md: 'static' },
                                 left: { xs: 0, md: 'auto' },
                                 zIndex: 1
                             }}
                         >
-                            <HambergerMenu size="32" color="white" />
+                            <HambergerMenu size="32" color={isDarkText ? "var(--foreground)" : "white"} />
                         </IconButton>
 
                         <Box
@@ -525,7 +530,7 @@ export default function Header() {
                             }}
                         >
                             <Image
-                                src="/images/logo_white.png"
+                                src={prefersDarkMode ? "/images/logo_white.png" : (isDarkText ? "/images/logo_black.png" : "/images/logo_white.png")}
                                 alt="SETEVENT"
                                 fill
                                 style={{
@@ -536,11 +541,11 @@ export default function Header() {
                         </Box>
 
                         {/* Date/Location Text - Hide on mobile */}
-                        <Box sx={{ display: { xs: 'none', lg: 'block' }, ml: 3, borderLeft: '1px solid rgba(255,255,255,0.3)', pl: 3 }}>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.8)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                        <Box sx={{ display: { xs: 'none', lg: 'block' }, ml: 3, borderLeft: isDarkText ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(255,255,255,0.3)', pl: 3 }}>
+                            <Typography variant="caption" sx={{ color: isDarkText ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
                                 PROFESSIONAL TEAM
                             </Typography>
-                            <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.6)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                            <Typography variant="caption" sx={{ color: isDarkText ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
                                 End-to-End Event Solution
                             </Typography>
                         </Box>
@@ -551,7 +556,9 @@ export default function Header() {
                         {navItems.map((item) => {
                             const hasDropdown = !!item.children || !!item.isMega;
                             const active = isActive(item.href);
-                            const finalColor = active ? 'var(--secondary)' : 'rgba(255,255,255,0.9)';
+                            const isDarkTextLocal = isDarkText; // Use parent scope
+                            const baseColor = isDarkTextLocal ? 'var(--foreground)' : 'rgba(255,255,255,0.9)';
+                            const finalColor = active ? 'var(--secondary)' : baseColor;
 
                             if (hasDropdown) {
                                 return (
@@ -743,10 +750,11 @@ export default function Header() {
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: 'center', gap: 3 }}>
                         <Button
                             variant="outlined"
-                            onClick={handleContactClick}
+                            component="a"
+                            href="/contact"
                             sx={{
-                                color: 'white',
-                                borderColor: 'rgba(255,255,255,0.5)',
+                                color: isDarkText ? 'var(--foreground)' : 'white',
+                                borderColor: isDarkText ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)',
                                 borderRadius: '0',
                                 fontFamily: 'var(--font-prompt)',
                                 px: 3,
@@ -762,7 +770,7 @@ export default function Header() {
                                 }
                             }}
                         >
-                            ติดต่อเราทันที
+                            ติดต่อเรา
                         </Button>
                         <Menu
                             anchorEl={contactAnchorEl}

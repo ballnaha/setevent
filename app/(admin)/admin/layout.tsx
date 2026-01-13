@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction, Tooltip, Menu, MenuItem, Divider } from '@mui/material';
-import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle, Box1, Category2, Ticket, Gallery, Brush2 } from 'iconsax-react';
+import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle, Box1, Category2, Ticket, Gallery, Brush2, MessageQuestion, Book } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -33,6 +33,7 @@ const sidebarGroups = [
             { label: 'Portfolio', href: '/admin/portfolio', icon: Gallery, roles: ['admin', 'sales'] },
             { label: 'Designs', href: '/admin/designs', icon: Brush2, roles: ['admin', 'sales'] },
             { label: 'Promotions', href: '/admin/promotions', icon: Ticket, roles: ['admin', 'sales'] },
+            { label: 'Blogs', href: '/admin/blogs', icon: Book, roles: ['admin'] },
             { label: 'Products', href: '/admin/products', icon: Box1, roles: ['admin'] },
             { label: 'Categories', href: '/admin/products/categories', icon: Category2, roles: ['admin'] },
         ]
@@ -41,6 +42,7 @@ const sidebarGroups = [
         title: 'System',
         items: [
             { label: 'Contact', href: '/admin/contact', icon: Message, roles: ['admin'] },
+            { label: 'FAQs', href: '/admin/faqs', icon: MessageQuestion, roles: ['admin'] },
             { label: 'Users', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },
             { label: 'Settings', href: '/admin/settings', icon: Setting2, roles: ['admin'] },
         ]

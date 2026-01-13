@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton } from "@mui/material";
+import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack } from "@mui/material";
 import { CloseCircle, Gallery, Heart, Eye, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -82,67 +82,81 @@ export default function PortfolioContent() {
 
     return (
         <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
-            {/* Hero Section - Soft Dark (Same as contact page) */}
+            {/* Header Section with Geometric background */}
             <Box sx={{
+                pt: { xs: 15, md: 22 },
+                pb: { xs: 8, md: 10 },
                 position: 'relative',
-                minHeight: { xs: 'auto', md: '400px' },
-                bgcolor: '#1a1a1a',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-                py: { xs: 8, md: 0 }
+                overflow: 'hidden'
             }}>
-                {/* Soft Dark Gradient Background */}
+                {/* Background Decor */}
                 <Box sx={{
                     position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%)',
+                    top: '-20%',
+                    right: '-10%',
+                    width: '600px',
+                    height: '600px',
+                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
                 }} />
-
-                {/* Diagonal Lines Pattern */}
                 <Box sx={{
                     position: 'absolute',
-                    inset: 0,
-                    opacity: 0.08,
-                    backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.15) 10px, rgba(255,255,255,0.15) 11px)',
-                }} />
-
-                {/* Subtle Accent */}
-                <Box sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: { xs: '250px', md: '600px' },
-                    height: { xs: '250px', md: '600px' },
-                    borderRadius: '50%',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, transparent 70%)',
-                    filter: 'blur(40px)',
+                    bottom: '-10%',
+                    left: '-10%',
+                    width: '500px',
+                    height: '500px',
+                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    filter: 'blur(60px)',
+                    zIndex: 0
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 700,
-                        color: 'white',
-                        fontSize: { xs: '1.2rem', md: '4rem' },
-                        lineHeight: 1.2,
-                        mb: { xs: 1, md: 2 },
-                        pt: { xs: 5, md: 0 }
-                    }}>
-                        PORTFOLIO
-                    </Typography>
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        color: 'rgba(255,255,255,0.7)',
-                        fontWeight: 300,
-                        fontSize: { xs: '0.85rem', md: '1.25rem' },
-                        maxWidth: '500px',
-                        mx: 'auto'
-                    }}>
-                        ผลงานที่ผ่านมาของเรา สะท้อนคุณภาพและความเชี่ยวชาญ
-                    </Typography>
+                    <Stack spacing={3} alignItems="center">
+                        <Chip
+                            label="Our Masterpieces"
+                            sx={{
+                                bgcolor: 'rgba(10, 92, 90, 0.1)',
+                                color: 'var(--primary)',
+                                border: '1px solid rgba(10, 92, 90, 0.2)',
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 600
+                            }}
+                        />
+                        <Typography
+                            component="h1"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 800,
+                                fontSize: { xs: '2.5rem', md: '4.5rem' },
+                                color: 'var(--foreground)',
+                                lineHeight: 1.1,
+                                letterSpacing: '-1px'
+                            }}
+                        >
+                            FEATURED <br />
+                            <span style={{
+                                background: 'linear-gradient(90deg, #0A5C5A 0%, #00C2CB 100%)',
+                                WebkitBackgroundClip: 'text',
+                                WebkitTextFillColor: 'transparent'
+                            }}>
+                                PORTFOLIO
+                            </span>
+                        </Typography>
+                        <Typography
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                color: 'var(--foreground)',
+                                opacity: 0.7,
+                                fontSize: { xs: '1rem', md: '1.2rem' },
+                                maxWidth: 600,
+                                lineHeight: 1.8,
+                                mx: 'auto'
+                            }}
+                        >
+                            ผลงานที่ผ่านมาของเรา สะท้อนคุณภาพและความเชี่ยวชาญในการเนรมิตงานอีเวนต์ทุกรูปแบบให้เป็นจริง
+                        </Typography>
+                    </Stack>
                 </Container>
             </Box>
 

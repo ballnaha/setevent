@@ -281,7 +281,8 @@ export function createStatusFlexMessage(
     progress?: number,
     senderName?: string,
     venue?: string,
-    eventDate?: string
+    eventDate?: string,
+    inviteCode?: string
 ): FlexMessage {
     const statusConfig: Record<string, any> = {
         'in-progress': {
@@ -530,6 +531,28 @@ export function createStatusFlexMessage(
             ]
         }
     };
+
+    // Add footer with "Reply" button if inviteCode is provided
+    if (inviteCode) {
+        bubble.footer = {
+            type: 'box',
+            layout: 'vertical',
+            spacing: 'sm',
+            contents: [
+                {
+                    type: 'button',
+                    style: 'link',
+                    height: 'sm',
+                    action: {
+                        type: 'message',
+                        label: '💬 สอบถามเกี่ยวกับงานนี้',
+                        text: `สอบถามงาน ${eventName} (Ref: ${inviteCode})\n------------------\n`
+                    },
+                    color: config.color
+                }
+            ]
+        };
+    }
 
     return {
         type: 'flex',

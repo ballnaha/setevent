@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { HomepageSchema } from "@/components/seo/JsonLdSchema";
 
 export default function WebsiteLayout({
     children,
@@ -8,6 +9,7 @@ export default function WebsiteLayout({
 }>) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <HomepageSchema />
             <Header />
             <main style={{ flex: 1 }}>
                 {children}

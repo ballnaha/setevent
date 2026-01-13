@@ -66,18 +66,19 @@ model User {
 
 // Customer - ลูกค้าจาก LINE
 model Customer {
-  id            String    @id @default(cuid())
-  lineUid       String    @unique
-  displayName   String?
-  pictureUrl    String?
-  phone         String?
-  email         String?
-  companyName   String?
-  status        String    @default("new") // new, pending, active
-  salesId       String?   // Sales ที่ดูแลลูกค้านี้
-  firstMessageAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  lineUid           String    @unique
+  displayName       String?
+  pictureUrl        String?
+  phone             String?
+  email             String?
+  companyName       String?
+  status            String    @default("new") // new, pending, active
+  salesId           String?   // Sales ที่ดูแลลูกค้านี้
+  lastActiveEventId String?   // Event ID ที่ลูกค้ากำลังคุยอยู่ล่าสุด (สำหรับ context)
+  firstMessageAt    DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   sales         User?     @relation(fields: [salesId], references: [id], onDelete: SetNull)
   events        Event[]
@@ -251,6 +252,35 @@ model SiteSettings {
   id          String   @id @default(cuid())
   key         String   @unique  // e.g., "contact", "social"
   value       String   @db.Text // JSON string
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// FAQ - คำถามที่พบบ่อย
+model FAQ {
+  id          String   @id @default(cuid())
+  question    String   @db.Text
+  answer      String   @db.Text
+  category    String   @default("ทั่วไป")
+  status      String   @default("active") // active, inactive
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Blog - บทความ
+model Blog {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String?  @db.Text
+  content     String?  @db.Text
+  coverImage  String?
+  author      String?  @default("Admin")
+  category    String?  @default("General")
+  views       Int      @default(0)
+  status      String   @default("published") // published, draft
+  publishedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

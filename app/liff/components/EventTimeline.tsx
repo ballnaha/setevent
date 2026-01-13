@@ -51,11 +51,12 @@ const getStatusColor = (status: string) => {
 };
 
 export default function EventTimeline({ event }: Props) {
-    // Sort chat logs by createdAt DESC (newest first)
+    // Sort chat logs by createdAt DESC (newest first) - show both inbound and outbound
     const sortedChatLogs = useMemo(() => {
-        return [...(event.chatLogs || [])].sort((a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
+        return (event.chatLogs || [])
+            .sort((a, b) =>
+                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
     }, [event.chatLogs]);
 
     // State for selected date/month
@@ -418,8 +419,11 @@ export default function EventTimeline({ event }: Props) {
                                 const { text, images, progress } = parseMessage(log.message);
                                 const msgType = messageTypeConfig[log.messageType] || messageTypeConfig.text;
                                 const MsgIcon = msgType.icon;
-                                // Use event status color for consistent theming
-                                const colorScheme = getStatusColor(event.status);
+                                // Different colors for inbound (customer) vs outbound (admin)
+                                const isInbound = log.direction === 'inbound';
+                                const colorScheme = isInbound
+                                    ? { accent: '#10B981', border: '#D1FAE5', bg: '#ECFDF5' } // Green for customer
+                                    : getStatusColor(event.status); // Event status color for admin
                                 const isLast = index === filteredChatLogs.length - 1;
 
                                 return (
@@ -512,7 +516,7 @@ export default function EventTimeline({ event }: Props) {
                                                     borderRadius: 4,
                                                     boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
                                                     border: `1px solid ${colorScheme.border}`,
-                                                    bgcolor: 'white',
+                                                    bgcolor: isInbound ? colorScheme.bg : 'white',
                                                     overflow: 'visible',
                                                     position: 'relative',
                                                     cursor: 'pointer',
@@ -565,11 +569,11 @@ export default function EventTimeline({ event }: Props) {
                                                             fontFamily: 'var(--font-prompt)',
                                                             fontWeight: 500,
                                                             fontSize: '0.85rem',
-                                                            color: '#64748B',
+                                                            color: isInbound ? '#059669' : '#64748B',
                                                             mb: images.length > 0 || progress !== undefined ? 1.5 : 0,
                                                         }}
                                                     >
-                                                        — {log.senderName || 'Admin'}
+                                                        — {isInbound ? (event.customerDisplayName || 'คุณ') : (log.senderName || 'Admin')}
                                                     </Typography>
 
                                                     {/* Progress bar */}
@@ -829,7 +833,11 @@ export default function EventTimeline({ event }: Props) {
 
                             {selectedChatLog && (() => {
                                 const { text, images, progress } = parseMessage(selectedChatLog.message);
-                                const colorScheme = getStatusColor(event.status);
+                                // Use same color scheme as card based on direction
+                                const isInbound = selectedChatLog.direction === 'inbound';
+                                const colorScheme = isInbound
+                                    ? { accent: '#10B981', border: '#D1FAE5', bg: '#ECFDF5' }
+                                    : getStatusColor(event.status);
 
                                 return (
                                     <Container maxWidth="sm" sx={{ pb: 4, height: 'calc(100% - 40px)', overflowY: 'auto' }}>
@@ -837,11 +845,11 @@ export default function EventTimeline({ event }: Props) {
                                             {/* Header */}
                                             <Box>
                                                 <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, fontSize: '1.25rem', color: '#1E293B', mb: 1 }}>
-                                                    รายละเอียดอัพเดท
+                                                    {isInbound ? 'ข้อความจากคุณ' : 'รายละเอียดอัพเดท'}
                                                 </Typography>
                                                 <Stack direction="row" spacing={2} alignItems="center">
-                                                    <Box sx={{ p: 1, bgcolor: 'rgba(59, 130, 246, 0.1)', borderRadius: 2, display: 'flex' }}>
-                                                        <Clock size={16} color="#3B82F6" />
+                                                    <Box sx={{ p: 1, bgcolor: `${colorScheme.accent}20`, borderRadius: 2, display: 'flex' }}>
+                                                        <Clock size={16} color={colorScheme.accent} />
                                                     </Box>
                                                     <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: '#64748B' }}>
                                                         {format(new Date(selectedChatLog.createdAt), 'd MMM yyyy, HH:mm น.', { locale: th })}
@@ -849,22 +857,29 @@ export default function EventTimeline({ event }: Props) {
                                                 </Stack>
                                             </Box>
 
-                                            {/* Sender Info */}
-                                            <Box sx={{ p: 2, bgcolor: '#F8FAFC', borderRadius: 3, border: '1px solid #E2E8F0' }}>
-                                                <Stack direction="row" spacing={2} alignItems="center">
-                                                    <Box sx={{ width: 40, height: 40, bgcolor: colorScheme.accent, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center', color: 'white' }}>
-                                                        <Typography sx={{ fontWeight: 700 }}>{(selectedChatLog.senderName || 'A')[0].toUpperCase()}</Typography>
-                                                    </Box>
-                                                    <Box>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '0.95rem', color: '#1E293B' }}>
-                                                            {selectedChatLog.senderName || 'Admin'}
-                                                        </Typography>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#94A3B8' }}>
-                                                            ผู้ดูแลโปรเจกต์
-                                                        </Typography>
-                                                    </Box>
-                                                </Stack>
-                                            </Box>
+                                            {/* Sender Info - Minimal */}
+                                            <Stack direction="row" spacing={1.5} alignItems="center">
+                                                <Box sx={{
+                                                    width: 28,
+                                                    height: 28,
+                                                    bgcolor: colorScheme.accent,
+                                                    borderRadius: '50%',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center',
+                                                    color: 'white',
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: 700
+                                                }}>
+                                                    {(isInbound ? (event.customerDisplayName || 'C') : (selectedChatLog.senderName || 'A'))[0].toUpperCase()}
+                                                </Box>
+                                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '0.9rem', color: colorScheme.accent }}>
+                                                    {isInbound ? (event.customerDisplayName || 'คุณ') : (selectedChatLog.senderName || 'Admin')}
+                                                </Typography>
+                                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#94A3B8' }}>
+                                                    • {isInbound ? 'ลูกค้า' : 'เจ้าหน้าที่'}
+                                                </Typography>
+                                            </Stack>
 
                                             {/* Message Content */}
                                             <Box>
@@ -882,17 +897,17 @@ export default function EventTimeline({ event }: Props) {
 
                                             {/* Progress */}
                                             {progress !== undefined && (
-                                                <Box sx={{ p: 2.5, bgcolor: '#F0F9FF', borderRadius: 4, border: `1px solid ${colorScheme.border}` }}>
+                                                <Box sx={{ p: 2.5, bgcolor: colorScheme.bg || '#F0F9FF', borderRadius: 4, border: `1px solid ${colorScheme.border}` }}>
                                                     <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1.5 }}>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#0369A1' }}>
+                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: colorScheme.accent }}>
                                                             ความคืบหน้างาน
                                                         </Typography>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, color: '#0369A1', fontSize: '1.2rem' }}>
+                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, color: colorScheme.accent, fontSize: '1.2rem' }}>
                                                             {progress}%
                                                         </Typography>
                                                     </Stack>
-                                                    <Box sx={{ height: 8, bgcolor: 'rgba(3, 105, 161, 0.1)', borderRadius: 4, overflow: 'hidden' }}>
-                                                        <Box sx={{ width: `${progress}%`, height: '100%', bgcolor: '#0369A1', borderRadius: 4 }} />
+                                                    <Box sx={{ height: 8, bgcolor: `${colorScheme.accent}20`, borderRadius: 4, overflow: 'hidden' }}>
+                                                        <Box sx={{ width: `${progress}%`, height: '100%', bgcolor: colorScheme.accent, borderRadius: 4 }} />
                                                     </Box>
                                                 </Box>
                                             )}

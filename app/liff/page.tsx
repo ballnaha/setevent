@@ -287,7 +287,7 @@ function LiffContent() {
                                             <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#64748B', fontSize: '0.85rem' }}>LINE Official</Typography>
                                             <Typography
                                                 component="a"
-                                                href={contactInfo.lineUrl || `https://line.me/ti/p/~${contactInfo.line}`}
+                                                href={contactInfo.lineUrl || `https://line.me/R/oaMessage/@setevent`}
                                                 target="_blank"
                                                 sx={{ fontFamily: 'var(--font-prompt)', color: '#1E293B', fontWeight: 600, fontSize: '1rem', textDecoration: 'none' }}
                                             >
@@ -948,12 +948,17 @@ function LiffContent() {
                                                 sx={{
                                                     minWidth: 260,
                                                     borderRadius: 4,
-                                                    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
-                                                    border: 'none',
+                                                    boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
+                                                    border: '1px solid rgba(255,255,255,0.8)',
                                                     position: 'relative',
                                                     overflow: 'hidden',
-                                                    transition: 'transform 0.2s',
-                                                    '&:hover': { transform: 'scale(0.98)' }
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                    background: 'linear-gradient(145deg, #FFFFFF 0%, #FAFBFC 100%)',
+                                                    '&:hover': {
+                                                        transform: 'translateY(-4px) scale(1.02)',
+                                                        boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)'
+                                                    },
+                                                    '&:active': { transform: 'scale(0.98)' }
                                                 }}
                                             >
                                                 {/* Colored Small Strip Indicator */}
@@ -1084,7 +1089,7 @@ function LiffContent() {
                         <Box
                             sx={{
                                 display: 'grid',
-                                gridTemplateColumns: 'repeat(2, 1fr)',
+                                gridTemplateColumns: 'repeat(3, 1fr)',
                                 gap: 2,
                                 bgcolor: 'white',
                                 p: 2,
@@ -1092,6 +1097,49 @@ function LiffContent() {
                                 boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
                             }}
                         >
+                            {/* Website */}
+                            <Box
+                                component="a"
+                                href="https://seteventthailand.com"
+                                target="_blank"
+                                sx={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    cursor: 'pointer',
+                                    textDecoration: 'none',
+                                    transition: 'transform 0.2s',
+                                    '&:active': { transform: 'scale(0.95)' }
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 3,
+                                        bgcolor: '#F0FDF4',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        mb: 0.5
+                                    }}
+                                >
+                                    <Monitor size={24} variant="Bulk" color="#22C55E" />
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontSize: '0.7rem',
+                                        color: '#64748B',
+                                        textAlign: 'center',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    เว็บไซต์
+                                </Typography>
+                            </Box>
+
                             {/* Contact Us */}
                             <Box
                                 onClick={handleContactClick}
@@ -1391,277 +1439,324 @@ function LiffContent() {
         );
     }
 
-    // No Events State - Professional Empty State
+    // No Events State - Show Promotions & Quick Actions, but empty My Projects
     if (status === 'no-events' || status === 'new' || status === 'pending') {
         return (
             <>
                 <LiffHeader onSearch={setSearchTerm} />
                 <Container maxWidth="sm" sx={{ pb: 10, bgcolor: '#FFFFFF' }}>
-                    <Box
-                        sx={{
-                            minHeight: 'calc(100vh - 200px)',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            textAlign: 'center',
-                            px: 3,
-                        }}
-                    >
-                        {/* Animated Illustration Container */}
+
+                    {/* My Project Section - Empty State */}
+                    <Box sx={{ mb: 4, pt: 2 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
+                            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
+                                My Project
+                            </Typography>
+                        </Box>
+
+                        {/* Empty State Card */}
                         <Box
                             sx={{
-                                position: 'relative',
-                                width: 200,
-                                height: 200,
-                                mb: 4,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                py: 5,
+                                px: 3,
+                                mx: 1,
+                                borderRadius: 4,
+                                background: 'linear-gradient(145deg, #F8FAFC 0%, #F1F5F9 100%)',
+                                border: '1px dashed #E2E8F0',
                             }}
                         >
-                            {/* Background Glow */}
                             <Box
                                 sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: 180,
-                                    height: 180,
+                                    width: 64,
+                                    height: 64,
                                     borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 51, 234, 0.1) 100%)',
-                                    filter: 'blur(30px)',
-                                    animation: 'pulse 3s ease-in-out infinite',
-                                    '@keyframes pulse': {
-                                        '0%, 100%': { transform: 'translate(-50%, -50%) scale(1)', opacity: 0.6 },
-                                        '50%': { transform: 'translate(-50%, -50%) scale(1.1)', opacity: 0.8 },
-                                    },
+                                    background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    mb: 2,
                                 }}
-                            />
-
-                            {/* Main Card Illustration */}
-                            <Box
+                            >
+                                <Clock size={28} color="#3B82F6" variant="Bulk" />
+                            </Box>
+                            <Typography
                                 sx={{
-                                    position: 'absolute',
-                                    top: '50%',
-                                    left: '50%',
-                                    transform: 'translate(-50%, -50%)',
-                                    width: 140,
-                                    height: 100,
-                                    borderRadius: 4,
-                                    background: 'linear-gradient(145deg, #FFFFFF 0%, #F8FAFC 100%)',
-                                    boxShadow: '0 20px 60px rgba(0, 0, 0, 0.1), 0 8px 25px rgba(59, 130, 246, 0.08)',
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontWeight: 600,
+                                    fontSize: '1rem',
+                                    color: '#1E293B',
+                                    mb: 0.5,
+                                }}
+                            >
+                                {status === 'new' ? 'ยินดีต้อนรับ! 🎉' : status === 'pending' ? 'กำลังตรวจสอบ...' : 'ยังไม่มีโปรเจกต์'}
+                            </Typography>
+                            <Typography
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.85rem',
+                                    color: '#94A3B8',
+                                    textAlign: 'center',
+                                }}
+                            >
+                                {status === 'new'
+                                    ? 'ขอบคุณที่สนใจบริการของเรา ทีมงานจะติดต่อกลับเร็วๆ นี้'
+                                    : status === 'pending'
+                                        ? 'เรากำลังตรวจสอบข้อมูลของคุณ กรุณารอสักครู่'
+                                        : 'เมื่อมีงานใหม่จะแสดงที่นี่'}
+                            </Typography>
+                        </Box>
+                    </Box>
+
+                    {/* Quick Actions Section */}
+                    <Box sx={{ mb: 4, px: 1 }}>
+                        <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B', mb: 2 }}>
+                            Quick Actions
+                        </Typography>
+                        <Box sx={{ display: 'flex', gap: 3, overflowX: 'auto', pb: 1, '::-webkit-scrollbar': { display: 'none' } }}>
+                            {/* Portfolio */}
+                            <Box
+                                component="a"
+                                href="/portfolio"
+                                target="_blank"
+                                sx={{
                                     display: 'flex',
                                     flexDirection: 'column',
                                     alignItems: 'center',
-                                    justifyContent: 'center',
-                                    border: '1px solid rgba(255, 255, 255, 0.8)',
-                                    animation: 'float 4s ease-in-out infinite',
-                                    '@keyframes float': {
-                                        '0%, 100%': { transform: 'translate(-50%, -50%) translateY(0px)' },
-                                        '50%': { transform: 'translate(-50%, -50%) translateY(-10px)' },
-                                    },
+                                    gap: 1,
+                                    cursor: 'pointer',
+                                    textDecoration: 'none',
+                                    transition: 'transform 0.2s',
+                                    '&:active': { transform: 'scale(0.95)' }
                                 }}
                             >
-                                {/* Calendar Icon */}
                                 <Box
                                     sx={{
                                         width: 48,
                                         height: 48,
                                         borderRadius: 3,
-                                        background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%)',
+                                        bgcolor: '#F0FDF4',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        boxShadow: '0 8px 20px rgba(59, 130, 246, 0.3)',
-                                        mb: 1,
+                                        mb: 0.5
                                     }}
                                 >
-                                    <Clock size={24} color="#FFFFFF" variant="Bold" />
+                                    <Gallery size={24} variant="Bulk" color="#22C55E" />
                                 </Box>
-                                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                    <Box sx={{ width: 40, height: 4, borderRadius: 2, bgcolor: '#E2E8F0' }} />
-                                    <Box sx={{ width: 20, height: 4, borderRadius: 2, bgcolor: '#F1F5F9' }} />
-                                </Box>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontSize: '0.7rem',
+                                        color: '#64748B',
+                                        textAlign: 'center',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    ผลงาน
+                                </Typography>
                             </Box>
 
-                            {/* Floating Decorative Elements */}
+                            {/* Quotation */}
                             <Box
+                                component="a"
+                                href="https://line.me/R/oaMessage/@setevent"
+                                target="_blank"
                                 sx={{
-                                    position: 'absolute',
-                                    top: 20,
-                                    right: 20,
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #F472B6 0%, #FB7185 100%)',
-                                    boxShadow: '0 4px 12px rgba(244, 114, 182, 0.4)',
-                                    animation: 'floatSmall 3s ease-in-out infinite 0.5s',
-                                    '@keyframes floatSmall': {
-                                        '0%, 100%': { transform: 'translateY(0px) rotate(0deg)' },
-                                        '50%': { transform: 'translateY(-8px) rotate(10deg)' },
-                                    },
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    cursor: 'pointer',
+                                    textDecoration: 'none',
+                                    transition: 'transform 0.2s',
+                                    '&:active': { transform: 'scale(0.95)' }
                                 }}
-                            />
+                            >
+                                <Box
+                                    sx={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 3,
+                                        bgcolor: '#FDF4FF',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        mb: 0.5
+                                    }}
+                                >
+                                    <DocumentText size={24} variant="Bulk" color="#A855F7" />
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontSize: '0.7rem',
+                                        color: '#64748B',
+                                        textAlign: 'center',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    ขอใบเสนอราคา
+                                </Typography>
+                            </Box>
+
+                            {/* Contact */}
                             <Box
+                                onClick={handleContactClick}
                                 sx={{
-                                    position: 'absolute',
-                                    bottom: 30,
-                                    left: 15,
-                                    width: 24,
-                                    height: 24,
-                                    borderRadius: 2,
-                                    background: 'linear-gradient(135deg, #10B981 0%, #34D399 100%)',
-                                    boxShadow: '0 4px 12px rgba(16, 185, 129, 0.4)',
-                                    animation: 'floatSmall 3.5s ease-in-out infinite 1s',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: 1,
+                                    cursor: 'pointer',
+                                    transition: 'transform 0.2s',
+                                    '&:active': { transform: 'scale(0.95)' }
                                 }}
-                            />
-                            <Box
-                                sx={{
-                                    position: 'absolute',
-                                    top: 50,
-                                    left: 25,
-                                    width: 16,
-                                    height: 16,
-                                    borderRadius: '50%',
-                                    background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
-                                    boxShadow: '0 4px 12px rgba(251, 191, 36, 0.4)',
-                                    animation: 'floatSmall 4s ease-in-out infinite 0.2s',
-                                }}
-                            />
+                            >
+                                <Box
+                                    sx={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 3,
+                                        bgcolor: '#EFF6FF',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        mb: 0.5
+                                    }}
+                                >
+                                    <Call size={24} variant="Bulk" color="#3B82F6" />
+                                </Box>
+                                <Typography
+                                    sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontSize: '0.7rem',
+                                        color: '#64748B',
+                                        textAlign: 'center',
+                                        lineHeight: 1.2
+                                    }}
+                                >
+                                    ติดต่อเรา
+                                </Typography>
+                            </Box>
                         </Box>
+                    </Box>
 
-                        {/* Welcome Message */}
-                        <Typography
-                            variant="h5"
-                            sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                fontWeight: 700,
-                                color: '#1E293B',
-                                mb: 1.5,
-                                background: 'linear-gradient(135deg, #1E293B 0%, #3B82F6 100%)',
-                                WebkitBackgroundClip: 'text',
-                                WebkitTextFillColor: 'transparent',
-                            }}
-                        >
-                            {status === 'new' ? 'ยินดีต้อนรับ! 🎉' : status === 'pending' ? 'กำลังตรวจสอบ...' : 'ยังไม่มีโปรเจกต์'}
-                        </Typography>
+                    {/* Promotions Section */}
+                    {promotions.length > 0 && (
+                        <Box sx={{ mb: 4 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 3 }}>
+                                <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
+                                    โปรโมชั่นพิเศษ 🎁
+                                </Typography>
+                            </Box>
 
-                        <Typography
-                            sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                color: '#64748B',
-                                fontSize: '0.95rem',
-                                lineHeight: 1.7,
-                                maxWidth: 280,
-                                mb: 4,
-                            }}
-                        >
-                            {status === 'new'
-                                ? 'ขอบคุณที่สนใจบริการของเรา ทีมงานจะติดต่อกลับเร็วๆ นี้'
-                                : status === 'pending'
-                                    ? 'เรากำลังตรวจสอบข้อมูลของคุณ กรุณารอสักครู่'
-                                    : 'คุณยังไม่มีโปรเจกต์ที่กำลังดำเนินการ เมื่อมีงานใหม่จะแสดงที่นี่'}
-                        </Typography>
-
-                        {/* Status Card */}
-                        <Card
-                            sx={{
-                                width: '100%',
-                                maxWidth: 320,
-                                borderRadius: 4,
-                                background: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.9) 100%)',
-                                backdropFilter: 'blur(10px)',
-                                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.06)',
-                                border: '1px solid rgba(255, 255, 255, 0.8)',
-                                overflow: 'hidden',
-                            }}
-                        >
                             <Box
                                 sx={{
-                                    height: 4,
-                                    background: status === 'pending'
-                                        ? 'linear-gradient(90deg, #F59E0B, #FBBF24, #F59E0B)'
-                                        : 'linear-gradient(90deg, #3B82F6, #8B5CF6, #3B82F6)',
-                                    backgroundSize: '200% 100%',
-                                    animation: 'shimmer 2s linear infinite',
-                                    '@keyframes shimmer': {
-                                        '0%': { backgroundPosition: '200% 0' },
-                                        '100%': { backgroundPosition: '-200% 0' },
-                                    },
+                                    display: 'flex',
+                                    gap: 2,
+                                    overflowX: 'auto',
+                                    px: 3,
+                                    mx: -2,
+                                    pb: 2,
+                                    '::-webkit-scrollbar': { display: 'none' },
+                                    scrollbarWidth: 'none'
                                 }}
-                            />
-                            <CardContent sx={{ p: 3 }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            >
+                                {promotions.map((promo, idx) => (
                                     <Box
+                                        key={promo.id || idx}
+                                        onClick={() => {
+                                            setSelectedPromo(promo);
+                                            setPromoOpen(true);
+                                        }}
                                         sx={{
-                                            width: 48,
-                                            height: 48,
-                                            borderRadius: 3,
-                                            background: status === 'pending'
-                                                ? 'linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(251, 191, 36, 0.1) 100%)'
-                                                : 'linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
+                                            minWidth: 240,
+                                            height: 180,
+                                            borderRadius: 5,
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                                            cursor: 'pointer',
+                                            flexShrink: 0,
+                                            border: '1px solid rgba(255,255,255,0.1)'
                                         }}
                                     >
-                                        {status === 'pending' ? (
-                                            <Clock size={24} color="#F59E0B" variant="Bulk" />
-                                        ) : (
-                                            <Instagram size={24} color="#3B82F6" variant="Bulk" />
-                                        )}
-                                    </Box>
-                                    <Box sx={{ flex: 1 }}>
-                                        <Typography
+                                        <Box
+                                            component="img"
+                                            src={promo.image || '/api/placeholder/promo_placeholder.png'}
                                             sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontWeight: 600,
-                                                fontSize: '0.9rem',
-                                                color: '#1E293B',
-                                                mb: 0.5,
+                                                width: '100%',
+                                                height: '100%',
+                                                objectFit: 'cover',
+                                                transition: 'transform 0.5s ease',
+                                                '&:hover': { transform: 'scale(1.1)' }
+                                            }}
+                                        />
+                                        <Box
+                                            sx={{
+                                                position: 'absolute',
+                                                bottom: 0,
+                                                left: 0,
+                                                right: 0,
+                                                background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 100%)',
+                                                p: 2,
+                                                pt: 4
                                             }}
                                         >
-                                            {status === 'pending' ? 'รอการยืนยัน' : 'พร้อมเริ่มต้น'}
-                                        </Typography>
-                                        <Typography
-                                            sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontSize: '0.8rem',
-                                                color: '#94A3B8',
-                                            }}
-                                        >
-                                            {status === 'pending' ? 'ทีมงานกำลังดำเนินการ' : 'ติดตามงานได้ที่นี่'}
-                                        </Typography>
+                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'white', fontSize: '0.95rem', lineHeight: 1.3 }}>
+                                                {promo.title}
+                                            </Typography>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                                                <Box sx={{ bgcolor: 'rgba(255,255,255,0.15)', px: 1.5, py: 0.3, borderRadius: 2 }}>
+                                                    <Typography sx={{ color: 'white', fontWeight: 500, fontSize: '0.7rem', fontFamily: 'var(--font-prompt)' }}>
+                                                        {promo.period}
+                                                    </Typography>
+                                                </Box>
+                                                {promo.price && (
+                                                    <Box sx={{ bgcolor: '#F59E0B', px: 1.5, py: 0.5, borderRadius: 2, ml: 1 }}>
+                                                        <Typography sx={{ color: 'white', fontWeight: 800, fontSize: '0.85rem', fontFamily: 'var(--font-prompt)' }}>
+                                                            ฿{promo.price}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                        </Box>
                                     </Box>
-                                    <Chip
-                                        label={status === 'pending' ? 'รอดำเนินการ' : 'ใหม่'}
-                                        size="small"
-                                        sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontSize: '0.7rem',
-                                            fontWeight: 600,
-                                            height: 24,
-                                            bgcolor: status === 'pending' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(59, 130, 246, 0.1)',
-                                            color: status === 'pending' ? '#F59E0B' : '#3B82F6',
-                                            border: 'none',
-                                        }}
-                                    />
-                                </Box>
-                            </CardContent>
-                        </Card>
+                                ))}
+                            </Box>
+                        </Box>
+                    )}
 
-                        {/* Contact Info */}
-                        <Typography
-                            sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                fontSize: '0.8rem',
-                                color: '#94A3B8',
-                                mt: 4,
-                            }}
-                        >
-                            มีคำถาม? ติดต่อเราได้ตลอดเวลา 💬
-                        </Typography>
-                    </Box>
                 </Container>
+                {contactDrawerJSX}
+                {promotionDrawerJSX}
+
+                {/* Snackbar */}
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={4000}
+                    onClose={() => setSnackbar({ ...snackbar, open: false })}
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    sx={{ top: { xs: 16, sm: 24 } }}
+                >
+                    <Alert
+                        onClose={() => setSnackbar({ ...snackbar, open: false })}
+                        severity={snackbar.severity}
+                        variant="filled"
+                        sx={{
+                            width: '100%',
+                            fontFamily: 'var(--font-prompt)',
+                            borderRadius: 3,
+                            boxShadow: '0 8px 24px rgba(0,0,0,0.15)'
+                        }}
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </Snackbar>
             </>
         );
     }
@@ -1752,7 +1847,7 @@ function LiffContent() {
 
         return (
             <>
-                {/* Skeleton Header */}
+                {/* Skeleton Header - Matches LiffHeader */}
                 <Box
                     sx={{
                         background: 'linear-gradient(135deg, #EBF4FF 0%, #F0F7FF 50%, #FDF2F8 100%)',
@@ -1764,21 +1859,21 @@ function LiffContent() {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                         <Skeleton
                             variant="circular"
-                            width={56}
-                            height={56}
+                            width={48}
+                            height={48}
                             sx={{ bgcolor: 'rgba(255,255,255,0.6)' }}
                         />
                         <Box sx={{ flex: 1 }}>
                             <Skeleton
                                 variant="text"
-                                width="60%"
-                                height={24}
+                                width="50%"
+                                height={20}
                                 sx={{ bgcolor: 'rgba(255,255,255,0.6)', mb: 0.5 }}
                             />
                             <Skeleton
                                 variant="text"
-                                width="40%"
-                                height={18}
+                                width="30%"
+                                height={16}
                                 sx={{ bgcolor: 'rgba(255,255,255,0.6)' }}
                             />
                         </Box>
@@ -1791,21 +1886,21 @@ function LiffContent() {
                 </Box>
 
                 <Container maxWidth="sm" sx={{ pb: 10, bgcolor: '#FFFFFF' }}>
-                    {/* My Projects Section Skeleton */}
+                    {/* My Project Section Skeleton */}
                     <Box sx={{ mb: 4, pt: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
-                            <Skeleton variant="text" width={120} height={28} />
-                            <Skeleton variant="text" width={60} height={20} />
+                            <Skeleton variant="text" width={100} height={28} />
                         </Box>
 
-                        {/* Project Cards Skeleton */}
+                        {/* Project Cards Skeleton - Horizontal scroll */}
                         <Box
                             sx={{
                                 display: 'flex',
                                 gap: 2,
                                 overflowX: 'hidden',
                                 pb: 2,
-                                px: 1,
+                                px: 3,
+                                mx: -2,
                             }}
                         >
                             {[1, 2].map((i) => (
@@ -1814,28 +1909,17 @@ function LiffContent() {
                                     sx={{
                                         minWidth: 260,
                                         borderRadius: 4,
-                                        boxShadow: '0 4px 20px rgba(0,0,0,0.04)',
+                                        boxShadow: '0 8px 32px rgba(0,0,0,0.08)',
                                         overflow: 'hidden',
+                                        flexShrink: 0,
                                     }}
                                 >
                                     <CardContent sx={{ p: 2.5 }}>
-                                        {/* Title Skeleton */}
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                            <Box sx={{ flex: 1 }}>
-                                                <Skeleton variant="text" width="80%" height={24} sx={{ mb: 0.5 }} />
-                                                <Skeleton variant="text" width="50%" height={18} />
-                                            </Box>
-                                        </Box>
-
-                                        <Skeleton variant="rectangular" height={1} sx={{ my: 1.5 }} />
-
-                                        {/* Footer Skeleton */}
+                                        <Skeleton variant="text" width="75%" height={24} sx={{ mb: 1 }} />
+                                        <Skeleton variant="text" width="50%" height={16} sx={{ mb: 2 }} />
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <Skeleton variant="circular" width={32} height={32} />
-                                            <Box>
-                                                <Skeleton variant="text" width={80} height={16} sx={{ mb: 0.5 }} />
-                                                <Skeleton variant="text" width={60} height={16} />
-                                            </Box>
+                                            <Skeleton variant="text" width={80} height={14} />
+                                            <Skeleton variant="rounded" width={60} height={24} sx={{ borderRadius: 2 }} />
                                         </Box>
                                     </CardContent>
                                 </Card>
@@ -1843,64 +1927,46 @@ function LiffContent() {
                         </Box>
                     </Box>
 
-                    {/* Progress Section Skeleton */}
-                    <Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 1 }}>
-                            <Skeleton variant="text" width={100} height={28} />
-                            <Skeleton variant="text" width={70} height={20} />
+                    {/* Quick Actions Section Skeleton */}
+                    <Box sx={{ mb: 4, px: 1 }}>
+                        <Skeleton variant="text" width={120} height={28} sx={{ mb: 2 }} />
+                        <Box sx={{ display: 'flex', gap: 3 }}>
+                            {[1, 2, 3, 4].map((i) => (
+                                <Box key={i} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                    <Skeleton variant="rounded" width={48} height={48} sx={{ borderRadius: 3 }} />
+                                    <Skeleton variant="text" width={50} height={14} />
+                                </Box>
+                            ))}
                         </Box>
+                    </Box>
 
-                        {/* Featured Card Skeleton */}
-                        <Card
+                    {/* Promotions Section Skeleton */}
+                    <Box sx={{ mb: 4 }}>
+                        <Box sx={{ px: 3, mb: 2 }}>
+                            <Skeleton variant="text" width={140} height={28} />
+                        </Box>
+                        <Box
                             sx={{
-                                borderRadius: 5,
-                                boxShadow: 'none',
-                                background: 'linear-gradient(160deg, #F0F4FF 0%, #FFFFFF 60%, #FFF1F2 100%)',
-                                mb: 4,
-                                p: 1,
+                                display: 'flex',
+                                gap: 2,
+                                overflowX: 'hidden',
+                                px: 3,
+                                mx: -2,
                             }}
                         >
-                            <CardContent sx={{ p: 2 }}>
-                                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                                    <Skeleton variant="circular" width={24} height={24} />
-                                </Box>
-
-                                <Box sx={{ textAlign: 'center', mb: 3 }}>
-                                    <Skeleton variant="text" width="60%" height={28} sx={{ mx: 'auto', mb: 1 }} />
-                                    <Skeleton variant="text" width="80%" height={18} sx={{ mx: 'auto' }} />
-                                    <Skeleton variant="text" width="70%" height={18} sx={{ mx: 'auto' }} />
-                                </Box>
-
-                                <Skeleton variant="rectangular" height={1} sx={{ my: 3 }} />
-
-                                {/* Calendar Strip Skeleton */}
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', gap: 1, mb: 3 }}>
-                                    {[1, 2, 3, 4, 5].map((i) => (
-                                        <Skeleton
-                                            key={i}
-                                            variant="rounded"
-                                            sx={{
-                                                flex: 1,
-                                                height: 70,
-                                                borderRadius: 4,
-                                            }}
-                                        />
-                                    ))}
-                                </Box>
-
-                                {/* Avatar Row Skeleton */}
-                                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
-                                    {[1, 2, 3, 4, 5].map((i) => (
-                                        <Skeleton
-                                            key={i}
-                                            variant="circular"
-                                            width={36}
-                                            height={36}
-                                        />
-                                    ))}
-                                </Box>
-                            </CardContent>
-                        </Card>
+                            {[1, 2].map((i) => (
+                                <Skeleton
+                                    key={i}
+                                    variant="rounded"
+                                    sx={{
+                                        minWidth: 240,
+                                        height: 180,
+                                        borderRadius: 5,
+                                        flexShrink: 0,
+                                    }}
+                                />
+                            ))}
+                        </Box>
                     </Box>
                 </Container>
             </>

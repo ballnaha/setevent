@@ -88,6 +88,16 @@ export async function POST(request: NextRequest) {
                 // body: { type: 'status', eventName, status: 'confirmed'|'in-progress'|'completed', message?, imageUrls?: string[] }
 
                 // 1. Create Status Flex Message
+                // Fetch inviteCode if eventId is provided
+                let inviteCode = data.inviteCode;
+                if (eventId && !inviteCode) {
+                    const event = await prisma.event.findUnique({
+                        where: { id: eventId },
+                        select: { inviteCode: true }
+                    });
+                    if (event) inviteCode = event.inviteCode;
+                }
+
                 // Ensure date is formatted if present
                 let formattedDate = data.eventDate;
                 if (data.eventDate && !data.eventDateNormalized) {
@@ -100,7 +110,7 @@ export async function POST(request: NextRequest) {
                     } catch (e) { }
                 }
 
-                const statusFlex = createStatusFlexMessage(data.eventName, data.status, data.message, data.progress, data.senderName, data.venue, formattedDate);
+                const statusFlex = createStatusFlexMessage(data.eventName, data.status, data.message, data.progress, data.senderName, data.venue, formattedDate, inviteCode);
                 const statusMessages: LineMessage[] = [statusFlex];
 
                 // 2. Add Images (if any)
