@@ -228,14 +228,17 @@ export default function DesignsContent() {
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 500,
                                 fontSize: '0.9rem',
-                                bgcolor: selectedCategory === cat ? '#8B5CF6' : 'white',
-                                color: selectedCategory === cat ? 'white' : 'text.primary',
-                                border: selectedCategory === cat ? 'none' : '1px solid #e0e0e0',
-                                boxShadow: selectedCategory === cat ? '0 4px 12px rgba(139, 92, 246, 0.3)' : '0 1px 3px rgba(0,0,0,0.05)',
+                                bgcolor: selectedCategory === cat ? '#8B5CF6' : 'transparent',
+                                color: selectedCategory === cat ? 'white' : 'var(--foreground)',
+                                border: '1px solid',
+                                borderColor: selectedCategory === cat ? '#8B5CF6' : 'rgba(128,128,128,0.4)',
+                                boxShadow: selectedCategory === cat ? '0 4px 12px rgba(139, 92, 246, 0.3)' : 'none',
                                 transition: 'all 0.3s ease',
+                                opacity: selectedCategory === cat ? 1 : 0.8,
                                 '&:hover': {
-                                    bgcolor: selectedCategory === cat ? '#8B5CF6' : '#f5f5f5',
+                                    bgcolor: selectedCategory === cat ? '#8B5CF6' : 'rgba(128,128,128,0.15)',
                                     transform: 'translateY(-2px)',
+                                    opacity: 1
                                 }
                             }}
                         />

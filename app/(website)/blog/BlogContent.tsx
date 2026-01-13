@@ -216,16 +216,18 @@ export default function BlogContent() {
                                     sx={{
                                         cursor: 'pointer',
                                         bgcolor: selectedCategory === cat ? 'var(--foreground)' : 'transparent',
-                                        color: selectedCategory === cat ? 'var(--background)' : 'text.secondary',
+                                        color: selectedCategory === cat ? 'var(--background)' : 'var(--foreground)',
                                         border: '1px solid',
-                                        borderColor: selectedCategory === cat ? 'var(--foreground)' : 'rgba(255,255,255,0.1)',
+                                        borderColor: selectedCategory === cat ? 'var(--foreground)' : 'rgba(128,128,128,0.4)',
                                         fontFamily: 'var(--font-prompt)',
                                         fontWeight: 500,
                                         transition: 'all 0.2s',
                                         py: 2.5,
                                         px: 1,
+                                        opacity: selectedCategory === cat ? 1 : 0.8,
                                         '&:hover': {
-                                            bgcolor: selectedCategory === cat ? 'var(--foreground)' : 'rgba(255,255,255,0.05)'
+                                            bgcolor: selectedCategory === cat ? 'var(--foreground)' : 'rgba(128,128,128,0.15)',
+                                            opacity: 1
                                         }
                                     }}
                                 />
