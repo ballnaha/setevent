@@ -39,11 +39,17 @@ export default function DesignsContent() {
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedItem, setSelectedItem] = useState<Design | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
     const swiperRef = useRef<SwiperType | null>(null);
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
 
     useEffect(() => {
         fetchDesigns();
+        // Load liked items from local storage
+        const savedLikes = localStorage.getItem('likedDesigns');
+        if (savedLikes) {
+            setLikedItems(new Set(JSON.parse(savedLikes)));
+        }
     }, []);
 
     const fetchDesigns = async () => {
@@ -71,9 +77,51 @@ export default function DesignsContent() {
         ? designs
         : designs.filter((d: Design) => d.category === selectedCategory);
 
+    const handleView = async (id: string) => {
+        try {
+            await fetch(`/api/designs/${id}/view`, { method: 'POST' });
+            // Update local state for view count
+            setDesigns(prev => prev.map(d =>
+                d.id === id ? { ...d, views: d.views + 1 } : d
+            ));
+        } catch (error) {
+            console.error("Failed to count view", error);
+        }
+    };
+
+    const handleLike = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation(); // Prevent opening lightbox
+
+        const isLiked = likedItems.has(id);
+        const action = isLiked ? 'unlike' : 'like';
+        const incrementValue = isLiked ? -1 : 1;
+
+        // Optimistic update status
+        const newLikedItems = new Set(likedItems);
+        if (isLiked) {
+            newLikedItems.delete(id);
+        } else {
+            newLikedItems.add(id);
+        }
+        setLikedItems(newLikedItems);
+        localStorage.setItem('likedDesigns', JSON.stringify(Array.from(newLikedItems)));
+
+        // Optimistic update count
+        setDesigns(prev => prev.map(d =>
+            d.id === id ? { ...d, likes: Math.max(0, d.likes + incrementValue) } : d
+        ));
+
+        try {
+            await fetch(`/api/designs/${id}/like?action=${action}`, { method: 'POST' });
+        } catch (error) {
+            console.error("Failed to toggle like", error);
+        }
+    };
+
     const openLightbox = (item: Design, index: number) => {
         setLightboxIndex(index);
         setSelectedItem(item);
+        handleView(item.id);
     };
 
     const closeLightbox = () => {
@@ -270,20 +318,17 @@ export default function DesignsContent() {
                                     />
                                 </Box>
 
-                                {/* Gradient Overlay - Desktop: Hover, Mobile: Gradient */}
+                                {/* Gradient Overlay - Always Visible */}
                                 <Box className="overlay" sx={{
                                     position: 'absolute',
                                     inset: 0,
-                                    background: {
-                                        xs: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
-                                        md: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%)'
-                                    },
-                                    opacity: { xs: 1, md: 0 },
+                                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
+                                    opacity: 1,
                                     transition: 'opacity 0.3s ease',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'flex-end',
-                                    p: { xs: 2, md: 3 }
+                                    p: 2
                                 }}>
                                     <Chip
                                         label={item.category}
@@ -314,8 +359,22 @@ export default function DesignsContent() {
                                     </Typography>
 
                                     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <Heart size="16" color="#ef4444" variant="Bold" />
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 0.5,
+                                                cursor: 'pointer',
+                                                transition: 'transform 0.2s',
+                                                '&:hover': { transform: 'scale(1.1)' }
+                                            }}
+                                            onClick={(e) => handleLike(e, item.id)}
+                                        >
+                                            <Heart
+                                                size="16"
+                                                color={likedItems.has(item.id) ? "#ef4444" : "white"}
+                                                variant={likedItems.has(item.id) ? "Bold" : "Linear"}
+                                            />
                                             <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
                                                 {item.likes}
                                             </Typography>

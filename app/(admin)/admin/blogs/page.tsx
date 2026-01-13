@@ -25,7 +25,7 @@ import {
     Autocomplete,
     Avatar,
 } from "@mui/material";
-import { Add, Edit, Trash, Eye, Image as ImageIcon } from "iconsax-react";
+import { Add, Edit, Trash, Eye, Gallery, Image as ImageIcon, CloseCircle } from "iconsax-react";
 
 interface Blog {
     id: string;
@@ -49,10 +49,18 @@ export default function BlogsAdminPage() {
     const [loading, setLoading] = useState(true);
     const [open, setOpen] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
+
+    // Image Delete State (Delete on Save pattern)
+    const [deleteImageDialogOpen, setDeleteImageDialogOpen] = useState(false);
+    const [deletingImage, setDeletingImage] = useState(false);
+    const [pendingDeleteImage, setPendingDeleteImage] = useState<string | null>(null);
 
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -95,6 +103,9 @@ export default function BlogsAdminPage() {
                 category: blog.category || "General",
                 status: blog.status
             });
+            if (blog.coverImage) {
+                setPreviewUrl(blog.coverImage);
+            }
         } else {
             setEditId(null);
             setFormData({
@@ -108,25 +119,89 @@ export default function BlogsAdminPage() {
                 status: "draft"
             });
         }
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setPendingDeleteImage(null);
         setOpen(true);
     };
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setPreviewUrl(null);
+        setSelectedFile(null);
+        setPendingDeleteImage(null);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // If replacing an existing image, mark it for deletion on save
+        if (formData.coverImage && !pendingDeleteImage) {
+            setPendingDeleteImage(formData.coverImage);
+        }
+
+        setSelectedFile(file);
+        setPreviewUrl(URL.createObjectURL(file));
+        setFormData(prev => ({ ...prev, coverImage: "" }));
+    };
+
+    const deleteFile = async (url: string) => {
+        try {
+            await fetch('/api/upload', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+        } catch (e) {
+            console.error("Failed to delete file", e);
+        }
+    };
 
     const handleSubmit = async () => {
         setSaving(true);
+        setUploading(true);
         try {
+            // Delete pending image file first (if user removed/replaced the old image)
+            if (pendingDeleteImage) {
+                await deleteFile(pendingDeleteImage);
+                setPendingDeleteImage(null);
+            }
+
+            let imageUrl = formData.coverImage;
+
+            if (selectedFile) {
+                const uploadFormData = new FormData();
+                uploadFormData.append("file", selectedFile);
+                uploadFormData.append("folder", "blogs");
+
+                const uploadRes = await fetch("/api/upload", {
+                    method: "POST",
+                    body: uploadFormData
+                });
+                const uploadData = await uploadRes.json();
+                if (uploadData.url) {
+                    imageUrl = uploadData.url;
+                }
+            }
+
+            const payload = {
+                ...formData,
+                coverImage: imageUrl
+            };
+
             const url = editId ? `/api/admin/blogs/${editId}` : "/api/admin/blogs";
             const res = await fetch(url, {
                 method: editId ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData)
+                body: JSON.stringify(payload)
             });
             if (res.ok) { fetchBlogs(); handleClose(); }
         } catch (error) {
             console.error("Save failed", error);
         } finally {
             setSaving(false);
+            setUploading(false);
         }
     };
 
@@ -136,6 +211,10 @@ export default function BlogsAdminPage() {
         if (!deleteId) return;
         setDeleting(true);
         try {
+            const blog = blogs.find(b => b.id === deleteId);
+            if (blog?.coverImage) {
+                await deleteFile(blog.coverImage);
+            }
             await fetch(`/api/admin/blogs/${deleteId}`, { method: "DELETE" });
             fetchBlogs();
         } catch (error) {
@@ -144,6 +223,27 @@ export default function BlogsAdminPage() {
             setDeleting(false);
             setDeleteDialogOpen(false);
             setDeleteId(null);
+        }
+    };
+
+    const handleDeleteImageClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setDeleteImageDialogOpen(true);
+    };
+
+    const handleDeleteImageConfirm = async () => {
+        setDeletingImage(true);
+        try {
+            if (formData.coverImage) {
+                setPendingDeleteImage(formData.coverImage);
+            }
+            setPreviewUrl(null);
+            setSelectedFile(null);
+            setFormData(prev => ({ ...prev, coverImage: "" }));
+        } finally {
+            setDeletingImage(false);
+            setDeleteImageDialogOpen(false);
         }
     };
 
@@ -338,13 +438,75 @@ export default function BlogsAdminPage() {
                             helperText="รองรับ HTML เช่น <p>, <h2>, <ul>, <li>, <img>, <blockquote>"
                         />
 
-                        <TextField
-                            label="URL รูปภาพปก"
-                            fullWidth
-                            value={formData.coverImage}
-                            onChange={(e) => setFormData({ ...formData, coverImage: e.target.value })}
-                            helperText="URL รูปภาพสำหรับหน้าปก"
-                        />
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 1, fontFamily: 'var(--font-prompt)' }}>รูปภาพปก</Typography>
+                            <Box sx={{
+                                width: '100%',
+                                height: 300,
+                                bgcolor: '#f5f5f5',
+                                borderRadius: 2,
+                                overflow: 'hidden',
+                                position: 'relative',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                border: '2px dashed #e0e0e0'
+                            }}>
+                                {(previewUrl || formData.coverImage) ? (
+                                    <>
+                                        <img
+                                            src={previewUrl || formData.coverImage}
+                                            alt="Preview"
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                        <IconButton
+                                            onClick={handleDeleteImageClick}
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 8,
+                                                right: 8,
+                                                zIndex: 10,
+                                                bgcolor: 'white',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                                '&:hover': { bgcolor: '#f5f5f5' }
+                                            }}
+                                            size="small"
+                                        >
+                                            <CloseCircle size="20" color="#ef4444" variant="Bold" />
+                                        </IconButton>
+                                    </>
+                                ) : (
+                                    <Box sx={{ textAlign: 'center', color: 'text.secondary' }}>
+                                        <Gallery size="48" variant="Bulk" />
+                                        <Typography variant="body2" sx={{ mt: 1, fontFamily: 'var(--font-prompt)' }}>
+                                            คลิกเพื่ออัพโหลดรูปภาพ
+                                        </Typography>
+                                        <Typography variant="caption" display="block">
+                                            แนะนำ 800x600px หรือใหญ่กว่า (จะถูก resize auto)
+                                        </Typography>
+                                    </Box>
+                                )}
+                                <input
+                                    accept="image/*"
+                                    type="file"
+                                    onChange={handleFileSelect}
+                                    style={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        opacity: 0,
+                                        cursor: 'pointer'
+                                    }}
+                                />
+                                {uploading && (
+                                    <Box sx={{
+                                        position: 'absolute', inset: 0, bgcolor: 'rgba(255,255,255,0.8)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                    }}>
+                                        <CircularProgress size={24} />
+                                    </Box>
+                                )}
+                            </Box>
+                        </Box>
 
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
                             <TextField
@@ -407,6 +569,23 @@ export default function BlogsAdminPage() {
                     <Button onClick={handleDeleteConfirm} variant="contained" color="error" disabled={deleting}
                         startIcon={deleting ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}>
                         {deleting ? "กำลังลบ..." : "ลบ"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Image Confirmation Dialog */}
+            <Dialog open={deleteImageDialogOpen} onClose={() => setDeleteImageDialogOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>ยืนยันการลบรูปภาพ</DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>
+                        คุณต้องการลบรูปภาพนี้ใช่หรือไม่? รูปภาพจะถูกลบเมื่อกดบันทึก
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteImageDialogOpen(false)} color="inherit" disabled={deletingImage}>ยกเลิก</Button>
+                    <Button onClick={handleDeleteImageConfirm} variant="contained" color="error" disabled={deletingImage}
+                        startIcon={deletingImage ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}>
+                        {deletingImage ? "กำลังลบ..." : "ลบ"}
                     </Button>
                 </DialogActions>
             </Dialog>

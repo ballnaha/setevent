@@ -237,7 +237,7 @@ model Design {
   id          String   @id @default(cuid())
   title       String
   category    String   // Wedding, Corporate, Dinner, Party, Concert, Fashion
-  image       String?  // Main display image
+  image       String?  @db.Text // Main display image
   description String?  @db.Text
   likes       Int      @default(0)
   views       Int      @default(0)

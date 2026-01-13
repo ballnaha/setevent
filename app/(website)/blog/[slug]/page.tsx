@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
 import BlogDetailContent from './BlogDetailContent';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -9,18 +12,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const { slug } = await params;
 
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3006'}/api/blogs/${slug}`, {
-            cache: 'no-store',
+        // Query DB directly to avoid triggering view increment in API
+        const blog = await prisma.blog.findUnique({
+            where: {
+                slug: slug,
+            },
+            select: {
+                title: true,
+                excerpt: true,
+                coverImage: true,
+            }
         });
 
-        if (!res.ok) {
+        if (!blog) {
             return {
                 title: 'บทความ | SetEvent',
                 description: 'บทความและสาระน่ารู้เกี่ยวกับการจัดงานอีเวนต์',
             };
         }
-
-        const blog = await res.json();
 
         return {
             title: blog.title,

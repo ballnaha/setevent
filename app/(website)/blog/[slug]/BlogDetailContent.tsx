@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Box, Container, Typography, Chip, Stack, Skeleton, Divider, Button, Avatar, Snackbar, Alert } from '@mui/material';
 import { Calendar, Clock, User, ArrowLeft, Eye, Share, Facebook, Link21 } from 'iconsax-react';
 import Link from 'next/link';
@@ -28,6 +28,21 @@ export default function BlogDetailContent({ params }: Props) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const viewCounted = useRef(false);
+
+    useEffect(() => {
+        const incrementView = async () => {
+            if (viewCounted.current) return;
+            viewCounted.current = true;
+            try {
+                const { slug } = await params;
+                await fetch(`/api/blogs/${slug}/view`, { method: 'POST' });
+            } catch (err) {
+                console.error("Failed to increment view", err);
+            }
+        };
+        incrementView();
+    }, [params]);
 
     useEffect(() => {
         const fetchBlog = async () => {

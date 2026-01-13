@@ -71,6 +71,11 @@ export default function DesignsAdminPage() {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    // Image Delete State (Delete on Save pattern)
+    const [deleteImageDialogOpen, setDeleteImageDialogOpen] = useState(false);
+    const [deletingImage, setDeletingImage] = useState(false);
+    const [pendingDeleteImage, setPendingDeleteImage] = useState<string | null>(null);
+
     // Form State
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -141,9 +146,8 @@ export default function DesignsAdminPage() {
         setShowCustomInput(false);
         // Reset file selection
         setSelectedFile(null);
-        if (!editId) {
-            setPreviewUrl(null);
-        }
+        setPreviewUrl(null);
+        setPendingDeleteImage(null);
         setOpen(true);
     };
 
@@ -151,6 +155,7 @@ export default function DesignsAdminPage() {
         setOpen(false);
         setPreviewUrl(null);
         setSelectedFile(null);
+        setPendingDeleteImage(null);
     };
 
     // Handle file selection - just store file and show preview
@@ -158,15 +163,26 @@ export default function DesignsAdminPage() {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // If replacing an existing image, mark it for deletion on save
+        if (formData.image && !pendingDeleteImage) {
+            setPendingDeleteImage(formData.image);
+        }
+
         setSelectedFile(file);
-        // Create local preview URL
         const url = URL.createObjectURL(file);
         setPreviewUrl(url);
+        setFormData(prev => ({ ...prev, image: "" }));
     };
 
     const handleSubmit = async () => {
         setUploading(true);
         try {
+            // Delete pending image file first (if user removed/replaced the old image)
+            if (pendingDeleteImage) {
+                await deleteFile(pendingDeleteImage);
+                setPendingDeleteImage(null);
+            }
+
             let imageUrl = formData.image;
 
             // Upload file first if selected
@@ -227,6 +243,40 @@ export default function DesignsAdminPage() {
             setDeleting(false);
             setDeleteDialogOpen(false);
             setDeleteId(null);
+        }
+    };
+
+    const deleteFile = async (url: string) => {
+        try {
+            await fetch('/api/upload', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+        } catch (e) {
+            console.error("Failed to delete file", e);
+        }
+    };
+
+    const handleDeleteImageClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setDeleteImageDialogOpen(true);
+    };
+
+    const handleDeleteImageConfirm = async () => {
+        setDeletingImage(true);
+        try {
+            // Store old image URL for deletion on save (don't delete immediately)
+            if (formData.image) {
+                setPendingDeleteImage(formData.image);
+            }
+            setPreviewUrl(null);
+            setSelectedFile(null);
+            setFormData(prev => ({ ...prev, image: "" }));
+        } finally {
+            setDeletingImage(false);
+            setDeleteImageDialogOpen(false);
         }
     };
 
@@ -423,23 +473,19 @@ export default function DesignsAdminPage() {
                                         />
                                         {/* Delete Image Button */}
                                         <IconButton
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setPreviewUrl(null);
-                                                setSelectedFile(null);
-                                                setFormData(prev => ({ ...prev, image: "" }));
-                                            }}
+                                            onClick={handleDeleteImageClick}
                                             sx={{
                                                 position: 'absolute',
                                                 top: 8,
                                                 right: 8,
-                                                bgcolor: 'rgba(0,0,0,0.6)',
-                                                color: 'white',
-                                                '&:hover': { bgcolor: 'rgba(220,38,38,0.9)' }
+                                                zIndex: 10,
+                                                bgcolor: 'white',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                                '&:hover': { bgcolor: '#f5f5f5' }
                                             }}
                                             size="small"
                                         >
-                                            <CloseCircle size="18" />
+                                            <CloseCircle size="20" color="#ef4444" variant="Bold" />
                                         </IconButton>
                                     </>
                                 ) : (
@@ -581,6 +627,23 @@ export default function DesignsAdminPage() {
                         startIcon={deleting ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}
                     >
                         {deleting ? "กำลังลบ..." : "ลบ"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Image Confirmation Dialog */}
+            <Dialog open={deleteImageDialogOpen} onClose={() => setDeleteImageDialogOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>ยืนยันการลบรูปภาพ</DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>
+                        คุณต้องการลบรูปภาพนี้ใช่หรือไม่? รูปภาพจะถูกลบเมื่อกดบันทึก
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteImageDialogOpen(false)} color="inherit" disabled={deletingImage}>ยกเลิก</Button>
+                    <Button onClick={handleDeleteImageConfirm} variant="contained" color="error" disabled={deletingImage}
+                        startIcon={deletingImage ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}>
+                        {deletingImage ? "กำลังลบ..." : "ลบ"}
                     </Button>
                 </DialogActions>
             </Dialog>

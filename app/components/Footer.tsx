@@ -85,7 +85,7 @@ function FooterSection({ title, children, defaultOpen = false }: { title: string
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    py: 2,
+                    py: 1.5,
                     cursor: 'pointer',
                     '&:hover': { bgcolor: 'rgba(255,255,255,0.02)' }
                 }}
@@ -108,7 +108,7 @@ function FooterSection({ title, children, defaultOpen = false }: { title: string
                 />
             </Box>
             <Collapse in={isOpen}>
-                <Box sx={{ pb: 3, pt: 1 }}>
+                <Box sx={{ pb: 2, pt: 1 }}>
                     {children}
                 </Box>
             </Collapse>
@@ -163,8 +163,8 @@ export default function Footer() {
         <Box component="footer" sx={{
             bgcolor: "#0a0a0a",
             color: "rgba(255,255,255,0.8)",
-            pt: { xs: 6, md: 10 },
-            pb: { xs: 4, md: 5 },
+            pt: { xs: 3, md: 10 },
+            pb: { xs: 3, md: 5 },
             mt: 'auto',
             position: 'relative',
             overflow: 'hidden'
@@ -183,12 +183,12 @@ export default function Footer() {
                 <Box sx={{
                     display: "grid",
                     gridTemplateColumns: { xs: '1fr', md: '1.5fr 1fr 1fr 1.2fr' },
-                    gap: { xs: 4, md: 6 },
-                    mb: { xs: 6, md: 8 }
+                    gap: { xs: 2.5, md: 6 },
+                    mb: { xs: 4, md: 8 }
                 }}>
                     {/* Brand Column */}
                     <Box>
-                        <Box sx={{ position: 'relative', width: { xs: 140, md: 160 }, height: { xs: 50, md: 60 }, mb: 3 }}>
+                        <Box sx={{ position: 'relative', width: { xs: 140, md: 160 }, height: { xs: 50, md: 60 }, mb: { xs: 2, md: 3 } }}>
                             <Image
                                 src="/images/logo_white.png"
                                 alt="SetEvent Logo"
@@ -200,7 +200,7 @@ export default function Footer() {
                             color: "rgba(255,255,255,0.6)",
                             fontFamily: "var(--font-prompt)",
                             maxWidth: 300,
-                            mb: 4,
+                            mb: { xs: 3, md: 4 },
                             fontSize: '0.95rem',
                             lineHeight: 1.8
                         }}>
@@ -385,7 +385,7 @@ export default function Footer() {
 
                 {/* Copyright */}
                 <Box sx={{
-                    pt: 4,
+                    pt: { xs: 3, md: 4 },
                     borderTop: '1px solid rgba(255,255,255,0.05)',
                     display: 'flex',
                     flexDirection: { xs: 'column', md: 'row' },

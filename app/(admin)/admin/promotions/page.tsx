@@ -144,6 +144,11 @@ export default function PromotionsAdminPage() {
     const [deleteId, setDeleteId] = useState<string | null>(null);
     const [deleting, setDeleting] = useState(false);
 
+    // Image Delete State
+    const [deleteImageDialogOpen, setDeleteImageDialogOpen] = useState(false);
+    const [deletingImage, setDeletingImage] = useState(false);
+    const [pendingDeleteImage, setPendingDeleteImage] = useState<string | null>(null);
+
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "",
@@ -165,7 +170,8 @@ export default function PromotionsAdminPage() {
     const fetchPromotions = async () => {
         setLoading(true);
         try {
-            const res = await fetch("/api/admin/promotions");
+            // Add timestamp to prevent caching
+            const res = await fetch(`/api/admin/promotions?t=${new Date().getTime()}`);
             if (res.ok) setPromotions(await res.json());
         } catch (error) {
             console.error(error);
@@ -221,16 +227,28 @@ export default function PromotionsAdminPage() {
         }
         setSelectedFile(null);
         setPreviewUrl(null);
+        setPendingDeleteImage(null);
         setOpen(true);
     };
 
-    const handleClose = () => setOpen(false);
+    const handleClose = () => {
+        setOpen(false);
+        setPendingDeleteImage(null);
+    };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
+
+        // If replacing an existing image, mark it for deletion on save
+        if (formData.image && !pendingDeleteImage) {
+            setPendingDeleteImage(formData.image);
+        }
+
         setSelectedFile(file);
         setPreviewUrl(URL.createObjectURL(file));
+        // Clear the old image URL since we're replacing it
+        setFormData(prev => ({ ...prev, image: "" }));
     };
 
     const handleFeatureChange = (index: number, field: keyof Feature, value: string) => {
@@ -245,6 +263,12 @@ export default function PromotionsAdminPage() {
     const handleSubmit = async () => {
         setUploading(true);
         try {
+            // Delete pending image file first (if user removed the old image)
+            if (pendingDeleteImage) {
+                await deleteFile(pendingDeleteImage);
+                setPendingDeleteImage(null);
+            }
+
             let imageUrl = formData.image;
             if (selectedFile) {
                 const uploadFormData = new FormData();
@@ -285,6 +309,40 @@ export default function PromotionsAdminPage() {
             setDeleting(false);
             setDeleteDialogOpen(false);
             setDeleteId(null);
+        }
+    };
+
+    const deleteFile = async (url: string) => {
+        try {
+            await fetch('/api/upload', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url })
+            });
+        } catch (e) {
+            console.error("Failed to delete file", e);
+        }
+    };
+
+    const handleDeleteImageClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        e.preventDefault();
+        setDeleteImageDialogOpen(true);
+    };
+
+    const handleDeleteImageConfirm = async () => {
+        setDeletingImage(true);
+        try {
+            // Store old image URL for deletion on save (don't delete immediately)
+            if (formData.image) {
+                setPendingDeleteImage(formData.image);
+            }
+            setPreviewUrl(null);
+            setSelectedFile(null);
+            setFormData(prev => ({ ...prev, image: "" }));
+        } finally {
+            setDeletingImage(false);
+            setDeleteImageDialogOpen(false);
         }
     };
 
@@ -375,11 +433,19 @@ export default function PromotionsAdminPage() {
                                     <>
                                         <img src={previewUrl || formData.image} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         <IconButton
-                                            onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); setSelectedFile(null); setFormData(prev => ({ ...prev, image: "" })); }}
-                                            sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(0,0,0,0.6)', color: 'white', '&:hover': { bgcolor: 'rgba(220,38,38,0.9)' } }}
+                                            onClick={handleDeleteImageClick}
+                                            sx={{
+                                                position: 'absolute',
+                                                top: 8,
+                                                right: 8,
+                                                zIndex: 10,
+                                                bgcolor: 'white',
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                                '&:hover': { bgcolor: '#f5f5f5' }
+                                            }}
                                             size="small"
                                         >
-                                            <Trash size="18" color="white" />
+                                            <CloseCircle size="20" color="#ef4444" variant="Bold" />
                                         </IconButton>
                                     </>
                                 ) : (
@@ -454,6 +520,23 @@ export default function PromotionsAdminPage() {
                     <Button onClick={handleDeleteConfirm} variant="contained" color="error" disabled={deleting}
                         startIcon={deleting ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}>
                         {deleting ? "กำลังลบ..." : "ลบ"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Image Confirmation Dialog */}
+            <Dialog open={deleteImageDialogOpen} onClose={() => setDeleteImageDialogOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>ยืนยันการลบรูปภาพ</DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>
+                        คุณต้องการลบรูปภาพนี้ใช่หรือไม่? การดำเนินการนี้จะลบไฟล์ออกจากระบบทันที
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteImageDialogOpen(false)} color="inherit" disabled={deletingImage}>ยกเลิก</Button>
+                    <Button onClick={handleDeleteImageConfirm} variant="contained" color="error" disabled={deletingImage}
+                        startIcon={deletingImage ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}>
+                        {deletingImage ? "กำลังลบ..." : "ลบ"}
                     </Button>
                 </DialogActions>
             </Dialog>

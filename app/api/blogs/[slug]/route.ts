@@ -20,12 +20,6 @@ export async function GET(
             return NextResponse.json({ error: 'Blog not found' }, { status: 404 });
         }
 
-        // Increment views
-        await prisma.blog.update({
-            where: { slug: slug },
-            data: { views: { increment: 1 } },
-        });
-
         return NextResponse.json(blog);
     } catch (error) {
         console.error('Error fetching blog:', error);

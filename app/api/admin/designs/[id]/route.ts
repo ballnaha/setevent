@@ -63,6 +63,29 @@ export async function DELETE(
     try {
         const { id } = await params;
 
+        // 1. Find the design to get the image path
+        const design = await prisma.design.findUnique({
+            where: { id },
+            select: { image: true }
+        });
+
+        if (design?.image) {
+            // 2. Delete the file from public folder
+            try {
+                // Extract relative path from URL (e.g., /uploads/designs/image.jpg -> uploads/designs/image.jpg)
+                const relativePath = design.image.startsWith('/') ? design.image.slice(1) : design.image;
+                const fs = require('fs/promises');
+                const path = require('path');
+                const filePath = path.join(process.cwd(), 'public', relativePath);
+
+                await fs.unlink(filePath);
+            } catch (fileError) {
+                console.warn("Failed to delete image file:", fileError);
+                // Continue to delete DB record even if file deletion fails
+            }
+        }
+
+        // 3. Delete from DB
         await prisma.design.delete({
             where: { id }
         });

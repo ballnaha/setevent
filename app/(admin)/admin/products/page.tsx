@@ -82,6 +82,7 @@ function ProductsContent() {
     });
 
     const [pendingImages, setPendingImages] = useState<{ file: File; previewUrl: string }[]>([]);
+    const [pendingDeleteImages, setPendingDeleteImages] = useState<string[]>([]); // Images to delete on save
     const [saving, setSaving] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
 
@@ -193,16 +194,21 @@ function ProductsContent() {
             });
         }
         setPendingImages([]);
+        setPendingDeleteImages([]);
         setDialogOpen(true);
     };
 
-    // Store selected file locally with preview (NOT uploading yet)
+    // Store selected files locally with preview (NOT uploading yet) - supports multiple files
     const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return;
-        const file = e.target.files[0];
-        const previewUrl = URL.createObjectURL(file);
-        setPendingImages(prev => [...prev, { file, previewUrl }]);
-        // Reset input value so user can select the same file again if needed
+
+        const newImages = Array.from(e.target.files).map(file => ({
+            file,
+            previewUrl: URL.createObjectURL(file)
+        }));
+
+        setPendingImages(prev => [...prev, ...newImages]);
+        // Reset input value so user can select the same files again if needed
         e.target.value = '';
     };
 
@@ -217,18 +223,18 @@ function ProductsContent() {
         setSnackbar({ open: true, message: 'ลบรูปที่รอ Upload สำเร็จ', severity: 'success' });
     };
 
-    // Remove an already uploaded image and delete from server
+    // Mark an already uploaded image for deletion on save (don't delete immediately)
     const removeUploadedImage = async (index: number) => {
         const imageUrl = formData.images[index];
-        // Delete from server folder
-        await deleteFile(imageUrl);
+        // Mark for deletion on save (don't delete immediately)
+        setPendingDeleteImages(prev => [...prev, imageUrl]);
         // Remove from formData
         setFormData(prev => ({
             ...prev,
             images: prev.images.filter((_, i) => i !== index)
         }));
         setImageDeleteConfirm({ open: false, type: null, index: -1 });
-        setSnackbar({ open: true, message: 'ลบรูปภาพสำเร็จ', severity: 'success' });
+        setSnackbar({ open: true, message: 'รูปภาพจะถูกลบเมื่อกดบันทึก', severity: 'success' });
     };
 
     // Open confirmation dialog for image deletion
@@ -265,6 +271,14 @@ function ProductsContent() {
 
         setSaving(true);
         try {
+            // Step 0: Delete pending delete images from server
+            if (pendingDeleteImages.length > 0) {
+                for (const imgUrl of pendingDeleteImages) {
+                    await deleteFile(imgUrl);
+                }
+                setPendingDeleteImages([]);
+            }
+
             // Step 1: Submit product first (with existing images only)
             const url = editingProduct ? `/api/admin/products/${editingProduct.id}` : '/api/admin/products';
             const method = editingProduct ? 'PUT' : 'POST';
@@ -664,11 +678,12 @@ function ProductsContent() {
                                 }}>
                                     <CloudPlus size="32" color="#3b82f6" variant="Bold" />
                                     <Typography variant="caption" sx={{ mt: 1, color: '#3b82f6', fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>
-                                        เลือกรูป
+                                        เลือกรูป (หลายรูปได้)
                                     </Typography>
                                     <input
                                         type="file"
                                         accept="image/*"
+                                        multiple
                                         onChange={handleImageSelect}
                                         style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
                                     />
