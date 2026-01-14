@@ -401,15 +401,15 @@ export default function Footer() {
                     }}>
                         © {new Date().getFullYear()} SetEvent Thailand. All rights reserved.
                     </Typography>
-                    <Stack direction="row" spacing={3} sx={{ display: { xs: 'none', md: 'flex' } }}>
+                    <Stack direction="row" spacing={3} sx={{ mt: { xs: 1, md: 0 } }}>
                         <Link href="/privacy-policy" style={{ textDecoration: 'none' }}>
                             <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: '0.875rem', fontFamily: "var(--font-prompt)", '&:hover': { color: 'white' } }}>
-                                Privacy Policy
+                                นโยบายความเป็นส่วนตัว
                             </Typography>
                         </Link>
-                        <Link href="/terms" style={{ textDecoration: 'none' }}>
+                        <Link href="/contact" style={{ textDecoration: 'none' }}>
                             <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: '0.875rem', fontFamily: "var(--font-prompt)", '&:hover': { color: 'white' } }}>
-                                Terms of Service
+                                เงื่อนไขการใช้บริการ
                             </Typography>
                         </Link>
                     </Stack>

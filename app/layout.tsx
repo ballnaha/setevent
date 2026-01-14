@@ -96,6 +96,7 @@ export const viewport: Viewport = {
 };
 
 import GoogleAnalytics from './components/GoogleAnalytics';
+import CookieConsent from './components/CookieConsent';
 
 export default function RootLayout({
   children,
@@ -115,6 +116,7 @@ export default function RootLayout({
               <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {children}
+                <CookieConsent />
               </ThemeProvider>
             </AppRouterCacheProvider>
           </NextThemeProvider>

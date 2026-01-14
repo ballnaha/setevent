@@ -119,8 +119,8 @@ export default function Header() {
     const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
-    const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq");
-    const isDarkText = (pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact") && (mounted && resolvedTheme !== 'dark');
+    const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/privacy-policy";
+    const isDarkText = (pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact" || pathname === "/privacy-policy") && (mounted && resolvedTheme !== 'dark');
 
     // ---- Handlers ----
 
