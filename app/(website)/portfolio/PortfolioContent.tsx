@@ -57,7 +57,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
 
     const fetchPortfolios = async () => {
         try {
-            const res = await fetch('/api/portfolios');
+            const res = await fetch('/api/portfolios', { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 setPortfolioItems(data);

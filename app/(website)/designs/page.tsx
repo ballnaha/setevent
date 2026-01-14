@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import DesignsContent from './DesignsContent';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     title: 'New Designs | SET EVENT',
     description: 'ผลงานการออกแบบและจัดอีเวนต์ที่สวยงาม สร้างสรรค์โดยทีมงาน SET EVENT',

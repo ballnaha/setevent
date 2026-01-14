@@ -56,7 +56,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
 
     const fetchDesigns = async () => {
         try {
-            const res = await fetch('/api/designs');
+            const res = await fetch('/api/designs', { cache: 'no-store' });
             if (res.ok) {
                 const data = await res.json();
                 setDesigns(data);

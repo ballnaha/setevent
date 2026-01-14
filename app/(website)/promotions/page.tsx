@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import PromotionsContent from './PromotionsContent';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     title: 'โปรโมชั่นพิเศษ | SET EVENT Thailand',
     description: 'รวมโปรโมชั่นและดีลพิเศษสุดคุ้มสำหรับบริการเช่าจอ LED เครื่องเสียง เวที และอุปกรณ์งานอีเวนต์ครบวงจรจาก SET EVENT Thailand',

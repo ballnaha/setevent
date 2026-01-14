@@ -267,7 +267,7 @@ export default function PromotionsContent() {
 
     const fetchPromotions = async () => {
         try {
-            const res = await fetch("/api/promotions");
+            const res = await fetch("/api/promotions", { cache: "no-store" });
             if (res.ok) {
                 const data: PromotionDB[] = await res.json();
                 // Parse features JSON and format data

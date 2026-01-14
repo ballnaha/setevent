@@ -633,7 +633,7 @@ export default function ProductCategoryContent() {
 
             setLoading(true);
             try {
-                const res = await fetch(`/api/products/by-slug?path=${encodeURIComponent(slugPath)}`);
+                const res = await fetch(`/api/products/by-slug?path=${encodeURIComponent(slugPath)}`, { cache: 'no-store' });
                 const json = await res.json();
 
                 if (!res.ok) {

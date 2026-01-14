@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/products/by-slug - Get category and products by slug path
 export async function GET(req: Request) {
     try {
@@ -18,11 +20,11 @@ export async function GET(req: Request) {
         }
 
         // Find category by traversing the slug path
-        let currentCategory = null;
+        let currentCategory: any = null;
         let parentId: string | null = null;
 
         for (const slug of slugs) {
-            const category = await prisma.category.findFirst({
+            const foundCategory: any = await prisma.category.findFirst({
                 where: {
                     slug: slug,
                     parentId: parentId
@@ -41,7 +43,7 @@ export async function GET(req: Request) {
                 }
             });
 
-            if (!category) {
+            if (!foundCategory) {
                 return NextResponse.json({
                     error: "Category not found",
                     slug: slug,
@@ -49,8 +51,8 @@ export async function GET(req: Request) {
                 }, { status: 404 });
             }
 
-            currentCategory = category;
-            parentId = category.id;
+            currentCategory = foundCategory;
+            parentId = foundCategory.id;
         }
 
         if (!currentCategory) {

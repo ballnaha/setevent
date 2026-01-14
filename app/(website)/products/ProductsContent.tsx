@@ -32,7 +32,7 @@ export default function ProductsContent() {
     useEffect(() => {
         async function fetchCategories() {
             try {
-                const res = await fetch('/api/admin/categories');
+                const res = await fetch('/api/admin/categories', { cache: 'no-store' });
                 const data = await res.json();
 
                 // Filter to get only root categories and build tree

@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import ProductCategoryContent from './ProductCategoryContent';
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
     params: Promise<{ slug: string[] }>
 }

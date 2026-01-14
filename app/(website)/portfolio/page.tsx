@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import PortfolioContent from './PortfolioContent';
 import prisma from '@/lib/prisma';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     // ... metadata content (keep as is)
     title: 'ผลงาน Portfolio | SET EVENT Thailand',

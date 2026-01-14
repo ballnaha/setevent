@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 // GET - List all active portfolios for public (frontend)
 export async function GET(req: NextRequest) {
     try {

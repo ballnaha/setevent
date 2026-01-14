@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import ProductsContent from './ProductsContent';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
     title: 'สินค้าและบริการ | SET EVENT Thailand',
     description: 'บริการเช่าจอ LED, เครื่องเสียง, ไฟเวที, โครงสร้างเวที, Motion Graphic, Interactive, Laser Show และอุปกรณ์งานอีเวนต์ครบวงจรจาก SET EVENT Thailand',
