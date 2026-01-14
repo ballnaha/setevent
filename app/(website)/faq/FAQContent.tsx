@@ -14,6 +14,7 @@ import {
     Button
 } from "@mui/material";
 import { ArrowDown2, MessageQuestion, Call, Whatsapp } from "iconsax-react";
+import { useTheme as useNextTheme } from 'next-themes';
 
 interface FAQItem {
     id: string;
@@ -56,13 +57,12 @@ export default function FAQContent() {
         : faqs.filter(item => item.category === selectedCategory);
 
     return (
-        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10 }}>
+        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10, overflowX: 'hidden' }}>
             {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
-                position: 'relative',
-                overflow: 'hidden'
+                position: 'relative'
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -71,7 +71,7 @@ export default function FAQContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(0, 194, 203, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-cyan) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -81,7 +81,7 @@ export default function FAQContent() {
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-ruby) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -106,7 +106,8 @@ export default function FAQContent() {
                                 fontSize: { xs: '2.5rem', md: '4.5rem' },
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
-                                letterSpacing: '-1px'
+                                letterSpacing: '-1px',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             FREQUENTLY ASKED <br />
@@ -192,13 +193,11 @@ export default function FAQContent() {
                                             mb: 2,
                                             borderRadius: '16px !important',
                                             overflow: 'hidden',
-                                            bgcolor: 'background.paper',
+                                            bgcolor: 'var(--card-bg)',
                                             backgroundImage: 'none',
-                                            boxShadow: expanded === `panel${faq.id}`
-                                                ? '0 10px 40px -10px rgba(0, 194, 203, 0.15)'
-                                                : '0 4px 10px rgba(0,0,0,0.05)',
+                                            boxShadow: 'var(--card-shadow)',
                                             border: '1px solid',
-                                            borderColor: expanded === `panel${faq.id}` ? '#00C2CB' : 'divider',
+                                            borderColor: expanded === `panel${faq.id}` ? '#00C2CB' : 'var(--border-color)',
                                             '&:before': { display: 'none' },
                                             transition: 'all 0.3s ease'
                                         }}
@@ -227,7 +226,7 @@ export default function FAQContent() {
                                                 <Typography sx={{
                                                     fontFamily: 'var(--font-prompt)',
                                                     fontWeight: 600,
-                                                    color: 'text.primary',
+                                                    color: 'var(--foreground)',
                                                     fontSize: '1.1rem',
                                                     lineHeight: 1.4
                                                 }}>
@@ -239,7 +238,7 @@ export default function FAQContent() {
                                             <Typography
                                                 sx={{
                                                     fontFamily: 'var(--font-prompt)',
-                                                    color: 'text.primary',
+                                                    color: 'var(--foreground)',
                                                     fontWeight: 500,
                                                     whiteSpace: 'pre-line',
                                                     lineHeight: 1.8,

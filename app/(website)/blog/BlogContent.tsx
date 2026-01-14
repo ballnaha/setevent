@@ -7,6 +7,7 @@ import { SearchNormal1, Calendar, User, ArrowRight2, Book, Clock, MagicStar, Clo
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useTheme as useNextTheme } from 'next-themes';
 
 interface Blog {
     id: string;
@@ -69,13 +70,13 @@ export default function BlogContent() {
     };
 
     return (
-        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10 }}>
+        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10, overflow: 'hidden' }}>
             {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 12 },
                 position: 'relative',
-                overflow: 'hidden'
+
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -84,7 +85,7 @@ export default function BlogContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(0, 194, 203, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-cyan) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -94,7 +95,7 @@ export default function BlogContent() {
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-ruby) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -119,7 +120,8 @@ export default function BlogContent() {
                                 fontSize: { xs: '2.5rem', md: '4.5rem' },
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
-                                letterSpacing: '-1px'
+                                letterSpacing: '-1px',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             INSIGHTS & <br />
@@ -153,11 +155,11 @@ export default function BlogContent() {
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 sx={{
                                     '& .MuiOutlinedInput-root': {
-                                        bgcolor: 'rgba(255,255,255,0.03)',
+                                        bgcolor: 'var(--card-bg)',
                                         borderRadius: 30,
                                         pr: 1,
                                         backdropFilter: 'blur(10px)',
-                                        border: '1px solid rgba(255,255,255,0.1)',
+                                        border: '1px solid var(--border-color)',
                                         '& fieldset': { border: 'none' },
                                         color: 'var(--foreground)'
                                     }
@@ -179,18 +181,7 @@ export default function BlogContent() {
                                                     <CloseCircle size="20" color="currentColor" variant="Bold" />
                                                 </IconButton>
                                             )}
-                                            <Button
-                                                variant="contained"
-                                                sx={{
-                                                    borderRadius: 20,
-                                                    bgcolor: 'var(--primary)',
-                                                    fontFamily: 'var(--font-prompt)',
-                                                    textTransform: 'none',
-                                                    minWidth: 80
-                                                }}
-                                            >
-                                                Search
-                                            </Button>
+
                                         </Stack>
                                     )
                                 }}
@@ -416,7 +407,8 @@ export default function BlogContent() {
                                         borderRadius: 4,
                                         overflow: 'hidden',
                                         mb: 2.5,
-                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                        border: '1px solid var(--border-color)',
+                                        boxShadow: 'var(--card-shadow)'
                                     }}>
                                         <Image
                                             src={blog.coverImage || '/images/logo.png'}

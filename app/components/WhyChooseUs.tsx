@@ -34,7 +34,8 @@ export default function WhyChooseUs() {
                             fontFamily: "var(--font-prompt)",
                             fontWeight: "bold",
                             mb: 4,
-                            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' }
+                            fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
+                            textShadow: 'var(--text-glow)'
                         }}>
                             ทำไมต้องเลือก <span style={{ color: 'var(--primary)' }}>SetEvent?</span>
                         </Typography>

@@ -47,6 +47,16 @@ export default function BannerSlider() {
                     priority
                     style={{ filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
                 />
+
+                {/* Dot Pattern Overlay for Mobile */}
+                <Box sx={{
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 1,
+                    display: { xs: 'block', md: 'none' },
+                    backgroundImage: 'radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px)',
+                    backgroundSize: '24px 24px',
+                }} />
             </Box>
 
             {/* Geometric Decor - Left Bottom */}
@@ -88,7 +98,14 @@ export default function BannerSlider() {
                     fontSize: { xs: '3.5rem', sm: '5rem', md: '7rem', lg: '8.5rem' },
                     lineHeight: 0.85,
                     letterSpacing: -2,
-                    textTransform: 'uppercase'
+                    textTransform: 'uppercase',
+                    textShadow: 'none',
+                    WebkitTextStroke: { xs: '0.5px rgba(255,255,255,0.2)', md: '1px rgba(255,255,255,0.1)' },
+                    '.dark &': {
+                        WebkitTextStroke: { xs: '1px rgba(255,255,255,0.4)', md: '1.5px rgba(255,255,255,0.5)' },
+                        textShadow: { xs: '0 0 8px var(--primary)', md: 'none' },
+                        animation: { xs: 'none', md: 'neon-pulse 4s ease-in-out infinite' }
+                    }
                 }}>
                     EVENT<br />RENTAL<br />SERVICE
                 </Typography>
@@ -131,6 +148,7 @@ export default function BannerSlider() {
                             py: { xs: 1, md: 1.5 },
                             borderRadius: 1,
                             fontSize: { xs: '0.85rem', md: '1rem' },
+                            boxShadow: 'var(--primary-glow)',
                             '&:hover': { bgcolor: '#c32f4b' }
                         }}
                     >
@@ -148,6 +166,7 @@ export default function BannerSlider() {
                             py: { xs: 1, md: 1.5 },
                             borderRadius: 1,
                             fontSize: { xs: '0.85rem', md: '1rem' },
+                            boxShadow: 'var(--primary-glow)',
                             '&:hover': { bgcolor: '#134b61' }
                         }}
                     >

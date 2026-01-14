@@ -12,6 +12,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-coverflow";
+import { useTheme as useNextTheme } from 'next-themes';
 
 // Portfolio interface
 interface PortfolioItem {
@@ -131,13 +132,13 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
     };
 
     return (
-        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
+        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
             {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-                overflow: 'hidden'
+
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -146,7 +147,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(10, 92, 90, 0.15) 0%, rgba(10, 92, 90, 0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-emerald) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -156,7 +157,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(233, 69, 96, 0.1) 0%, rgba(233, 69, 96, 0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-ruby) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -181,7 +182,8 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                 fontSize: { xs: '2.5rem', md: '4.5rem' },
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
-                                letterSpacing: '-1px'
+                                letterSpacing: '-1px',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             FEATURED <br />

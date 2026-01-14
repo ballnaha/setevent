@@ -96,13 +96,13 @@ export default function ContactContent() {
     }
 
     return (
-        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh' }}>
+        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', overflow: 'hidden', pb: 10 }}>
             {/* Hero Section */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-                overflow: 'hidden',
+
                 bgcolor: 'var(--background)'
             }}>
                 {/* Background Decor - Teal/Emerald gradients */}
@@ -148,7 +148,8 @@ export default function ContactContent() {
                                 fontSize: { xs: '2.5rem', md: '4rem' },
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
-                                letterSpacing: '-1px'
+                                letterSpacing: '-1px',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             CONTACT<br />

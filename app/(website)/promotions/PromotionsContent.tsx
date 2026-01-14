@@ -303,15 +303,13 @@ export default function PromotionsContent() {
     };
 
     return (
-        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
-            {/* Hero Section */}
-            {/* Hero Section */}
+        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
             {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-                overflow: 'hidden'
+
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -355,7 +353,8 @@ export default function PromotionsContent() {
                                 fontSize: { xs: '2.5rem', md: '4.5rem' },
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
-                                letterSpacing: '-1px'
+                                letterSpacing: '-1px',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             EXCLUSIVE <br />
@@ -392,8 +391,27 @@ export default function PromotionsContent() {
                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
                         gap: 4
                     }}>
-                        {[1, 2, 3].map((i) => (
-                            <Skeleton key={i} variant="rounded" height={380} sx={{ borderRadius: 6 }} />
+                        {[1, 2, 3, 4, 5, 6].map((i) => (
+                            <Box key={i} sx={{ borderRadius: 6, overflow: 'hidden', bgcolor: 'rgba(128,128,128,0.05)', height: 380, position: 'relative' }}>
+                                <Skeleton variant="rectangular" height="100%" sx={{ bgcolor: 'rgba(128,128,128,0.1)' }} />
+                                <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2.5, zIndex: 2 }}>
+                                    <Skeleton variant="text" width="80%" height={40} sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+                                        <Box sx={{ flex: 1 }}>
+                                            <Skeleton variant="text" width="40%" height={24} sx={{ mb: 0.5, bgcolor: 'rgba(255,255,255,0.1)' }} />
+                                            <Skeleton variant="text" width="100%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.08)' }} />
+                                            <Skeleton variant="text" width="100%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.08)' }} />
+                                        </Box>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Skeleton variant="rounded" width={55} height={55} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.08)' }} />
+                                            <Skeleton variant="rounded" width={55} height={55} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.08)' }} />
+                                        </Box>
+                                    </Box>
+                                    <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: 1.5 }}>
+                                        <Skeleton variant="text" width="60%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+                                    </Box>
+                                </Box>
+                            </Box>
                         ))}
                     </Box>
                 ) : promotions.length === 0 ? (

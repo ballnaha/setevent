@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
     AppBar,
     Box,
@@ -20,10 +20,11 @@ import {
     Stack,
     Divider
 } from "@mui/material";
-import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Map1, Gift } from "iconsax-react";
+import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Moon, Map1, Gift } from "iconsax-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
+import { useTheme } from "next-themes";
 import { useMenuData } from "@/app/hooks/useMenuData";
 
 // ---- Data Structures ----
@@ -57,13 +58,17 @@ const DEFAULT_SETTINGS: ContactSettings = {
 };
 
 export default function Header() {
+    const { theme, setTheme, resolvedTheme } = useTheme();
+    const [mounted, setMounted] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+
     const [settings, setSettings] = useState<ContactSettings>(DEFAULT_SETTINGS);
 
     // Fetch product menu from database
     const { sections: productSections } = useMenuData();
 
-    React.useEffect(() => {
+    useEffect(() => {
+        setMounted(true);
         const fetchSettings = async () => {
             try {
                 const res = await fetch('/api/settings/contact');
@@ -115,7 +120,7 @@ export default function Header() {
 
     const pathname = usePathname();
     const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq");
-    const isDarkText = pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact";
+    const isDarkText = (pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact") && (mounted && resolvedTheme !== 'dark');
 
     // ---- Handlers ----
 
@@ -194,7 +199,7 @@ export default function Header() {
                         <ListItemButton
                             component={hasChildren ? "div" : Link}
                             href={hasChildren ? "#" : child.href}
-                            onClick={hasChildren ? (e) => handleMobileExpand(childId, e) : handleDrawerToggle}
+                            onClick={hasChildren ? (e: React.MouseEvent) => handleMobileExpand(childId, e) : handleDrawerToggle}
                             sx={{
                                 pl: 4 + (level * 2),
                                 py: 1.5,
@@ -378,15 +383,16 @@ export default function Header() {
         }}>
             {/* Sticky Header */}
             <Box sx={{
-                py: 3,
+                py: 2,
                 px: 2,
                 display: 'flex',
-                justifyContent: 'center',
+                justifyContent: 'space-between',
                 alignItems: 'center',
                 borderBottom: '1px solid rgba(255,255,255,0.1)',
                 flexShrink: 0
             }}>
-                <Link href="/" onClick={handleDrawerToggle} style={{ display: 'block', position: 'relative', width: '160px', height: '60px' }}>
+                <Box sx={{ width: 40 }} /> {/* Spacer */}
+                <Link href="/" onClick={handleDrawerToggle} style={{ display: 'block', position: 'relative', width: '140px', height: '50px' }}>
                     <Image
                         src="/images/logo_white.png"
                         alt="SetEvent Logo"
@@ -395,6 +401,16 @@ export default function Header() {
                         priority
                     />
                 </Link>
+                <IconButton
+                    onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                    sx={{ color: 'white' }}
+                >
+                    {mounted && resolvedTheme === 'dark' ? (
+                        <Sun1 size="24" variant="Bold" color="#FDB813" />
+                    ) : (
+                        <Moon size="24" variant="Bold" color="#4F46E5" />
+                    )}
+                </IconButton>
             </Box>
 
             {/* Scrollable Content Area */}
@@ -415,7 +431,7 @@ export default function Header() {
                             <React.Fragment key={item.label}>
                                 <ListItem disablePadding>
                                     <ListItemButton
-                                        onClick={hasChildren ? (e) => handleMobileExpand(itemId, e) : handleDrawerToggle}
+                                        onClick={hasChildren ? (e: React.MouseEvent) => handleMobileExpand(itemId, e) : handleDrawerToggle}
                                         component={hasChildren ? "div" : Link}
                                         href={hasChildren ? "#" : item.href}
                                         sx={{
@@ -679,11 +695,11 @@ export default function Header() {
                                                     mt: 2,
                                                     overflow: 'visible',
                                                     filter: 'drop-shadow(0px 30px 60px rgba(0,0,0,0.15))',
-                                                    bgcolor: 'rgba(255, 255, 255, 0.96)', // Slightly more opaque for premium feel
-                                                    backdropFilter: 'blur(40px)', // Heavier blur
-                                                    border: '1px solid rgba(255, 255, 255, 0.8)',
+                                                    bgcolor: 'var(--card-bg)', // Use CSS Variable
+                                                    backdropFilter: 'blur(40px)',
+                                                    border: '1px solid var(--border-color)', // Use CSS Variable
                                                     borderRadius: 2,
-                                                    minWidth: item.isMega ? 700 : 260, // Wider for mega menu
+                                                    minWidth: item.isMega ? 700 : 260,
                                                 },
                                             }}
                                             transformOrigin={{ horizontal: 'left', vertical: 'top' }}
@@ -706,8 +722,8 @@ export default function Header() {
                                                                 sx={{
                                                                     p: 4,
                                                                     flex: idx === 0 ? '1 1 auto' : '0 0 250px',
-                                                                    borderRight: idx !== (item.sections?.length ?? 0) - 1 ? '1px solid rgba(0,0,0,0.05)' : 'none',
-                                                                    bgcolor: idx === 0 ? 'transparent' : 'rgba(0,0,0,0.02)'
+                                                                    borderRight: idx !== (item.sections?.length ?? 0) - 1 ? '1px solid var(--border-color)' : 'none',
+                                                                    bgcolor: idx === 0 ? 'transparent' : 'rgba(128,128,128,0.02)'
                                                                 }}
                                                             >
                                                                 <Typography variant="overline" sx={{
@@ -732,9 +748,9 @@ export default function Header() {
                                                     {/* View All Link */}
                                                     <Box sx={{
                                                         p: 2,
-                                                        borderTop: '1px solid rgba(0,0,0,0.08)',
+                                                        borderTop: '1px solid var(--border-color)',
                                                         textAlign: 'center',
-                                                        bgcolor: 'rgba(0,0,0,0.02)'
+                                                        bgcolor: 'rgba(128,128,128,0.02)'
                                                     }}>
                                                         <Box
                                                             component={Link}
@@ -798,7 +814,26 @@ export default function Header() {
                     </Box>
 
                     {/* Right Action Area */}
-                    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: 'center', gap: 3 }}>
+                    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: 'center', gap: 2 }}>
+                        {/* Theme Toggle Button */}
+                        <IconButton
+                            onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                            sx={{
+                                color: isDarkText ? 'var(--foreground)' : 'white',
+                                transition: 'all 0.3s ease',
+                                '&:hover': {
+                                    bgcolor: 'rgba(128,128,128,0.1)',
+                                    transform: 'rotate(15deg)'
+                                }
+                            }}
+                        >
+                            {mounted && resolvedTheme === 'dark' ? (
+                                <Sun1 size="24" variant="Bold" color="#FDB813" />
+                            ) : (
+                                <Moon size="24" variant="Bold" color="#4F46E5" />
+                            )}
+                        </IconButton>
+
                         <Button
                             variant="outlined"
                             component="a"

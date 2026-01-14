@@ -3,6 +3,15 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --card-bg: #ffffff;
+  --border-color: rgba(0, 0, 0, 0.1);
+  --decor-cyan: rgba(0, 194, 203, 0.08);
+  --decor-ruby: rgba(233, 69, 96, 0.05);
+  --decor-emerald: rgba(10, 92, 90, 0.08);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  --text-glow: none;
+  --primary-glow: none;
+  --neon-glow: none;
   /* Premium & Luxury Palette */
   --primary: #0A5C5A;
   /* Deep Emerald / Teal - Professional & Stability */
@@ -23,17 +32,42 @@
   --font-sans: var(--font-comfortaa), var(--font-prompt), sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --primary: #14807D;
-    /* Slightly lighter Emerald for dark mode */
-    --secondary: #D94545;
-    /* Lighter Ruby */
-    --tertiary: #D4AF37;
-    /* Metallic Gold */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --card-bg: #141414;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --decor-cyan: rgba(0, 194, 203, 0.15);
+  --decor-ruby: rgba(233, 69, 96, 0.1);
+  --decor-emerald: rgba(10, 92, 90, 0.15);
+  --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --text-glow: 0 0 10px rgba(255, 255, 255, 0.2), 0 0 20px rgba(255, 255, 255, 0.1);
+  --primary-glow: 0 0 15px rgba(20, 128, 125, 0.5);
+  --neon-glow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--primary), 0 0 30px var(--primary), 0 0 40px var(--primary);
+  --primary: #14807D;
+  /* Slightly lighter Emerald for dark mode */
+  --secondary: #D94545;
+  /* Lighter Ruby */
+  --tertiary: #D4AF37;
+  /* Metallic Gold */
+}
+
+@keyframes neon-pulse {
+
+  0%,
+  100% {
+    text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px var(--primary), 0 0 30px var(--primary);
+    opacity: 1;
   }
+
+  50% {
+    text-shadow: 0 0 2px #fff, 0 0 5px #fff, 0 0 10px var(--primary), 0 0 15px var(--primary);
+    opacity: 0.85;
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 4s ease-in-out infinite;
 }
 
 body {
@@ -94,12 +128,10 @@ body {
   display: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  .logo-light {
-    display: none !important;
-  }
+.dark .logo-light {
+  display: none !important;
+}
 
-  .logo-dark {
-    display: block !important;
-  }
+.dark .logo-dark {
+  display: block !important;
 }

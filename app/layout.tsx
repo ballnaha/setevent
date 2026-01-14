@@ -6,6 +6,8 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import { Providers } from "./providers";
+import { ThemeProvider as NextThemeProvider } from "./theme-provider";
+
 
 const prompt = Prompt({
   variable: "--font-prompt",
@@ -98,12 +100,14 @@ export default function RootLayout({
       >
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || ''} />
         <Providers>
-          <AppRouterCacheProvider>
-            <ThemeProvider theme={theme}>
-              <CssBaseline />
-              {children}
-            </ThemeProvider>
-          </AppRouterCacheProvider>
+          <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <AppRouterCacheProvider>
+              <ThemeProvider theme={theme}>
+                <CssBaseline />
+                {children}
+              </ThemeProvider>
+            </AppRouterCacheProvider>
+          </NextThemeProvider>
         </Providers>
         <script
           type="application/ld+json"

@@ -54,13 +54,13 @@ export default function ProductsContent() {
     }, []);
 
     return (
-        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh' }}>
+        <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', overflow: 'hidden', pb: 10 }}>
             {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-                overflow: 'hidden'
+
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -104,7 +104,8 @@ export default function ProductsContent() {
                                 fontSize: { xs: '2.5rem', md: '4.5rem' },
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
-                                letterSpacing: '-1px'
+                                letterSpacing: '-1px',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             PRODUCTS <br />

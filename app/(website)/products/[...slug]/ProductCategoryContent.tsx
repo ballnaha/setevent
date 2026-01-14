@@ -661,7 +661,7 @@ export default function ProductCategoryContent() {
 
     if (loading) {
         return (
-            <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
+            <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
                 {/* Hero Skeleton - Light Theme */}
                 <Box sx={{
                     pt: { xs: 15, md: 22 },
@@ -715,15 +715,12 @@ export default function ProductCategoryContent() {
     const hasProducts = products && products.length > 0;
 
     return (
-        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10 }}>
-            {/* Hero Section - Same as Contact */}
-            {/* Hero Section - Same as Contact */}
+        <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
             {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-                overflow: 'hidden'
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -768,7 +765,8 @@ export default function ProductCategoryContent() {
                                 color: 'var(--foreground)',
                                 lineHeight: 1.1,
                                 letterSpacing: '-1px',
-                                textTransform: 'uppercase'
+                                textTransform: 'uppercase',
+                                textShadow: 'var(--text-glow)'
                             }}
                         >
                             {category.name}
