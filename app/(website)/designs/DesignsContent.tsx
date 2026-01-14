@@ -272,7 +272,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                             {selectedCategory !== "All" ? "ไม่พบดีไซน์ในหมวดหมู่นี้" : "ยังไม่มีดีไซน์ในขณะนี้"}
                         </Typography>
                         <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6 }}>
-                            {selectedCategory !== "All" ? "ลองเลือกหมวดหมู่户外อื่นๆ ดูนะคะ" : "ทีมงานกำลังออกแบบไอเดียใหม่ๆ มาให้ชม เร็วๆ นี้แน่นอนค่ะ"}
+                            {selectedCategory !== "All" ? "ลองเลือกหมวดหมู่อื่นๆ ดูนะคะ" : "ทีมงานกำลังออกแบบไอเดียใหม่ๆ มาให้ชม เร็วๆ นี้แน่นอนค่ะ"}
                         </Typography>
                         {selectedCategory !== "All" && (
                             <Button
@@ -307,7 +307,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         transform: 'translateY(-5px)',
                                         boxShadow: '0 12px 30px rgba(0,0,0,0.2)',
                                     },
-                                    '&:hover img': {
+                                    '&:hover .design-image': {
                                         transform: 'scale(1.1)',
                                     },
                                     '&:hover .overlay': {
@@ -319,6 +319,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
+                                        className="design-image"
                                         width={500}
                                         height={500}
                                         style={{
@@ -466,6 +467,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         fill
                                         style={{ objectFit: 'contain' }}
                                     />
+
                                     {/* Title Overlay */}
                                     <Box sx={{
                                         position: 'absolute',

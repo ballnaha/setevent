@@ -26,7 +26,9 @@ import {
     CircularProgress,
     Stack,
     InputAdornment,
-    Tooltip
+    Tooltip,
+    Checkbox,
+    FormControlLabel
 } from '@mui/material';
 import { Add, Edit2, Trash, Category as CategoryIcon, SearchNormal1, Image as ImageIcon, CloudPlus } from 'iconsax-react';
 import TopSnackbar from '@/components/ui/TopSnackbar';
@@ -85,6 +87,7 @@ function ProductsContent() {
     const [pendingDeleteImages, setPendingDeleteImages] = useState<string[]>([]); // Images to delete on save
     const [saving, setSaving] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
+    const [useWatermark, setUseWatermark] = useState(true);
 
     // State for image delete confirmation
     const [imageDeleteConfirm, setImageDeleteConfirm] = useState<{
@@ -196,6 +199,7 @@ function ProductsContent() {
         setPendingImages([]);
         setPendingDeleteImages([]);
         setDialogOpen(true);
+        if (!product) setUseWatermark(true); // Default to true for new products
     };
 
     // Store selected files locally with preview (NOT uploading yet) - supports multiple files
@@ -314,6 +318,7 @@ function ProductsContent() {
                     const uploadData = new FormData();
                     uploadData.append('file', pending.file);
                     uploadData.append('folder', folder);
+                    uploadData.append('watermark', useWatermark.toString());
 
                     const uploadRes = await fetch('/api/upload', {
                         method: 'POST',
@@ -620,6 +625,22 @@ function ProductsContent() {
                                         📷 {pendingImages.length} รูปรอ Upload (จะ Upload หลังกดบันทึก)
                                     </Typography>
                                 )}
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={useWatermark}
+                                            onChange={(e) => setUseWatermark(e.target.checked)}
+                                            color="primary"
+                                            size="small"
+                                        />
+                                    }
+                                    label={
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                                            ใส่ลายน้ำ
+                                        </Typography>
+                                    }
+                                    sx={{ ml: 2 }}
+                                />
                             </Box>
 
                             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>

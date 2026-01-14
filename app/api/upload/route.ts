@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
         const formData = await req.formData();
         const file = formData.get("file") as File;
         const folder = formData.get("folder") as string || "general";
+        const useWatermark = formData.get("watermark") === "true";
 
         if (!file) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
@@ -20,13 +21,64 @@ export async function POST(req: NextRequest) {
         let isWebP = false;
         if (file.type.startsWith("image/")) {
             try {
-                buffer = await sharp(buffer)
+                // 1. First resize the image
+                let pipeline = sharp(buffer)
                     .resize(1920, 1920, {
                         fit: 'inside',
                         withoutEnlargement: true
-                    })
+                    });
+
+                // Get intermediate buffer to calculate dimensions for watermark
+                let intermediateBuffer = await pipeline.toBuffer();
+
+                // 2. Apply Watermark if explicitly requested
+                if (useWatermark) {
+                    try {
+                        const metadata = await sharp(intermediateBuffer).metadata();
+                        const width = metadata.width || 1000;
+                        const height = metadata.height || 1000;
+
+                        const watermarkPath = path.join(process.cwd(), "public", "images", "logo_white.png");
+
+                        // Check if watermark exists
+                        await fs.access(watermarkPath);
+
+                        // Resize watermark to 15% of image width
+                        const wmWidth = Math.max(Math.round(width * 0.15), 100); // Min 100px
+
+                        const watermarkBuffer = await sharp(watermarkPath)
+                            .resize(wmWidth)
+                            .toBuffer();
+
+                        const wmMetadata = await sharp(watermarkBuffer).metadata();
+                        const wmHeight = wmMetadata.height || 50;
+
+                        // Calculate position (bottom-right with padding)
+                        const padding = Math.round(width * 0.02); // 2% padding
+                        const left = width - wmWidth - padding;
+                        const top = height - wmHeight - padding;
+
+                        // Apply watermark
+                        intermediateBuffer = await sharp(intermediateBuffer)
+                            .composite([{
+                                input: watermarkBuffer,
+                                top: Math.max(0, top),
+                                left: Math.max(0, left),
+                                blend: 'over'
+                            }])
+                            .toBuffer();
+
+                    } catch (wmError) {
+                        console.error("Watermarking failed, proceeding with original:", wmError);
+                        // If watermark fails, we just continue with intermediateBuffer (the resized image)
+                    }
+                }
+
+                // 3. Final WebP conversion
+                buffer = await sharp(intermediateBuffer)
                     .webp({ quality: 80 })
                     .toBuffer();
+
                 isWebP = true;
             } catch (err) {
                 console.error("Image processing error:", err);

@@ -28,7 +28,9 @@ import {
     Select,
     SelectChangeEvent,
     Tabs,
-    Tab
+    Tab,
+    Checkbox,
+    FormControlLabel
 } from "@mui/material";
 import { Add, Edit, Trash, Gallery, CloseCircle, Eye, Heart } from "iconsax-react";
 
@@ -65,6 +67,7 @@ export default function PortfolioAdminPage() {
     const [activeTab, setActiveTab] = useState<string>("All");
     const [customCategory, setCustomCategory] = useState<string>("");
     const [showCustomInput, setShowCustomInput] = useState(false);
+    const [useWatermark, setUseWatermark] = useState(true);
 
     // Delete Confirmation State
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -144,6 +147,7 @@ export default function PortfolioAdminPage() {
         }
         setCustomCategory("");
         setShowCustomInput(false);
+        setUseWatermark(true);
         // Reset file selection
         setSelectedFile(null);
         setPreviewUrl(null);
@@ -190,6 +194,7 @@ export default function PortfolioAdminPage() {
                 const uploadFormData = new FormData();
                 uploadFormData.append("file", selectedFile);
                 uploadFormData.append("folder", "portfolio");
+                uploadFormData.append("watermark", useWatermark.toString());
 
                 const uploadRes = await fetch("/api/upload", {
                     method: "POST",
@@ -518,6 +523,21 @@ export default function PortfolioAdminPage() {
                                     </Box>
                                 )}
                             </Box>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        checked={useWatermark}
+                                        onChange={(e) => setUseWatermark(e.target.checked)}
+                                        color="primary"
+                                    />
+                                }
+                                label={
+                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
+                                        ใส่ลายน้ำ (Watermark)
+                                    </Typography>
+                                }
+                                sx={{ mt: 1 }}
+                            />
                         </Box>
 
                         {/* Fields Column */}
