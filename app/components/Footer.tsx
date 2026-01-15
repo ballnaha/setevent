@@ -407,7 +407,7 @@ export default function Footer() {
                                 นโยบายความเป็นส่วนตัว
                             </Typography>
                         </Link>
-                        <Link href="/contact" style={{ textDecoration: 'none' }}>
+                        <Link href="/terms-of-service" style={{ textDecoration: 'none' }}>
                             <Typography sx={{ color: "rgba(255,255,255,0.4)", fontSize: '0.875rem', fontFamily: "var(--font-prompt)", '&:hover': { color: 'white' } }}>
                                 เงื่อนไขการใช้บริการ
                             </Typography>

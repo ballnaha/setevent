@@ -45,11 +45,6 @@ import { FreeMode } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/free-mode';
 
-interface SalesUser {
-    id: string;
-    name: string | null;
-    email: string | null;
-}
 
 interface Customer {
     id: string;
@@ -59,10 +54,8 @@ interface Customer {
     phone: string | null;
     email: string | null;
     companyName: string | null;
-    salesId: string | null;
     status: string;
     createdAt: string;
-    sales: SalesUser | null;
     _count: {
         events: number;
     };
@@ -80,7 +73,6 @@ export default function CustomersPage() {
 
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
-    const [salesUsers, setSalesUsers] = useState<SalesUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -88,14 +80,13 @@ export default function CustomersPage() {
     // Edit Dialog State
     const [editDialogOpen, setEditDialogOpen] = useState(false);
     const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
-    const [formData, setFormData] = useState({ displayName: '', companyName: '', phone: '', email: '', status: 'new', salesId: '' });
+    const [formData, setFormData] = useState({ displayName: '', companyName: '', phone: '', email: '', status: 'new' });
     const [saving, setSaving] = useState(false);
     const [syncing, setSyncing] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' | 'info' });
 
     useEffect(() => {
         fetchCustomers();
-        fetchSalesUsers();
     }, []);
 
     async function handleSyncLine() {
@@ -153,16 +144,6 @@ export default function CustomersPage() {
         }
     }
 
-    async function fetchSalesUsers() {
-        try {
-            const res = await fetch('/api/admin/users');
-            const data = await res.json();
-            // Filter only sales users
-            setSalesUsers(data.filter((u: any) => u.role === 'sales' || u.role === 'admin'));
-        } catch (error) {
-            console.error('Error fetching sales users:', error);
-        }
-    }
 
     function handleOpenEdit(customer: Customer) {
         setEditingCustomer(customer);
@@ -172,7 +153,6 @@ export default function CustomersPage() {
             phone: customer.phone || '',
             email: customer.email || '',
             status: customer.status,
-            salesId: customer.salesId || '',
         });
         setEditDialogOpen(true);
     }
@@ -180,7 +160,7 @@ export default function CustomersPage() {
     function handleCloseEdit() {
         setEditDialogOpen(false);
         setEditingCustomer(null);
-        setFormData({ displayName: '', companyName: '', phone: '', email: '', status: 'new', salesId: '' });
+        setFormData({ displayName: '', companyName: '', phone: '', email: '', status: 'new' });
     }
 
     async function handleSave() {
@@ -403,7 +383,6 @@ export default function CustomersPage() {
                                     <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>บริษัท/องค์กร</TableCell>
                                     <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>ติดต่อ</TableCell>
                                     <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>สถานะ</TableCell>
-                                    <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>Sales ที่ดูแล</TableCell>
                                     <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>จำนวนงาน</TableCell>
                                     <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>วันที่เพิ่ม</TableCell>
                                     <TableCell align="right" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>จัดการ</TableCell>
@@ -471,22 +450,6 @@ export default function CustomersPage() {
                                                         color: statusLabels[customer.status]?.color || '#666',
                                                     }}
                                                 />
-                                            </TableCell>
-                                            <TableCell>
-                                                {customer.sales ? (
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <Avatar sx={{ width: 24, height: 24, fontSize: '0.7rem', bgcolor: '#F59E0B' }}>
-                                                            {customer.sales.name?.charAt(0) || 'S'}
-                                                        </Avatar>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
-                                                            {customer.sales.name || customer.sales.email}
-                                                        </Typography>
-                                                    </Box>
-                                                ) : (
-                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: '#ccc' }}>
-                                                        ยังไม่มอบหมาย
-                                                    </Typography>
-                                                )}
                                             </TableCell>
                                             <TableCell>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -642,19 +605,7 @@ export default function CustomersPage() {
 
                                         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <Typography sx={{ fontSize: '0.75rem', color: '#999' }}>ดูแลโดย:</Typography>
-                                                {customer.sales ? (
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Avatar sx={{ width: 20, height: 20, fontSize: '0.6rem', bgcolor: '#F59E0B' }}>
-                                                            {customer.sales.name?.charAt(0) || 'S'}
-                                                        </Avatar>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem', fontWeight: 500 }}>
-                                                            {customer.sales.name?.split(' ')[0]}
-                                                        </Typography>
-                                                    </Box>
-                                                ) : (
-                                                    <Typography sx={{ fontSize: '0.8rem', color: '#ccc' }}>-</Typography>
-                                                )}
+                                                <Typography sx={{ fontSize: '0.75rem', color: '#999' }}>ลูกค้าของ LINE OA</Typography>
                                             </Box>
                                             <Typography sx={{ fontSize: '0.75rem', color: '#bbb' }}>
                                                 {new Date(customer.createdAt).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' })}
@@ -776,33 +727,6 @@ export default function CustomersPage() {
                                                         bgcolor: config.color
                                                     }} />
                                                     <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>{config.label}</Typography>
-                                                </Box>
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <FormControl fullWidth>
-                                    <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>Sales ที่ดูแล</InputLabel>
-                                    <Select
-                                        value={formData.salesId}
-                                        label="Sales ที่ดูแล"
-                                        onChange={(e) => setFormData({ ...formData, salesId: e.target.value })}
-                                        sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
-                                    >
-                                        <MenuItem value="">
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#999' }}>
-                                                ยังไม่มอบหมาย
-                                            </Typography>
-                                        </MenuItem>
-                                        {salesUsers.map((sales) => (
-                                            <MenuItem key={sales.id} value={sales.id}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Avatar sx={{ width: 24, height: 24, fontSize: '0.75rem', bgcolor: '#F59E0B' }}>
-                                                        {sales.name?.charAt(0) || 'S'}
-                                                    </Avatar>
-                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>
-                                                        {sales.name || sales.email}
-                                                    </Typography>
                                                 </Box>
                                             </MenuItem>
                                         ))}

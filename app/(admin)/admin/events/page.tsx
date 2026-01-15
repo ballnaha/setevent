@@ -62,6 +62,16 @@ interface Event {
         companyName: string | null;
         pictureUrl: string | null;
     };
+    sales: {
+        id: string;
+        name: string | null;
+    } | null;
+}
+
+interface Staff {
+    id: string;
+    name: string | null;
+    role: string;
 }
 
 interface Customer {
@@ -96,6 +106,8 @@ export default function EventsPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [fetchingCustomers, setFetchingCustomers] = useState(false);
+    const [staffs, setStaffs] = useState<Staff[]>([]);
+    const [fetchingStaffs, setFetchingStaffs] = useState(false);
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [showFilters, setShowFilters] = useState(false); // Mobile filter toggle
@@ -106,6 +118,7 @@ export default function EventsPage() {
     const [eventDate, setEventDate] = useState<Dayjs | null>(null);
     const [venue, setVenue] = useState('');
     const [status, setStatus] = useState('draft');
+    const [salesId, setSalesId] = useState('');
     const [description, setDescription] = useState('');
     const [notes, setNotes] = useState('');
 
@@ -123,9 +136,15 @@ export default function EventsPage() {
         try {
             const res = await fetch('/api/admin/events');
             const data = await res.json();
-            setEvents(data);
+            if (Array.isArray(data)) {
+                setEvents(data);
+            } else {
+                console.warn('API response is not an array:', data);
+                setEvents([]);
+            }
         } catch (error) {
             console.error('Error fetching events:', error);
+            setEvents([]);
         } finally {
             setLoading(false);
         }
@@ -145,8 +164,27 @@ export default function EventsPage() {
         }
     }
 
+    async function fetchStaffs() {
+        if (staffs.length > 0) return;
+        setFetchingStaffs(true);
+        try {
+            const res = await fetch('/api/admin/users');
+            const data = await res.json();
+            // Filter only sales and admins who can manage events
+            setStaffs(data.filter((u: any) => u.role === 'sales' || u.role === 'admin'));
+        } catch (error) {
+            console.error('Failed to fetch staffs', error);
+        } finally {
+            setFetchingStaffs(false);
+        }
+    }
+
     function filterEvents() {
-        let result = events;
+        if (!Array.isArray(events)) {
+            setFilteredEvents([]);
+            return;
+        }
+        let result = [...events];
 
         if (search) {
             const searchLower = search.toLowerCase();
@@ -174,10 +212,11 @@ export default function EventsPage() {
 
     const handleOpenDialog = () => {
         fetchCustomers();
+        fetchStaffs();
         setSelectedEvent(null);
         setEventName('');
         setCustomerId('');
-        setEventDate(null);
+        setSalesId('');
         setEventDate(null);
         setVenue('');
         setStatus('draft');
@@ -188,9 +227,11 @@ export default function EventsPage() {
 
     const handleEditEvent = (event: Event) => {
         fetchCustomers();
+        fetchStaffs();
         setSelectedEvent(event);
         setEventName(event.eventName);
         setCustomerId(event.customer.id);
+        setSalesId(event.sales?.id || '');
         setEventDate(event.eventDate ? dayjs(event.eventDate) : null);
         setVenue(event.venue || '');
         setStatus(event.status || 'draft');
@@ -224,6 +265,7 @@ export default function EventsPage() {
             const payload = {
                 eventName,
                 customerId,
+                salesId: salesId || null,
                 eventDate: eventDate ? eventDate.toISOString() : null,
                 venue,
                 status,
@@ -571,6 +613,7 @@ export default function EventsPage() {
                             <TableRow sx={{ bgcolor: 'rgba(0,0,0,0.02)' }}>
                                 <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>งาน</TableCell>
                                 <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>ลูกค้า</TableCell>
+                                <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>ผู้ดูแล (Sales)</TableCell>
                                 <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>วันที่จัดงาน</TableCell>
                                 <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>สถานที่</TableCell>
                                 <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>สถานะ</TableCell>
@@ -605,6 +648,11 @@ export default function EventsPage() {
                                                 )}
                                             </Typography>
                                         </Box>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: event.sales ? '#1a1a1a' : '#999' }}>
+                                            {event.sales?.name || 'ไม่ระบุ'}
+                                        </Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -924,9 +972,33 @@ export default function EventsPage() {
                             </Box>
                         </Box>
 
-
-
                         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
+                            <Box sx={{ flex: 1 }}>
+                                <FormControl fullWidth>
+                                    <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>ผู้ดูแล (Sales)</InputLabel>
+                                    <Select
+                                        value={salesId}
+                                        label="ผู้ดูแล (Sales)"
+                                        onChange={(e) => setSalesId(e.target.value)}
+                                        sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
+                                        disabled={fetchingStaffs}
+                                        startAdornment={
+                                            <InputAdornment position="start" sx={{ ml: 1 }}>
+                                                <User size={20} color="#999" />
+                                            </InputAdornment>
+                                        }
+                                    >
+                                        <MenuItem value="" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                            <em>ไม่ระบุผู้ดูแล</em>
+                                        </MenuItem>
+                                        {staffs.map((s) => (
+                                            <MenuItem key={s.id} value={s.id} sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                                {s.name} ({s.role === 'admin' ? 'Admin' : 'Sales'})
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Box>
                             <Box sx={{ flex: 1 }}>
                                 <TextField
                                     label="สถานที่จัดงาน"
@@ -944,12 +1016,14 @@ export default function EventsPage() {
                                     InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                                 />
                             </Box>
+                        </Box>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
                             <Box sx={{ flex: 1 }}>
                                 <FormControl fullWidth>
-                                    <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>สถานะ</InputLabel>
+                                    <InputLabel sx={{ fontFamily: 'var(--font-prompt)' }}>สถานะงาน</InputLabel>
                                     <Select
                                         value={status}
-                                        label="สถานะ"
+                                        label="สถานะงาน"
                                         onChange={(e) => setStatus(e.target.value)}
                                         sx={{ fontFamily: 'var(--font-prompt)', borderRadius: 2 }}
                                         disabled={!selectedEvent}
@@ -974,6 +1048,7 @@ export default function EventsPage() {
                                     </Select>
                                 </FormControl>
                             </Box>
+                            <Box sx={{ flex: 1 }} />
                         </Box>
 
                         <Box>

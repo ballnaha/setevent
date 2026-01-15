@@ -39,10 +39,6 @@ export async function GET(
             return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
         }
 
-        // Check if sales is allowed to see this customer
-        if (currentUser.role === 'sales' && customer.salesId !== currentUser.id) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
 
         return NextResponse.json(customer);
     } catch (error) {
@@ -64,7 +60,7 @@ export async function PATCH(
 
         const { id } = await params;
         const body = await request.json();
-        const { displayName, companyName, phone, email, status, salesId } = body;
+        const { displayName, companyName, phone, email, status } = body;
 
         // Get user for role check
         const currentUser = await prisma.user.findUnique({
@@ -82,10 +78,6 @@ export async function PATCH(
             return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
         }
 
-        // Check if sales is allowed to update this customer
-        if (currentUser.role === 'sales' && existingCustomer.salesId !== currentUser.id) {
-            return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-        }
 
         // Build update data
         const updateData: any = {};
@@ -94,10 +86,6 @@ export async function PATCH(
         if (phone !== undefined) updateData.phone = phone;
         if (email !== undefined) updateData.email = email;
 
-        // Sales cannot reassign themselves or others unless they are admin
-        if (currentUser.role === 'admin' && salesId !== undefined) {
-            updateData.salesId = salesId || null;
-        }
 
         if (status !== undefined) {
             const validStatuses = ['new', 'pending', 'active'];
@@ -113,13 +101,6 @@ export async function PATCH(
                 _count: {
                     select: { events: true },
                 },
-                sales: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    }
-                }
             },
         });
 

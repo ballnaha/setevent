@@ -59,7 +59,7 @@ model User {
   status        String    @default("active") // active, disabled
   accounts      Account[]
   sessions      Session[]
-  customers     Customer[] // ลูกค้าที่ดูแล (sales)
+  events        Event[]    // งานที่ดูแล (sales)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 }
@@ -74,13 +74,11 @@ model Customer {
   email             String?
   companyName       String?
   status            String    @default("new") // new, pending, active
-  salesId           String?   // Sales ที่ดูแลลูกค้านี้
   lastActiveEventId String?   // Event ID ที่ลูกค้ากำลังคุยอยู่ล่าสุด (สำหรับ context)
   firstMessageAt    DateTime?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
-  sales         User?     @relation(fields: [salesId], references: [id], onDelete: SetNull)
   events        Event[]
   chatLogs      ChatLog[]
 }
@@ -101,6 +99,8 @@ model Event {
   updatedAt   DateTime @updatedAt
 
   customer    Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  sales       User?    @relation(fields: [salesId], references: [id], onDelete: SetNull)
+  salesId     String?
   bookings    Booking[]
   timelines   EventTimeline[]
   chatLogs    ChatLog[]

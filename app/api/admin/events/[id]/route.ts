@@ -8,18 +8,18 @@ async function checkEventAuth(eventId: string) {
     if (!session?.user) return { error: 'Unauthorized', status: 401 };
 
     const currentUser = await prisma.user.findUnique({
-        where: { email: session.user.email! },
+        where: { id: (session.user as any).id },
         select: { id: true, role: true }
     });
     if (!currentUser) return { error: 'User not found', status: 404 };
 
     const event = await prisma.event.findUnique({
         where: { id: eventId },
-        include: { customer: { select: { salesId: true } } }
-    });
+        select: { id: true, salesId: true }
+    }) as any;
     if (!event) return { error: 'Event not found', status: 404 };
 
-    if (currentUser.role === 'sales' && event.customer.salesId !== currentUser.id) {
+    if (currentUser.role === 'sales' && event.salesId !== currentUser.id) {
         return { error: 'Forbidden', status: 403 };
     }
 
@@ -75,21 +75,23 @@ export async function PUT(
         if (auth.error) return NextResponse.json({ error: auth.error }, { status: auth.status });
 
         const body = await request.json();
-        const { eventName, customerId, eventDate, venue, description, notes, status } = body;
+        const { eventName, customerId, salesId, eventDate, venue, description, notes, status } = body;
 
-        // If customer is being changed, verify access to new customer if sales
-        if (customerId && auth.user?.role === 'sales') {
-            const newCustomer = await prisma.customer.findUnique({ where: { id: customerId } });
-            if (!newCustomer || newCustomer.salesId !== auth.user.id) {
-                return NextResponse.json({ error: 'Forbidden change to another customer' }, { status: 403 });
-            }
+        // Validation for sales: Cannot change sales assigned to event if not admin
+        if (salesId !== undefined && auth.user?.role !== 'admin' && salesId !== auth.user?.id) {
+            return NextResponse.json({ error: 'Only admins can reassign sales' }, { status: 403 });
         }
+
+        // If customer is being changed, verify access to new customer if sales (Optional: based on your business logic)
+        // In the new logic, sales is linked to event, so they might handle events for any customer assigned to them.
+        // For now, let's keep it simple. Admin can change anything. Sales can update their own events.
 
         const updatedEvent = await prisma.event.update({
             where: { id },
             data: {
                 eventName,
                 customerId,
+                salesId,
                 eventDate: eventDate ? new Date(eventDate) : null,
                 venue,
                 description,

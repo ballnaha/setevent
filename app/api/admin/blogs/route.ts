@@ -48,7 +48,7 @@ export async function POST(request: Request) {
                 author: data.author || 'Admin',
                 category: data.category || 'General',
                 status: data.status || 'draft',
-                publishedAt: data.status === 'published' ? new Date() : null,
+                publishedAt: data.status === 'published' ? new Date() : undefined,
             },
         });
 

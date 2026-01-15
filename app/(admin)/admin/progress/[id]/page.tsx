@@ -35,7 +35,7 @@ import {
     Collapse,
     Menu
 } from '@mui/material';
-import { ArrowLeft, Trash, Image as ImageIcon, FolderOpen, User, Location, Calendar, Add, Minus, TickCircle, ArrowDown2 } from 'iconsax-react';
+import { ArrowLeft, Trash, Image as ImageIcon, FolderOpen, User, Location, Calendar, Add, Minus, TickCircle, ArrowDown2, Instagram, Setting2, CloseCircle, MessageText, Chart, DirectRight, Flash, Play, StatusUp, Cup } from 'iconsax-react';
 import TopSnackbar from '@/components/ui/TopSnackbar';
 
 // Status Configuration
@@ -80,72 +80,87 @@ function StatusFlexPreview({ eventName, status, message, imageUrls, progress, se
             const d = new Date(eventDate);
             if (!isNaN(d.getTime())) {
                 formattedEventDate = d.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: 'numeric' });
-                const timePart = d.toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
-                if (timePart !== '00:00') {
-                    formattedEventDate += ` ${timePart}`;
-                }
             }
         } catch (e) { }
     }
 
     return (
         <Box sx={{ width: '100%', maxWidth: 350, mx: 'auto', pointerEvents: 'none', fontFamily: 'var(--font-prompt)' }}>
-            <Box sx={{ border: '1px solid #ddd', borderRadius: 2, overflow: 'hidden', bgcolor: '#fff', boxShadow: '0 4px 12px rgba(0,0,0,0.08)', mb: 2 }}>
-                {/* 1. Color Bar at Top */}
+            <Box sx={{ border: 'none', borderRadius: 3, overflow: 'hidden', bgcolor: '#fff', boxShadow: '0 12px 24px -4px rgba(0,0,0,0.1)', mb: 2 }}>
+                {/* 1. Header Line */}
                 <Box sx={{ height: 6, bgcolor: config.color }} />
 
-                {/* 2. Main Content Area */}
-                <Box sx={{ p: '20px' }}>
-                    {/* Header Row */}
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                        <Typography sx={{ color: config.color, fontWeight: 'bold', fontSize: '0.65rem', textTransform: 'uppercase' }}>{config.label}</Typography>
-                        <Typography sx={{ color: '#bbb', fontSize: '0.65rem' }}>{dateStr} {timeStr}</Typography>
+                <Box sx={{ p: 3 }}>
+                    {/* Top Row: Badge & Date */}
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                        {/* Status Badge */}
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.75,
+                            bgcolor: config.color,
+                            color: '#fff',
+                            pl: 1.5,
+                            pr: 2,
+                            py: 0.75,
+                            borderRadius: '20px',
+                            fontSize: '0.8rem',
+                            fontWeight: 600,
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.15)',
+                            transform: 'translateY(-5px)' // Slight lift for "floating" effect
+                        }}>
+                            {status === 'completed' ? <TickCircle size="16" variant="Bold" color="#fff" /> :
+                                (status === 'cancelled' ? <CloseCircle size="16" variant="Bold" color="#fff" /> :
+                                    <StatusUp size="16" variant="Bold" color="#fff" />)}
+                            {config.label}
+                        </Box>
+
+                        <Typography sx={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 500, pt: 0.5 }}>
+                            {dateStr} {timeStr}
+                        </Typography>
                     </Box>
 
                     {/* Title */}
-                    <Typography sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: '#1a1a1a', mb: 2, lineHeight: 1.3 }}>{eventName}</Typography>
+                    <Typography sx={{ fontWeight: 700, fontSize: '1.25rem', color: '#1e293b', mb: 2.5, lineHeight: 1.3 }}>
+                        {eventName}
+                    </Typography>
 
-                    {/* Details section (Date, Venue) */}
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2, bgcolor: '#f9fafb', p: 1.5, borderRadius: 2 }}>
-                        {formattedEventDate && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Calendar size="16" color="#666" variant="Bold" />
-                                <Typography sx={{ fontSize: '0.75rem', color: '#444' }}>{formattedEventDate}</Typography>
-                            </Box>
-                        )}
-                        {venue && (
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                <Location size="16" color="#666" variant="Bold" />
-                                <Typography sx={{ fontSize: '0.75rem', color: '#444' }}>{venue}</Typography>
-                            </Box>
-                        )}
+                    {/* Meta Box */}
+                    <Box sx={{ bgcolor: '#f8fafc', p: 2, borderRadius: 3, display: 'flex', flexDirection: 'column', gap: 1.5, mb: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Calendar size="20" color="#64748b" variant="Bold" />
+                            <Typography sx={{ fontSize: '0.9rem', color: '#334155', fontWeight: 500 }}>{formattedEventDate || 'ไม่ระบุวันที่'}</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Location size="20" color="#64748b" variant="Bold" />
+                            <Typography sx={{ fontSize: '0.9rem', color: '#334155', fontWeight: 500 }}>{venue || 'ไม่ระบุสถานที่'}</Typography>
+                        </Box>
                     </Box>
 
-                    {/* Progress */}
+                    {/* Progress Section */}
                     {progress !== undefined && (
-                        <Box sx={{ mb: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                <Typography sx={{ fontSize: '0.75rem', color: '#aaa', fontWeight: 'bold' }}>Progress</Typography>
-                                <Typography sx={{ fontSize: '0.75rem', color: progress === 100 ? '#10B981' : config.color, fontWeight: 'bold' }}>{progress}%</Typography>
+                        <Box sx={{ mb: 3 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1, alignItems: 'flex-end' }}>
+                                <Typography sx={{ fontSize: '0.9rem', color: '#64748b', fontWeight: 700 }}>Progress</Typography>
+                                <Typography sx={{ fontSize: '1.1rem', color: config.color, fontWeight: 800 }}>{progress}%</Typography>
                             </Box>
-                            <Box sx={{ width: '100%', height: 6, bgcolor: '#f0f0f0', borderRadius: 3, overflow: 'hidden' }}>
-                                <Box sx={{ width: `${progress}%`, height: '100%', bgcolor: progress === 100 ? '#10B981' : config.color, borderRadius: 3 }} />
+                            <Box sx={{ width: '100%', height: 10, bgcolor: '#f1f5f9', borderRadius: 5, overflow: 'hidden' }}>
+                                <Box sx={{ width: `${progress}%`, height: '100%', bgcolor: config.color, borderRadius: 5, boxShadow: `0 0 10px ${config.bgColor}` }} />
                             </Box>
                         </Box>
                     )}
 
-                    <Divider sx={{ my: 2, borderColor: '#f0f0f0' }} />
+                    <Divider sx={{ borderStyle: 'dashed', borderColor: '#e2e8f0', mb: 2.5 }} />
 
-                    {/* Message */}
+                    {/* Message & Content */}
                     {message && (
-                        <Typography sx={{ fontSize: '0.85rem', color: '#333', lineHeight: 1.6, mb: imageUrls.length > 0 ? 2 : 0 }}>{message}</Typography>
+                        <Typography sx={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.6, mb: imageUrls.length > 0 ? 2 : 0 }}>{message}</Typography>
                     )}
 
-                    {/* Images Grid */}
                     {imageUrls.length > 0 && (
-                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1 }}>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, mt: 2 }}>
                             {imageUrls.map((url, i) => (
-                                <Box key={i} sx={{ position: 'relative', paddingTop: '75%', borderRadius: 2, overflow: 'hidden', border: '1px solid #eee' }}>
+                                <Box key={i} sx={{ position: 'relative', paddingTop: '75%', borderRadius: 2, overflow: 'hidden', border: '1px solid #f1f5f9' }}>
                                     <img src={url} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </Box>
                             ))}
@@ -153,11 +168,9 @@ function StatusFlexPreview({ eventName, status, message, imageUrls, progress, se
                     )}
 
                     {/* Footer */}
-                    {senderName && (
-                        <Typography sx={{ fontSize: '0.6rem', color: '#ccc', textAlign: 'center', mt: 3 }}>
-                            Updated by {senderName}
-                        </Typography>
-                    )}
+                    <Typography sx={{ fontSize: '0.7rem', color: '#94a3b8', textAlign: 'center', mt: 3, fontWeight: 500 }}>
+                        Updated by {senderName}
+                    </Typography>
                 </Box>
             </Box>
         </Box>
@@ -177,6 +190,7 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
     // Form State
     const [sendMode, setSendMode] = useState<'status' | 'chat'>('status'); // 'status' or 'chat'
     const [newStatus, setNewStatus] = useState('in-progress');
+    const [confirmStatus, setConfirmStatus] = useState<string | null>(null);
     const [message, setMessage] = useState('');
     const [progress, setProgress] = useState(0);
     const [selectedImages, setSelectedImages] = useState<{ file: File, url: string }[]>([]);
@@ -457,268 +471,446 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 <Box sx={{ flex: { xs: '1 1 100%', md: 7 }, minWidth: 0 }}>
                     <Card sx={{ borderRadius: 3, boxShadow: '0 4px 20px rgba(0,0,0,0.05)', mb: 3 }}>
                         <CardContent sx={{ p: { xs: 1.5, md: 3 } }}>
-                            {/* Custom Tab Header */}
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: { xs: 2, md: 4 }, px: 0.5, borderBottom: '1px solid #f0f0f0', height: '56px' }}>
-                                <IconButton onClick={() => router.back()} size="small" sx={{ color: '#333' }}>
-                                    <ArrowLeft size="24" />
-                                </IconButton>
 
-                                <Box sx={{ display: 'flex', gap: { xs: 2, md: 4 }, height: '100%' }}>
+                            {/* Custom Tab Header - Segmented Pill Style */}
+                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: { xs: 3, md: 4 } }}>
+
+                                <Box sx={{
+                                    display: 'flex',
+                                    p: 0.5,
+                                    bgcolor: '#f1f5f9',
+                                    borderRadius: 3,
+                                    gap: 0.5
+                                }}>
                                     <Box
                                         onClick={() => setSendMode('status')}
                                         sx={{
+                                            px: 3,
+                                            py: 0.85,
+                                            borderRadius: 2.5,
                                             cursor: 'pointer',
-                                            fontWeight: sendMode === 'status' ? 700 : 500,
-                                            color: sendMode === 'status' ? '#1a1a1a' : '#aaa',
-                                            position: 'relative',
-                                            fontSize: { xs: '0.9rem', md: '1rem' },
-                                            height: '100%',
+                                            bgcolor: sendMode === 'status' ? '#fff' : 'transparent',
+                                            color: sendMode === 'status' ? '#0f172a' : '#64748b',
+                                            fontWeight: sendMode === 'status' ? 600 : 500,
+                                            fontSize: '0.9rem',
+                                            fontFamily: 'var(--font-prompt)',
+                                            boxShadow: sendMode === 'status' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                                            transition: 'all 0.2s ease-in-out',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            transition: 'all 0.3s',
-                                            '&:after': {
-                                                content: '""',
-                                                position: 'absolute',
-                                                bottom: 0,
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                width: sendMode === 'status' ? '100%' : '0%',
-                                                height: 3,
-                                                bgcolor: '#1a1a1a',
-                                                borderRadius: '10px 10px 0 0',
-                                                transition: 'all 0.3s'
+                                            gap: 1,
+                                            '&:hover': {
+                                                color: '#0f172a'
                                             }
                                         }}
                                     >
-                                        Update Status
+                                        <Setting2 size="16" variant={sendMode === 'status' ? 'Bold' : 'Linear'} color="#0f172a" />
+                                        อัพเดทสถานะ
                                     </Box>
                                     <Box
                                         onClick={() => setSendMode('chat')}
                                         sx={{
+                                            px: 3,
+                                            py: 0.85,
+                                            borderRadius: 2.5,
                                             cursor: 'pointer',
-                                            fontWeight: sendMode === 'chat' ? 700 : 500,
-                                            color: sendMode === 'chat' ? '#1a1a1a' : '#aaa',
-                                            position: 'relative',
-                                            fontSize: { xs: '0.9rem', md: '1rem' },
-                                            height: '100%',
+                                            bgcolor: sendMode === 'chat' ? '#fff' : 'transparent',
+                                            color: sendMode === 'chat' ? '#0f172a' : '#64748b',
+                                            fontWeight: sendMode === 'chat' ? 600 : 500,
+                                            fontSize: '0.9rem',
+                                            fontFamily: 'var(--font-prompt)',
+                                            boxShadow: sendMode === 'chat' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                                            transition: 'all 0.2s ease-in-out',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            transition: 'all 0.3s',
-                                            '&:after': {
-                                                content: '""',
-                                                position: 'absolute',
-                                                bottom: 0,
-                                                left: '50%',
-                                                transform: 'translateX(-50%)',
-                                                width: sendMode === 'chat' ? '100%' : '0%',
-                                                height: 3,
-                                                bgcolor: '#1a1a1a',
-                                                borderRadius: '10px 10px 0 0',
-                                                transition: 'all 0.3s'
+                                            gap: 1,
+                                            '&:hover': {
+                                                color: '#0f172a'
                                             }
                                         }}
                                     >
-                                        Chat
+                                        <MessageText size="16" variant={sendMode === 'chat' ? 'Bold' : 'Linear'} color="#0f172a" />
+                                        แชท
                                     </Box>
                                 </Box>
 
-                                <Box sx={{ width: 24 }} /> {/* Spacer to balance Back button */}
+                                <Box sx={{ width: 36 }} /> {/* Spacer */}
                             </Box>
 
-                            {/* Section: Status & Progress */}
+                            {/* Section: Status & Progress - Modern Card Design */}
                             {sendMode === 'status' && (
-                                <CollapsibleSection title="Status & Progress">
-                                    <Box sx={{ mb: 4 }}>
-                                        {/* Status Select as Chips/Cards */}
-                                        <Box sx={{ display: 'flex', gap: 1.5, mb: 4, overflowX: 'auto', p: 1, '::-webkit-scrollbar': { display: 'none' } }}>
-                                            {Object.entries(statusLabels).filter(([k]) => k === 'in-progress' || k === 'draft').map(([key, val]) => {
-                                                const isSelected = newStatus === key;
-                                                return (
-                                                    <Box
-                                                        key={key}
-                                                        onClick={() => setNewStatus(key)}
-                                                        sx={{
-                                                            minWidth: 'auto',
-                                                            px: { xs: 1.5, md: 2.5 },
-                                                            py: 1.5,
-                                                            borderRadius: 2,
-                                                            bgcolor: isSelected ? val.bgColor : '#f9f9f9',
-                                                            border: `1px solid ${isSelected ? val.color : '#eee'}`,
-                                                            color: isSelected ? val.color : '#888',
-                                                            cursor: 'pointer',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 1,
-                                                            transition: 'all 0.2s',
-                                                            boxShadow: isSelected ? `0 4px 12px ${val.bgColor}` : 'none',
-                                                            '&:hover': { transform: 'translateY(-2px)' }
-                                                        }}
-                                                    >
-                                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: val.color }} />
-                                                        <Typography sx={{ fontWeight: 600, fontSize: '0.85rem', fontFamily: 'var(--font-prompt)' }}>{val.label}</Typography>
-                                                    </Box>
-                                                );
-                                            })}
-
-                                            <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-
-                                            {/* Critical Statuses - Dropdown Menu Trigger */}
+                                <CollapsibleSection title="สถานะงาน">
+                                    <Box sx={{ mb: 3 }}>
+                                        {/* Status Cards - Refined for Safety */}
+                                        <Box sx={{
+                                            display: 'grid',
+                                            gridTemplateColumns: { xs: '1.2fr 1fr 1fr', md: '1.2fr 1fr 1fr' },
+                                            gap: 1.25,
+                                            mb: 3
+                                        }}>
+                                            {/* In Progress Card - Main Choice */}
                                             <Box
-                                                onClick={(e) => setStatusMenuAnchor(e.currentTarget)}
+                                                onClick={() => {
+                                                    setNewStatus('in-progress');
+                                                    setConfirmStatus(null);
+                                                }}
                                                 sx={{
-                                                    minWidth: 'auto',
-                                                    px: { xs: 1.5, md: 2 },
-                                                    py: 1.5,
-                                                    borderRadius: 2,
-                                                    bgcolor: (newStatus === 'completed' || newStatus === 'cancelled') ? statusLabels[newStatus]?.bgColor : '#fff',
-                                                    border: (newStatus === 'completed' || newStatus === 'cancelled') ? `1px solid ${statusLabels[newStatus]?.color}` : '1px dashed #ccc',
-                                                    color: (newStatus === 'completed' || newStatus === 'cancelled') ? statusLabels[newStatus]?.color : '#666',
+                                                    p: { xs: 1.5, md: 2 },
+                                                    borderRadius: 4,
+                                                    bgcolor: '#fff',
+                                                    border: newStatus === 'in-progress' ? '2px solid #f59e0b' : '1px solid #f1f5f9',
                                                     cursor: 'pointer',
+                                                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     display: 'flex',
+                                                    flexDirection: 'column',
                                                     alignItems: 'center',
                                                     gap: 1,
-                                                    transition: 'all 0.2s',
-                                                    '&:hover': { bgcolor: '#f5f5f5', borderColor: '#bbb' }
+                                                    boxShadow: newStatus === 'in-progress' ? '0 8px 20px rgba(245, 158, 11, 0.15)' : 'none',
+                                                    '&:hover': { borderColor: '#f59e0b' }
                                                 }}
                                             >
-                                                {(newStatus === 'completed' || newStatus === 'cancelled') ? (
-                                                    <>
-                                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: statusLabels[newStatus]?.color }} />
-                                                        <Typography sx={{ fontWeight: 600, fontSize: '0.8rem', fontFamily: 'var(--font-prompt)' }}>{statusLabels[newStatus]?.label}</Typography>
-                                                    </>
-                                                ) : (
-                                                    <Typography sx={{ fontWeight: 500, fontSize: '0.8rem', fontFamily: 'var(--font-prompt)' }}>เปลี่ยนสถานะ...</Typography>
-                                                )}
-                                                <ArrowDown2 size="16" color="currentColor" />
+                                                <Box sx={{
+                                                    p: 1.25,
+                                                    borderRadius: '50%',
+                                                    bgcolor: newStatus === 'in-progress' ? '#fffbeb' : '#f8fafc',
+                                                }}>
+                                                    <Setting2 size="24" variant={newStatus === 'in-progress' ? 'Bold' : 'Linear'} color={newStatus === 'in-progress' ? '#d97706' : '#cbd5e1'} />
+                                                </Box>
+                                                <Typography sx={{
+                                                    fontSize: '0.8rem',
+                                                    fontWeight: newStatus === 'in-progress' ? 700 : 500,
+                                                    color: newStatus === 'in-progress' ? '#1e293b' : '#64748b',
+                                                    textAlign: 'center',
+                                                    fontFamily: 'var(--font-prompt)'
+                                                }}>
+                                                    กำลังดำเนินการ
+                                                </Typography>
                                             </Box>
 
-                                            <Menu
-                                                anchorEl={statusMenuAnchor}
-                                                open={Boolean(statusMenuAnchor)}
-                                                onClose={() => setStatusMenuAnchor(null)}
-                                                PaperProps={{
-                                                    sx: {
-                                                        mt: 1,
-                                                        borderRadius: 2,
-                                                        boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-                                                        minWidth: 160
-                                                    }
+                                            {/* Completed Card - Simple Selection */}
+                                            <Box
+                                                onClick={() => {
+                                                    setNewStatus('completed');
+                                                    setConfirmStatus(null);
+                                                }}
+                                                sx={{
+                                                    p: { xs: 1.25, md: 1.5 },
+                                                    borderRadius: 4,
+                                                    bgcolor: '#fff',
+                                                    border: newStatus === 'completed' ? '2px solid #10b981' : '1px solid #f1f5f9',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                    boxShadow: newStatus === 'completed' ? '0 8px 20px rgba(16, 185, 129, 0.15)' : 'none',
+                                                    opacity: newStatus === 'completed' ? 1 : 0.8,
+                                                    '&:hover': { borderColor: '#10b981', opacity: 1 }
                                                 }}
                                             >
-                                                {Object.entries(statusLabels).filter(([k]) => k === 'completed' || k === 'cancelled').map(([key, val]) => (
-                                                    <MenuItem
-                                                        key={key}
-                                                        onClick={() => { setNewStatus(key); setStatusMenuAnchor(null); }}
-                                                        sx={{ fontFamily: 'var(--font-prompt)', gap: 1.5, py: 1.5 }}
-                                                    >
-                                                        <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: val.color }} />
-                                                        {val.label}
-                                                    </MenuItem>
-                                                ))}
-                                            </Menu>
+                                                <Box sx={{
+                                                    p: 1,
+                                                    borderRadius: '50%',
+                                                    bgcolor: newStatus === 'completed' ? '#dcfce7' : '#f8fafc',
+                                                }}>
+                                                    <TickCircle size="22" variant={newStatus === 'completed' ? 'Bold' : 'Linear'} color={newStatus === 'completed' ? '#059669' : '#cbd5e1'} />
+                                                </Box>
+                                                <Typography sx={{
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: newStatus === 'completed' ? 700 : 500,
+                                                    color: newStatus === 'completed' ? '#1e293b' : '#64748b',
+                                                    textAlign: 'center',
+                                                    fontFamily: 'var(--font-prompt)'
+                                                }}>
+                                                    ปิดงาน
+                                                </Typography>
+                                            </Box>
+
+                                            {/* Cancelled Card - Simple Selection */}
+                                            <Box
+                                                onClick={() => {
+                                                    setNewStatus('cancelled');
+                                                    setConfirmStatus(null);
+                                                }}
+                                                sx={{
+                                                    p: { xs: 1.25, md: 1.5 },
+                                                    borderRadius: 4,
+                                                    bgcolor: '#fff',
+                                                    border: newStatus === 'cancelled' ? '2px solid #ef4444' : '1px solid #f1f5f9',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.2s',
+                                                    display: 'flex',
+                                                    flexDirection: 'column',
+                                                    alignItems: 'center',
+                                                    gap: 1,
+                                                    boxShadow: newStatus === 'cancelled' ? '0 8px 20px rgba(239, 68, 68, 0.15)' : 'none',
+                                                    opacity: newStatus === 'cancelled' ? 1 : 0.8,
+                                                    '&:hover': { borderColor: '#ef4444', opacity: 1 }
+                                                }}
+                                            >
+                                                <Box sx={{
+                                                    p: 1,
+                                                    borderRadius: '50%',
+                                                    bgcolor: newStatus === 'cancelled' ? '#fee2e2' : '#f8fafc',
+                                                }}>
+                                                    <CloseCircle size="22" variant={newStatus === 'cancelled' ? 'Bold' : 'Linear'} color={newStatus === 'cancelled' ? '#dc2626' : '#cbd5e1'} />
+                                                </Box>
+                                                <Typography sx={{
+                                                    fontSize: '0.75rem',
+                                                    fontWeight: newStatus === 'cancelled' ? 700 : 500,
+                                                    color: newStatus === 'cancelled' ? '#1e293b' : '#64748b',
+                                                    textAlign: 'center',
+                                                    fontFamily: 'var(--font-prompt)'
+                                                }}>
+                                                    ยกเลิก
+                                                </Typography>
+                                            </Box>
                                         </Box>
 
-                                        {/* Progress Slider */}
+                                        {/* Progress Selection - Easy Click Buttons for Mobile */}
                                         {newStatus === 'in-progress' && (
-                                            <Box sx={{ px: 1 }}>
-                                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                                                    <Typography sx={{ fontWeight: 600, color: '#1a1a1a' }}>Progress</Typography>
-                                                    <Typography sx={{ fontWeight: 700, color: 'var(--primary)' }}>{progress}%</Typography>
+                                            <Box sx={{ mt: 4 }}>
+                                                <Typography sx={{
+                                                    fontWeight: 600,
+                                                    color: '#1e293b',
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    mb: 2.5,
+                                                    fontSize: '0.95rem',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: 1
+                                                }}>
+                                                    <Chart size="20" variant="Bold" color="#f59e0b" />
+                                                    ระบุความคืบหน้า
+                                                </Typography>
+
+                                                <Box sx={{
+                                                    display: 'grid',
+                                                    gridTemplateColumns: 'repeat(4, 1fr)',
+                                                    gap: 1.25
+                                                }}>
+                                                    {[0, 25, 50, 75, 100].map((val) => {
+                                                        const isSelected = progress === val;
+
+                                                        const steps: { [key: number]: { label: string, icon: any } } = {
+                                                            0: { label: 'เริ่ม', icon: Play },
+                                                            25: { label: '25%', icon: StatusUp },
+                                                            50: { label: '50%', icon: Flash },
+                                                            75: { label: '75%', icon: DirectRight },
+                                                            100: { label: 'เสร็จสิ้น (100%)', icon: Cup }
+                                                        };
+
+                                                        const stepConfig = {
+                                                            0: { c: '#f59e0b', b: 'rgba(245, 158, 11, 0.1)', s: 'rgba(245, 158, 11, 0.2)' },
+                                                            25: { c: '#eab308', b: 'rgba(234, 179, 8, 0.1)', s: 'rgba(234, 179, 8, 0.2)' },
+                                                            50: { c: '#84cc16', b: 'rgba(132, 204, 22, 0.1)', s: 'rgba(132, 204, 22, 0.2)' },
+                                                            75: { c: '#22c55e', b: 'rgba(34, 197, 94, 0.1)', s: 'rgba(34, 197, 94, 0.2)' },
+                                                            100: { c: '#10b981', b: 'rgba(16, 185, 129, 0.1)', s: 'rgba(16, 185, 129, 0.2)' }
+                                                        }[val as keyof typeof steps] || { c: '#f59e0b', b: 'rgba(245, 158, 11, 0.1)', s: 'rgba(245, 158, 11, 0.2)' };
+
+                                                        const color = stepConfig.c;
+                                                        const bgColor = stepConfig.b;
+                                                        const is100 = val === 100;
+
+                                                        const StepIcon = steps[val].icon;
+
+                                                        return (
+                                                            <Button
+                                                                key={val}
+                                                                onClick={() => setProgress(val)}
+                                                                sx={{
+                                                                    py: is100 ? 2 : 1.25,
+                                                                    px: 1,
+                                                                    borderRadius: 3,
+                                                                    border: '1.5px solid',
+                                                                    borderColor: isSelected ? color : '#f1f5f9',
+                                                                    bgcolor: isSelected ? bgColor : '#fff',
+                                                                    color: isSelected ? color : '#64748b',
+                                                                    fontFamily: 'var(--font-prompt)',
+                                                                    fontWeight: isSelected ? 700 : 500,
+                                                                    fontSize: is100 ? '0.9rem' : '0.8rem',
+                                                                    transition: 'all 0.2s',
+                                                                    flexDirection: is100 ? 'row' : 'column',
+                                                                    gap: is100 ? 1.5 : 0.5,
+                                                                    gridColumn: is100 ? 'span 4' : 'span 1',
+                                                                    boxShadow: isSelected ? `0 8px 16px ${stepConfig.s}` : 'none',
+                                                                    '&:hover': {
+                                                                        borderColor: color,
+                                                                        bgcolor: bgColor,
+                                                                    },
+                                                                    '&:active': {
+                                                                        transform: 'scale(0.98)'
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <StepIcon size={is100 ? "24" : "20"} variant={isSelected ? 'Bold' : 'Linear'} color={isSelected ? color : '#cbd5e1'} />
+                                                                {steps[val].label}
+                                                            </Button>
+                                                        );
+                                                    })}
                                                 </Box>
-                                                <Slider
-                                                    value={progress}
-                                                    onChange={(_, val) => setProgress(val as number)}
-                                                    valueLabelDisplay="off"
-                                                    step={10}
-                                                    min={0}
-                                                    max={100}
-                                                    sx={{
-                                                        color: 'var(--primary)',
-                                                        height: 6,
-                                                        '& .MuiSlider-thumb': {
-                                                            width: 20,
-                                                            height: 20,
-                                                            bgcolor: 'white',
-                                                            border: '3px solid currentColor',
-                                                            '&:focus, &:hover, &.Mui-active': {
-                                                                boxShadow: '0 0 0 8px rgba(0, 194, 203, 0.16)',
-                                                            },
-                                                        },
-                                                        '& .MuiSlider-rail': {
-                                                            bgcolor: '#e0e0e0',
-                                                            opacity: 1
-                                                        }
-                                                    }}
-                                                />
+
+                                                <Typography sx={{
+                                                    mt: 2,
+                                                    fontSize: '0.8rem',
+                                                    color: '#94a3b8',
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    textAlign: 'center',
+                                                    fontWeight: 500
+                                                }}>
+                                                    {progress === 0 && "เตรียมพร้อมเริ่มดำเนินงาน"}
+                                                    {progress === 25 && "กำลังดำเนินการระยะเริ่มต้น"}
+                                                    {progress === 50 && "ดำเนินการมาถึงครึ่งทางแล้ว"}
+                                                    {progress === 75 && "ใกล้เสร็จสมบูรณ์ พร้อมตรวจสอบ"}
+                                                    {progress === 100 && "งานเสร็จสมบูรณ์เรียบร้อย 100%"}
+                                                </Typography>
                                             </Box>
                                         )}
                                     </Box>
                                 </CollapsibleSection>
                             )}
 
-                            {/* Section: Attachments (Facilities Style) */}
-                            <CollapsibleSection title="Media & Files">
-                                <Box sx={{ display: 'flex', gap: 2, mb: 4, flexWrap: 'wrap' }}>
-                                    {/* Upload Buttons */}
+                            {/* Section: Attachments - New Modern Design */}
+                            <CollapsibleSection title="รูปภาพและไฟล์">
+                                {/* Upload Action Buttons - Clean Tinted Style */}
+                                <Box sx={{
+                                    display: 'grid',
+                                    gridTemplateColumns: { xs: 'repeat(3, 1fr)', md: 'repeat(3, auto)' },
+                                    gap: 1.5,
+                                    mb: 3
+                                }}>
+                                    {/* Camera Capture Button */}
                                     <Button
                                         component="label"
                                         disabled={sending}
                                         sx={{
-                                            minWidth: 80,
-                                            width: 80,
-                                            height: 80,
-                                            borderRadius: 2.5,
-                                            bgcolor: '#f5f7ff',
-                                            border: '1px dashed #ced4da',
+                                            minHeight: 90,
+                                            borderRadius: 3,
+                                            bgcolor: '#f3e8ff', // Tinted Purple
+                                            border: '1px solid #d8b4fe',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            gap: 0.5,
+                                            gap: 1,
                                             cursor: 'pointer',
                                             transition: 'all 0.2s',
-                                            '&:hover': { bgcolor: '#eff2fe', borderColor: 'var(--primary)' }
+                                            '&:hover': {
+                                                bgcolor: '#e9d5ff',
+                                                transform: 'translateY(-2px)'
+                                            }
+                                        }}
+                                    >
+                                        <input
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            capture="environment"
+                                            onChange={handleImageUpload}
+                                        />
+                                        <Box sx={{
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: '50%',
+                                            bgcolor: '#fff',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0 2px 5px rgba(124, 58, 237, 0.1)'
+                                        }}>
+                                            <Instagram size="22" color="#7c3aed" variant="Bold" />
+                                        </Box>
+                                        <Typography sx={{ fontSize: '0.75rem', color: '#6b21a8', fontWeight: 600 }}>ถ่ายรูป</Typography>
+                                    </Button>
+
+                                    {/* Gallery Select Button */}
+                                    <Button
+                                        component="label"
+                                        disabled={sending}
+                                        sx={{
+                                            minHeight: 90,
+                                            borderRadius: 3,
+                                            bgcolor: '#eff6ff', // Tinted Blue
+                                            border: '1px solid #bfdbfe',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: 1,
+                                            cursor: 'pointer',
+                                            transition: 'all 0.2s',
+                                            '&:hover': {
+                                                bgcolor: '#dbeafe',
+                                                transform: 'translateY(-2px)'
+                                            }
                                         }}
                                     >
                                         <input type="file" hidden multiple accept="image/*" onChange={handleImageUpload} />
-                                        <ImageIcon size="24" color="var(--primary)" variant="Bold" />
-                                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: '#666', fontWeight: 600 }}>Image</Typography>
+                                        <Box sx={{
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: '50%',
+                                            bgcolor: '#fff',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0 2px 5px rgba(37, 99, 235, 0.1)'
+                                        }}>
+                                            <ImageIcon size="22" color="#2563eb" variant="Bold" />
+                                        </Box>
+                                        <Typography sx={{ fontSize: '0.75rem', color: '#1e40af', fontWeight: 600 }}>เลือกรูป</Typography>
                                     </Button>
 
+                                    {/* File Upload Button */}
                                     <Button
                                         component="label"
                                         disabled={sending}
                                         sx={{
-                                            minWidth: 80,
-                                            width: 80,
-                                            height: 80,
-                                            borderRadius: 2.5,
-                                            bgcolor: '#fff7ed',
-                                            border: '1px dashed #ced4da',
+                                            minHeight: 90,
+                                            borderRadius: 3,
+                                            bgcolor: '#fff7ed', // Tinted Orange
+                                            border: '1px solid #fed7aa',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            gap: 0.5,
+                                            gap: 1,
                                             cursor: 'pointer',
                                             transition: 'all 0.2s',
-                                            '&:hover': { bgcolor: '#ffedd5', borderColor: '#f97316' }
+                                            '&:hover': {
+                                                bgcolor: '#ffedd5',
+                                                transform: 'translateY(-2px)'
+                                            }
                                         }}
                                     >
                                         <input type="file" hidden multiple accept=".pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} />
-                                        <FolderOpen size="24" color="#f97316" variant="Bold" />
-                                        <Typography variant="caption" sx={{ fontSize: '0.65rem', color: '#666', fontWeight: 600 }}>File</Typography>
+                                        <Box sx={{
+                                            width: 40,
+                                            height: 40,
+                                            borderRadius: '50%',
+                                            bgcolor: '#fff',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            boxShadow: '0 2px 5px rgba(249, 115, 22, 0.1)'
+                                        }}>
+                                            <FolderOpen size="22" color="#f97316" variant="Bold" />
+                                        </Box>
+                                        <Typography sx={{ fontSize: '0.75rem', color: '#9a3412', fontWeight: 600 }}>ไฟล์งาน</Typography>
                                     </Button>
+                                </Box>
 
-                                    <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                                {/* Preview Grid */}
+                                <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
 
-                                    {/* Previews (Facilities Badges Style) */}
+                                    {/* Previews (Clean Tinted Badges Style) */}
                                     {selectedImages.map((img, index) => (
                                         <Box key={`img-${index}`} sx={{ position: 'relative', minWidth: 80, width: 80, height: 80 }}>
                                             <img
                                                 src={img.url}
                                                 alt="preview"
-                                                style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover' }}
+                                                style={{ width: '100%', height: '100%', borderRadius: 10, objectFit: 'cover', border: '1px solid #e2e8f0' }}
                                             />
                                             <Box
                                                 onClick={() => handleRemoveImage(index)}
@@ -726,18 +918,20 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                                     position: 'absolute',
                                                     top: -6,
                                                     right: -6,
-                                                    width: 20,
-                                                    height: 20,
-                                                    bgcolor: '#ef4444',
+                                                    width: 22,
+                                                    height: 22,
+                                                    bgcolor: '#fff',
                                                     borderRadius: '50%',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     cursor: 'pointer',
-                                                    border: '2px solid white',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    border: '1px solid #ef4444',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                                                    transition: 'transform 0.2s',
+                                                    '&:hover': { transform: 'scale(1.1)' }
                                                 }}>
-                                                <Minus size="12" color="white" />
+                                                <Minus size="14" color="#ef4444" />
                                             </Box>
                                         </Box>
                                     ))}
@@ -749,16 +943,16 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                             width: 80,
                                             height: 80,
                                             borderRadius: 2.5,
-                                            bgcolor: '#f8fafc',
-                                            border: '1px solid #e2e8f0',
+                                            bgcolor: '#fff7ed', // Orange tint for files
+                                            border: '1px solid #ffedd5',
                                             display: 'flex',
                                             flexDirection: 'column',
                                             alignItems: 'center',
                                             justifyContent: 'center',
                                             p: 1
                                         }}>
-                                            <FolderOpen size="24" color="#64748b" variant="Bulk" />
-                                            <Typography variant="caption" noWrap sx={{ width: '100%', textAlign: 'center', mt: 0.5, fontSize: '0.6rem' }}>
+                                            <FolderOpen size="24" color="#f97316" variant="Bulk" />
+                                            <Typography variant="caption" noWrap sx={{ width: '100%', textAlign: 'center', mt: 0.5, fontSize: '0.6rem', color: '#9a3412' }}>
                                                 {file.name}
                                             </Typography>
                                             <Box
@@ -767,52 +961,70 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                                     position: 'absolute',
                                                     top: -6,
                                                     right: -6,
-                                                    width: 20,
-                                                    height: 20,
-                                                    bgcolor: '#ef4444',
+                                                    width: 22,
+                                                    height: 22,
+                                                    bgcolor: '#fff',
                                                     borderRadius: '50%',
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     justifyContent: 'center',
                                                     cursor: 'pointer',
-                                                    border: '2px solid white',
-                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                    border: '1px solid #ef4444',
+                                                    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+                                                    transition: 'transform 0.2s',
+                                                    '&:hover': { transform: 'scale(1.1)' }
                                                 }}>
-                                                <Minus size="12" color="white" />
+                                                <Minus size="14" color="#ef4444" />
                                             </Box>
                                         </Box>
                                     ))}
                                 </Box>
                             </CollapsibleSection>
 
-                            {/* Section: Message (Property Type style) */}
-                            <CollapsibleSection title="Message">
-                                <TextField
-                                    fullWidth
-                                    multiline
-                                    minRows={3}
-                                    placeholder="เขียนข้อความถึงลูกค้า..."
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    variant="outlined"
-                                    sx={{
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: 3,
-                                            bgcolor: '#f9f9f9',
-                                            '& fieldset': { borderColor: 'transparent' },
-                                            '&:hover fieldset': { borderColor: '#eee' },
-                                            '&.Mui-focused fieldset': { borderColor: 'var(--primary)' },
-                                        },
+                            {/* Section: Message - Clean Design */}
+                            <CollapsibleSection title="ข้อความ">
+                                <Box sx={{ position: 'relative' }}>
+                                    <TextField
+                                        fullWidth
+                                        multiline
+                                        minRows={4}
+                                        placeholder="รายละเอียดความคืบหน้า หรือข้อความถึงลูกค้า..."
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        variant="outlined"
+                                        inputProps={{ maxLength: 500 }}
+                                        sx={{
+                                            '& .MuiOutlinedInput-root': {
+                                                borderRadius: 3,
+                                                bgcolor: '#f8fafc',
+                                                '& fieldset': { borderColor: '#e2e8f0' },
+                                                '&:hover fieldset': { borderColor: '#cbd5e1' },
+                                                '&.Mui-focused fieldset': { borderColor: '#3b82f6', borderWidth: 2 },
+                                            },
+                                            fontFamily: 'var(--font-prompt)'
+                                        }}
+                                    />
+                                    <Typography sx={{
+                                        position: 'absolute',
+                                        bottom: 8,
+                                        right: 12,
+                                        fontSize: '0.7rem',
+                                        color: message.length > 450 ? '#f59e0b' : '#94a3b8',
                                         fontFamily: 'var(--font-prompt)'
-                                    }}
-                                />
+                                    }}>
+                                        {message.length}/500
+                                    </Typography>
+                                </Box>
                             </CollapsibleSection>
 
                             {/* Preview Section */}
                             {sendMode === 'status' && (
-                                <Box sx={{ mt: 4, pt: 3, borderTop: '1px dashed #eee' }}>
+                                <Box sx={{ mt: 4, pt: 3, borderTop: '1px dashed #e2e8f0' }}>
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                                        <Typography sx={{ fontSize: '0.85rem', color: '#aaa', fontWeight: 600, textTransform: 'uppercase' }}>Preview</Typography>
+                                        <Typography sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: '0.85rem', color: '#64748b', fontWeight: 600, fontFamily: 'var(--font-prompt)' }}>
+                                            <MessageText size="16" variant="Bold" />
+                                            ตัวอย่างการแสดงผล
+                                        </Typography>
                                     </Box>
                                     <Box sx={{ transform: 'scale(0.95)', transformOrigin: 'top center' }}>
                                         <StatusFlexPreview
@@ -839,7 +1051,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                     <Card sx={{ borderRadius: 3, height: { xs: '600px', md: '100%' }, maxHeight: 800, display: 'flex', flexDirection: 'column' }}>
                         <CardContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
                             <Box sx={{ p: { xs: 2, md: 3 }, borderBottom: '1px solid #eee' }}>
-                                <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>🕰️ ประวัติการส่งข้อความ</Typography>
+                                <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1.5, fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: { xs: '1rem', md: '1.25rem' } }}>
+                                    <Chart size="24" color="#0f172a" variant="Bold" />
+                                    ประวัติการส่งข้อความ
+                                </Typography>
                             </Box>
 
                             <Box sx={{ flex: 1, overflowY: 'auto', p: { xs: 2, md: 3 }, scrollBehavior: 'smooth' }}>
@@ -895,7 +1110,10 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                                                                     <Box sx={{ mt: 1 }}>
                                                                         {content.files.map((f: { name: string, url: string }, i: number) => (
                                                                             <Typography key={i} variant="caption" sx={{ display: 'block', color: '#666' }}>
-                                                                                📄 {f.name}
+                                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                                                                                    <FolderOpen size="14" color="#666" variant="Bold" />
+                                                                                    {f.name}
+                                                                                </Box>
                                                                             </Typography>
                                                                         ))}
                                                                     </Box>
@@ -978,26 +1196,27 @@ export default function EventDetailPage({ params }: { params: Promise<{ id: stri
                 </Button>
 
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', flex: { xs: 1, md: 'initial' } }}>
+
                     <Button
                         variant="contained"
                         onClick={handleSendClick}
                         disabled={sending}
-
                         sx={{
-                            fontFamily: 'var(--font-prompt)',
                             borderRadius: 3,
                             px: 4,
                             height: 56,
                             minWidth: { xs: 0, md: 200 },
                             width: '100%',
                             fontSize: '1.05rem',
-                            fontWeight: 700,
-                            bgcolor: '#10B981',
+                            fontWeight: 600,
+                            fontFamily: 'var(--font-prompt)',
+                            background: sending ? '#cbd5e1' : 'linear-gradient(90deg, #10B981 0%, #059669 100%)',
                             color: '#fff',
                             boxShadow: '0 8px 20px rgba(16, 185, 129, 0.4)',
+                            textTransform: 'none',
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                             '&:hover': {
-                                bgcolor: '#059669',
+                                background: 'linear-gradient(90deg, #059669 0%, #047857 100%)',
                                 boxShadow: '0 12px 24px rgba(16, 185, 129, 0.5)',
                                 transform: 'translateY(-2px)'
                             },

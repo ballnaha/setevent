@@ -40,6 +40,10 @@ interface Event {
         lineUid: string;
         companyName: string | null;
     };
+    sales: {
+        id: string;
+        name: string | null;
+    } | null;
 }
 
 const statusLabels: Record<string, { label: string; color: string; bgColor: string; gradient: string }> = {
@@ -487,6 +491,14 @@ export default function ProgressPage() {
                                                             : 'ไม่ระบุ'}
                                                     </Typography>
                                                 </Box>
+                                                {event.sales && (
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
+                                                        <User size={14} color="#bbb" variant="Bold" />
+                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#999' }}>
+                                                            {event.sales.name}
+                                                        </Typography>
+                                                    </Box>
+                                                )}
                                                 {event.venue && (
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flex: 1, minWidth: 0 }}>
                                                         <Location size={14} color="#bbb" variant="Bold" />

@@ -1,5 +1,6 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import ScrollToTop from "../components/ScrollToTop";
 import { HomepageSchema } from "@/components/seo/JsonLdSchema";
 
 export default function WebsiteLayout({
@@ -15,6 +16,8 @@ export default function WebsiteLayout({
                 {children}
             </main>
             <Footer />
+            <ScrollToTop />
         </div>
     );
 }
+

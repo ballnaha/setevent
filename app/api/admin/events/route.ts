@@ -30,11 +30,9 @@ export async function GET() {
         // Build where clause based on role
         const whereClause: any = {};
 
-        // If user is sales, only show events from their assigned customers
+        // If user is sales, only show events assigned to them
         if (currentUser.role === 'sales') {
-            whereClause.customer = {
-                salesId: currentUser.id
-            };
+            whereClause.salesId = currentUser.id;
         }
         // Admin and other roles can see all events
 
@@ -48,9 +46,14 @@ export async function GET() {
                         pictureUrl: true,
                         lineUid: true,
                         companyName: true,
-                        salesId: true,
                     },
                 },
+                sales: {
+                    select: {
+                        id: true,
+                        name: true,
+                    }
+                }
             },
             orderBy: { createdAt: 'desc' },
         });
@@ -70,7 +73,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { eventName, customerId, eventDate, venue, description, totalPrice, notes } = body;
+        const { eventName, customerId, salesId, eventDate, venue, description, totalPrice, notes } = body;
 
         if (!eventName || !customerId) {
             return NextResponse.json({ error: 'Event name and Customer are required' }, { status: 400 });
@@ -98,6 +101,7 @@ export async function POST(req: NextRequest) {
             data: {
                 eventName,
                 customerId,
+                salesId: salesId || null, // Allow assigning sales on create
                 inviteCode,
                 eventDate: eventDate ? new Date(eventDate) : undefined,
                 venue,

@@ -24,10 +24,8 @@ export async function GET() {
         // Build where clause based on role
         const whereClause: any = {};
 
-        // If user is sales, only show their assigned customers
-        if (currentUser.role === 'sales') {
-            whereClause.salesId = currentUser.id;
-        }
+        // Admin and Sales roles can see all customers
+        // Filtering by event assignment is handled in the events API
         // Admin and other roles can see all customers
 
         const customers = await prisma.customer.findMany({
@@ -36,13 +34,6 @@ export async function GET() {
                 _count: {
                     select: { events: true },
                 },
-                sales: {
-                    select: {
-                        id: true,
-                        name: true,
-                        email: true,
-                    }
-                }
             },
             orderBy: { createdAt: 'desc' },
         });

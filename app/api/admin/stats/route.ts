@@ -25,8 +25,8 @@ export async function GET() {
         const eventWhere: any = {};
 
         if (currentUser.role === 'sales') {
-            customerWhere.salesId = currentUser.id;
-            eventWhere.customer = { salesId: currentUser.id };
+            customerWhere.events = { some: { salesId: currentUser.id } };
+            eventWhere.salesId = currentUser.id;
         }
 
         const [totalEvents, totalCustomers, pendingEvents, completedEvents] = await Promise.all([

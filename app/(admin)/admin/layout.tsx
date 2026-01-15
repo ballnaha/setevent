@@ -52,9 +52,10 @@ const sidebarGroups = [
 // Bottom Navigation Items (Mobile) - Can be different from Sidebar
 const bottomNavItems = [
     { label: 'Home', href: '/admin', icon: Home3, roles: ['admin'] },
-    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
-    { label: 'Customer', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
     { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
+    { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
+    { label: 'Customer', href: '/admin/customers', icon: People, roles: ['admin'] },
+
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

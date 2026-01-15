@@ -314,30 +314,49 @@ export function createStatusFlexMessage(
     const dateStr = now.toLocaleDateString('th-TH', { timeZone: 'Asia/Bangkok', day: 'numeric', month: 'short', year: '2-digit' });
     const timeStr = now.toLocaleTimeString('th-TH', { timeZone: 'Asia/Bangkok', hour: '2-digit', minute: '2-digit' });
 
-    // 2. Main Content Area - Construct contents array dynamically to avoid spread issues
+    // 2. Main Content Area - Construct contents array dynamically
     const mainContents: any[] = [
-        // Header: Status + Time
+        // Top Row: Status Pill & Date
         {
             type: 'box',
             layout: 'horizontal',
             alignItems: 'center',
             justifyContent: 'space-between',
             contents: [
+                // Status Pill
                 {
-                    type: 'text',
-                    text: config.label.toUpperCase(),
-                    weight: 'bold',
-                    color: config.color,
-                    size: 'xs',
-                    flex: 1
+                    type: 'box',
+                    layout: 'horizontal',
+                    backgroundColor: config.color,
+                    cornerRadius: '20px',
+                    paddingStart: 'md',
+                    paddingEnd: 'md',
+                    paddingTop: '3px',
+                    paddingBottom: '3px',
+                    width: '120px', // Fixed width for pill shape consistency or let it float
+                    flex: 0,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    contents: [
+                        {
+                            type: 'text',
+                            text: config.label,
+                            color: '#FFFFFF',
+                            size: 'xs',
+                            weight: 'bold',
+                            align: 'center'
+                        }
+                    ]
                 },
+                // Date/Time
                 {
                     type: 'text',
-                    text: dateStr,
-                    size: 'xs',
-                    color: '#bbbbbb',
+                    text: `${dateStr} ${timeStr}`,
+                    size: 'xxs',
+                    color: '#94A3B8',
                     align: 'end',
-                    flex: 0
+                    flex: 1,
+                    weight: 'regular'
                 }
             ]
         },
@@ -347,85 +366,53 @@ export function createStatusFlexMessage(
             text: eventName,
             weight: 'bold',
             size: 'xl',
-            color: '#1a1a1a',
+            color: '#1E293B',
             margin: 'md',
-            wrap: true
+            wrap: true,
+            lineSpacing: '2px'
         }
     ];
 
-    // Event Date & Time
-    // Event Date & Time
-    if (eventDate) {
+    // Meta Box (Date & Venue)
+    if (eventDate || venue) {
+        const metaContents: any[] = [];
+        if (eventDate) {
+            metaContents.push({
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                contents: [
+                    { type: 'text', text: '📅', size: 'sm', flex: 0 },
+                    { type: 'text', text: eventDate, size: 'sm', color: '#334155', flex: 1, wrap: true }
+                ]
+            });
+        }
+        if (venue) {
+            metaContents.push({
+                type: 'box',
+                layout: 'baseline',
+                spacing: 'sm',
+                margin: eventDate ? 'sm' : 'none',
+                contents: [
+                    { type: 'text', text: '📍', size: 'sm', flex: 0 },
+                    { type: 'text', text: venue, size: 'sm', color: '#334155', flex: 1, wrap: true }
+                ]
+            });
+        }
+
         mainContents.push({
             type: 'box',
-            layout: 'baseline',
-            spacing: 'sm',
-            margin: 'sm',
-            contents: [
-                {
-                    type: 'text',
-                    text: 'วันที่เริ่มงาน :',
-                    size: 'xs',
-                    color: '#1a1a1a',
-                    weight: 'bold',
-                    flex: 0,
-                    margin: 'none'
-                },
-                {
-                    type: 'text',
-                    text: eventDate,
-                    size: 'xs',
-                    color: '#666666',
-                    flex: 1,
-                    wrap: true,
-                    margin: 'md'
-                }
-            ]
+            layout: 'vertical',
+            backgroundColor: '#F8FAFC',
+            cornerRadius: 'md',
+            paddingAll: 'md',
+            margin: 'lg',
+            contents: metaContents
         });
     }
-
-    // Venue Row
-    // Venue Row
-    if (venue) {
-        mainContents.push({
-            type: 'box',
-            layout: 'baseline',
-            spacing: 'sm',
-            margin: 'sm',
-            contents: [
-                {
-                    type: 'text',
-                    text: 'สถานที่จัดงาน :',
-                    size: 'xs',
-                    color: '#1a1a1a',
-                    weight: 'bold',
-                    flex: 0,
-                    margin: 'none'
-                },
-                {
-                    type: 'text',
-                    text: venue,
-                    size: 'xs',
-                    color: '#666666',
-                    flex: 1,
-                    wrap: true,
-                    margin: 'md'
-                }
-            ]
-        });
-    }
-
-    // Separator
-    mainContents.push({
-        type: 'separator',
-        margin: 'xl',
-        color: '#f0f0f0'
-    });
 
     // Progress Section
     if (validProgress !== undefined) {
-        const progressColor = validProgress === 100 ? '#10B981' : config.color;
-
         mainContents.push({
             type: 'box',
             layout: 'vertical',
@@ -435,27 +422,28 @@ export function createStatusFlexMessage(
                     type: 'box',
                     layout: 'horizontal',
                     justifyContent: 'space-between',
+                    alignItems: 'flex-end',
                     contents: [
-                        { type: 'text', text: 'Progress', size: 'xs', color: '#aaaaaa', weight: 'bold' },
-                        { type: 'text', text: `${validProgress}%`, size: 'xs', weight: 'bold', color: progressColor, align: 'end' }
+                        { type: 'text', text: 'Progress', size: 'sm', color: '#64748B', weight: 'bold' },
+                        { type: 'text', text: `${validProgress}%`, size: 'lg', weight: 'bold', color: config.color }
                     ]
                 },
                 {
                     type: 'box',
                     layout: 'vertical',
                     width: '100%',
-                    backgroundColor: '#f5f5f5',
-                    height: '6px',
-                    cornerRadius: '3px',
+                    backgroundColor: '#F1F5F9',
+                    height: '10px',
+                    cornerRadius: '5px',
                     margin: 'sm',
                     contents: [
                         {
                             type: 'box',
                             layout: 'vertical',
                             width: `${validProgress}%`,
-                            backgroundColor: progressColor,
-                            height: '6px',
-                            cornerRadius: '3px',
+                            backgroundColor: config.color,
+                            height: '10px',
+                            cornerRadius: '5px',
                             contents: []
                         }
                     ]
@@ -464,25 +452,23 @@ export function createStatusFlexMessage(
         });
     }
 
+    // Divider
+    mainContents.push({
+        type: 'separator',
+        margin: 'xl',
+        color: '#E2E8F0'
+    });
+
     // Message Section
     if (message) {
         mainContents.push({
-            type: 'box',
-            layout: 'vertical',
+            type: 'text',
+            text: message,
+            size: 'sm',
+            color: '#334155',
+            wrap: true,
             margin: 'lg',
-            backgroundColor: '#f9f9f9',
-            cornerRadius: 'md',
-            paddingAll: 'md',
-            contents: [
-                {
-                    type: 'text',
-                    text: message,
-                    size: 'sm',
-                    color: '#555555',
-                    wrap: true,
-                    lineSpacing: '5px'
-                }
-            ]
+            lineSpacing: '4px'
         });
     }
 
@@ -490,15 +476,16 @@ export function createStatusFlexMessage(
     if (senderName) {
         mainContents.push({
             type: 'box',
-            layout: 'baseline',
-            margin: 'xl',
+            layout: 'vertical',
+            margin: 'lg',
             contents: [
                 {
                     type: 'text',
                     text: `Updated by ${senderName}`,
                     size: 'xxs',
-                    color: '#cccccc',
-                    align: 'center'
+                    color: '#94A3B8',
+                    align: 'center',
+                    weight: 'regular'
                 }
             ]
         });
