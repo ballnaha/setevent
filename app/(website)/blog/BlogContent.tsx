@@ -232,7 +232,7 @@ export default function BlogContent() {
                 {loading ? (
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 4 }}>
                         {[1, 2, 3].map(n => (
-                            <Skeleton key={n} variant="rectangular" height={300} sx={{ borderRadius: 4, bgcolor: 'rgba(255,255,255,0.05)' }} />
+                            <Skeleton key={n} variant="rectangular" height={300} sx={{ borderRadius: 4, bgcolor: 'var(--border-color)' }} />
                         ))}
                     </Box>
                 ) : filteredBlogs.length === 0 ? (
@@ -459,13 +459,13 @@ export default function BlogContent() {
                                         </Typography>
                                         <Stack direction="row" alignItems="center" spacing={2} sx={{ mt: 'auto' }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                <User size="16" color="gray" />
-                                                <Typography variant="caption" color="text.secondary">
+                                                <User size="16" color="var(--primary)" />
+                                                <Typography variant="caption" sx={{ color: 'var(--foreground)', opacity: 0.6 }}>
                                                     {blog.author || 'Admin'}
                                                 </Typography>
                                             </Box>
-                                            <Typography variant="caption" color="text.secondary">•</Typography>
-                                            <Typography variant="caption" color="text.secondary">
+                                            <Typography variant="caption" sx={{ color: 'var(--foreground)', opacity: 0.4 }}>•</Typography>
+                                            <Typography variant="caption" sx={{ color: 'var(--foreground)', opacity: 0.6 }}>
                                                 {formatDate(blog.publishedAt)}
                                             </Typography>
                                         </Stack>

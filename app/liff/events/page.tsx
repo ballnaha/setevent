@@ -240,15 +240,31 @@ export default function LiffEventsPage() {
             </Box>
 
             {filteredEvents.length === 0 ? (
-                <Card sx={{ borderRadius: 2, textAlign: 'center', py: 6, bgcolor: 'transparent', boxShadow: 'none' }}>
+                <Card sx={{ borderRadius: 4, textAlign: 'center', py: 8, bgcolor: 'rgba(0,0,0,0.02)', boxShadow: 'none', border: '1px dashed rgba(0,0,0,0.1)' }}>
                     <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#64748b', mb: 1 }}>
-                        ไม่พบงานที่คุณค้นหา
+                        ไม่พบข้อมูลงานในระบบ
                     </Typography>
                 </Card>
             ) : (
-                <Stack spacing={1.5}>
+                <Stack spacing={2}>
                     {filteredEvents.map((event) => {
-                        const statusInfo = getStatusInfo(event.status);
+                        const getEventTheme = (status: string) => {
+                            switch (status) {
+                                case 'in-progress':
+                                    return { bg: '#f17a4c', icon: <MagicStar size="48" color="rgba(255,255,255,0.9)" variant="Outline" />, label: 'กำลังดำเนินการ' };
+                                case 'confirmed':
+                                    return { bg: '#8e94f3', icon: <TickCircle size="48" color="rgba(255,255,255,0.9)" variant="Outline" />, label: 'ยืนยันรายละเอียด' };
+                                case 'completed':
+                                    return { bg: '#50c878', icon: <MagicStar size="48" color="rgba(255,255,255,0.9)" variant="Bold" />, label: 'เสร็จสมบูรณ์' };
+                                case 'cancelled':
+                                    return { bg: '#94a3b8', icon: <CloseCircle size="48" color="rgba(255,255,255,0.9)" variant="Outline" />, label: 'ยกเลิกงาน' };
+                                default:
+                                    return { bg: '#5da9e9', icon: <SearchNormal size="48" color="rgba(255,255,255,0.9)" variant="Outline" />, label: 'งานใหม่' };
+                            }
+                        };
+
+                        const theme = getEventTheme(event.status);
+
                         return (
                             <Link
                                 key={event.id}
@@ -258,161 +274,132 @@ export default function LiffEventsPage() {
                                 <Card
                                     sx={{
                                         position: 'relative',
-                                        borderRadius: 2.5,
+                                        borderRadius: 6,
                                         overflow: 'hidden',
-                                        border: '1px solid rgba(0,0,0,0.05)',
-                                        boxShadow: '0 2px 10px rgba(0,0,0,0.03)',
-                                        transition: 'all 0.2s',
-                                        bgcolor: 'white',
-                                        '&:hover': {
-                                            transform: 'translateY(-2px)',
-                                            boxShadow: '0 8px 16px rgba(0,0,0,0.06)',
+                                        bgcolor: theme.bg,
+                                        height: 120,
+                                        display: 'flex',
+                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        border: 'none',
+                                        boxShadow: `0 8px 24px ${theme.bg}40`,
+                                        '&:active': {
+                                            transform: 'scale(0.98)',
+                                            opacity: 0.9
                                         },
+                                        '&::before': {
+                                            content: '""',
+                                            position: 'absolute',
+                                            right: -20,
+                                            top: -20,
+                                            width: 140,
+                                            height: 160,
+                                            bgcolor: 'rgba(255,255,255,0.15)',
+                                            borderRadius: '50%',
+                                            zIndex: 0
+                                        }
                                     }}
                                 >
-                                    {/* Status Strip Indicator */}
-                                    <Box sx={{
-                                        position: 'absolute',
-                                        left: 0,
-                                        top: 0,
-                                        bottom: 0,
-                                        width: 4,
-                                        bgcolor: statusInfo.color
-                                    }} />
+                                    <CardContent sx={{
+                                        p: 3,
+                                        width: '100%',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
+                                        position: 'relative',
+                                        zIndex: 1,
+                                        '&:last-child': { pb: 3 }
+                                    }}>
+                                        <Box sx={{ flex: 1, pr: 2 }}>
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontWeight: 700,
+                                                    fontSize: '1.25rem',
+                                                    color: 'white',
+                                                    lineHeight: 1.2,
+                                                    mb: 0.5,
+                                                    textShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                                                }}
+                                            >
+                                                {event.eventName}
+                                            </Typography>
+                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                <Typography sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontSize: '0.85rem',
+                                                    color: 'rgba(255,255,255,0.85)',
+                                                    fontWeight: 500
+                                                }}>
+                                                    {event.eventDate ? new Date(event.eventDate).toLocaleDateString('th-TH', {
+                                                        day: 'numeric',
+                                                        month: 'short',
+                                                        year: '2-digit'
+                                                    }) : 'ไม่ระบุวันที่'}
+                                                </Typography>
+                                                <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>•</Typography>
+                                                <Typography sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontSize: '0.85rem',
+                                                    color: 'rgba(255,255,255,0.85)',
+                                                    fontWeight: 500,
+                                                    whiteSpace: 'nowrap',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    maxWidth: 120
+                                                }}>
+                                                    {event.venue || 'ไม่ระบุสถานที่'}
+                                                </Typography>
+                                            </Stack>
 
-                                    <CardContent sx={{ p: 1.5, pl: 2.5, display: 'flex', alignItems: 'center', gap: 2, '&:last-child': { pb: 1.5 } }}>
-                                        {/* Date Badge (Compact) */}
-                                        <Box sx={{
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            bgcolor: 'rgba(0,0,0,0.03)',
-                                            borderRadius: 1.5,
-                                            width: 46,
-                                            height: 48,
-                                            flexShrink: 0
-                                        }}>
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.65rem', color: '#64748b', fontWeight: 600, textTransform: 'uppercase', lineHeight: 1, mb: 0.2 }}>
-                                                {event.eventDate ? new Date(event.eventDate).toLocaleDateString('en-US', { month: 'short' }) : '-'}
-                                            </Typography>
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1rem', color: '#1e293b', fontWeight: 700, lineHeight: 1 }}>
-                                                {event.eventDate ? new Date(event.eventDate).getDate() : '-'}
-                                            </Typography>
+                                            {/* Status Badge inside card - optional but helpful */}
+                                            <Box sx={{
+                                                mt: 1.5,
+                                                display: 'inline-flex',
+                                                alignItems: 'center',
+                                                bgcolor: 'rgba(255,255,255,0.2)',
+                                                px: 1.5,
+                                                py: 0.5,
+                                                borderRadius: 10,
+                                                backdropFilter: 'blur(4px)'
+                                            }}>
+                                                <Typography sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontSize: '0.65rem',
+                                                    color: 'white',
+                                                    fontWeight: 600,
+                                                    letterSpacing: 0.5
+                                                }}>
+                                                    {theme.label.toUpperCase()}
+                                                </Typography>
+                                            </Box>
                                         </Box>
 
-                                        {/* Content */}
-                                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 0.5 }}>
-                                                <Typography
-                                                    sx={{
-                                                        fontFamily: 'var(--font-prompt)',
-                                                        fontWeight: 600,
-                                                        fontSize: '0.95rem',
-                                                        color: '#1e293b',
-                                                        whiteSpace: 'nowrap',
-                                                        overflow: 'hidden',
-                                                        textOverflow: 'ellipsis'
-                                                    }}
-                                                >
-                                                    {event.eventName}
-                                                </Typography>
-
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, ml: 1 }}>
-                                                    {event.isReviewed && (
-                                                        <Box sx={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 0.5,
-                                                            bgcolor: '#FEF3C7',
-                                                            color: '#D97706',
-                                                            px: 0.8,
-                                                            py: 0.2,
-                                                            borderRadius: 1,
-                                                            height: 20
-                                                        }}>
-                                                            <MagicStar size={10} variant="Bold" color="#D97706" />
-                                                            <Typography sx={{ fontSize: '0.6rem', fontWeight: 600, fontFamily: 'var(--font-prompt)', lineHeight: 1 }}>
-                                                                รีวิวแล้ว
-                                                            </Typography>
-                                                        </Box>
-                                                    )}
-                                                    <Chip
-                                                        label={statusInfo.label}
-                                                        size="small"
-                                                        sx={{
-                                                            bgcolor: statusInfo.bgColor,
-                                                            color: statusInfo.color,
-                                                            fontFamily: 'var(--font-prompt)',
-                                                            fontSize: '0.6rem',
-                                                            fontWeight: 600,
-                                                            height: 20,
-                                                            flexShrink: 0
-                                                        }}
-                                                    />
-                                                </Box>
-                                            </Box>
-
-                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                {event.venue && (
-                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: 0.5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '140px' }}>
-                                                        <Location size={12} variant="Bold" color="#64748b" />
-                                                        {event.venue}
-                                                    </Typography>
-                                                )}
-                                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.75rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Calendar size={12} variant="Bold" color="#64748b" />
-                                                    {event.eventDate ? new Date(event.eventDate).getFullYear() : '-'}
-                                                </Typography>
-                                            </Box>
+                                        <Box sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            mr: 1
+                                        }}>
+                                            {theme.icon}
                                         </Box>
                                     </CardContent>
 
-                                    {/* Review Comment Section */}
-                                    {event.isReviewed && event.reviewComment && (
-                                        <Box sx={{ px: 2.5, pb: 2, pt: 0 }}>
-                                            <Box sx={{
-                                                p: 1.5,
-                                                bgcolor: '#F8FAFC',
-                                                borderRadius: 2,
-                                                border: '1px dashed #E2E8F0',
-                                                position: 'relative'
-                                            }}>
-                                                <Typography
-                                                    sx={{
-                                                        fontFamily: 'var(--font-prompt)',
-                                                        fontSize: '0.8rem',
-                                                        color: '#475569',
-                                                        lineHeight: 1.5,
-                                                        display: expandedReviews[event.id] ? 'block' : '-webkit-box',
-                                                        WebkitLineClamp: expandedReviews[event.id] ? 'none' : 2,
-                                                        WebkitBoxOrient: 'vertical',
-                                                        overflow: 'hidden'
-                                                    }}
-                                                >
-                                                    <span style={{ color: '#D97706', fontWeight: 600 }}>ความเห็น: </span>
-                                                    {event.reviewComment}
-                                                </Typography>
-
-                                                {event.reviewComment.length > 80 && (
-                                                    <Typography
-                                                        component="span"
-                                                        onClick={(e) => toggleReview(e, event.id)}
-                                                        sx={{
-                                                            display: 'inline-block',
-                                                            fontFamily: 'var(--font-prompt)',
-                                                            fontSize: '0.75rem',
-                                                            color: '#3B82F6',
-                                                            fontWeight: 600,
-                                                            mt: 0.5,
-                                                            cursor: 'pointer',
-                                                            '&:hover': { textDecoration: 'underline' }
-                                                        }}
-                                                    >
-                                                        {expandedReviews[event.id] ? 'แสดงน้อยลง' : '... อ่านเพิ่มเติม'}
-                                                    </Typography>
-                                                )}
-                                            </Box>
+                                    {/* Review Indicator Overlay if reviewed */}
+                                    {event.isReviewed && (
+                                        <Box sx={{
+                                            position: 'absolute',
+                                            top: 12,
+                                            right: 12,
+                                            bgcolor: '#fbbf24',
+                                            color: '#b45309',
+                                            p: 0.5,
+                                            borderRadius: '50%',
+                                            display: 'flex',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                                            zIndex: 2,
+                                            border: '2px solid white'
+                                        }}>
+                                            <MagicStar size={12} variant="Bold" />
                                         </Box>
                                     )}
                                 </Card>

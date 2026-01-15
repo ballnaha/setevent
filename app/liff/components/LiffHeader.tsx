@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Avatar, Typography, Skeleton, IconButton, Menu, MenuItem, ListItemIcon } from '@mui/material';
 import { initializeLiff, LiffProfile } from '@/lib/liff';
-import { Setting2, CloseCircle, User, LogoutCurve } from 'iconsax-react';
+import { Setting2, CloseCircle, User, LogoutCurve, SearchNormal } from 'iconsax-react';
 import { useRouter } from 'next/navigation';
 
 interface LiffHeaderProps {
@@ -134,6 +134,7 @@ export default function LiffHeader({ onSearch, searchValue = '', onClear }: Liff
                                 bgcolor: 'background: paper',
                                 transform: 'translateY(-50%) rotate(45deg)',
                                 zIndex: 0,
+                                margin: 0 // Resetting margin
                             },
                         },
                     }}
@@ -170,7 +171,7 @@ export default function LiffHeader({ onSearch, searchValue = '', onClear }: Liff
                 }}
             >
                 {/* Search Icon */}
-                <Typography sx={{ color: '#94A3B8', fontSize: '1.2rem' }}>🔍</Typography>
+                <SearchNormal size={20} color="#94A3B8" />
                 <input
                     type="text"
                     placeholder="ค้นหาโปรเจกต์..."

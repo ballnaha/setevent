@@ -19,7 +19,7 @@ import {
     TextField,
     Button,
 } from '@mui/material';
-import { ArrowRight2, Clock, ArrowUp2, Instagram, DocumentText, Call, Gallery, User, Music, MagicStar, Monitor, CloseCircle, Sms, Map, Facebook } from 'iconsax-react';
+import { ArrowRight2, Clock, ArrowUp2, Instagram, DocumentText, Call, Gallery, User, Music, MagicStar, Monitor, CloseCircle, Sms, Map, Facebook, SearchNormal, TickCircle, Calendar, Location } from 'iconsax-react';
 import Link from 'next/link';
 import { initializeLiff, LiffProfile } from '@/lib/liff';
 import LiffHeader from './components/LiffHeader';
@@ -867,7 +867,7 @@ function LiffContent() {
                                         mb: 3,
                                     }}
                                 >
-                                    <Typography sx={{ fontSize: '2.5rem' }}>🔍</Typography>
+                                    <SearchNormal size={40} variant="Bulk" color="#3B82F6" />
                                 </Box>
 
                                 <Typography
@@ -940,137 +940,143 @@ function LiffContent() {
                                 }}
                             >
                                 {filteredEvents.map((evt, index) => {
-                                    // Color based on status
-                                    const color = getStatusColor(evt.status).bg;
+                                    const getEventTheme = (status: string) => {
+                                        switch (status) {
+                                            case 'in-progress':
+                                                return { bg: '#f17a4c', icon: <MagicStar size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'กำลังดำเนินการ' };
+                                            case 'confirmed':
+                                                return { bg: '#8e94f3', icon: <TickCircle size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'ยืนยันรายละเอียด' };
+                                            case 'completed':
+                                                return { bg: '#50c878', icon: <MagicStar size="42" color="rgba(255,255,255,0.8)" variant="Bold" />, label: 'เสร็จสมบูรณ์' };
+                                            case 'cancelled':
+                                                return { bg: '#94a3b8', icon: <CloseCircle size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'ยกเลิกงาน' };
+                                            default:
+                                                return { bg: '#5da9e9', icon: <SearchNormal size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'งานใหม่' };
+                                        }
+                                    };
+
+                                    const theme = getEventTheme(evt.status);
+
                                     return (
                                         <Link key={evt.id} href={`/liff?inviteCode=${evt.inviteCode}`} style={{ textDecoration: 'none' }}>
                                             <Card
                                                 sx={{
-                                                    minWidth: 260,
-                                                    borderRadius: 4,
-                                                    boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06)',
-                                                    border: '1px solid rgba(255,255,255,0.8)',
+                                                    minWidth: 280,
+                                                    height: 120,
+                                                    borderRadius: 6,
+                                                    bgcolor: theme.bg,
                                                     position: 'relative',
                                                     overflow: 'hidden',
+                                                    display: 'flex',
                                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                    background: 'linear-gradient(145deg, #FFFFFF 0%, #FAFBFC 100%)',
-                                                    '&:hover': {
-                                                        transform: 'translateY(-4px) scale(1.02)',
-                                                        boxShadow: '0 12px 40px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.08)'
+                                                    border: 'none',
+                                                    boxShadow: `0 8px 24px ${theme.bg}40`,
+                                                    '&:active': {
+                                                        transform: 'scale(0.96)',
+                                                        opacity: 0.9
                                                     },
-                                                    '&:active': { transform: 'scale(0.98)' }
+                                                    '&::before': {
+                                                        content: '""',
+                                                        position: 'absolute',
+                                                        right: -15,
+                                                        top: -15,
+                                                        width: 110,
+                                                        height: 130,
+                                                        bgcolor: 'rgba(255,255,255,0.15)',
+                                                        borderRadius: '50%',
+                                                        zIndex: 0
+                                                    }
                                                 }}
                                             >
-                                                {/* Colored Small Strip Indicator */}
-                                                <Box
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        left: 0,
-                                                        top: 28,
-                                                        height: 40,
-                                                        width: 4,
-                                                        bgcolor: color,
-                                                        borderTopRightRadius: 4,
-                                                        borderBottomRightRadius: 4
-                                                    }}
-                                                />
-
-                                                <CardContent sx={{ p: 2.5, pl: 3 }}>
-                                                    {/* Title & Menu */}
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                                                <CardContent sx={{
+                                                    p: 2.5,
+                                                    width: '100%',
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center',
+                                                    position: 'relative',
+                                                    zIndex: 1,
+                                                    '&:last-child': { pb: 2.5 }
+                                                }}>
+                                                    <Box sx={{ flex: 1, pr: 1 }}>
                                                         <Typography
-                                                            variant="subtitle1"
                                                             sx={{
                                                                 fontFamily: 'var(--font-prompt)',
                                                                 fontWeight: 700,
-                                                                color: '#1E293B',
-                                                                lineHeight: 1.3,
+                                                                fontSize: '1.1rem',
+                                                                color: 'white',
+                                                                lineHeight: 1.2,
+                                                                mb: 0.5,
+                                                                textShadow: '0 2px 4px rgba(0,0,0,0.1)',
                                                                 overflow: 'hidden',
                                                                 textOverflow: 'ellipsis',
                                                                 display: '-webkit-box',
                                                                 WebkitLineClamp: 2,
                                                                 WebkitBoxOrient: 'vertical',
-                                                                maxWidth: '85%'
                                                             }}
                                                         >
                                                             {evt.eventName}
                                                         </Typography>
-                                                        <Box sx={{ color: '#CBD5E1', mt: -0.5 }}>•••</Box>
+                                                        <Stack direction="row" spacing={1} alignItems="center">
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                <Calendar size="12" color="rgba(255,255,255,0.7)" variant="Bold" />
+                                                                <Typography sx={{
+                                                                    fontFamily: 'var(--font-prompt)',
+                                                                    fontSize: '0.75rem',
+                                                                    color: 'rgba(255,255,255,0.85)',
+                                                                    fontWeight: 500
+                                                                }}>
+                                                                    {evt.eventDate ? format(new Date(evt.eventDate), 'dd MMM yy') : 'ไม่ระบุวันที่'}
+                                                                </Typography>
+                                                            </Box>
+                                                            <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>•</Typography>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>
+                                                                <Location size="12" color="rgba(255,255,255,0.7)" variant="Bold" />
+                                                                <Typography sx={{
+                                                                    fontFamily: 'var(--font-prompt)',
+                                                                    fontSize: '0.75rem',
+                                                                    color: 'rgba(255,255,255,0.8) ',
+                                                                    fontWeight: 500,
+                                                                    whiteSpace: 'nowrap',
+                                                                    overflow: 'hidden',
+                                                                    textOverflow: 'ellipsis',
+                                                                    maxWidth: 100
+                                                                }}>
+                                                                    {evt.venue || 'ไม่ระบุสถานที่'}
+                                                                </Typography>
+                                                            </Box>
+                                                        </Stack>
+
+                                                        {/* Status Chip */}
+                                                        <Box sx={{
+                                                            mt: 1.5,
+                                                            display: 'inline-flex',
+                                                            alignItems: 'center',
+                                                            bgcolor: 'rgba(255,255,255,0.2)',
+                                                            px: 1.2,
+                                                            py: 0.4,
+                                                            borderRadius: 10,
+                                                            backdropFilter: 'blur(4px)'
+                                                        }}>
+                                                            <Typography sx={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontSize: '0.6rem',
+                                                                color: 'white',
+                                                                fontWeight: 600,
+                                                                letterSpacing: 0.5
+                                                            }}>
+                                                                {theme.label.toUpperCase()}
+                                                            </Typography>
+                                                        </Box>
                                                     </Box>
 
-                                                    {/* Venue - Optional (kept subtle) */}
-                                                    {evt.venue && (
-                                                        <Typography
-                                                            variant="caption"
-                                                            sx={{
-                                                                fontFamily: 'var(--font-prompt)',
-                                                                color: '#94A3B8',
-                                                                display: 'block',
-                                                                mb: 1,
-                                                                whiteSpace: 'nowrap',
-                                                                overflow: 'hidden',
-                                                                textOverflow: 'ellipsis'
-                                                            }}
-                                                        >
-                                                            📍 {evt.venue}
-                                                        </Typography>
-                                                    )}
-
-                                                    <Box sx={{ height: 1.5, bgcolor: '#E2E8F0', my: 1.5 }} />
-
-                                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                        {/* Avatar (Left) */}
-                                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                                            {evt.customerPictureUrl ? (
-                                                                <Box
-                                                                    component="img"
-                                                                    src={evt.customerPictureUrl}
-                                                                    sx={{
-                                                                        width: 32,
-                                                                        height: 32,
-                                                                        borderRadius: '50%',
-                                                                        bgcolor: '#F1F5F9',
-                                                                        border: '2px solid white',
-                                                                        objectFit: 'cover'
-                                                                    }}
-                                                                />
-                                                            ) : (
-                                                                <Box
-                                                                    sx={{
-                                                                        width: 32,
-                                                                        height: 32,
-                                                                        borderRadius: '50%',
-                                                                        bgcolor: '#F1F5F9',
-                                                                        border: '2px solid white',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'center',
-                                                                        color: '#94A3B8',
-                                                                        fontSize: '14px'
-                                                                    }}
-                                                                >
-                                                                    <Instagram size={18} variant="Bold" color="#CBD5E1" />
-                                                                </Box>
-                                                            )}
-                                                        </Box>
-
-                                                        {/* Info Stack (Right) */}
-                                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 0.5 }}>
-                                                            {/* Date */}
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94A3B8' }}>
-                                                                <Clock size={14} variant="Outline" color="#94A3B8" />
-                                                                <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1 }}>
-                                                                    {evt.eventDate ? format(new Date(evt.eventDate), 'dd/MM/yyyy') : '-'}
-                                                                </Typography>
-                                                            </Box>
-                                                            {/* Tasks */}
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, color: '#94A3B8' }}>
-                                                                <Clock size={14} variant="Outline" color="#94A3B8" />
-                                                                <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1 }}>
-                                                                    {evt.tasksCount || 0} Messages
-                                                                </Typography>
-                                                            </Box>
-                                                        </Box>
+                                                    <Box sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        mr: -1
+                                                    }}>
+                                                        {theme.icon}
                                                     </Box>
                                                 </CardContent>
                                             </Card>
@@ -1339,10 +1345,31 @@ function LiffContent() {
                                                     }}>
                                                         {promo.period || 'Special Offer'}
                                                     </Typography>
-                                                    <Typography sx={{ color: 'white', fontWeight: 700, fontSize: '1.05rem', fontFamily: 'var(--font-prompt)', lineHeight: 1.2 }}>
+                                                    <Typography sx={{
+                                                        color: 'white',
+                                                        fontWeight: 700,
+                                                        fontSize: '1.05rem',
+                                                        fontFamily: 'var(--font-prompt)',
+                                                        lineHeight: 1.2,
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 2,
+                                                        WebkitBoxOrient: 'vertical'
+                                                    }}>
                                                         {promo.title}
                                                     </Typography>
-                                                    <Typography sx={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.875rem', fontFamily: 'var(--font-prompt)', mt: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                                    <Typography sx={{
+                                                        color: 'rgba(255,255,255,0.7)',
+                                                        fontSize: '0.875rem',
+                                                        fontFamily: 'var(--font-prompt)',
+                                                        mt: 0.5,
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: 1,
+                                                        WebkitBoxOrient: 'vertical'
+                                                    }}>
                                                         {promo.description}
                                                     </Typography>
                                                 </Box>

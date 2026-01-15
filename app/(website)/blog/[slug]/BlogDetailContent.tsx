@@ -106,25 +106,25 @@ export default function BlogDetailContent({ params }: Props) {
                     position: 'relative'
                 }}>
                     <Container maxWidth="md">
-                        <Skeleton variant="rounded" width={100} height={32} sx={{ mb: 3, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.05)' }} />
-                        <Skeleton variant="text" width="90%" height={60} sx={{ bgcolor: 'rgba(0,0,0,0.08)' }} />
-                        <Skeleton variant="text" width="70%" height={60} sx={{ mb: 3, bgcolor: 'rgba(0,0,0,0.08)' }} />
+                        <Skeleton variant="rounded" width={100} height={32} sx={{ mb: 3, borderRadius: 2, bgcolor: 'var(--border-color)' }} />
+                        <Skeleton variant="text" width="90%" height={60} sx={{ bgcolor: 'var(--border-color)', opacity: 0.8 }} />
+                        <Skeleton variant="text" width="70%" height={60} sx={{ mb: 3, bgcolor: 'var(--border-color)', opacity: 0.8 }} />
                         <Stack direction="row" spacing={3}>
-                            <Skeleton variant="text" width={150} height={24} sx={{ bgcolor: 'rgba(0,0,0,0.05)' }} />
-                            <Skeleton variant="text" width={100} height={24} sx={{ bgcolor: 'rgba(0,0,0,0.05)' }} />
+                            <Skeleton variant="text" width={150} height={24} sx={{ bgcolor: 'var(--border-color)', opacity: 0.6 }} />
+                            <Skeleton variant="text" width={100} height={24} sx={{ bgcolor: 'var(--border-color)', opacity: 0.6 }} />
                         </Stack>
                     </Container>
                 </Box>
 
                 {/* Image Skeleton */}
                 <Container maxWidth="lg" sx={{ mb: 6 }}>
-                    <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4, bgcolor: 'rgba(0,0,0,0.06)' }} />
+                    <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4, bgcolor: 'var(--border-color)' }} />
                 </Container>
 
                 {/* Content Skeleton */}
                 <Container maxWidth="md">
                     {[1, 2, 3, 4, 5].map((n) => (
-                        <Skeleton key={n} variant="text" width={`${90 - n * 5}%`} height={24} sx={{ mb: 2, bgcolor: 'rgba(0,0,0,0.05)' }} />
+                        <Skeleton key={n} variant="text" width={`${90 - n * 5}%`} height={24} sx={{ mb: 2, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
                     ))}
                 </Container>
             </Box>
@@ -272,7 +272,7 @@ export default function BlogDetailContent({ params }: Props) {
                             </Box>
                         </Stack>
 
-                        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' }, bgcolor: 'rgba(128,128,128,0.3)' }} />
+                        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' }, bgcolor: 'var(--border-color)' }} />
 
                         <Stack direction="row" spacing={3}>
                             <Stack direction="row" spacing={0.5} alignItems="center">
@@ -363,7 +363,7 @@ export default function BlogDetailContent({ params }: Props) {
                 />
 
                 {/* Share Section */}
-                <Divider sx={{ my: 6, bgcolor: 'rgba(128,128,128,0.2)' }} />
+                <Divider sx={{ my: 6, bgcolor: 'var(--border-color)' }} />
 
                 <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={2}>
                     <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>

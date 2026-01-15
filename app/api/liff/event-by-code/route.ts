@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 // GET /api/liff/event-by-code?code=xxx&lineUid=xxx
 export async function GET(request: NextRequest) {
@@ -19,7 +17,7 @@ export async function GET(request: NextRequest) {
         }
 
         // Find event by invite code
-        const event = await prisma.event.findUnique({
+        const event = await (prisma.event as any).findUnique({
             where: { inviteCode },
             include: {
                 customer: {
@@ -27,11 +25,11 @@ export async function GET(request: NextRequest) {
                         id: true,
                         lineUid: true,
                         displayName: true,
-                        sales: {
-                            select: {
-                                name: true
-                            }
-                        }
+                    }
+                },
+                sales: {
+                    select: {
+                        name: true
                     }
                 },
                 timelines: {
@@ -55,7 +53,7 @@ export async function GET(request: NextRequest) {
 
         // Fallback names
         const customerFallback = event.customer.displayName || 'Customer';
-        const staffFallback = (event.customer as any).sales?.name || 'Admin';
+        const staffFallback = event.sales?.name || 'Admin';
 
         // Functional helper for mapping logs
         const mapChatLogs = (logs: any[], customerName: string, staffName: string) => {
@@ -97,20 +95,20 @@ export async function GET(request: NextRequest) {
             });
 
             // Refetch with new timelines
-            const updatedEvent = await prisma.event.findUnique({
+            const updatedEvent = await (prisma.event as any).findUnique({
                 where: { id: event.id },
                 include: {
                     timelines: { orderBy: { createdAt: 'desc' } },
                     chatLogs: { orderBy: { createdAt: 'desc' } },
                     bookings: true,
+                    sales: {
+                        select: {
+                            name: true
+                        }
+                    },
                     customer: {
                         select: {
                             displayName: true,
-                            sales: {
-                                select: {
-                                    name: true
-                                }
-                            }
                         }
                     }
                 }
@@ -119,7 +117,7 @@ export async function GET(request: NextRequest) {
             if (!updatedEvent) return NextResponse.json({ error: 'Event not found after update' }, { status: 404 });
 
             const customerName = updatedEvent.customer.displayName || 'Customer';
-            const staffName = (updatedEvent.customer as any).sales?.name || 'Admin';
+            const staffName = updatedEvent.sales?.name || 'Admin';
 
             return NextResponse.json({
                 success: true,

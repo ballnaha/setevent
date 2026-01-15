@@ -331,20 +331,17 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                     />
                                 </Box>
 
-                                {/* Gradient Overlay - Desktop: Hover, Mobile: Gradient */}
+                                {/* Gradient Overlay - Always Visible */}
                                 <Box className="overlay" sx={{
                                     position: 'absolute',
                                     inset: 0,
-                                    background: {
-                                        xs: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)',
-                                        md: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 100%)' // Full overlay on hover for desktop
-                                    },
-                                    opacity: { xs: 1, md: 0 },
+                                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
+                                    opacity: 1,
                                     transition: 'opacity 0.3s ease',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     justifyContent: 'flex-end',
-                                    p: { xs: 2, md: 3 }
+                                    p: 2
                                 }}>
                                     <Chip
                                         label={item.category}

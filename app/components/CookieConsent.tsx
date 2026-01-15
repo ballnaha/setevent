@@ -64,11 +64,11 @@ const CookieConsent = () => {
                         sx={{
                             p: { xs: 3, md: 4 },
                             borderRadius: { xs: 4, md: 6 },
-                            background: 'rgba(255, 255, 255, 0.95)',
+                            background: 'var(--card-bg)',
                             backdropFilter: 'blur(10px)',
-                            border: '1px solid rgba(10, 92, 90, 0.1)',
+                            border: '1px solid var(--border-color)',
                             pointerEvents: 'auto',
-                            boxShadow: '0 10px 40px rgba(0,0,0,0.1)',
+                            boxShadow: 'var(--card-shadow)',
                             position: 'relative',
                             overflow: 'hidden',
                             '&::before': {
@@ -104,7 +104,7 @@ const CookieConsent = () => {
                                         นโยบายความเป็นส่วนตัวและคุ้กกี้
                                     </Typography>
                                 </Stack>
-                                <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6, maxWidth: '800px' }}>
+                                <Typography variant="body2" sx={{ color: 'var(--foreground)', opacity: 0.7, lineHeight: 1.6, maxWidth: '800px' }}>
                                     เราใช้คุกกี้เพื่อเพิ่มประสิทธิภาพและประสบการณ์ที่ดีในการใช้งานเว็บไซต์
                                     โดยการใช้งานเว็บไซต์นี้ถือว่าท่านยอมรับการใช้งานคุกกี้ของเรา
                                     ท่านสามารถศึกษารายละเอียดเพิ่มเติมได้ที่
@@ -136,8 +136,9 @@ const CookieConsent = () => {
                                         px: 3,
                                         py: 1.2,
                                         borderRadius: '12px',
-                                        color: 'text.secondary',
-                                        borderColor: 'divider',
+                                        color: 'var(--foreground)',
+                                        opacity: 0.8,
+                                        borderColor: 'var(--border-color)',
                                         fontWeight: 500,
                                         '&:hover': {
                                             borderColor: 'text.primary',
