@@ -200,7 +200,7 @@ export default function ContactSettingsPage() {
                             fullWidth
                             value={settings.facebook}
                             onChange={handleChange("facebook")}
-                            placeholder="https://facebook.com/yourpage"
+                            placeholder="https://facebook.com/seteventthailand"
                             InputProps={{
                                 sx: { fontFamily: 'var(--font-prompt)' },
                                 startAdornment: <Facebook size="18" color="rgba(0,0,0,0.4)" style={{ marginRight: 8 }} />

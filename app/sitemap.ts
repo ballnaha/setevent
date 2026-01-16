@@ -13,11 +13,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
         '/contact',
         '/faq',
         '/about',
+        '/blog',
+        '/designs',
+        '/privacy-policy',
+        '/terms-of-service',
     ].map((route) => ({
         url: `${baseUrl}${route}`,
         lastModified: new Date(),
         changeFrequency: 'weekly' as const,
-        priority: route === '' ? 1 : 0.8,
+        priority: route === '' ? 1 : route === '/blog' ? 0.7 : 0.8,
     }));
 
     // Product routes

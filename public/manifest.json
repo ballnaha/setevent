@@ -1,21 +1,100 @@
 {
-    "name": "SetEvent Admin",
-    "short_name": "SetEventAdmin",
-    "description": "Admin panel for Event Management System",
-    "start_url": "/admin",
+    "name": "SET EVENT Thailand - บริการเช่าอุปกรณ์จัดงานอีเว้นท์",
+    "short_name": "SET EVENT",
+    "description": "บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา และอีเวนต์ทุกประเภท พร้อมทีมงานมืออาชีพ",
+    "start_url": "/",
+    "id": "/",
+    "scope": "/",
     "display": "standalone",
+    "display_override": [
+        "window-controls-overlay",
+        "standalone",
+        "browser"
+    ],
+    "orientation": "any",
     "background_color": "#ffffff",
-    "theme_color": "#111827",
+    "theme_color": "#00C2CB",
+    "lang": "th",
+    "dir": "ltr",
+    "categories": [
+        "business",
+        "entertainment",
+        "events"
+    ],
     "icons": [
         {
-            "src": "/icons/icon-512x512.png",
-            "sizes": "192x192",
+            "src": "/images/favicon.png",
+            "sizes": "32x32",
             "type": "image/png"
         },
         {
-            "src": "/icons/icon-512x512.png",
+            "src": "/images/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icon-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/images/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
-    ]
+    ],
+    "screenshots": [
+        {
+            "src": "/images/og-image.jpg",
+            "sizes": "1200x630",
+            "type": "image/jpeg",
+            "form_factor": "wide",
+            "label": "SET EVENT Thailand Homepage"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "สินค้าและบริการ",
+            "short_name": "Products",
+            "description": "ดูสินค้าและบริการทั้งหมด",
+            "url": "/products",
+            "icons": [
+                {
+                    "src": "/images/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "ติดต่อเรา",
+            "short_name": "Contact",
+            "description": "ติดต่อสอบถามบริการ",
+            "url": "/contact",
+            "icons": [
+                {
+                    "src": "/images/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "ผลงาน",
+            "short_name": "Portfolio",
+            "description": "ชมผลงานของเรา",
+            "url": "/portfolio",
+            "icons": [
+                {
+                    "src": "/images/icon-192x192.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ],
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+        "preferred_width": 400
+    }
 }

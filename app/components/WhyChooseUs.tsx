@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export default function WhyChooseUs() {
     return (
-        <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)", overflow: 'hidden' }}>
+        <Box component="section" aria-label="ทำไมต้องเลือก SET EVENT" sx={{ py: { xs: 8, md: 12 }, bgcolor: "var(--background)", overflow: 'hidden' }}>
             <Container maxWidth="lg">
                 <Stack
                     direction={{ xs: 'column', md: 'row' }}
@@ -29,7 +29,7 @@ export default function WhyChooseUs() {
                         }}>
                             WHY CHOOSE US
                         </Typography>
-                        <Typography variant="h3" sx={{
+                        <Typography variant="h3" component="h2" sx={{
                             color: "var(--foreground)",
                             fontFamily: "var(--font-prompt)",
                             fontWeight: "bold",
@@ -37,7 +37,7 @@ export default function WhyChooseUs() {
                             fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
                             textShadow: 'var(--text-glow)'
                         }}>
-                            ทำไมต้องเลือก <span style={{ color: 'var(--primary)' }}>SetEvent?</span>
+                            ทำไมต้องเลือก <span style={{ color: 'var(--primary)' }}>SET EVENT Thailand?</span>
                         </Typography>
 
                         <Stack spacing={4}>
@@ -72,7 +72,7 @@ export default function WhyChooseUs() {
                         }}>
                             <Image
                                 src="/images/app_screen3.png"
-                                alt="Event Management Mockup"
+                                alt="ระบบติดตามงานอีเว้นท์ SET EVENT Thailand - Web Application สำหรับจัดการงาน"
                                 fill
                                 style={{ objectFit: 'cover' }}
                                 priority

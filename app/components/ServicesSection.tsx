@@ -33,7 +33,25 @@ const services = [
 
 export default function ServicesSection() {
     return (
-        <Box sx={{ py: { xs: 8, md: 15 }, bgcolor: "var(--background)", position: "relative", overflow: "hidden" }}>
+        <Box component="section" aria-label="บริการของ SET EVENT Thailand" sx={{ py: { xs: 8, md: 15 }, bgcolor: "var(--background)", position: "relative", overflow: "hidden" }}>
+            {/* Section Heading for SEO */}
+            <Typography
+                variant="h2"
+                component="h2"
+                sx={{
+                    position: 'absolute',
+                    width: '1px',
+                    height: '1px',
+                    padding: 0,
+                    margin: '-1px',
+                    overflow: 'hidden',
+                    clip: 'rect(0, 0, 0, 0)',
+                    whiteSpace: 'nowrap',
+                    border: 0,
+                }}
+            >
+                บริการเช่าอุปกรณ์จัดงานอีเว้นท์ครบวงจร - SET EVENT Thailand
+            </Typography>
             {/* Geometric Decor - Left */}
             <Box sx={{ position: 'absolute', top: '20%', left: 0, zIndex: 0, display: { xs: 'none', lg: 'block' } }}>
                 <svg width="150" height="300" viewBox="0 0 150 300" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -92,7 +110,7 @@ export default function ServicesSection() {
                             </Box>
 
                             {/* Title */}
-                            <Typography variant="h4" sx={{
+                            <Typography variant="h4" component="h3" sx={{
                                 fontFamily: "var(--font-prompt)",
                                 fontWeight: "bold",
                                 mb: 1,

@@ -83,7 +83,25 @@ const infoBlocks = [
 
 export default function FeaturedEvents() {
     return (
-        <Box sx={{ position: "relative", width: "100%" }}>
+        <Box component="section" aria-label="บริการจอ LED และอุปกรณ์จัดงาน" sx={{ position: "relative", width: "100%" }}>
+            {/* Hidden H2 for SEO */}
+            <Typography
+                variant="h2"
+                component="h2"
+                sx={{
+                    position: 'absolute',
+                    width: '1px',
+                    height: '1px',
+                    padding: 0,
+                    margin: '-1px',
+                    overflow: 'hidden',
+                    clip: 'rect(0, 0, 0, 0)',
+                    whiteSpace: 'nowrap',
+                    border: 0,
+                }}
+            >
+                บริการให้เช่าจอ LED แสง เสียง เวที และอุปกรณ์จัดงานอีเว้นท์ครบวงจร
+            </Typography>
 
             {/* Top Section with Image Background */}
             <Box sx={{
@@ -96,7 +114,7 @@ export default function FeaturedEvents() {
                 <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                     <Image
                         src="/images/concert.png"
-                        alt="Background"
+                        alt="SET EVENT Thailand - บริการเช่าจอ LED และระบบแสงเสียงสำหรับงานคอนเสิร์ต"
                         fill
                         style={{ objectFit: 'cover' }}
                     />
@@ -130,7 +148,7 @@ export default function FeaturedEvents() {
                                 borderRadius: { xs: 2, md: 0 },
                                 border: { xs: '1px solid rgba(255,255,255,0.1)', md: 'none' }
                             }}>
-                                <Typography variant="h4" sx={{
+                                <Typography variant="h4" component="h3" sx={{
                                     fontFamily: "var(--font-prompt)",
                                     fontWeight: 700,
                                     color: "white",
@@ -199,58 +217,61 @@ export default function FeaturedEvents() {
                         ))}
                     </Box>
                 </Container>
-            </Box>
+            </Box >
 
             {/* Bottom Info Bar */}
-            <Box sx={{
+            < Box sx={{
                 display: 'grid',
                 gridTemplateColumns: { xs: '1fr 1fr', md: 'repeat(4, 1fr)' } // 2 columns on mobile
-            }}>
-                {infoBlocks.map((block, index) => (
-                    <Box
-                        key={index}
-                        sx={{
-                            bgcolor: block.color,
-                            py: { xs: 4, md: 6 }, // Reduce padding on mobile
-                            px: 2,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            textAlign: 'center',
-                            transition: 'filter 0.3s ease',
-                            cursor: 'pointer',
-                            minHeight: { xs: '160px', md: 'auto' }, // Ensure touch target size
-                            '&:hover': {
-                                filter: 'brightness(1.1)'
-                            }
-                        }}
-                    >
-                        <Box sx={{ mb: 1.5 }}>
-                            {block.icon}
+            }
+            }>
+                {
+                    infoBlocks.map((block, index) => (
+                        <Box
+                            key={index}
+                            sx={{
+                                bgcolor: block.color,
+                                py: { xs: 4, md: 6 }, // Reduce padding on mobile
+                                px: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                textAlign: 'center',
+                                transition: 'filter 0.3s ease',
+                                cursor: 'pointer',
+                                minHeight: { xs: '160px', md: 'auto' }, // Ensure touch target size
+                                '&:hover': {
+                                    filter: 'brightness(1.1)'
+                                }
+                            }}
+                        >
+                            <Box sx={{ mb: 1.5 }}>
+                                {block.icon}
+                            </Box>
+                            <Typography variant="h6" sx={{
+                                fontFamily: "var(--font-prompt)",
+                                fontWeight: 700,
+                                color: "white",
+                                textTransform: 'uppercase',
+                                mb: 0.5,
+                                fontSize: { xs: '0.9rem', md: '1.1rem' } // Responsive font size
+                            }}>
+                                {block.title}
+                            </Typography>
+                            <Typography variant="body2" sx={{
+                                fontFamily: "var(--font-prompt)",
+                                fontWeight: 400,
+                                color: "rgba(255,255,255,0.9)",
+                                fontSize: { xs: '0.8rem', md: '1rem' }
+                            }}>
+                                {block.subtitle}
+                            </Typography>
                         </Box>
-                        <Typography variant="h6" sx={{
-                            fontFamily: "var(--font-prompt)",
-                            fontWeight: 700,
-                            color: "white",
-                            textTransform: 'uppercase',
-                            mb: 0.5,
-                            fontSize: { xs: '0.9rem', md: '1.1rem' } // Responsive font size
-                        }}>
-                            {block.title}
-                        </Typography>
-                        <Typography variant="body2" sx={{
-                            fontFamily: "var(--font-prompt)",
-                            fontWeight: 400,
-                            color: "rgba(255,255,255,0.9)",
-                            fontSize: { xs: '0.8rem', md: '1rem' }
-                        }}>
-                            {block.subtitle}
-                        </Typography>
-                    </Box>
-                ))}
-            </Box>
+                    ))
+                }
+            </Box >
 
-        </Box>
+        </Box >
     );
 }

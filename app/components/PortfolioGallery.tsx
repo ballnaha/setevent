@@ -45,15 +45,15 @@ const works = [
 
 export default function PortfolioGallery() {
     return (
-        <Box sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 8, md: 0 }, bgcolor: "var(--background)" }}>
+        <Box component="section" aria-label="บริการรับจัดงานอีเว้นท์" sx={{ pt: { xs: 8, md: 12 }, pb: { xs: 8, md: 0 }, bgcolor: "var(--background)" }}>
             <Container maxWidth="lg">
                 <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="end" mb={{ xs: 4, md: 4 }} spacing={2}>
                     <Box>
                         <Typography variant="h6" sx={{ color: "var(--secondary)", fontFamily: "var(--font-comfortaa)", fontWeight: "bold", mb: 1, letterSpacing: 1.5, fontSize: { xs: '0.9rem', md: '1.25rem' } }}>
                             OUR SERVICES
                         </Typography>
-                        <Typography variant="h3" sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", fontWeight: "bold", fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
-                            บริการของเรา
+                        <Typography variant="h3" component="h2" sx={{ color: "var(--foreground)", fontFamily: "var(--font-prompt)", fontWeight: "bold", fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' } }}>
+                            บริการรับจัดงานอีเว้นท์ครบวงจร
                         </Typography>
                     </Box>
                     <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>
@@ -111,7 +111,7 @@ export default function PortfolioGallery() {
                                 justifyContent: 'flex-end',
                                 p: 4
                             }}>
-                                <Typography variant="h5" color="white" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', mb: 1 }}>
+                                <Typography variant="h5" component="h3" color="white" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', mb: 1 }}>
                                     {work.title}
                                 </Typography>
                                 <Typography variant="body1" color="rgba(255,255,255,0.8)" sx={{ fontFamily: 'var(--font-prompt)' }}>

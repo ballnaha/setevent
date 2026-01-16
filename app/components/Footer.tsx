@@ -220,7 +220,7 @@ export default function Footer() {
                                         '&:hover': { bgcolor: 'var(--primary)', borderColor: 'var(--primary)' }
                                     }}
                                 >
-                                    <Facebook size="20" variant="Bold" />
+                                    <Facebook size="20" variant="Bold" color="white" />
                                 </IconButton>
                             )}
                             {settings.instagram && (
@@ -236,7 +236,7 @@ export default function Footer() {
                                         '&:hover': { bgcolor: 'var(--primary)', borderColor: 'var(--primary)' }
                                     }}
                                 >
-                                    <Instagram size="20" variant="Bold" />
+                                    <Instagram size="20" variant="Bold" color="white" />
                                 </IconButton>
                             )}
                             {settings.tiktok && (

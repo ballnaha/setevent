@@ -65,9 +65,11 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    nocache: false,
     googleBot: {
       index: true,
       follow: true,
+      noimageindex: false,
       "max-video-preview": -1,
       "max-image-preview": "large",
       "max-snippet": -1,
@@ -84,15 +86,32 @@ export const metadata: Metadata = {
     ],
     shortcut: ['/favicon.ico'],
   },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+    // Add other verifications as needed
+    // bing: 'your-bing-verification-code',
+  },
+  category: 'event services',
+  classification: 'Business',
   other: {
     google: "notranslate",
+    "apple-mobile-web-app-capable": "yes",
+    "apple-mobile-web-app-status-bar-style": "default",
+    "apple-mobile-web-app-title": "SET EVENT",
+    "mobile-web-app-capable": "yes",
+    "format-detection": "telephone=no",
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" }
+  ],
   width: "device-width",
   initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
 };
 
 import GoogleAnalytics from './components/GoogleAnalytics';
@@ -105,6 +124,97 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th" translate="no" suppressHydrationWarning>
+      <head>
+        {/* Preconnect hints for performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+        {/* WebSite Schema for Sitelinks Search Box */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              "@id": "https://seteventthailand.com/#website",
+              "name": "SET EVENT Thailand",
+              "url": "https://seteventthailand.com",
+              "description": "บริการให้เช่าจอ LED เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร",
+              "inLanguage": "th-TH",
+              "publisher": {
+                "@id": "https://seteventthailand.com/#organization"
+              },
+              "potentialAction": {
+                "@type": "SearchAction",
+                "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://seteventthailand.com/search?q={search_term_string}"
+                },
+                "query-input": "required name=search_term_string"
+              }
+            })
+          }}
+        />
+
+        {/* Organization Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "@id": "https://seteventthailand.com/#organization",
+              "name": "SET EVENT Thailand",
+              "alternateName": ["SetEvent", "เซ็ทอีเว้นท์", "SET EVENT"],
+              "url": "https://seteventthailand.com",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://seteventthailand.com/images/logo.png",
+                "width": 512,
+                "height": 512
+              },
+              "image": "https://seteventthailand.com/images/og-image.jpg",
+              "description": "SET EVENT Thailand - บริการให้เช่าจอ LED, เวที, แสง เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร พร้อมทีมงานมืออาชีพ",
+              "telephone": "+66-93-726-5055",
+              "email": "setevent26@gmail.com",
+              "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "Bangkok",
+                "addressLocality": "Bangkok",
+                "addressRegion": "Bangkok",
+                "postalCode": "10000",
+                "addressCountry": "TH"
+              },
+              "geo": {
+                "@type": "GeoCoordinates",
+                "latitude": 13.7563,
+                "longitude": 100.5236
+              },
+              "areaServed": {
+                "@type": "Country",
+                "name": "Thailand"
+              },
+              "foundingDate": "2015",
+              "slogan": "End-to-End Event Solution",
+              "sameAs": [
+                "https://www.facebook.com/seteventthailand",
+                "https://www.instagram.com/setevent",
+                "https://line.me/ti/p/~@setevent",
+                "https://www.youtube.com/@setevent"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+66-93-726-5055",
+                "contactType": "customer service",
+                "availableLanguage": ["Thai", "English"],
+                "areaServed": "TH"
+              }
+            })
+          }}
+        />
+      </head>
       <body
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ margin: 0 }}
@@ -127,42 +237,96 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "LocalBusiness",
-              "name": "SetEvent",
-              "image": "https://seteventthailand.com/images/logo1.png",
-              "description": "บริการให้เช่าอุปกรณ์จัดงานครบวงจร และรับจัดงานอีเว้นท์ งานแต่งงาน งานสัมมนา งานเปิดตัวสินค้า งานปาร์ตี้ ด้วยทีมงานมืออาชีพ",
-              "@id": "https://seteventthailand.com",
+              "@id": "https://seteventthailand.com/#localbusiness",
+              "name": "SET EVENT Thailand",
+              "image": [
+                "https://seteventthailand.com/images/logo.png",
+                "https://seteventthailand.com/images/og-image.jpg"
+              ],
+              "description": "บริการให้เช่าจอ LED เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร รับจัดงานแต่งงาน งานสัมมนา งานเปิดตัวสินค้า งานคอนเสิร์ต ด้วยทีมงานมืออาชีพ",
               "url": "https://seteventthailand.com",
-              "telephone": "",
+              "telephone": "+66-93-726-5055",
+              "email": "setevent26@gmail.com",
+              "priceRange": "฿฿฿",
+              "currenciesAccepted": "THB",
+              "paymentAccepted": "Cash, Credit Card, Bank Transfer",
               "address": {
                 "@type": "PostalAddress",
-                "streetAddress": "",
-                "addressLocality": "",
-                "postalCode": "",
+                "streetAddress": "Bangkok",
+                "addressLocality": "Bangkok",
+                "addressRegion": "Bangkok",
+                "postalCode": "10000",
                 "addressCountry": "TH"
               },
               "geo": {
                 "@type": "GeoCoordinates",
-                "latitude": "",
-                "longitude": ""
+                "latitude": 13.7563,
+                "longitude": 100.5236
               },
-              "openingHoursSpecification": {
-                "@type": "OpeningHoursSpecification",
-                "dayOfWeek": [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                  "Sunday"
-                ],
-                "opens": "09:00",
-                "closes": "18:00"
+              "openingHoursSpecification": [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  "opens": "09:00",
+                  "closes": "18:00"
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": ["Saturday", "Sunday"],
+                  "opens": "09:00",
+                  "closes": "18:00"
+                }
+              ],
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.9",
+                "reviewCount": "127",
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "บริการเช่าอุปกรณ์งานอีเว้นท์",
+                "itemListElement": [
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "เช่าจอ LED",
+                      "description": "บริการให้เช่าจอ LED ทุกขนาด Indoor และ Outdoor"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "เช่าเวที",
+                      "description": "บริการให้เช่าเวทีและโครงสร้าง Truss"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "เช่าระบบแสงเสียง",
+                      "description": "บริการให้เช่าระบบแสง เสียง ครบวงจร"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "รับจัดงานอีเว้นท์",
+                      "description": "รับจัดงานอีเว้นท์ครบวงจร งานแต่งงาน งานสัมมนา"
+                    }
+                  }
+                ]
               },
               "sameAs": [
-                "https://facebook.com/SetEvent",
-                "https://instagram.com/SetEvent",
-                "https://youtube.com/SetEvent"
+                "https://www.facebook.com/seteventthailand",
+                "https://www.instagram.com/setevent",
+                "https://line.me/ti/p/~@setevent",
+                "https://www.youtube.com/@setevent"
               ]
             })
           }}

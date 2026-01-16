@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://seteventthailand.com/og-image.jpg',
+        url: 'https://seteventthailand.com/images/og-image.jpg',
         width: 1200,
         height: 630,
         alt: 'SET EVENT Thailand',

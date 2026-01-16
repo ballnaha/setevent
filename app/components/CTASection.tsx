@@ -8,13 +8,13 @@ import Link from "next/link";
 
 export default function CTASection() {
     return (
-        <Box sx={{ position: 'relative', py: { xs: 10, md: 16 }, overflow: 'hidden' }}>
+        <Box component="section" aria-label="ติดต่อขอใบเสนอราคา" sx={{ position: 'relative', py: { xs: 10, md: 16 }, overflow: 'hidden' }}>
 
             {/* Full Width Background Image */}
             <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                 <Image
                     src="/images/banner1-2.webp"
-                    alt="CTA Background"
+                    alt="SET EVENT Thailand - บริการรับจัดงานอีเว้นท์และเช่าอุปกรณ์ครบวงจร"
                     fill
                     style={{ objectFit: 'cover', objectPosition: 'center' }}
                 />
@@ -44,7 +44,7 @@ export default function CTASection() {
                     </Typography>
                 </Box>
 
-                <Typography variant="h2" sx={{
+                <Typography variant="h2" component="h2" sx={{
                     fontFamily: 'var(--font-prompt)',
                     fontWeight: 800,
                     color: 'white',
@@ -53,8 +53,8 @@ export default function CTASection() {
                     fontSize: { xs: '2rem', md: '3.5rem' },
                     textShadow: '0 10px 30px rgba(0,0,0,0.5)'
                 }}>
-                    เปลี่ยนไอเดียงานในฝัน<br />
-                    <span style={{ color: 'var(--primary)' }}>ให้เกิดขึ้นจริงกับเรา</span>
+                    รับจัดงานอีเว้นท์ครบวงจร<br />
+                    <span style={{ color: 'var(--primary)' }}>ให้เกิดขึ้นจริงกับ SET EVENT</span>
                 </Typography>
 
                 <Typography variant="h6" sx={{
@@ -78,6 +78,7 @@ export default function CTASection() {
                         variant="contained"
                         size="large"
                         endIcon={<ArrowRight />}
+                        aria-label="ขอใบเสนอราคาบริการจัดงานอีเว้นท์"
                         sx={{
                             bgcolor: "var(--primary)",
                             color: "white",
@@ -103,9 +104,11 @@ export default function CTASection() {
                         component="a"
                         href="https://line.me/ti/p/~@setevent"
                         target="_blank"
+                        rel="noopener noreferrer"
                         variant="outlined"
                         size="large"
                         startIcon={<Message />}
+                        aria-label="สอบถามบริการจัดงานอีเว้นท์ผ่าน LINE Official"
                         sx={{
                             borderColor: "white",
                             color: "white",

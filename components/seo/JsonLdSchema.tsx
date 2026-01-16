@@ -34,7 +34,7 @@ export function OrganizationSchema({
         addressCountry: 'TH',
     },
     socialProfiles = [
-        'https://www.facebook.com/setevent',
+        'https://www.facebook.com/seteventthailand',
         'https://www.instagram.com/setevent',
         'https://line.me/ti/p/~@setevent',
     ],
@@ -240,6 +240,78 @@ export function FAQSchema({
     );
 }
 
+// Breadcrumb Schema for navigation
+interface BreadcrumbSchemaProps {
+    items?: Array<{
+        name: string;
+        url: string;
+    }>;
+}
+
+export function BreadcrumbSchema({
+    items = [
+        { name: 'หน้าแรก', url: 'https://seteventthailand.com' }
+    ],
+}: BreadcrumbSchemaProps) {
+    const schema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: items.map((item, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: item.name,
+            item: item.url,
+        })),
+    };
+
+    return (
+        <Script
+            id="breadcrumb-schema"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+    );
+}
+
+// WebPage Schema
+interface WebPageSchemaProps {
+    name?: string;
+    description?: string;
+    url?: string;
+}
+
+export function WebPageSchema({
+    name = 'SET EVENT Thailand - บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร',
+    description = 'บริการให้เช่าจอ LED, เวที, แสง เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา',
+    url = 'https://seteventthailand.com',
+}: WebPageSchemaProps) {
+    const schema = {
+        '@context': 'https://schema.org',
+        '@type': 'WebPage',
+        '@id': `${url}/#webpage`,
+        name,
+        description,
+        url,
+        isPartOf: {
+            '@id': 'https://seteventthailand.com/#website'
+        },
+        about: {
+            '@id': 'https://seteventthailand.com/#organization'
+        },
+        inLanguage: 'th-TH',
+        datePublished: '2020-01-01T00:00:00+07:00',
+        dateModified: new Date().toISOString(),
+    };
+
+    return (
+        <Script
+            id="webpage-schema"
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+    );
+}
+
 // Combined Schema for homepage
 export function HomepageSchema() {
     return (
@@ -247,6 +319,8 @@ export function HomepageSchema() {
             <OrganizationSchema />
             <LocalBusinessSchema />
             <ServiceSchema />
+            <BreadcrumbSchema />
+            <WebPageSchema />
         </>
     );
 }

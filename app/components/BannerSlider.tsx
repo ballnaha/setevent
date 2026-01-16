@@ -42,7 +42,7 @@ export default function BannerSlider() {
             }}>
                 <Image
                     src="/images/banner1-4.webp"
-                    alt="Event Background"
+                    alt="SET EVENT Thailand - บริการเช่าจอ LED เวที แสง เสียง และจัดงานอีเว้นท์ครบวงจร"
                     fill
                     priority
                     style={{ filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
@@ -91,7 +91,25 @@ export default function BannerSlider() {
                 pt: { xs: 12, md: 15 },
                 pb: { xs: 6, md: 4 }
             }}>
-                <Typography variant="h1" sx={{
+                {/* Hidden H1 for SEO - visually hidden but accessible */}
+                <Typography
+                    component="h1"
+                    sx={{
+                        position: 'absolute',
+                        width: '1px',
+                        height: '1px',
+                        padding: 0,
+                        margin: '-1px',
+                        overflow: 'hidden',
+                        clip: 'rect(0, 0, 0, 0)',
+                        whiteSpace: 'nowrap',
+                        border: 0,
+                    }}
+                >
+                    SET EVENT Thailand - บริการให้เช่าจอ LED เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร
+                </Typography>
+
+                <Typography variant="h2" component="div" sx={{
                     fontFamily: 'var(--font-prompt)',
                     fontWeight: 900,
                     color: 'white',
