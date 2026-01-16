@@ -71,11 +71,12 @@ export default function WhyChooseUs() {
 
                         }}>
                             <Image
-                                src="/images/app_screen3.png"
+                                src="/images/app_screen1.webp"
                                 alt="ระบบติดตามงานอีเว้นท์ SET EVENT Thailand - Web Application สำหรับจัดการงาน"
                                 fill
+                                loading="lazy"
+                                sizes="(max-width: 768px) 100vw, 50vw"
                                 style={{ objectFit: 'cover' }}
-                                priority
                             />
                         </Box>
                     </Box>

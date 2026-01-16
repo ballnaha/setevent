@@ -97,8 +97,9 @@ export default function PortfolioGallery() {
                                 src={work.image}
                                 alt={work.title}
                                 fill
+                                loading="lazy"
+                                sizes="(max-width: 768px) 85vw, 33vw"
                                 style={{ objectFit: 'cover', transition: 'transform 0.5s ease' }}
-
                             />
                             <Box className="overlay" sx={{
                                 position: 'absolute',

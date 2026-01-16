@@ -113,9 +113,11 @@ export default function FeaturedEvents() {
                 {/* Background Image with Overlay */}
                 <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                     <Image
-                        src="/images/concert.png"
+                        src="/images/concert.webp"
                         alt="SET EVENT Thailand - บริการเช่าจอ LED และระบบแสงเสียงสำหรับงานคอนเสิร์ต"
                         fill
+                        loading="lazy"
+                        sizes="100vw"
                         style={{ objectFit: 'cover' }}
                     />
                     <Box sx={{

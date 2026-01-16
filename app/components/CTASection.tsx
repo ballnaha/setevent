@@ -16,6 +16,8 @@ export default function CTASection() {
                     src="/images/banner1-2.webp"
                     alt="SET EVENT Thailand - บริการรับจัดงานอีเว้นท์และเช่าอุปกรณ์ครบวงจร"
                     fill
+                    loading="lazy"
+                    sizes="100vw"
                     style={{ objectFit: 'cover', objectPosition: 'center' }}
                 />
                 {/* Dark Overlay Gradient for Readability */}

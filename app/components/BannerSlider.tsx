@@ -45,6 +45,7 @@ export default function BannerSlider() {
                     alt="SET EVENT Thailand - บริการเช่าจอ LED เวที แสง เสียง และจัดงานอีเว้นท์ครบวงจร"
                     fill
                     priority
+                    sizes="100vw"
                     style={{ filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
                 />
 
