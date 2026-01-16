@@ -34,19 +34,22 @@ export default function BannerSlider() {
                 position: 'absolute',
                 inset: 0,
                 zIndex: 0,
-                bgcolor: '#000',
-                '& img': {
-                    objectFit: { xs: 'contain', md: 'cover' },
-                    objectPosition: 'center',
-                }
+                bgcolor: '#0a0a0a',
             }}>
                 <Image
-                    src="/images/banner1-4.webp"
+                    src="/images/banner1-4-mobile.webp"
                     alt="SET EVENT Thailand - บริการเช่าจอ LED เวที แสง เสียง และจัดงานอีเว้นท์ครบวงจร"
                     fill
                     priority
                     sizes="100vw"
-                    style={{ filter: 'grayscale(100%) brightness(0.4)' }} // Darkened grayscale as per ref
+                    quality={75}
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAcI/8QAIhAAAQMDBAMBAAAAAAAAAAAAAQIDBAAFEQYSITEHE0FR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAP/xAAYEQEBAQEBAAAAAAAAAAAAAAABAgARIf/aAAwDAQACEQMRAD8Aw2hKUJQhvYlKQAB9J4x/lKUfD3VP/9k="
+                    style={{
+                        objectFit: 'cover',
+                        objectPosition: 'center',
+                        filter: 'grayscale(100%) brightness(0.4)'
+                    }}
                 />
 
                 {/* Dot Pattern Overlay for Mobile */}

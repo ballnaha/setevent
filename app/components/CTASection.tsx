@@ -11,13 +11,15 @@ export default function CTASection() {
         <Box component="section" aria-label="ติดต่อขอใบเสนอราคา" sx={{ position: 'relative', py: { xs: 10, md: 16 }, overflow: 'hidden' }}>
 
             {/* Full Width Background Image */}
-            <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <Box sx={{ position: 'absolute', inset: 0, zIndex: 0, bgcolor: '#0a0a0a' }}>
                 <Image
                     src="/images/banner1-2.webp"
                     alt="SET EVENT Thailand - บริการรับจัดงานอีเว้นท์และเช่าอุปกรณ์ครบวงจร"
                     fill
                     loading="lazy"
                     sizes="100vw"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUG/8QAHxAAAgICAgMBAAAAAAAAAAAAAQIDBAAREiEFBjFB/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAABAgMAESH/2gAMAwEAAhEDEQA/AMN7B5aS7IyW54Y4EUYVY+XQHZOz3/cYx9Bn/9k="
                     style={{ objectFit: 'cover', objectPosition: 'center' }}
                 />
                 {/* Dark Overlay Gradient for Readability */}

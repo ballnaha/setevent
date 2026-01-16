@@ -68,7 +68,9 @@ export default function WhyChooseUs() {
                             height: { xs: '300px', sm: '400px', md: '450px' },
                             width: '100%',
                             position: 'relative',
-
+                            bgcolor: '#1a1a1a',
+                            borderRadius: 2,
+                            overflow: 'hidden',
                         }}>
                             <Image
                                 src="/images/app_screen1.webp"
@@ -76,6 +78,8 @@ export default function WhyChooseUs() {
                                 fill
                                 loading="lazy"
                                 sizes="(max-width: 768px) 100vw, 50vw"
+                                placeholder="blur"
+                                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUG/8QAHxAAAgICAgMBAAAAAAAAAAAAAQIDBAAREiEFBjFB/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAABAgMAESH/2gAMAwEAAhEDEQA/AMN7B5aS7IyW54Y4EUYVY+XQHZOz3/cYx9Bn/9k="
                                 style={{ objectFit: 'cover' }}
                             />
                         </Box>

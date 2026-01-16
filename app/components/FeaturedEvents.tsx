@@ -113,11 +113,14 @@ export default function FeaturedEvents() {
                 {/* Background Image with Overlay */}
                 <Box sx={{ position: 'absolute', inset: 0, zIndex: 0 }}>
                     <Image
-                        src="/images/concert.webp"
+                        src="/images/concert-mobile.webp"
                         alt="SET EVENT Thailand - บริการเช่าจอ LED และระบบแสงเสียงสำหรับงานคอนเสิร์ต"
                         fill
                         loading="lazy"
                         sizes="100vw"
+                        quality={75}
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUG/8QAHxAAAgICAgMBAAAAAAAAAAAAAQIDBAAREiEFBjFB/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAABAgMAESH/2gAMAwEAAhEDEQA/AMN7B5aS7IyW54Y4EUYVY+XQHZOz3/cYx9Bn/9k="
                         style={{ objectFit: 'cover' }}
                     />
                     <Box sx={{
