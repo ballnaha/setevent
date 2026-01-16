@@ -23,32 +23,37 @@ interface Blog {
 
 const CATEGORIES = ["All", "Inspiration", "Knowledge", "Technical Guide", "Trends", "Guides"];
 
-export default function BlogContent() {
+interface BlogContentProps {
+    initialBlogs?: Blog[];
+}
+
+export default function BlogContent({ initialBlogs = [] }: BlogContentProps) {
     const router = useRouter();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const [blogs, setBlogs] = useState<Blog[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [blogs, setBlogs] = useState<Blog[]>(initialBlogs);
+    const [loading, setLoading] = useState(initialBlogs.length === 0);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState("All");
 
     useEffect(() => {
-        const fetchBlogs = async () => {
-            try {
-                const res = await fetch('/api/blogs');
-                if (res.ok) {
-                    const data = await res.json();
-                    setBlogs(data);
+        if (initialBlogs.length === 0) {
+            const fetchBlogs = async () => {
+                try {
+                    const res = await fetch('/api/blogs');
+                    if (res.ok) {
+                        const data = await res.json();
+                        setBlogs(data);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch blogs:", error);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error("Failed to fetch blogs:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchBlogs();
-    }, []);
+            };
+            fetchBlogs();
+        }
+    }, [initialBlogs.length]);
 
     const filteredBlogs = blogs.filter(blog => {
         const matchesSearch = blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -283,6 +288,8 @@ export default function BlogContent() {
                                         src={featuredBlogs[0].coverImage || '/images/logo.png'}
                                         alt={featuredBlogs[0].title}
                                         fill
+                                        priority
+                                        sizes="(max-width: 768px) 100vw, 50vw"
                                         style={{ objectFit: 'cover', transition: 'transform 0.5s' }}
                                         className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                                     />
@@ -296,7 +303,7 @@ export default function BlogContent() {
                                         p: 4
                                     }}>
                                         <Chip label={featuredBlogs[0].category} size="small" sx={{ bgcolor: 'var(--primary)', color: 'white', width: 'fit-content', mb: 2 }} />
-                                        <Typography variant="h4" sx={{
+                                        <Typography component="h2" variant="h4" sx={{ // Changed to h2 (semantic)
                                             color: 'white',
                                             fontFamily: 'var(--font-prompt)',
                                             fontWeight: 700,
@@ -338,6 +345,8 @@ export default function BlogContent() {
                                                 src={blog.coverImage || '/images/logo.png'}
                                                 alt={blog.title}
                                                 fill
+                                                loading="lazy"
+                                                sizes="(max-width: 768px) 100vw, 33vw"
                                                 style={{ objectFit: 'cover' }}
                                             />
                                             <Box sx={{
@@ -414,6 +423,8 @@ export default function BlogContent() {
                                             src={blog.coverImage || '/images/logo.png'}
                                             alt={blog.title}
                                             fill
+                                            loading="lazy"
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             style={{ objectFit: 'cover', transition: 'transform 0.5s' }}
                                         />
                                     </Box>

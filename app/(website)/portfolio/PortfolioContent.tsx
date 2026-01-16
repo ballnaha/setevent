@@ -461,11 +461,39 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}>
+                                    {/* Loading Spinner */}
+                                    <Box
+                                        sx={{
+                                            position: 'absolute',
+                                            top: '50%',
+                                            left: '50%',
+                                            transform: 'translate(-50%, -50%)',
+                                            zIndex: 0
+                                        }}
+                                    >
+                                        <Box className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" sx={{
+                                            borderTopColor: 'var(--primary)',
+                                            borderBottomColor: 'transparent',
+                                            borderWidth: 4,
+                                            borderStyle: 'solid',
+                                            borderRadius: '50%',
+                                            width: 48,
+                                            height: 48,
+                                            animation: 'spin 1s linear infinite',
+                                            '@keyframes spin': {
+                                                '0%': { transform: 'rotate(0deg)' },
+                                                '100%': { transform: 'rotate(360deg)' }
+                                            }
+                                        }} />
+                                    </Box>
+
                                     <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         fill
-                                        style={{ objectFit: 'contain' }}
+                                        sizes="90vw"
+                                        quality={85}
+                                        style={{ objectFit: 'contain', zIndex: 1 }}
                                     />
                                     {/* Title Overlay */}
                                     <Box sx={{
@@ -474,6 +502,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                         left: 0,
                                         right: 0,
                                         p: 3,
+                                        zIndex: 2,
                                         background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
                                     }}>
                                         <Typography

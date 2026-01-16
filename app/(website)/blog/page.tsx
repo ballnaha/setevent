@@ -27,6 +27,44 @@ export const metadata: Metadata = {
     },
 };
 
-export default function BlogPage() {
-    return <BlogContent />;
+import prisma from '@/lib/prisma';
+
+// Fetch blogs directly from database for better performance (Server Component)
+async function getBlogs() {
+    try {
+        const blogs = await prisma.blog.findMany({
+            where: { status: 'published' },
+            orderBy: { publishedAt: 'desc' },
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                excerpt: true,
+                coverImage: true,
+                category: true,
+                author: true,
+                publishedAt: true,
+                views: true,
+            }
+        });
+
+        // Transform data to match interface
+        return blogs.map(blog => ({
+            ...blog,
+            author: blog.author || 'Admin',
+            publishedAt: blog.publishedAt.toISOString(),
+            // Add required fields for props matching
+            category: blog.category || 'General',
+            excerpt: blog.excerpt || '',
+            coverImage: blog.coverImage || ''
+        }));
+    } catch (error) {
+        console.error("Failed to fetch blogs:", error);
+        return [];
+    }
+}
+
+export default async function BlogPage() {
+    const blogs = await getBlogs();
+    return <BlogContent initialBlogs={blogs} />;
 }

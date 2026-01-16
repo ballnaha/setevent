@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import HomeContent from './HomeContent';
+import BannerSlider from '../components/BannerSlider';
 
 export const metadata: Metadata = {
   title: 'SET EVENT Thailand | บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร',
@@ -56,5 +57,10 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <HomeContent />;
+  return (
+    <>
+      <BannerSlider />
+      <HomeContent />
+    </>
+  );
 }
