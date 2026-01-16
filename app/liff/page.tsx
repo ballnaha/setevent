@@ -19,7 +19,7 @@ import {
     TextField,
     Button,
 } from '@mui/material';
-import { ArrowRight2, Clock, ArrowUp2, Instagram, DocumentText, Call, Gallery, User, Music, MagicStar, Monitor, CloseCircle, Sms, Map, Facebook, SearchNormal, TickCircle, Calendar, Location } from 'iconsax-react';
+import { ArrowRight2, Clock, ArrowUp2, Instagram, DocumentText, Call, Gallery, User, Music, MagicStar, Monitor, CloseCircle, Sms, Map, Facebook, SearchNormal, TickCircle, Calendar, Location, MirroringScreen, StatusUp } from 'iconsax-react';
 import Link from 'next/link';
 import { initializeLiff, LiffProfile } from '@/lib/liff';
 import LiffHeader from './components/LiffHeader';
@@ -63,6 +63,7 @@ function LiffContent() {
     });
     const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
     const [promotions, setPromotions] = useState<any[]>([]);
+    const [promotionsLoading, setPromotionsLoading] = useState(true);
     const [selectedPromo, setSelectedPromo] = useState<any>(null);
     const [promoOpen, setPromoOpen] = useState(false);
 
@@ -157,6 +158,7 @@ function LiffContent() {
     }
 
     async function loadPromotions() {
+        setPromotionsLoading(true);
         try {
             const res = await fetch('/api/promotions');
             if (res.ok) {
@@ -165,6 +167,8 @@ function LiffContent() {
             }
         } catch (error) {
             console.error('Failed to load promotions:', error);
+        } finally {
+            setPromotionsLoading(false);
         }
     }
 
@@ -474,7 +478,7 @@ function LiffContent() {
 
                         {reviewData.step === 'select' ? (
                             <Stack spacing={2}>
-                                {reviewData.candidates.map((evt) => (
+                                {reviewData.candidates.map((evt, index) => (
                                     <Box
                                         key={evt.id}
                                         onClick={() => setReviewData({
@@ -484,58 +488,230 @@ function LiffContent() {
                                             eventName: evt.eventName
                                         })}
                                         sx={{
-                                            p: 2,
-                                            borderRadius: 3,
-                                            border: '1px solid #E2E8F0',
+                                            p: 2.5,
+                                            borderRadius: 4,
+                                            background: 'linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 50%, #6EE7B7 100%)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             gap: 2,
                                             cursor: 'pointer',
-                                            transition: 'all 0.2s',
-                                            '&:active': { bgcolor: '#F8FAFC', transform: 'scale(0.98)' }
+                                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                            boxShadow: '0 4px 15px rgba(16, 185, 129, 0.3)',
+                                            position: 'relative',
+                                            overflow: 'hidden',
+                                            '&:active': {
+                                                transform: 'scale(0.97)',
+                                                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.4)'
+                                            },
+                                            '&::before': {
+                                                content: '""',
+                                                position: 'absolute',
+                                                top: -30,
+                                                right: -30,
+                                                width: 80,
+                                                height: 80,
+                                                borderRadius: '50%',
+                                                background: 'rgba(255, 255, 255, 0.3)',
+                                            },
+                                            '&::after': {
+                                                content: '""',
+                                                position: 'absolute',
+                                                bottom: -20,
+                                                left: -20,
+                                                width: 60,
+                                                height: 60,
+                                                borderRadius: '50%',
+                                                background: 'rgba(255, 255, 255, 0.2)',
+                                            }
                                         }}
                                     >
+                                        {/* Star Icon with glow */}
                                         <Box sx={{
-                                            width: 40,
-                                            height: 40,
-                                            borderRadius: 2,
-                                            bgcolor: '#FEF3C7',
+                                            width: 52,
+                                            height: 52,
+                                            borderRadius: 3,
+                                            bgcolor: 'rgba(255, 255, 255, 0.7)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            color: '#F59E0B'
+                                            color: '#10B981',
+                                            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+                                            position: 'relative',
+                                            zIndex: 1,
+                                            backdropFilter: 'blur(8px)'
                                         }}>
-                                            <MagicStar size={20} variant="Bulk" />
+                                            <MagicStar size={28} variant="Bulk" color="#10B981" />
                                         </Box>
-                                        <Box sx={{ flex: 1 }}>
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: '#1E293B' }}>
+
+                                        {/* Content */}
+                                        <Box sx={{ flex: 1, position: 'relative', zIndex: 1 }}>
+                                            <Typography sx={{
+                                                fontFamily: 'var(--font-prompt)',
+                                                fontWeight: 700,
+                                                color: '#065F46',
+                                                fontSize: '1rem',
+                                                lineHeight: 1.3,
+                                                mb: 0.5
+                                            }}>
                                                 {evt.eventName}
                                             </Typography>
-                                            <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: '#94A3B8' }}>
-                                                {evt.eventDate ? format(new Date(evt.eventDate), 'dd MMM yyyy') : '-'}
-                                            </Typography>
+                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    <Calendar size={14} color="#047857" variant="Bold" />
+                                                    <Typography sx={{
+                                                        fontFamily: 'var(--font-prompt)',
+                                                        color: '#047857',
+                                                        fontSize: '0.8rem',
+                                                        fontWeight: 500
+                                                    }}>
+                                                        {evt.eventDate ? format(new Date(evt.eventDate), 'dd MMM yyyy') : '-'}
+                                                    </Typography>
+                                                </Box>
+                                                {evt.venue && (
+                                                    <>
+                                                        <Typography sx={{ color: '#059669', fontSize: '0.75rem' }}>•</Typography>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Location size={14} color="#047857" variant="Bold" />
+                                                            <Typography sx={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                color: '#047857',
+                                                                fontSize: '0.8rem',
+                                                                fontWeight: 500,
+                                                                maxWidth: 100,
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis'
+                                                            }}>
+                                                                {evt.venue}
+                                                            </Typography>
+                                                        </Box>
+                                                    </>
+                                                )}
+                                            </Box>
                                         </Box>
-                                        <ArrowRight2 size={16} color="#CBD5E1" />
+
+                                        {/* Arrow */}
+                                        <Box sx={{
+                                            width: 36,
+                                            height: 36,
+                                            borderRadius: '50%',
+                                            bgcolor: 'rgba(255, 255, 255, 0.6)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            position: 'relative',
+                                            zIndex: 1
+                                        }}>
+                                            <ArrowRight2 size={18} color="#059669" />
+                                        </Box>
                                     </Box>
                                 ))}
                             </Stack>
                         ) : (
                             <>
                                 <Box sx={{ mb: 4, textAlign: 'center' }}>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: '#64748B', mb: 1 }}>
-                                        {reviewData.eventName}
-                                    </Typography>
+                                    {/* Event Name Badge */}
+                                    <Box sx={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        gap: 1,
+                                        bgcolor: '#F0FDF4',
+                                        px: 2,
+                                        py: 0.75,
+                                        borderRadius: 3,
+                                        mb: 3
+                                    }}>
+                                        <MagicStar size={16} color="#10B981" variant="Bold" />
+                                        <Typography sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            color: '#065F46',
+                                            fontWeight: 600,
+                                            fontSize: '0.9rem'
+                                        }}>
+                                            {reviewData.eventName}
+                                        </Typography>
+                                    </Box>
 
-                                    <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
-                                        <Rating
-                                            name="event-rating"
-                                            value={reviewData.rating}
-                                            onChange={(_, newValue) => {
-                                                setReviewData({ ...reviewData, rating: newValue || 5 });
-                                            }}
-                                            size="large"
-                                            sx={{ fontSize: '3rem' }}
-                                        />
+                                    {/* Rating Stars Container */}
+                                    <Box sx={{
+                                        background: 'linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%)',
+                                        borderRadius: 4,
+                                        p: 3,
+                                        position: 'relative',
+                                        overflow: 'hidden',
+                                        boxShadow: '0 4px 20px rgba(251, 191, 36, 0.15)',
+                                        border: '1px solid #FDE68A',
+                                        '&::before': {
+                                            content: '""',
+                                            position: 'absolute',
+                                            top: -50,
+                                            right: -50,
+                                            width: 120,
+                                            height: 120,
+                                            borderRadius: '50%',
+                                            background: 'rgba(251, 191, 36, 0.1)',
+                                        }
+                                    }}>
+                                        <Typography sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            color: '#92400E',
+                                            fontSize: '0.85rem',
+                                            fontWeight: 500,
+                                            mb: 2
+                                        }}>
+                                            แตะดาวเพื่อให้คะแนน
+                                        </Typography>
+
+                                        {/* Custom Cute Star Rating */}
+                                        <Box sx={{
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            gap: 1.5,
+                                            position: 'relative',
+                                            zIndex: 1
+                                        }}>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Box
+                                                    key={star}
+                                                    onClick={() => setReviewData({ ...reviewData, rating: star })}
+                                                    sx={{
+                                                        cursor: 'pointer',
+                                                        transition: 'all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+                                                        transform: star <= reviewData.rating ? 'scale(1.2)' : 'scale(1)',
+                                                        filter: star <= reviewData.rating
+                                                            ? 'drop-shadow(0 4px 8px rgba(251, 191, 36, 0.6))'
+                                                            : 'none',
+                                                        '&:active': {
+                                                            transform: 'scale(0.85)'
+                                                        },
+                                                        '&:hover': {
+                                                            transform: 'scale(1.25)'
+                                                        }
+                                                    }}
+                                                >
+                                                    <MagicStar
+                                                        size={42}
+                                                        color={star <= reviewData.rating ? '#F59E0B' : '#D1D5DB'}
+                                                        variant={star <= reviewData.rating ? 'Bold' : 'Outline'}
+                                                    />
+                                                </Box>
+                                            ))}
+                                        </Box>
+
+                                        {/* Rating Label */}
+                                        <Typography sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            color: '#B45309',
+                                            fontSize: '1.1rem',
+                                            fontWeight: 700,
+                                            mt: 2
+                                        }}>
+                                            {reviewData.rating === 5 ? '⭐ ยอดเยี่ยมมาก!' :
+                                                reviewData.rating === 4 ? '😊 ดีมาก' :
+                                                    reviewData.rating === 3 ? '👍 พอใช้' :
+                                                        reviewData.rating === 2 ? '😐 ควรปรับปรุง' :
+                                                            reviewData.rating === 1 ? '😞 ไม่พอใจ' : ''}
+                                        </Typography>
                                     </Box>
                                 </Box>
 
@@ -943,7 +1119,7 @@ function LiffContent() {
                                     const getEventTheme = (status: string) => {
                                         switch (status) {
                                             case 'in-progress':
-                                                return { bg: '#f17a4c', icon: <MagicStar size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'กำลังดำเนินการ' };
+                                                return { bg: '#F59E0B', icon: <StatusUp size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'กำลังดำเนินการ' };
                                             case 'confirmed':
                                                 return { bg: '#8e94f3', icon: <TickCircle size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'ยืนยันรายละเอียด' };
                                             case 'completed':
@@ -951,7 +1127,7 @@ function LiffContent() {
                                             case 'cancelled':
                                                 return { bg: '#94a3b8', icon: <CloseCircle size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'ยกเลิกงาน' };
                                             default:
-                                                return { bg: '#5da9e9', icon: <SearchNormal size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'งานใหม่' };
+                                                return { bg: '#5da9e9', icon: <MirroringScreen size="42" color="rgba(255,255,255,0.8)" variant="Outline" />, label: 'งานใหม่' };
                                         }
                                     };
 
@@ -1017,35 +1193,32 @@ function LiffContent() {
                                                         >
                                                             {evt.eventName}
                                                         </Typography>
-                                                        <Stack direction="row" spacing={1} alignItems="center">
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                <Calendar size="12" color="rgba(255,255,255,0.7)" variant="Bold" />
-                                                                <Typography sx={{
-                                                                    fontFamily: 'var(--font-prompt)',
-                                                                    fontSize: '0.75rem',
-                                                                    color: 'rgba(255,255,255,0.85)',
-                                                                    fontWeight: 500
-                                                                }}>
-                                                                    {evt.eventDate ? format(new Date(evt.eventDate), 'dd MMM yy') : 'ไม่ระบุวันที่'}
-                                                                </Typography>
-                                                            </Box>
-                                                            <Typography sx={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.75rem' }}>•</Typography>
-                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flex: 1, minWidth: 0 }}>
-                                                                <Location size="12" color="rgba(255,255,255,0.7)" variant="Bold" />
-                                                                <Typography sx={{
-                                                                    fontFamily: 'var(--font-prompt)',
-                                                                    fontSize: '0.75rem',
-                                                                    color: 'rgba(255,255,255,0.8) ',
-                                                                    fontWeight: 500,
-                                                                    whiteSpace: 'nowrap',
-                                                                    overflow: 'hidden',
-                                                                    textOverflow: 'ellipsis',
-                                                                    maxWidth: 100
-                                                                }}>
-                                                                    {evt.venue || 'ไม่ระบุสถานที่'}
-                                                                </Typography>
-                                                            </Box>
-                                                        </Stack>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Calendar size="12" color="rgba(255,255,255,0.7)" variant="Bold" />
+                                                            <Typography sx={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontSize: '0.75rem',
+                                                                color: 'rgba(255,255,255,0.85)',
+                                                                fontWeight: 500
+                                                            }}>
+                                                                {evt.eventDate ? format(new Date(evt.eventDate), 'dd MMM yy') : 'ไม่ระบุวันที่'}
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                                                            <Location size="12" color="rgba(255,255,255,0.7)" variant="Bold" />
+                                                            <Typography sx={{
+                                                                fontFamily: 'var(--font-prompt)',
+                                                                fontSize: '0.75rem',
+                                                                color: 'rgba(255,255,255,0.8)',
+                                                                fontWeight: 500,
+                                                                whiteSpace: 'nowrap',
+                                                                overflow: 'hidden',
+                                                                textOverflow: 'ellipsis',
+                                                                maxWidth: 160
+                                                            }}>
+                                                                {evt.venue || 'ไม่ระบุสถานที่'}
+                                                            </Typography>
+                                                        </Box>
 
                                                         {/* Status Chip */}
                                                         <Box sx={{
@@ -1257,15 +1430,63 @@ function LiffContent() {
                     </Box>
 
                     {/* Promotions Section - Dynamic from DB */}
-                    {promotions.length > 0 && (
-                        <Box sx={{ mb: 4 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 3 }}>
-                                <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
-                                    โปรโมชั่นพิเศษ 🎁
+                    <Box sx={{ mb: 4 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2, px: 3 }}>
+                            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: '#1E293B' }}>
+                                โปรโมชั่นพิเศษ 🎁
+                            </Typography>
+                            <Link href="/liff/promotions" style={{ textDecoration: 'none' }}>
+                                <Typography sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.85rem',
+                                    fontWeight: 600,
+                                    color: '#3B82F6',
+                                    '&:hover': { textDecoration: 'underline' }
+                                }}>
+                                    ดูทั้งหมด
                                 </Typography>
+                            </Link>
+                        </Box>
 
+                        {promotionsLoading ? (
+                            /* Skeleton Loading */
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    gap: 2,
+                                    overflowX: 'auto',
+                                    px: 3,
+                                    mx: -2,
+                                    pb: 2,
+                                    '::-webkit-scrollbar': { display: 'none' },
+                                    scrollbarWidth: 'none'
+                                }}
+                            >
+                                {[1, 2, 3].map((i) => (
+                                    <Box
+                                        key={i}
+                                        sx={{
+                                            minWidth: 240,
+                                            height: 180,
+                                            borderRadius: 5,
+                                            overflow: 'hidden',
+                                            flexShrink: 0,
+                                        }}
+                                    >
+                                        <Skeleton
+                                            variant="rounded"
+                                            width={240}
+                                            height={180}
+                                            sx={{
+                                                borderRadius: 5,
+                                                bgcolor: 'rgba(0,0,0,0.06)'
+                                            }}
+                                        />
+                                    </Box>
+                                ))}
                             </Box>
-
+                        ) : promotions.length > 0 ? (
+                            /* Promotions List */
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -1382,14 +1603,32 @@ function LiffContent() {
                                                 )}
                                             </Box>
                                         </Box>
-
                                     </Box>
                                 ))}
                             </Box>
-                        </Box>
-                    )}
+                        ) : (
+                            /* No Promotions */
+                            <Box sx={{ px: 3 }}>
+                                <Box sx={{
+                                    bgcolor: '#F8FAFC',
+                                    borderRadius: 4,
+                                    p: 3,
+                                    textAlign: 'center',
+                                    border: '1px dashed #E2E8F0'
+                                }}>
+                                    <Typography sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        color: '#94A3B8',
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        ยังไม่มีโปรโมชั่นในขณะนี้
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        )}
+                    </Box>
 
-                </Container>
+                </Container >
                 {contactDrawerJSX}
                 {reviewDrawerJSX}
                 {promotionDrawerJSX}

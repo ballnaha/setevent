@@ -16,10 +16,18 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Missing LINE UID' }, { status: 400 });
         }
 
-        // Find event by invite code
+        // Optimized query - select only necessary fields
         const event = await (prisma.event as any).findUnique({
             where: { inviteCode },
-            include: {
+            select: {
+                id: true,
+                eventName: true,
+                inviteCode: true,
+                eventDate: true,
+                venue: true,
+                description: true,
+                status: true,
+                totalPrice: true,
                 customer: {
                     select: {
                         id: true,
@@ -33,12 +41,38 @@ export async function GET(request: NextRequest) {
                     }
                 },
                 timelines: {
-                    orderBy: { createdAt: 'desc' }
+                    orderBy: { order: 'asc' },
+                    select: {
+                        id: true,
+                        title: true,
+                        description: true,
+                        status: true,
+                        order: true,
+                        progress: true,
+                        images: true,
+                        completedAt: true,
+                        createdAt: true
+                    }
                 },
                 chatLogs: {
-                    orderBy: { createdAt: 'desc' }
+                    orderBy: { createdAt: 'desc' },
+                    select: {
+                        id: true,
+                        message: true,
+                        direction: true,
+                        messageType: true,
+                        createdAt: true
+                    }
                 },
-                bookings: true,
+                bookings: {
+                    select: {
+                        id: true,
+                        serviceName: true,
+                        quantity: true,
+                        price: true,
+                        notes: true
+                    }
+                },
             }
         });
 

@@ -50,11 +50,11 @@ const CookieConsent = () => {
             <Box
                 sx={{
                     position: 'fixed',
-                    bottom: isMobile ? 16 : 30,
+                    bottom: isMobile ? 8 : 30,
                     left: 0,
                     right: 0,
                     zIndex: 9999,
-                    px: 3,
+                    px: isMobile ? 1.5 : 3,
                     pointerEvents: 'none'
                 }}
             >
@@ -62,8 +62,8 @@ const CookieConsent = () => {
                     <Paper
                         elevation={24}
                         sx={{
-                            p: { xs: 3, md: 4 },
-                            borderRadius: { xs: 4, md: 6 },
+                            p: { xs: 2, sm: 2.5, md: 4 },
+                            borderRadius: { xs: 3, md: 6 },
                             background: 'var(--card-bg)',
                             backdropFilter: 'blur(10px)',
                             border: '1px solid var(--border-color)',
@@ -84,30 +84,49 @@ const CookieConsent = () => {
                     >
                         <Stack
                             direction={{ xs: 'column', md: 'row' }}
-                            spacing={{ xs: 2, md: 4 }}
+                            spacing={{ xs: 1.5, md: 4 }}
                             alignItems={{ xs: 'flex-start', md: 'center' }}
                             justifyContent="space-between"
                         >
-                            <Box sx={{ flex: 1 }}>
-                                <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 1 }}>
+                            <Box sx={{ flex: 1, pr: { xs: 3, md: 0 } }}>
+                                <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 0.5 }}>
                                     <Box
                                         sx={{
-                                            p: 1,
+                                            p: { xs: 0.6, md: 1 },
                                             borderRadius: 2,
                                             background: `linear-gradient(135deg, ${theme.palette.primary.main}15, ${theme.palette.secondary.main}15)`,
-                                            color: theme.palette.primary.main
+                                            color: theme.palette.primary.main,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
                                         }}
                                     >
-                                        <CookieIcon />
+                                        <CookieIcon sx={{ fontSize: { xs: 18, md: 24 } }} />
                                     </Box>
-                                    <Typography variant="h6" fontWeight={700} sx={{ color: theme.palette.primary.main }}>
-                                        นโยบายความเป็นส่วนตัวและคุ้กกี้
+                                    <Typography
+                                        variant="h6"
+                                        fontWeight={700}
+                                        sx={{
+                                            color: theme.palette.primary.main,
+                                            fontSize: { xs: '0.9rem', sm: '1rem', md: '1.25rem' }
+                                        }}
+                                    >
+                                        นโยบายความเป็นส่วนตัวและคุกกี้
                                     </Typography>
                                 </Stack>
-                                <Typography variant="body2" sx={{ color: 'var(--foreground)', opacity: 0.7, lineHeight: 1.6, maxWidth: '800px' }}>
-                                    เราใช้คุกกี้เพื่อเพิ่มประสิทธิภาพและประสบการณ์ที่ดีในการใช้งานเว็บไซต์
-                                    โดยการใช้งานเว็บไซต์นี้ถือว่าท่านยอมรับการใช้งานคุกกี้ของเรา
-                                    ท่านสามารถศึกษารายละเอียดเพิ่มเติมได้ที่
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        color: 'var(--foreground)',
+                                        opacity: 0.7,
+                                        lineHeight: 1.5,
+                                        maxWidth: '800px',
+                                        fontSize: { xs: '0.75rem', sm: '0.8rem', md: '0.875rem' }
+                                    }}
+                                >
+                                    เราใช้คุกกี้เพื่อเพิ่มประสิทธิภาพและประสบการณ์การใช้งานเว็บไซต์
+                                    {!isMobile && ' โดยการใช้งานเว็บไซต์นี้ถือว่าท่านยอมรับการใช้งานคุกกี้ของเรา'}
+                                    {' '}ดูรายละเอียดที่
                                     <Box
                                         component={NextLink}
                                         href="/privacy-policy"
@@ -125,21 +144,23 @@ const CookieConsent = () => {
                             </Box>
 
                             <Stack
-                                direction={{ xs: 'row-reverse', sm: 'row' }}
-                                spacing={2}
+                                direction="row"
+                                spacing={1}
                                 sx={{ width: { xs: '100%', md: 'auto' } }}
                             >
                                 <Button
                                     variant="outlined"
                                     onClick={handleDecline}
+                                    size={isMobile ? 'small' : 'medium'}
                                     sx={{
-                                        px: 3,
-                                        py: 1.2,
-                                        borderRadius: '12px',
+                                        px: { xs: 2, md: 3 },
+                                        py: { xs: 0.8, md: 1.2 },
+                                        borderRadius: { xs: '8px', md: '12px' },
                                         color: 'var(--foreground)',
                                         opacity: 0.8,
                                         borderColor: 'var(--border-color)',
                                         fontWeight: 500,
+                                        fontSize: { xs: '0.75rem', md: '0.875rem' },
                                         '&:hover': {
                                             borderColor: 'text.primary',
                                             bgcolor: 'transparent'
@@ -152,13 +173,15 @@ const CookieConsent = () => {
                                 <Button
                                     variant="contained"
                                     onClick={handleAccept}
+                                    size={isMobile ? 'small' : 'medium'}
                                     sx={{
-                                        px: 4,
-                                        py: 1.2,
-                                        borderRadius: '12px',
+                                        px: { xs: 2, md: 4 },
+                                        py: { xs: 0.8, md: 1.2 },
+                                        borderRadius: { xs: '8px', md: '12px' },
                                         bgcolor: theme.palette.primary.main,
                                         boxShadow: `0 8px 20px ${theme.palette.primary.main}30`,
                                         fontWeight: 600,
+                                        fontSize: { xs: '0.75rem', md: '0.875rem' },
                                         '&:hover': {
                                             bgcolor: theme.palette.primary.dark,
                                             boxShadow: `0 12px 25px ${theme.palette.primary.main}50`,
@@ -166,22 +189,23 @@ const CookieConsent = () => {
                                         flex: { xs: 1, md: 'none' }
                                     }}
                                 >
-                                    ยอมรับทั้งหมด
+                                    ยอมรับ
                                 </Button>
                             </Stack>
                         </Stack>
 
                         <IconButton
                             onClick={() => setIsVisible(false)}
+                            size={isMobile ? 'small' : 'medium'}
                             sx={{
                                 position: 'absolute',
-                                top: 12,
-                                right: 12,
+                                top: { xs: 6, md: 12 },
+                                right: { xs: 6, md: 12 },
                                 color: 'text.disabled',
                                 '&:hover': { color: 'text.primary' }
                             }}
                         >
-                            <CloseIcon fontSize="small" />
+                            <CloseIcon sx={{ fontSize: { xs: 16, md: 20 } }} />
                         </IconButton>
                     </Paper>
                 </Container>
