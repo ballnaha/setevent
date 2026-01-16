@@ -197,6 +197,7 @@ const CookieConsent = () => {
                         <IconButton
                             onClick={() => setIsVisible(false)}
                             size={isMobile ? 'small' : 'medium'}
+                            aria-label="ปิดหน้าต่างนโยบายคุกกี้"
                             sx={{
                                 position: 'absolute',
                                 top: { xs: 6, md: 12 },

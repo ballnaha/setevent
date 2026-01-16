@@ -1,6 +1,7 @@
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ScrollToTop from "../components/ScrollToTop";
+import SkipToContent from "../components/SkipToContent";
 import { HomepageSchema } from "@/components/seo/JsonLdSchema";
 
 export default function WebsiteLayout({
@@ -10,9 +11,11 @@ export default function WebsiteLayout({
 }>) {
     return (
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            {/* Skip to main content link for keyboard navigation */}
+            <SkipToContent />
             <HomepageSchema />
             <Header />
-            <main style={{ flex: 1 }}>
+            <main id="main-content" style={{ flex: 1 }} tabIndex={-1}>
                 {children}
             </main>
             <Footer />

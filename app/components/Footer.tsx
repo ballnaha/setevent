@@ -212,7 +212,9 @@ export default function Footer() {
                                     component="a"
                                     href={settings.facebook}
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     size="small"
+                                    aria-label="ติดตามเราบน Facebook"
                                     sx={{
                                         color: "white",
                                         bgcolor: 'rgba(255,255,255,0.05)',
@@ -228,7 +230,9 @@ export default function Footer() {
                                     component="a"
                                     href={settings.instagram}
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     size="small"
+                                    aria-label="ติดตามเราบน Instagram"
                                     sx={{
                                         color: "white",
                                         bgcolor: 'rgba(255,255,255,0.05)',
@@ -244,7 +248,9 @@ export default function Footer() {
                                     component="a"
                                     href={settings.tiktok}
                                     target="_blank"
+                                    rel="noopener noreferrer"
                                     size="small"
+                                    aria-label="ติดตามเราบน TikTok"
                                     sx={{
                                         color: "white",
                                         bgcolor: 'rgba(255,255,255,0.05)',

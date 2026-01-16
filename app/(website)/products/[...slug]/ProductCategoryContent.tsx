@@ -406,6 +406,7 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                         {/* Right Column: Share Button */}
                         <Stack direction="row" spacing={1}>
                             <IconButton
+                                aria-label="แชร์สินค้านี้"
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     if (navigator.share) {
@@ -467,6 +468,7 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                     {/* Close Button */}
                     <IconButton
                         onClick={() => setLightboxOpen(false)}
+                        aria-label="ปิดภาพขยาย"
                         sx={{
                             position: 'absolute',
                             top: { xs: 8, md: 16 },
@@ -516,6 +518,7 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                             <>
                                 <IconButton
                                     className="lightbox-prev"
+                                    aria-label="ภาพก่อนหน้า"
                                     sx={{
                                         position: 'absolute',
                                         left: { xs: 8, md: 24 },
@@ -537,6 +540,7 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                                 </IconButton>
                                 <IconButton
                                     className="lightbox-next"
+                                    aria-label="ภาพถัดไป"
                                     sx={{
                                         position: 'absolute',
                                         right: { xs: 8, md: 24 },
@@ -1020,6 +1024,8 @@ export default function ProductCategoryContent() {
                         <Button
                             href="https://line.me/ti/p/~@setevent"
                             target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="ติดต่อเราผ่าน LINE @setevent"
                             variant="contained"
                             startIcon={<MessageQuestion size="24" variant="Bold" color="white" />}
                             sx={{

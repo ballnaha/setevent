@@ -403,6 +403,7 @@ export default function Header() {
                 </Link>
                 <IconButton
                     onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                    aria-label={resolvedTheme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
                     sx={{ color: 'white' }}
                 >
                     {mounted && resolvedTheme === 'dark' ? (
@@ -484,6 +485,8 @@ export default function Header() {
                         startIcon={<Message size="18" variant="Bold" color="currentColor" />}
                         href={settings.lineUrl}
                         target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`ติดต่อเราผ่าน LINE ${settings.line}`}
                         sx={{
                             bgcolor: '#06C755',
                             fontFamily: 'var(--font-prompt)',
@@ -818,6 +821,7 @@ export default function Header() {
                         {/* Theme Toggle Button */}
                         <IconButton
                             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                            aria-label={resolvedTheme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
                             sx={{
                                 color: isDarkText ? 'var(--foreground)' : 'white',
                                 transition: 'all 0.3s ease',
@@ -894,7 +898,7 @@ export default function Header() {
                             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                         >
-                            <MenuItem onClick={handleContactClose} component="a" href={settings.lineUrl} target="_blank">
+                            <MenuItem onClick={handleContactClose} component="a" href={settings.lineUrl} target="_blank" rel="noopener noreferrer" aria-label="ติดต่อเราผ่าน Line Official">
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                     <Box sx={{
                                         width: 36,

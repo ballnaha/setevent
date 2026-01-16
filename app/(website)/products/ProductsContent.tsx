@@ -442,6 +442,8 @@ export default function ProductsContent() {
                         <Button
                             href="https://line.me/ti/p/~@setevent"
                             target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label="ติดต่อเราผ่าน LINE @setevent"
                             variant="contained"
                             startIcon={<MessageQuestion size="24" variant="Bold" color="white" />}
                             sx={{

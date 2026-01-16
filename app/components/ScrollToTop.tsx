@@ -36,17 +36,20 @@ export default function ScrollToTop() {
             <Box
                 onClick={scrollToTop}
                 role="button"
-                aria-label="Scroll to top"
+                tabIndex={0}
+                aria-label="เลื่อนกลับไปด้านบน"
+                onKeyDown={(e) => e.key === 'Enter' && scrollToTop()}
                 sx={{
                     position: "fixed",
                     bottom: { xs: 24, md: 32 },
                     right: { xs: 24, md: 32 },
                     zIndex: 1000,
+                    cursor: 'pointer',
                 }}
             >
                 <Fab
                     size="small"
-                    aria-label="scroll to top"
+                    aria-label="เลื่อนกลับไปด้านบน"
                     sx={{
                         width: 40,
                         height: 40,

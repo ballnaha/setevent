@@ -260,6 +260,7 @@ export default function ContactContent() {
                                             component="a"
                                             href={item.link}
                                             target={item.link.startsWith('http') ? '_blank' : '_self'}
+                                            rel={item.link.startsWith('http') ? 'noopener noreferrer' : undefined}
                                             sx={{
                                                 fontFamily: 'var(--font-prompt)',
                                                 color: 'var(--foreground)',
@@ -297,6 +298,8 @@ export default function ContactContent() {
                                     component="a"
                                     href={social.url}
                                     target="_blank"
+                                    rel="noopener noreferrer"
+                                    aria-label={`ติดตามเราบน ${social.label}`}
                                     variant="outlined"
                                     sx={{
                                         minWidth: 0,
@@ -332,6 +335,7 @@ export default function ContactContent() {
                         }}>
                             <iframe
                                 src={settings.mapUrl}
+                                title="แผนที่ที่ตั้ง SET EVENT Thailand"
                                 width="100%"
                                 height="100%"
                                 style={{ border: 0 }}
