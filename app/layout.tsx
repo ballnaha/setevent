@@ -114,14 +114,8 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-import dynamic from 'next/dynamic';
 import GoogleAnalytics from './components/GoogleAnalytics';
-
-// Lazy load CookieConsent เพื่อไม่ให้ block initial render
-const CookieConsent = dynamic(() => import('./components/CookieConsent'), {
-  ssr: false,
-  loading: () => null,
-});
+import CookieConsentWrapper from './components/CookieConsentWrapper';
 
 export default function RootLayout({
   children,
@@ -232,7 +226,7 @@ export default function RootLayout({
               <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {children}
-                <CookieConsent />
+                <CookieConsentWrapper />
               </ThemeProvider>
             </AppRouterCacheProvider>
           </NextThemeProvider>
