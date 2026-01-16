@@ -1,30 +1,8 @@
 "use client";
 
 import React from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay, Pagination, EffectFade } from "swiper/modules";
-import { Box, Typography, Button, Container, Stack } from "@mui/material";
-import { ArrowRight, Star1 } from "iconsax-react";
+import { Box, Typography, Button, Stack } from "@mui/material";
 import Image from "next/image";
-
-// Import Swiper styles
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/effect-fade";
-
-
-
-const slides = [
-    {
-        titlePart1: "SET",
-        titlePart2: "EVENT",
-        titlePart3: "",
-        subtitle: "AND EQUIPMENT",
-        button1: "TICKETS KAUFEN", // Keeping reference text for now, should likely be "OUR SERVICES" or similar
-        button2: "ZUM LINE UP",
-        image: "/images/banner1-2.webp", // Reusing an existing image as placeholder, or could use new one
-    }
-];
 
 export default function BannerSlider() {
     return (
@@ -66,9 +44,9 @@ export default function BannerSlider() {
             {/* Geometric Decor - Left Bottom */}
             <Box sx={{ position: 'absolute', bottom: 0, left: 0, zIndex: 1, display: { xs: 'none', md: 'block' } }}>
                 <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M0 400V200L200 400H0Z" fill="#E94560" /> {/* Red Triangle */}
-                    <path d="M0 200V0L200 200H0Z" fill="#0F3460" /> {/* Blue Triangle */}
-                    <path d="M200 400L400 400L200 200L200 400Z" fill="#C29B40" /> {/* Gold Triangle */}
+                    <path d="M0 400V200L200 400H0Z" fill="#E94560" />
+                    <path d="M0 200V0L200 200H0Z" fill="#0F3460" />
+                    <path d="M200 400L400 400L200 200L200 400Z" fill="#C29B40" />
                     <rect x="50" y="250" width="100" height="100" fill="white" fillOpacity="0.1" />
                 </svg>
             </Box>
@@ -123,11 +101,6 @@ export default function BannerSlider() {
                     textTransform: 'uppercase',
                     textShadow: 'none',
                     WebkitTextStroke: { xs: '0.5px rgba(255,255,255,0.2)', md: '1px rgba(255,255,255,0.1)' },
-                    '.dark &': {
-                        WebkitTextStroke: { xs: '1px rgba(255,255,255,0.4)', md: '1.5px rgba(255,255,255,0.5)' },
-                        textShadow: { xs: '0 0 8px var(--primary)', md: 'none' },
-                        animation: { xs: 'none', md: 'neon-pulse 4s ease-in-out infinite' }
-                    }
                 }}>
                     EVENT<br />RENTAL<br />SERVICE
                 </Typography>

@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Box, Container, Stack, Typography } from "@mui/material";
-import { Gallery } from "iconsax-react";
 import Image from "next/image";
 
 const works = [
@@ -44,139 +43,8 @@ const works = [
     }
 ];
 
-// Premium Skeleton Component
-function ImageSkeleton() {
-    return (
-        <Box
-            sx={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-                overflow: 'hidden',
-                '&::before': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.08) 50%, transparent 100%)',
-                    animation: 'shimmer 2s infinite',
-                    transform: 'translateX(-100%)',
-                },
-                '@keyframes shimmer': {
-                    '0%': { transform: 'translateX(-100%)' },
-                    '100%': { transform: 'translateX(100%)' },
-                },
-            }}
-        >
-            {/* Icon */}
-            <Box
-                sx={{
-                    width: 64,
-                    height: 64,
-                    borderRadius: '50%',
-                    background: 'rgba(255,255,255,0.05)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    animation: 'pulse 2s ease-in-out infinite',
-                    '@keyframes pulse': {
-                        '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
-                        '50%': { opacity: 0.7, transform: 'scale(1.05)' },
-                    },
-                }}
-            >
-                <Gallery size={28} color="rgba(255,255,255,0.3)" variant="Bulk" />
-            </Box>
-
-            {/* Text placeholders */}
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                <Box
-                    sx={{
-                        width: 120,
-                        height: 12,
-                        borderRadius: 1,
-                        background: 'rgba(255,255,255,0.08)',
-                        animation: 'pulse 2s ease-in-out infinite 0.2s',
-                    }}
-                />
-                <Box
-                    sx={{
-                        width: 80,
-                        height: 8,
-                        borderRadius: 1,
-                        background: 'rgba(255,255,255,0.05)',
-                        animation: 'pulse 2s ease-in-out infinite 0.4s',
-                    }}
-                />
-            </Box>
-        </Box>
-    );
-}
-
-// Component สำหรับแต่ละ Work Card พร้อม Skeleton
-function WorkCard({ work, index }: { work: typeof works[0]; index: number }) {
-    const [isLoaded, setIsLoaded] = useState(false);
-
-    return (
-        <Box
-            sx={{
-                position: 'relative',
-                height: work.height,
-                overflow: 'hidden',
-                cursor: 'pointer',
-                borderRadius: { xs: 2, md: 0 },
-                '&:hover img': {
-                    transform: isLoaded ? 'scale(1.1)' : 'none'
-                }
-            }}
-        >
-            {/* Premium Skeleton - แสดงจนกว่ารูปจะโหลดเสร็จ */}
-            {!isLoaded && <ImageSkeleton />}
-
-            {/* Image */}
-            <Image
-                src={work.image}
-                alt={work.title}
-                fill
-                loading="lazy"
-                sizes="(max-width: 768px) 85vw, 33vw"
-                onLoad={() => setIsLoaded(true)}
-                style={{
-                    objectFit: 'cover',
-                    transition: 'transform 0.5s ease, opacity 0.4s ease',
-                    opacity: isLoaded ? 1 : 0
-                }}
-            />
-
-            {/* Overlay - แสดงเมื่อรูปโหลดเสร็จ */}
-            <Box
-                className="overlay"
-                sx={{
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
-                    opacity: isLoaded ? 1 : 0,
-                    transition: 'opacity 0.4s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    p: 4
-                }}
-            >
-                <Typography variant="h5" component="h3" color="white" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', mb: 1 }}>
-                    {work.title}
-                </Typography>
-                <Typography variant="body1" color="rgba(255,255,255,0.8)" sx={{ fontFamily: 'var(--font-prompt)' }}>
-                    {work.category}
-                </Typography>
-            </Box>
-        </Box>
-    );
-}
+// Blur placeholder - very small base64 image
+const BLUR_DATA_URL = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUG/8QAHxAAAgICAgMBAAAAAAAAAAAAAQIDBAAREiEFBjFB/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQADAQEBAAAAAAAAAAAAAAABAgMAESH/2gAMAwEAAhEDEQA/AMN7B5aS7IyW54Y4EUYVY+XQHZOz3/cYx9Bn/9k=";
 
 export default function PortfolioGallery() {
     return (
@@ -215,7 +83,47 @@ export default function PortfolioGallery() {
                     }
                 }}>
                     {works.map((work, index) => (
-                        <WorkCard key={index} work={work} index={index} />
+                        <Box
+                            key={index}
+                            sx={{
+                                position: 'relative',
+                                height: work.height,
+                                overflow: 'hidden',
+                                cursor: 'pointer',
+                                borderRadius: { xs: 2, md: 0 },
+                                bgcolor: '#1a1a1a',
+                                '&:hover img': {
+                                    transform: 'scale(1.1)'
+                                }
+                            }}
+                        >
+                            <Image
+                                src={work.image}
+                                alt={work.title}
+                                fill
+                                loading="lazy"
+                                sizes="(max-width: 768px) 85vw, 33vw"
+                                placeholder="blur"
+                                blurDataURL={BLUR_DATA_URL}
+                                style={{ objectFit: 'cover', transition: 'transform 0.5s ease' }}
+                            />
+                            <Box className="overlay" sx={{
+                                position: 'absolute',
+                                inset: 0,
+                                background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'flex-end',
+                                p: 4
+                            }}>
+                                <Typography variant="h5" component="h3" color="white" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', mb: 1 }}>
+                                    {work.title}
+                                </Typography>
+                                <Typography variant="body1" color="rgba(255,255,255,0.8)" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                    {work.category}
+                                </Typography>
+                            </Box>
+                        </Box>
                     ))}
                 </Box>
             </Container>
