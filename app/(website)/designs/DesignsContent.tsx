@@ -413,9 +413,9 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
             >
                 <Box sx={{
                     position: 'relative',
-                    width: '95vw',
+                    width: { xs: '100vw', md: '95vw' },
                     maxWidth: 1200,
-                    height: '90vh',
+                    height: { xs: '100vh', md: '90vh' },
                     bgcolor: 'transparent',
                     outline: 'none',
                 }}>
@@ -424,8 +424,8 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                         onClick={closeLightbox}
                         sx={{
                             position: 'absolute',
-                            top: 10,
-                            right: 10,
+                            top: { xs: 20, md: 10 },
+                            right: { xs: 20, md: 10 },
                             zIndex: 100,
                             bgcolor: 'rgba(0,0,0,0.5)',
                             color: 'white',
@@ -443,7 +443,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                         navigation
                         pagination={{ clickable: true }}
                         loop={filteredItems.length > 1}
-                        style={{ height: '100%', borderRadius: 16 }}
+                        style={{ height: '100%', borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
                     >
                         {filteredItems.map((item) => (
                             <SwiperSlide key={item.id}>

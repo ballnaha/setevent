@@ -459,9 +459,9 @@ export default function PromotionsContent() {
                 onClose={() => setSelectedPromotion(null)}
                 sx={{
                     display: 'flex',
-                    alignItems: { xs: 'flex-end', md: 'center' },
+                    alignItems: 'center',
                     justifyContent: 'center',
-                    p: { xs: 0, md: 4 },
+                    p: 0,
                     '& .MuiBackdrop-root': {
                         bgcolor: 'rgba(0,0,0,0.85)',
                         backdropFilter: 'blur(10px)'
