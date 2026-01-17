@@ -525,6 +525,8 @@ export default function PromotionsContent() {
                                         src={selectedPromotion.image}
                                         alt={selectedPromotion.title}
                                         fill
+                                        priority
+                                        sizes="(max-width: 1200px) 50vw, 500px"
                                         style={{ objectFit: 'contain', padding: '16px' }}
                                     />
                                 </Box>
@@ -650,6 +652,7 @@ export default function PromotionsContent() {
                                         fill
                                         style={{ objectFit: 'contain' }}
                                         priority
+                                        sizes="100vw"
                                     />
                                     {/* Bottom gradient for smooth transition */}
                                     <Box sx={{

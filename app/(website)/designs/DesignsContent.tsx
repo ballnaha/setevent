@@ -463,11 +463,43 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                 }}>
+                                    {/* Image Loading State */}
+                                    <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)' }}>
+                                        <Skeleton
+                                            variant="rectangular"
+                                            width="100%"
+                                            height="100%"
+                                            sx={{
+                                                bgcolor: 'rgba(255,255,255,0.05)',
+                                                position: 'absolute'
+                                            }}
+                                        />
+                                        <Typography sx={{ color: 'white', opacity: 0.3, fontFamily: 'var(--font-prompt)', zIndex: 1 }}>
+                                            Loading Image...
+                                        </Typography>
+                                    </Box>
+
                                     <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         fill
-                                        style={{ objectFit: 'contain' }}
+                                        priority={filteredItems.indexOf(item) === lightboxIndex}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                                        style={{
+                                            objectFit: 'contain',
+                                            zIndex: 2,
+                                            transition: 'opacity 0.3s ease-in-out'
+                                        }}
+                                        onLoadingComplete={(img) => {
+                                            // Optional: Hide the skeleton when loaded
+                                            const parent = img.parentElement;
+                                            if (parent) {
+                                                const skeleton = parent.querySelector('.MuiSkeleton-root');
+                                                const loadingText = parent.querySelector('.MuiTypography-root');
+                                                if (skeleton) (skeleton as HTMLElement).style.display = 'none';
+                                                if (loadingText) (loadingText as HTMLElement).style.display = 'none';
+                                            }
+                                        }}
                                     />
 
                                     {/* Title Overlay */}
@@ -477,7 +509,8 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         left: 0,
                                         right: 0,
                                         p: 3,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
+                                        zIndex: 10,
+                                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
                                     }}>
                                         <Typography
                                             sx={{

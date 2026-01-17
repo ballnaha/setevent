@@ -493,9 +493,21 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         fill
-                                        sizes="90vw"
+                                        priority={portfolioItems.indexOf(item) === lightboxIndex}
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                                         quality={85}
-                                        style={{ objectFit: 'contain', zIndex: 1 }}
+                                        style={{
+                                            objectFit: 'contain',
+                                            zIndex: 2,
+                                            transition: 'opacity 0.3s ease-in-out'
+                                        }}
+                                        onLoadingComplete={(img) => {
+                                            const parent = img.parentElement;
+                                            if (parent) {
+                                                const spinner = parent.querySelector('.MuiBox-root');
+                                                if (spinner) (spinner as HTMLElement).style.display = 'none';
+                                            }
+                                        }}
                                     />
                                     {/* Title Overlay */}
                                     <Box sx={{
@@ -504,8 +516,8 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                         left: 0,
                                         right: 0,
                                         p: 3,
-                                        zIndex: 2,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)',
+                                        zIndex: 10,
+                                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
                                     }}>
                                         <Typography
                                             sx={{
