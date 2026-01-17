@@ -23,15 +23,8 @@ interface Design {
     views: number;
 }
 
-// Default categories
-const DEFAULT_CATEGORIES = [
-    "Wedding",
-    "Corporate",
-    "Dinner",
-    "Party",
-    "Concert",
-    "Fashion",
-];
+// Categories are now dynamically derived from the database data.
+// Empty categories will automatically disappear from the filters.
 
 export default function DesignsContent({ initialData = [] }: { initialData?: Design[] }) {
     const [designs, setDesigns] = useState<Design[]>(initialData);
@@ -68,10 +61,10 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
         }
     };
 
-    // Get all unique categories from designs + default categories
+    // Get all unique categories from designs
     const allCategories = React.useMemo(() => {
         const categoriesFromData = designs.map(d => d.category);
-        const uniqueCategories = Array.from(new Set([...DEFAULT_CATEGORIES, ...categoriesFromData]));
+        const uniqueCategories = Array.from(new Set(categoriesFromData));
         return ["All", ...uniqueCategories.sort()];
     }, [designs]);
 

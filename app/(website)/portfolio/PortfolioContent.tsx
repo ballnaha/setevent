@@ -24,15 +24,8 @@ interface PortfolioItem {
     views: number;
 }
 
-// Default categories - will be merged with categories from DB
-const DEFAULT_CATEGORIES = [
-    "Marketing Event",
-    "Seminar & Conference",
-    "Exhibition",
-    "Concert",
-    "Wedding",
-    "Fixed Installation",
-];
+// Categories are now dynamically derived from the database data.
+// Empty categories will automatically disappear from the filters.
 
 export default function PortfolioContent({ initialData = [] }: { initialData?: PortfolioItem[] }) {
     const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(initialData);
@@ -69,10 +62,10 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
         }
     };
 
-    // Get all unique categories from portfolios + default categories
+    // Get all unique categories from portfolios
     const allCategories = React.useMemo(() => {
         const categoriesFromData = portfolioItems.map(p => p.category);
-        const uniqueCategories = Array.from(new Set([...DEFAULT_CATEGORIES, ...categoriesFromData]));
+        const uniqueCategories = Array.from(new Set(categoriesFromData));
         return ["All", ...uniqueCategories.sort()];
     }, [portfolioItems]);
 

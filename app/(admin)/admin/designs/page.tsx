@@ -47,15 +47,8 @@ interface Design {
     createdAt: string;
 }
 
-// Default categories for designs
-const DEFAULT_CATEGORIES = [
-    "Wedding",
-    "Corporate",
-    "Dinner",
-    "Party",
-    "Concert",
-    "Fashion",
-];
+// Default categories removed to allow full dynamic management through data.
+const FALLBACK_CATEGORY = "General";
 
 export default function DesignsAdminPage() {
     const [designs, setDesigns] = useState<Design[]>([]);
@@ -83,16 +76,16 @@ export default function DesignsAdminPage() {
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "",
-        category: DEFAULT_CATEGORIES[0],
+        category: "",
         image: "",
         description: "",
         status: "active"
     });
 
-    // Get all unique categories from designs + default categories
+    // Get all unique categories from designs
     const allCategories = React.useMemo(() => {
         const categoriesFromData = designs.map(d => d.category);
-        const uniqueCategories = Array.from(new Set([...DEFAULT_CATEGORIES, ...categoriesFromData]));
+        const uniqueCategories = Array.from(new Set(categoriesFromData));
         return uniqueCategories.sort();
     }, [designs]);
 
@@ -139,7 +132,7 @@ export default function DesignsAdminPage() {
             setEditId(null);
             setFormData({
                 title: "",
-                category: DEFAULT_CATEGORIES[0],
+                category: allCategories.length > 0 ? allCategories[0] : FALLBACK_CATEGORY,
                 image: "",
                 description: "",
                 status: "active"

@@ -47,15 +47,8 @@ interface Portfolio {
     createdAt: string;
 }
 
-// Default categories for portfolio (can be extended by custom categories from DB)
-const DEFAULT_CATEGORIES = [
-    "Marketing Event",
-    "Seminar & Conference",
-    "Exhibition",
-    "Concert",
-    "Wedding",
-    "Fixed Installation",
-];
+// Default categories removed to allow full dynamic management through data.
+const FALLBACK_CATEGORY = "General";
 
 export default function PortfolioAdminPage() {
     const [portfolios, setPortfolios] = useState<Portfolio[]>([]);
@@ -83,16 +76,16 @@ export default function PortfolioAdminPage() {
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "",
-        category: DEFAULT_CATEGORIES[0],
+        category: "",
         image: "",
         description: "",
         status: "active"
     });
 
-    // Get all unique categories from portfolios + default categories
+    // Get all unique categories from portfolios
     const allCategories = React.useMemo(() => {
         const categoriesFromData = portfolios.map(p => p.category);
-        const uniqueCategories = Array.from(new Set([...DEFAULT_CATEGORIES, ...categoriesFromData]));
+        const uniqueCategories = Array.from(new Set(categoriesFromData));
         return uniqueCategories.sort();
     }, [portfolios]);
 
@@ -139,7 +132,7 @@ export default function PortfolioAdminPage() {
             setEditId(null);
             setFormData({
                 title: "",
-                category: DEFAULT_CATEGORIES[0],
+                category: allCategories.length > 0 ? allCategories[0] : FALLBACK_CATEGORY,
                 image: "",
                 description: "",
                 status: "active"
