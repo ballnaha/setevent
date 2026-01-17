@@ -84,6 +84,8 @@ function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: 
                     src={promotion.image}
                     alt={promotion.title}
                     fill
+                    placeholder="blur"
+                    blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                     style={{ objectFit: 'cover' }}
                 />
             </Box>
@@ -392,8 +394,8 @@ export default function PromotionsContent() {
                         gap: 4
                     }}>
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Box key={i} sx={{ borderRadius: 6, overflow: 'hidden', bgcolor: 'rgba(128,128,128,0.05)', height: 380, position: 'relative' }}>
-                                <Skeleton variant="rectangular" height="100%" sx={{ bgcolor: 'rgba(128,128,128,0.1)' }} />
+                            <Box key={i} sx={{ borderRadius: 6, overflow: 'hidden', bgcolor: 'rgba(224,224,224,0.2)', height: 380, position: 'relative' }}>
+                                <Skeleton variant="rectangular" height="100%" sx={{ bgcolor: 'rgba(224,224,224,0.4)', animation: 'pulse 1.5s ease-in-out infinite' }} />
                                 <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2.5, zIndex: 2 }}>
                                     <Skeleton variant="text" width="80%" height={40} sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 2 }}>

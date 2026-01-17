@@ -21,17 +21,19 @@ interface Blog {
 
 type Props = {
     params: Promise<{ slug: string }>;
+    initialBlog?: Blog | null;
 };
 
-export default function BlogDetailContent({ params }: Props) {
-    const [blog, setBlog] = useState<Blog | null>(null);
-    const [loading, setLoading] = useState(true);
+export default function BlogDetailContent({ params, initialBlog = null }: Props) {
+    const [blog, setBlog] = useState<Blog | null>(initialBlog);
+    const [loading, setLoading] = useState(!initialBlog);
     const [error, setError] = useState(false);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const viewCounted = useRef(false);
 
     useEffect(() => {
         const incrementView = async () => {
+            // ... keep increment view logic ...
             if (viewCounted.current) return;
             viewCounted.current = true;
             try {
@@ -45,26 +47,28 @@ export default function BlogDetailContent({ params }: Props) {
     }, [params]);
 
     useEffect(() => {
-        const fetchBlog = async () => {
-            try {
-                const { slug } = await params;
-                const res = await fetch(`/api/blogs/${slug}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setBlog(data);
-                } else {
+        if (!initialBlog && !blog) {
+            const fetchBlog = async () => {
+                try {
+                    const { slug } = await params;
+                    const res = await fetch(`/api/blogs/${slug}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setBlog(data);
+                    } else {
+                        setError(true);
+                    }
+                } catch (err) {
+                    console.error("Failed to fetch blog:", err);
                     setError(true);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (err) {
-                console.error("Failed to fetch blog:", err);
-                setError(true);
-            } finally {
-                setLoading(false);
-            }
-        };
+            };
 
-        fetchBlog();
-    }, [params]);
+            fetchBlog();
+        }
+    }, [params, initialBlog, blog]);
 
     const formatDate = (dateString: string) => {
         return new Date(dateString).toLocaleDateString('th-TH', {

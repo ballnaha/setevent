@@ -252,7 +252,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                 {loading ? (
                     <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, gap: 2 }}>
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Skeleton key={i} variant="rounded" height={300} sx={{ mb: 2, borderRadius: 3, width: '100%' }} />
+                            <Skeleton key={i} variant="rounded" height={300} sx={{ mb: 2, borderRadius: 3, width: '100%', bgcolor: 'rgba(224,224,224,0.4)', animation: 'pulse 1.5s ease-in-out infinite' }} />
                         ))}
                     </Box>
                 ) : filteredItems.length === 0 ? (
@@ -315,13 +315,15 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     }
                                 }}
                             >
-                                <Box sx={{ position: 'relative', width: '100%', borderRadius: 'inherit' }}>
+                                <Box sx={{ position: 'relative', width: '100%', borderRadius: 'inherit', bgcolor: '#e0e0e0' }}>
                                     <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         className="design-image"
                                         width={500}
                                         height={500}
+                                        placeholder="blur"
+                                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                         style={{
                                             width: '100%',
                                             height: 'auto',

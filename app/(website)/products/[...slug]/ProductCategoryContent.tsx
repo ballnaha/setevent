@@ -168,6 +168,8 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                                                 src={img}
                                                 alt={product.name}
                                                 fill
+                                                placeholder="blur"
+                                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                                 style={{ objectFit: 'cover' }}
                                             />
                                         </Box>

@@ -403,7 +403,7 @@ export default function Header() {
                 </Link>
                 <IconButton
                     onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                    aria-label={resolvedTheme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
+                    aria-label={!mounted ? 'เปลี่ยนเป็นโหมดมืด' : (resolvedTheme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด')}
                     sx={{ color: 'white' }}
                 >
                     {mounted && resolvedTheme === 'dark' ? (
@@ -821,7 +821,7 @@ export default function Header() {
                         {/* Theme Toggle Button */}
                         <IconButton
                             onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                            aria-label={resolvedTheme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด'}
+                            aria-label={!mounted ? 'เปลี่ยนเป็นโหมดมืด' : (resolvedTheme === 'dark' ? 'เปลี่ยนเป็นโหมดสว่าง' : 'เปลี่ยนเป็นโหมดมืด')}
                             sx={{
                                 color: isDarkText ? 'var(--foreground)' : 'white',
                                 transition: 'all 0.3s ease',

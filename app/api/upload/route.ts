@@ -43,29 +43,70 @@ export async function POST(req: NextRequest) {
                         // Check if watermark exists
                         await fs.access(watermarkPath);
 
-                        // Resize watermark to 15% of image width
-                        const wmWidth = Math.max(Math.round(width * 0.15), 100); // Min 100px
+                        // Resize watermark to 10% of image width (Reduced from 15%)
+                        const wmWidth = Math.max(Math.round(width * 0.10), 80);
 
                         const watermarkBuffer = await sharp(watermarkPath)
                             .resize(wmWidth)
                             .toBuffer();
 
                         const wmMetadata = await sharp(watermarkBuffer).metadata();
-                        const wmHeight = wmMetadata.height || 50;
+                        const wmHeight = wmMetadata.height || 40;
 
                         // Calculate position (bottom-right with padding)
                         const padding = Math.round(width * 0.02); // 2% padding
-                        const left = width - wmWidth - padding;
-                        const top = height - wmHeight - padding;
 
-                        // Apply watermark
+                        // Create website text watermark using SVG with Cinzel font and wide spacing
+                        const rawText = "SETEVENTTHAILAND.COM";
+                        const websiteText = rawText.split('').join(' '); // Add space between every letter
+
+                        const fontSize = Math.max(Math.round(width * 0.012), 11); // Reduced from 0.018
+                        // Increase width calculation to account for extra spaces and Cinzel's width
+                        const textWidth = Math.round(fontSize * websiteText.length * 0.55);
+                        const textHeight = Math.round(fontSize * 1.5);
+
+                        const textSvg = `
+                            <svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${textHeight}">
+                                <text 
+                                    x="50%" 
+                                    y="${fontSize}" 
+                                    text-anchor="middle"
+                                    font-family="Cinzel, serif" 
+                                    font-size="${fontSize}" 
+                                    font-weight="400" 
+                                    fill="white" 
+                                    opacity="1"
+                                >${websiteText}</text>
+                            </svg>`;
+
+                        const textBuffer = await sharp(Buffer.from(textSvg))
+                            .png()
+                            .toBuffer();
+
+                        // Position for logo (above text)
+                        const logoLeft = width - wmWidth - padding;
+                        const textTop = height - textHeight - padding;
+                        const logoTop = textTop - wmHeight - Math.round(padding * 0.3);
+
+                        // Position for text (below logo, right aligned)
+                        const textLeft = width - textWidth - padding;
+
+                        // Apply both watermarks
                         intermediateBuffer = await sharp(intermediateBuffer)
-                            .composite([{
-                                input: watermarkBuffer,
-                                top: Math.max(0, top),
-                                left: Math.max(0, left),
-                                blend: 'over'
-                            }])
+                            .composite([
+                                {
+                                    input: watermarkBuffer,
+                                    top: Math.max(0, logoTop),
+                                    left: Math.max(0, logoLeft),
+                                    blend: 'over'
+                                },
+                                {
+                                    input: textBuffer,
+                                    top: Math.max(0, textTop),
+                                    left: Math.max(0, textLeft),
+                                    blend: 'over'
+                                }
+                            ])
                             .toBuffer();
 
                     } catch (wmError) {

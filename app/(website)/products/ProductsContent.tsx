@@ -366,6 +366,8 @@ export default function ProductsContent() {
                                                             src={child.image}
                                                             alt={child.name}
                                                             fill
+                                                            placeholder="blur"
+                                                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                                             style={{ objectFit: 'cover' }}
                                                         />
                                                     ) : (

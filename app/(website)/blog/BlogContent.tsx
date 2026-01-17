@@ -237,7 +237,7 @@ export default function BlogContent({ initialBlogs = [] }: BlogContentProps) {
                 {loading ? (
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 4 }}>
                         {[1, 2, 3].map(n => (
-                            <Skeleton key={n} variant="rectangular" height={300} sx={{ borderRadius: 4, bgcolor: 'var(--border-color)' }} />
+                            <Skeleton key={n} variant="rectangular" height={300} sx={{ borderRadius: 4, bgcolor: 'rgba(224,224,224,0.4)', animation: 'pulse 1.5s ease-in-out infinite' }} />
                         ))}
                     </Box>
                 ) : filteredBlogs.length === 0 ? (
@@ -345,7 +345,7 @@ export default function BlogContent({ initialBlogs = [] }: BlogContentProps) {
                                                 src={blog.coverImage || '/images/logo.png'}
                                                 alt={blog.title}
                                                 fill
-                                                loading="lazy"
+                                                priority
                                                 sizes="(max-width: 768px) 100vw, 33vw"
                                                 style={{ objectFit: 'cover' }}
                                             />
@@ -425,6 +425,8 @@ export default function BlogContent({ initialBlogs = [] }: BlogContentProps) {
                                             fill
                                             loading="lazy"
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            placeholder="blur"
+                                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                             style={{ objectFit: 'cover', transition: 'transform 0.5s' }}
                                         />
                                     </Box>

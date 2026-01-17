@@ -48,6 +48,45 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 }
 
-export default function BlogDetailPage({ params }: Props) {
-    return <BlogDetailContent params={params} />;
+
+export default async function BlogDetailPage({ params }: Props) {
+    const { slug } = await params;
+    let blog = null;
+
+    try {
+        blog = await prisma.blog.findUnique({
+            where: {
+                slug: slug,
+                status: 'published'
+            },
+            select: {
+                id: true,
+                title: true,
+                slug: true,
+                excerpt: true,
+                content: true,
+                coverImage: true,
+                category: true,
+                author: true,
+                publishedAt: true,
+                views: true,
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching blog details:", error);
+    }
+
+    // Convert Date to string for client component
+    const serializedBlog = blog ? {
+        ...blog,
+        publishedAt: blog.publishedAt.toISOString(),
+        author: blog.author || 'Admin', // Ensure author is string
+        category: blog.category || 'General',
+        excerpt: blog.excerpt || '',
+        content: blog.content || '',
+        coverImage: blog.coverImage || ''
+    } : null;
+
+    return <BlogDetailContent params={params} initialBlog={serializedBlog} />;
 }
+
