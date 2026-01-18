@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -31,6 +32,9 @@ export async function POST(req: NextRequest) {
                 status: status || 'active'
             }
         });
+
+        // Revalidate the public promotions page to show new content immediately
+        revalidatePath('/promotions');
 
         return NextResponse.json(promotion);
     } catch (error) {

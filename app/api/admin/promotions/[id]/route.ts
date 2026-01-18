@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -22,6 +23,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
             }
         });
 
+        // Revalidate the public promotions page
+        revalidatePath('/promotions');
+
         return NextResponse.json(promotion);
     } catch (error) {
         console.error("Error updating promotion:", error);
@@ -35,6 +39,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         await prisma.promotion.delete({
             where: { id }
         });
+
+        // Revalidate the public promotions page
+        revalidatePath('/promotions');
+
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Error deleting promotion:", error);

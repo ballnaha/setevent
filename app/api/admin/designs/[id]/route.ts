@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -48,6 +49,9 @@ export async function PUT(
             }
         });
 
+        // Revalidate the public designs page to show updated content immediately
+        revalidatePath('/designs');
+
         return NextResponse.json(design);
     } catch (error) {
         console.error("Error updating design:", error);
@@ -89,6 +93,9 @@ export async function DELETE(
         await prisma.design.delete({
             where: { id }
         });
+
+        // Revalidate the public designs page to remove deleted content immediately
+        revalidatePath('/designs');
 
         return NextResponse.json({ success: true });
     } catch (error) {

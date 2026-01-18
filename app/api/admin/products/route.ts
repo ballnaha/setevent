@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 // GET /api/admin/products - Get all products with optional filters
 export async function GET(req: NextRequest) {
@@ -57,6 +58,9 @@ export async function POST(req: NextRequest) {
                 status: status || 'active'
             } as any // priceUnit added to schema, run prisma generate
         });
+
+        // Revalidate the public products pages to show new content immediately
+        revalidatePath('/products');
 
         return NextResponse.json(product);
     } catch (error) {

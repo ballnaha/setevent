@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -40,9 +41,13 @@ export async function POST(req: NextRequest) {
             }
         });
 
+        // Revalidate the public designs page to show new content immediately
+        revalidatePath('/designs');
+
         return NextResponse.json(design, { status: 201 });
     } catch (error) {
         console.error("Error creating design:", error);
         return NextResponse.json({ error: "Failed to create design" }, { status: 500 });
     }
 }
+

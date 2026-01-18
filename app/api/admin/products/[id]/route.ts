@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 // Use RouteParams interface for type safety with params Promise
 interface RouteParams {
@@ -28,6 +29,9 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
             } as any // priceUnit added to schema, run prisma generate
         });
 
+        // Revalidate the public products pages
+        revalidatePath('/products');
+
         return NextResponse.json(product);
     } catch (error) {
         console.error("Error updating product:", error);
@@ -41,6 +45,10 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
         await prisma.product.delete({
             where: { id }
         });
+
+        // Revalidate the public products pages
+        revalidatePath('/products');
+
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Error deleting product:", error);

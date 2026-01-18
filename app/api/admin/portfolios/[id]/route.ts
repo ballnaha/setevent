@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 const prisma = new PrismaClient();
 
@@ -71,6 +72,9 @@ export async function PUT(
             }
         });
 
+        // Revalidate the public portfolio page to show updated content immediately
+        revalidatePath('/portfolio');
+
         return NextResponse.json(portfolio);
     } catch (error) {
         console.error("Error updating portfolio:", error);
@@ -114,6 +118,9 @@ export async function DELETE(
         await prisma.portfolio.delete({
             where: { id }
         });
+
+        // Revalidate the public portfolio page to remove deleted content immediately
+        revalidatePath('/portfolio');
 
         return NextResponse.json({ success: true });
     } catch (error) {
