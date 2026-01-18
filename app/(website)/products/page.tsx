@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import ProductsContent from './ProductsContent';
 
-export const dynamic = 'force-dynamic';
+// Revalidate every 60 seconds for fresh data with caching
+export const revalidate = 60;
 
 export const metadata: Metadata = {
     title: 'สินค้าและบริการ | SET EVENT Thailand',

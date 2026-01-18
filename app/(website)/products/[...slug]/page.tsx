@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import ProductCategoryContent from './ProductCategoryContent';
 import { prisma } from "@/lib/prisma";
 
-export const dynamic = 'force-dynamic';
+// Revalidate every 60 seconds for fresh data with caching
+export const revalidate = 60;
 
 type Props = {
     params: Promise<{ slug: string[] }>

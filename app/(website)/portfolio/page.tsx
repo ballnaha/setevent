@@ -2,7 +2,8 @@ import { Metadata } from 'next';
 import PortfolioContent from './PortfolioContent';
 import prisma from '@/lib/prisma';
 
-export const dynamic = 'force-dynamic';
+// Revalidate every 60 seconds for fresh data with caching
+export const revalidate = 60;
 
 export const metadata: Metadata = {
     // ... metadata content (keep as is)
