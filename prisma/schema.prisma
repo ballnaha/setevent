@@ -275,7 +275,7 @@ model Blog {
   slug        String   @unique
   excerpt     String?  @db.Text
   content     String?  @db.Text
-  coverImage  String?
+  coverImage  String?  @db.Text
   author      String?  @default("Admin")
   category    String?  @default("General")
   views       Int      @default(0)

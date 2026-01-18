@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
     request: Request,
@@ -9,10 +7,11 @@ export async function GET(
 ) {
     try {
         const { slug } = await params;
+        const decodedSlug = decodeURIComponent(slug);
 
         const blog = await prisma.blog.findUnique({
             where: {
-                slug: slug,
+                slug: decodedSlug,
             },
         });
 

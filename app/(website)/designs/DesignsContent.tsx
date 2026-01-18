@@ -424,8 +424,8 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                         onClick={closeLightbox}
                         sx={{
                             position: 'absolute',
-                            top: { xs: 20, md: 10 },
-                            right: { xs: 20, md: 10 },
+                            top: { xs: 48, md: 24 },
+                            right: { xs: 24, md: 24 },
                             zIndex: 100,
                             bgcolor: 'rgba(0,0,0,0.5)',
                             color: 'white',
@@ -501,7 +501,8 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         bottom: 0,
                                         left: 0,
                                         right: 0,
-                                        p: 3,
+                                        p: { xs: 4, md: 4 },
+                                        pb: { xs: 8, md: 4 },
                                         zIndex: 10,
                                         background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
                                     }}>
@@ -519,7 +520,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                             label={item.category}
                                             size="small"
                                             sx={{
-                                                mt: 1,
+                                                mt: 2,
                                                 bgcolor: '#8B5CF6',
                                                 color: 'white',
                                                 fontFamily: 'var(--font-prompt)',

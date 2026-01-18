@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
 
 export async function POST(
     request: Request,
@@ -9,10 +7,11 @@ export async function POST(
 ) {
     try {
         const { slug } = await params;
+        const decodedSlug = decodeURIComponent(slug);
 
         // Check if blog exists first (optional but good)
         const blog = await prisma.blog.findUnique({
-            where: { slug },
+            where: { slug: decodedSlug },
             select: { id: true }
         });
 
@@ -22,7 +21,7 @@ export async function POST(
 
         // Increment views
         await prisma.blog.update({
-            where: { slug },
+            where: { slug: decodedSlug },
             data: { views: { increment: 1 } },
         });
 

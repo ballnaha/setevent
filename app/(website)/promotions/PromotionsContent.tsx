@@ -106,7 +106,7 @@ function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: 
                     alignItems: 'center',
                     gap: 0.5
                 }}>
-                    <Ticket size="14" color="#FFD700" variant="Bold" />
+                    <Ticket size="14" color="#FFD700" variant="TwoTone" />
                     <Typography sx={{
                         fontFamily: 'var(--font-prompt)',
                         fontSize: '0.75rem',
@@ -187,7 +187,7 @@ function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: 
                     {/* Right: Features with Icons */}
                     <Box sx={{
                         display: 'flex',
-                        gap: 2,
+                        gap: 1,
                         flexShrink: 0
                     }}>
                         {promotion.features.slice(0, 2).map((feature, idx) => (
@@ -221,6 +221,26 @@ function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: 
                                 </Typography>
                             </Box>
                         ))}
+                        {extraFeaturesCount > 0 && (
+                            <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: 'rgba(255,255,255,0.08)',
+                                borderRadius: 2,
+                                width: 40,
+                                height: 'auto',
+                            }}>
+                                <Typography sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.9rem',
+                                    color: 'white',
+                                    fontWeight: 600
+                                }}>
+                                    +{extraFeaturesCount}
+                                </Typography>
+                            </Box>
+                        )}
                     </Box>
                 </Box>
 
@@ -295,12 +315,6 @@ export default function PromotionsContent() {
     // Helper to format date
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
-        const now = new Date();
-        const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-        if (diff === 0) return "วันนี้";
-        if (diff === 1) return "เมื่อวาน";
-        if (diff < 7) return `${diff} วันที่แล้ว`;
-        if (diff < 30) return `${Math.floor(diff / 7)} สัปดาห์ที่แล้ว`;
         return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
     };
 
@@ -623,7 +637,7 @@ export default function PromotionsContent() {
                                             fontSize: '0.9rem',
                                             color: 'rgba(255,255,255,0.5)',
                                         }}>
-                                            โพสต์เมื่อ {selectedPromotion.createdAt}
+                                            ข้อมูล ณ วันที่ {selectedPromotion.createdAt}
                                         </Typography>
                                     </Box>
                                 </Box>

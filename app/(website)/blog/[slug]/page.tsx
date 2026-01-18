@@ -1,83 +1,70 @@
 import { Metadata } from 'next';
 import BlogDetailContent from './BlogDetailContent';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/prisma';
+import { cache } from 'react';
+import { notFound } from 'next/navigation';
 
 type Props = {
     params: Promise<{ slug: string }>;
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-    const { slug } = await params;
-
+// Start of Selection
+const getBlog = cache(async (slug: string) => {
     try {
-        // Query DB directly to avoid triggering view increment in API
         const blog = await prisma.blog.findUnique({
             where: {
                 slug: slug,
-            },
-            select: {
-                title: true,
-                excerpt: true,
-                coverImage: true,
             }
         });
 
-        if (!blog) {
-            return {
-                title: 'บทความ | SetEvent',
-                description: 'บทความและสาระน่ารู้เกี่ยวกับการจัดงานอีเวนต์',
-            };
+        if (!blog || blog.status !== 'published') {
+            return null;
         }
 
-        return {
-            title: blog.title,
-            description: blog.excerpt || blog.title,
-            openGraph: {
-                title: blog.title,
-                description: blog.excerpt || blog.title,
-                images: blog.coverImage ? [blog.coverImage] : [],
-            },
-        };
-    } catch {
+        return blog;
+    } catch (error) {
+        console.error("Error fetching blog details:", error);
+        return null;
+    }
+});
+
+// Start of Selection
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+    const { slug } = await params;
+    const decodedSlug = decodeURIComponent(slug);
+    const blog = await getBlog(decodedSlug);
+
+    if (!blog) {
+        // End of Selection
         return {
             title: 'บทความ | SetEvent',
             description: 'บทความและสาระน่ารู้เกี่ยวกับการจัดงานอีเวนต์',
         };
     }
+
+    return {
+        title: blog.title,
+        description: blog.excerpt || blog.title,
+        openGraph: {
+            title: blog.title,
+            description: blog.excerpt || blog.title,
+            images: blog.coverImage ? [blog.coverImage] : [],
+        },
+    };
 }
 
 
 export default async function BlogDetailPage({ params }: Props) {
     const { slug } = await params;
-    let blog = null;
+    const decodedSlug = decodeURIComponent(slug);
+    const blog = await getBlog(decodedSlug);
 
-    try {
-        blog = await prisma.blog.findUnique({
-            where: {
-                slug: slug,
-                status: 'published'
-            },
-            select: {
-                id: true,
-                title: true,
-                slug: true,
-                excerpt: true,
-                content: true,
-                coverImage: true,
-                category: true,
-                author: true,
-                publishedAt: true,
-                views: true,
-            }
-        });
-    } catch (error) {
-        console.error("Error fetching blog details:", error);
+    if (!blog) {
+        notFound();
     }
 
     // Convert Date to string for client component
-    const serializedBlog = blog ? {
+    const serializedBlog = {
         ...blog,
         publishedAt: blog.publishedAt.toISOString(),
         author: blog.author || 'Admin', // Ensure author is string
@@ -85,7 +72,7 @@ export default async function BlogDetailPage({ params }: Props) {
         excerpt: blog.excerpt || '',
         content: blog.content || '',
         coverImage: blog.coverImage || ''
-    } : null;
+    };
 
     return <BlogDetailContent params={params} initialBlog={serializedBlog} />;
 }
