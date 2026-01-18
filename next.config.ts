@@ -4,8 +4,59 @@ import withPWAInit from "@ducanh2912/next-pwa";
 const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
+  // Optimize for faster initial load
+  register: true,
   workboxOptions: {
     disableDevLogs: true,
+    skipWaiting: true,
+    clientsClaim: true,
+    // Don't precache everything - use runtime caching instead
+    maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3MB limit
+    // Exclude large chunks from precache
+    exclude: [
+      /\.map$/,
+      /^manifest.*\.js$/,
+      /\.woff2$/,
+      /\.woff$/,
+    ],
+    runtimeCaching: [
+      {
+        // Cache pages with Network First strategy
+        urlPattern: /^https?:\/\/.*\/(?!api\/).*/,
+        handler: "NetworkFirst",
+        options: {
+          cacheName: "pages-cache",
+          expiration: {
+            maxEntries: 50,
+            maxAgeSeconds: 24 * 60 * 60, // 24 hours
+          },
+        },
+      },
+      {
+        // Cache static assets with Cache First
+        urlPattern: /\/_next\/static\/.*/,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "static-cache",
+          expiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+          },
+        },
+      },
+      {
+        // Cache images
+        urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif|ico)$/,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "image-cache",
+          expiration: {
+            maxEntries: 100,
+            maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+          },
+        },
+      },
+    ],
   },
 });
 

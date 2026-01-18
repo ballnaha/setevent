@@ -44,47 +44,37 @@ type NavItem = {
     sections?: { title: string; items: SubItem[] }[];
 };
 
-// Interface for settings
-interface ContactSettings {
-    phone: string;
-    line: string;
-    lineUrl: string;
+// Import ContactSettings type from shared utility
+import type { ContactSettings } from "@/lib/getContactSettings";
+
+// Props interface
+interface HeaderProps {
+    contactSettings?: ContactSettings;
 }
 
-const DEFAULT_SETTINGS: ContactSettings = {
+const DEFAULT_SETTINGS = {
     phone: "081-234-5678",
     line: "@setevent",
     lineUrl: "https://line.me/ti/p/~@setevent",
 };
 
-export default function Header() {
+export default function Header({ contactSettings }: HeaderProps) {
     const { theme, setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
 
-    const [settings, setSettings] = useState<ContactSettings>(DEFAULT_SETTINGS);
+    // Use passed contactSettings or fallback to defaults
+    const settings = {
+        phone: contactSettings?.phone || DEFAULT_SETTINGS.phone,
+        line: contactSettings?.line || DEFAULT_SETTINGS.line,
+        lineUrl: contactSettings?.lineUrl || DEFAULT_SETTINGS.lineUrl,
+    };
 
     // Fetch product menu from database
     const { sections: productSections } = useMenuData();
 
     useEffect(() => {
         setMounted(true);
-        const fetchSettings = async () => {
-            try {
-                const res = await fetch('/api/settings/contact');
-                if (res.ok) {
-                    const data = await res.json();
-                    setSettings({
-                        phone: data.phone,
-                        line: data.line,
-                        lineUrl: data.lineUrl
-                    });
-                }
-            } catch (error) {
-                console.error('Error fetching contact settings:', error);
-            }
-        };
-        fetchSettings();
     }, []);
 
     // Build navItems dynamically based on fetched sections

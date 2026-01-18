@@ -7,20 +7,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { useMenuData } from "@/app/hooks/useMenuData";
 
-// Interface for settings
-interface ContactSettings {
-    address: string;
-    phone: string;
-    email: string;
-    line: string;
-    lineUrl: string;
-    facebook: string;
-    instagram: string;
-    tiktok: string;
-    mapUrl: string;
+// Import ContactSettings type from shared utility
+import type { ContactSettings } from "@/lib/getContactSettings";
+
+// Props interface
+interface FooterProps {
+    contactSettings?: ContactSettings;
 }
 
-const DEFAULT_SETTINGS: ContactSettings = {
+const DEFAULT_SETTINGS = {
     address: "123/45 ถนนนวมินทร์ แขวงนวลจันทร์ เขตบึงกุ่ม กทม. 10240",
     phone: "081-234-5678",
     email: "contact@seteventthailand.com",
@@ -116,31 +111,30 @@ function FooterSection({ title, children, defaultOpen = false }: { title: string
     );
 }
 
-export default function Footer() {
+export default function Footer({ contactSettings }: FooterProps) {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const [settings, setSettings] = useState<ContactSettings>(DEFAULT_SETTINGS);
     const [mounted, setMounted] = useState(false);
+
+    // Use passed contactSettings or fallback to defaults
+    const settings = {
+        address: contactSettings?.address || DEFAULT_SETTINGS.address,
+        phone: contactSettings?.phone || DEFAULT_SETTINGS.phone,
+        email: contactSettings?.email || DEFAULT_SETTINGS.email,
+        line: contactSettings?.line || DEFAULT_SETTINGS.line,
+        lineUrl: contactSettings?.lineUrl || DEFAULT_SETTINGS.lineUrl,
+        facebook: contactSettings?.facebook || DEFAULT_SETTINGS.facebook,
+        instagram: contactSettings?.instagram || DEFAULT_SETTINGS.instagram,
+        tiktok: contactSettings?.tiktok || DEFAULT_SETTINGS.tiktok,
+        mapUrl: contactSettings?.mapUrl || DEFAULT_SETTINGS.mapUrl,
+    };
 
     // Fetch dynamic product menu
     const { sections: productSections } = useMenuData();
 
     useEffect(() => {
         setMounted(true);
-        fetchSettings();
     }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings/contact');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings(data);
-            }
-        } catch (error) {
-            console.error('Error fetching contact settings:', error);
-        }
-    };
 
     // Flatten product links from sections (take up to 5-6 items)
     const productLinks = React.useMemo(() => {
