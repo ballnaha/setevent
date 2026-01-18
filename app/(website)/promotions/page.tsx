@@ -1,7 +1,9 @@
 import { Metadata } from 'next';
+import { PrismaClient } from '@prisma/client';
 import PromotionsContent from './PromotionsContent';
 
-export const dynamic = 'force-dynamic';
+// Use a singleton PrismaClient for better performance
+const prisma = new PrismaClient();
 
 export const metadata: Metadata = {
     title: 'โปรโมชั่นพิเศษ | SET EVENT Thailand',
@@ -26,6 +28,59 @@ export const metadata: Metadata = {
     },
 };
 
-export default function PromotionsPage() {
-    return <PromotionsContent />;
+// Parsed interface for display
+interface Promotion {
+    id: string;
+    title: string;
+    description: string;
+    image: string;
+    price?: string;
+    period?: string;
+    features: { label: string; value: string }[];
+    createdAt: string;
+}
+
+// Helper to format date
+const formatDate = (date: Date): string => {
+    return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+// Server-side data fetching for better LCP
+async function getPromotions(): Promise<Promotion[]> {
+    try {
+        const promotions = await prisma.promotion.findMany({
+            where: { status: 'active' },
+            orderBy: { order: 'asc' },
+            select: {
+                id: true,
+                title: true,
+                description: true,
+                image: true,
+                price: true,
+                period: true,
+                features: true,
+                createdAt: true,
+            }
+        });
+
+        return promotions.map((p) => ({
+            id: p.id,
+            title: p.title,
+            description: p.description ?? '',
+            image: p.image ?? '',
+            price: p.price || undefined,
+            period: p.period || undefined,
+            features: p.features ? JSON.parse(p.features) : [],
+            createdAt: formatDate(p.createdAt)
+        }));
+    } catch (error) {
+        console.error("Failed to fetch promotions:", error);
+        return [];
+    }
+}
+
+export default async function PromotionsPage() {
+    const promotions = await getPromotions();
+
+    return <PromotionsContent initialPromotions={promotions} />;
 }

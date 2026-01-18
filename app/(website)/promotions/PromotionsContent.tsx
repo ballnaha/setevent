@@ -1,22 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Box, Container, Typography, Paper, IconButton, Stack, Chip, Modal, CircularProgress, Skeleton, Button } from "@mui/material";
-import { ArrowRight2, Gallery, CloseCircle, ArrowLeft2, Calendar, Ticket, User, Maximize4 } from "iconsax-react";
+import React, { useState } from "react";
+import { Box, Container, Typography, Paper, IconButton, Stack, Chip, Modal } from "@mui/material";
+import { Gallery, CloseCircle, Ticket } from "iconsax-react";
 import Image from "next/image";
-
-// Interface aligned with DB schema
-interface PromotionDB {
-    id: string;
-    title: string;
-    description: string;
-    image: string;
-    price: string | null;
-    period: string | null;
-    features: string | null; // JSON string from DB
-    status: string;
-    createdAt: string;
-}
 
 // Parsed interface for display
 interface Promotion {
@@ -28,6 +15,10 @@ interface Promotion {
     period?: string;
     features: { label: string; value: string }[];
     createdAt: string;
+}
+
+interface PromotionsContentProps {
+    initialPromotions: Promotion[];
 }
 
 // Helper function to format price with commas
@@ -47,7 +38,7 @@ const formatPrice = (price: string | undefined): string => {
     return hasThaiCurrency ? `฿${formatted}` : formatted;
 };
 
-function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: () => void }) {
+function PromotionCard({ promotion, onClick, priority = false }: { promotion: Promotion; onClick: () => void; priority?: boolean }) {
     const [isHovered, setIsHovered] = useState(false);
     const extraFeaturesCount = Math.max(0, promotion.features.length - 2);
 
@@ -84,6 +75,8 @@ function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: 
                     src={promotion.image}
                     alt={promotion.title}
                     fill
+                    priority={priority}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     placeholder="blur"
                     blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                     style={{ objectFit: 'cover' }}
@@ -277,46 +270,9 @@ function PromotionCard({ promotion, onClick }: { promotion: Promotion; onClick: 
     );
 }
 
-export default function PromotionsContent() {
-    const [promotions, setPromotions] = useState<Promotion[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function PromotionsContent({ initialPromotions }: PromotionsContentProps) {
     const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null);
-
-
-    useEffect(() => {
-        fetchPromotions();
-    }, []);
-
-    const fetchPromotions = async () => {
-        try {
-            const res = await fetch("/api/promotions", { cache: "no-store" });
-            if (res.ok) {
-                const data: PromotionDB[] = await res.json();
-                // Parse features JSON and format data
-                const parsed = data.map((p) => ({
-                    id: p.id,
-                    title: p.title,
-                    description: p.description,
-                    image: p.image,
-                    price: p.price || undefined,
-                    period: p.period || undefined,
-                    features: p.features ? JSON.parse(p.features) : [],
-                    createdAt: formatDate(p.createdAt)
-                }));
-                setPromotions(parsed);
-            }
-        } catch (error) {
-            console.error("Failed to fetch promotions", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Helper to format date
-    const formatDate = (dateStr: string) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: 'numeric' });
-    };
+    const promotions = initialPromotions;
 
     return (
         <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
@@ -401,36 +357,7 @@ export default function PromotionsContent() {
 
             {/* Content List */}
             <Container maxWidth="lg" sx={{ mt: 8 }}>
-                {loading ? (
-                    <Box sx={{
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-                        gap: 4
-                    }}>
-                        {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Box key={i} sx={{ borderRadius: 6, overflow: 'hidden', bgcolor: 'rgba(224,224,224,0.2)', height: 380, position: 'relative' }}>
-                                <Skeleton variant="rectangular" height="100%" sx={{ bgcolor: 'rgba(224,224,224,0.4)', animation: 'pulse 1.5s ease-in-out infinite' }} />
-                                <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 2.5, zIndex: 2 }}>
-                                    <Skeleton variant="text" width="80%" height={40} sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.1)' }} />
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 2 }}>
-                                        <Box sx={{ flex: 1 }}>
-                                            <Skeleton variant="text" width="40%" height={24} sx={{ mb: 0.5, bgcolor: 'rgba(255,255,255,0.1)' }} />
-                                            <Skeleton variant="text" width="100%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.08)' }} />
-                                            <Skeleton variant="text" width="100%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.08)' }} />
-                                        </Box>
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
-                                            <Skeleton variant="rounded" width={55} height={55} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.08)' }} />
-                                            <Skeleton variant="rounded" width={55} height={55} sx={{ borderRadius: 2, bgcolor: 'rgba(255,255,255,0.08)' }} />
-                                        </Box>
-                                    </Box>
-                                    <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', pt: 1.5 }}>
-                                        <Skeleton variant="text" width="60%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
-                                    </Box>
-                                </Box>
-                            </Box>
-                        ))}
-                    </Box>
-                ) : promotions.length === 0 ? (
+                {promotions.length === 0 ? (
                     <Box sx={{
                         textAlign: 'center',
                         py: 15,
@@ -456,11 +383,12 @@ export default function PromotionsContent() {
                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
                         gap: 4
                     }}>
-                        {promotions.map((promo) => (
+                        {promotions.map((promo, index) => (
                             <PromotionCard
                                 key={promo.id}
                                 promotion={promo}
                                 onClick={() => setSelectedPromotion(promo)}
+                                priority={index < 3} // First 3 cards get priority loading for LCP
                             />
                         ))}
                     </Box>
