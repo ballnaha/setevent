@@ -131,6 +131,28 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
         <link rel="dns-prefetch" href="https://www.google-analytics.com" />
 
+        {/* Preload critical resources for faster LCP */}
+        <link
+          rel="preload"
+          href="/images/logo_white.png"
+          as="image"
+          type="image/png"
+        />
+        <link
+          rel="preload"
+          href="/images/banner1-4.webp"
+          as="image"
+          type="image/webp"
+          media="(min-width: 768px)"
+        />
+        <link
+          rel="preload"
+          href="/images/banner1-4-mobile.webp"
+          as="image"
+          type="image/webp"
+          media="(max-width: 767px)"
+        />
+
         {/* WebSite Schema for Sitelinks Search Box */}
         <script
           type="application/ld+json"
