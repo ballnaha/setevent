@@ -315,6 +315,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         className="design-image"
                                         width={500}
                                         height={500}
+                                        loading={idx < 6 ? 'eager' : 'lazy'}
                                         placeholder="blur"
                                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                         style={{

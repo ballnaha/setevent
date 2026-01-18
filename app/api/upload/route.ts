@@ -21,9 +21,9 @@ export async function POST(req: NextRequest) {
         let isWebP = false;
         if (file.type.startsWith("image/")) {
             try {
-                // 1. First resize the image
+                // 1. First resize the image (1200px max for faster loading)
                 let pipeline = sharp(buffer)
-                    .resize(1920, 1920, {
+                    .resize(1200, 1200, {
                         fit: 'inside',
                         withoutEnlargement: true
                     });
