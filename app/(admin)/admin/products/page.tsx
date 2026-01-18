@@ -87,7 +87,7 @@ function ProductsContent() {
     const [pendingDeleteImages, setPendingDeleteImages] = useState<string[]>([]); // Images to delete on save
     const [saving, setSaving] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
-    const [useWatermark, setUseWatermark] = useState(true);
+    const [useWatermark, setUseWatermark] = useState(false);
 
     // State for image delete confirmation
     const [imageDeleteConfirm, setImageDeleteConfirm] = useState<{
@@ -199,7 +199,7 @@ function ProductsContent() {
         setPendingImages([]);
         setPendingDeleteImages([]);
         setDialogOpen(true);
-        if (!product) setUseWatermark(true); // Default to true for new products
+        if (!product) setUseWatermark(false); // Default to false for new products
     };
 
     // Store selected files locally with preview (NOT uploading yet) - supports multiple files

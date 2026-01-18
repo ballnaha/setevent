@@ -60,7 +60,7 @@ export default function PortfolioAdminPage() {
     const [activeTab, setActiveTab] = useState<string>("All");
     const [customCategory, setCustomCategory] = useState<string>("");
     const [showCustomInput, setShowCustomInput] = useState(false);
-    const [useWatermark, setUseWatermark] = useState(true);
+    const [useWatermark, setUseWatermark] = useState(false);
 
     // Delete Confirmation State
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -140,7 +140,7 @@ export default function PortfolioAdminPage() {
         }
         setCustomCategory("");
         setShowCustomInput(false);
-        setUseWatermark(true);
+        setUseWatermark(false);
         // Reset file selection
         setSelectedFile(null);
         setPreviewUrl(null);
