@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { EffectCards, Pagination } from "swiper/modules";
@@ -139,34 +139,54 @@ export default function ValentineSlugPage() {
         return heartsArr;
     }, []);
 
+    // Ref to track image preload objects to prevent memory leaks
+    const preloadImagesRef = useRef<HTMLImageElement[]>([]);
+
+    // Memoized callback for handling image load
+    const handleImageLoaded = useCallback((index: number) => {
+        setLoadedImages(prev => {
+            if (prev.has(index)) return prev;
+            const updated = new Set(prev);
+            updated.add(index);
+            return updated;
+        });
+    }, []);
+
     useEffect(() => {
+        // Cleanup previous preload images
+        preloadImagesRef.current.forEach(img => {
+            img.onload = null;
+            img.onerror = null;
+        });
+        preloadImagesRef.current = [];
+
         // Preload all images and mark other types as loaded
-        const newLoaded = new Set<number>();
+        const nonImageIndexes: number[] = [];
+
         memories.forEach((memory, index) => {
             if (memory.type === 'image') {
                 const img = new Image();
-                img.onload = () => setLoadedImages(prev => {
-                    if (prev.has(index)) return prev;
-                    return new Set(prev).add(index);
-                });
+                img.onload = () => handleImageLoaded(index);
+                img.onerror = () => handleImageLoaded(index); // Mark as loaded even on error to prevent infinite loading
                 img.src = memory.url;
+                preloadImagesRef.current.push(img);
             } else if (memory.type === 'youtube') {
                 const img = new Image();
-                img.onload = () => setLoadedImages(prev => {
-                    if (prev.has(index)) return prev;
-                    return new Set(prev).add(index);
-                });
+                img.onload = () => handleImageLoaded(index);
+                img.onerror = () => handleImageLoaded(index);
                 img.src = `https://img.youtube.com/vi/${memory.url}/hqdefault.jpg`;
+                preloadImagesRef.current.push(img);
             } else {
-                newLoaded.add(index);
+                nonImageIndexes.push(index);
             }
         });
 
-        if (newLoaded.size > 0) {
+        // Batch update for non-image types
+        if (nonImageIndexes.length > 0) {
             setLoadedImages(prev => {
                 const updated = new Set(prev);
                 let changed = false;
-                newLoaded.forEach(idx => {
+                nonImageIndexes.forEach(idx => {
                     if (!updated.has(idx)) {
                         updated.add(idx);
                         changed = true;
@@ -175,7 +195,15 @@ export default function ValentineSlugPage() {
                 return changed ? updated : prev;
             });
         }
-    }, [memories]);
+
+        // Cleanup on unmount
+        return () => {
+            preloadImagesRef.current.forEach(img => {
+                img.onload = null;
+                img.onerror = null;
+            });
+        };
+    }, [memories, handleImageLoaded]);
 
     const displayContent = content || DEFAULT_CONTENT;
 
@@ -308,6 +336,35 @@ export default function ValentineSlugPage() {
             #FFEBEE 0deg 18deg,
             #FFCDD2 18deg 36deg
           );
+        }
+        
+        /* Valentine Swiper - Hardware Acceleration & Smooth Transitions */
+        .swiper {
+            will-change: transform;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        .swiper-slide {
+            will-change: transform;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        .swiper-slide img {
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+        
+        /* Smooth image reveal */
+        .memory-image {
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        .memory-image.loaded {
+            opacity: 1;
         }
         
         /* Valentine Swiper Bullets - Heart Style */
@@ -593,16 +650,17 @@ export default function ValentineSlugPage() {
                                                     <div className="w-full h-full relative">
                                                         {/* Loading skeleton - only show if not loaded */}
                                                         {!loadedImages.has(index) && (
-                                                            <div className="absolute inset-0 image-loading flex items-center justify-center">
+                                                            <div className="absolute inset-0 image-loading flex items-center justify-center z-5">
                                                                 <div className="text-4xl animate-pulse">💖</div>
                                                             </div>
                                                         )}
-                                                        {/* Actual image */}
+                                                        {/* Actual image - hidden until loaded */}
                                                         <img
                                                             src={memory.url}
                                                             alt={memory.caption || ""}
-                                                            className="w-full h-full object-cover relative z-10"
-                                                            onLoad={() => setLoadedImages(prev => new Set(prev).add(index))}
+                                                            className={`w-full h-full object-cover memory-image ${loadedImages.has(index) ? 'loaded' : ''}`}
+                                                            style={{ position: 'relative', zIndex: loadedImages.has(index) ? 10 : 1 }}
+                                                            onLoad={() => handleImageLoaded(index)}
                                                         />
                                                     </div>
                                                 )}
