@@ -42,7 +42,7 @@ export async function PUT(
         const body = await req.json();
         const {
             slug, jobName, title, openingText, greeting, subtitle, message,
-            signer, backgroundColor, youtubeAutoplay, youtubeMute, tiktokAutoplay, tiktokMute, backgroundMusicYoutubeId, status, memories
+            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, memories
         } = body;
 
         // Update main card data
@@ -58,35 +58,33 @@ export async function PUT(
                 message,
                 signer,
                 backgroundColor,
-                youtubeAutoplay,
-                youtubeMute,
-                tiktokAutoplay,
-                tiktokMute,
                 backgroundMusicYoutubeId,
+                backgroundMusicUrl,
                 status
             }
         });
 
-        // Handle memories update if provided
-        if (memories && Array.isArray(memories)) {
-            // Delete specified files if urlsToDelete is provided
-            const { urlsToDelete } = body;
-            if (urlsToDelete && Array.isArray(urlsToDelete)) {
-                const fs = require('fs/promises');
-                const path = require('path');
-                for (const url of urlsToDelete) {
-                    if (url && url.startsWith('/uploads')) {
-                        try {
-                            const filepath = path.join(process.cwd(), 'public', url.substring(1));
-                            await fs.unlink(filepath).catch((err: any) => {
-                                if (err.code !== 'ENOENT') console.error("Error deleting file:", err);
-                            });
-                        } catch (err) {
-                            console.error("File deletion logic error:", err);
-                        }
+        // Delete specified files if urlsToDelete is provided (handle both memories and music)
+        const { urlsToDelete } = body;
+        if (urlsToDelete && Array.isArray(urlsToDelete)) {
+            const fs = require('fs/promises');
+            const path = require('path');
+            for (const url of urlsToDelete) {
+                if (url && url.startsWith('/uploads')) {
+                    try {
+                        const filepath = path.join(process.cwd(), 'public', url.substring(1));
+                        await fs.unlink(filepath).catch((err: any) => {
+                            if (err.code !== 'ENOENT') console.error("Error deleting file:", err);
+                        });
+                    } catch (err) {
+                        console.error("File deletion logic error:", err);
                     }
                 }
             }
+        }
+
+        // Handle memories update if provided
+        if (memories && Array.isArray(memories)) {
 
             // Simple approach: delete all and recreate
             await prisma.valentineMemory.deleteMany({
@@ -150,6 +148,18 @@ export async function DELETE(
                 } catch (err) {
                     console.error("File deletion error:", err);
                 }
+            }
+        }
+
+        // Delete background music file
+        if (card.backgroundMusicUrl && card.backgroundMusicUrl.startsWith('/uploads')) {
+            try {
+                const filepath = path.join(process.cwd(), 'public', card.backgroundMusicUrl.substring(1));
+                await fs.unlink(filepath).catch((err: any) => {
+                    if (err.code !== 'ENOENT') console.error("Error deleting music file:", err);
+                });
+            } catch (err) {
+                console.error("Music file deletion error:", err);
             }
         }
 

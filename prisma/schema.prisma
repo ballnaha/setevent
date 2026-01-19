@@ -298,17 +298,10 @@ model ValentineCard {
   signer          String?
   backgroundColor String?  @default("#FFF0F3")
   status          String   @default("active") // active, inactive
-  
-  // YouTube settings
-  youtubeAutoplay Boolean  @default(true)
-  youtubeMute     Boolean  @default(false)
 
-  // TikTok settings
-  tiktokAutoplay  Boolean  @default(true)
-  tiktokMute      Boolean  @default(false)
-
-  // Background Music
+  // Background Music (เลือกใช้ได้ทีละอันเท่านั้น - MP3 จะถูกใช้ก่อนถ้ามีทั้งคู่)
   backgroundMusicYoutubeId String?  // YouTube Video ID for background music
+  backgroundMusicUrl       String?  @db.Text // Uploaded MP3 file URL
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

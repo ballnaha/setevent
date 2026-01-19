@@ -78,11 +78,8 @@ interface ValentineCard {
     message: string | null;
     signer: string | null;
     backgroundColor: string | null;
-    youtubeAutoplay: boolean;
-    youtubeMute: boolean;
-    tiktokAutoplay: boolean;
-    tiktokMute: boolean;
     backgroundMusicYoutubeId: string | null;
+    backgroundMusicUrl: string | null;
     status: string;
     createdAt: string;
     _count?: { memories: number };
@@ -374,13 +371,11 @@ export default function ValentineAdminPage() {
         message: "",
         signer: "",
         backgroundColor: "#FFF0F3",
-        youtubeAutoplay: true,
-        youtubeMute: false,
-        tiktokAutoplay: true,
-        tiktokMute: false,
         backgroundMusicYoutubeId: "",
+        backgroundMusicUrl: "",
         status: "active"
     });
+    const [musicFile, setMusicFile] = useState<File | null>(null);
     const [memories, setMemories] = useState<ValentineMemory[]>([]);
 
     // Delete Confirmation State
@@ -459,13 +454,11 @@ export default function ValentineAdminPage() {
                     message: data.message || "",
                     signer: data.signer || "",
                     backgroundColor: data.backgroundColor || "#FFF0F3",
-                    youtubeAutoplay: data.youtubeAutoplay ?? true,
-                    youtubeMute: data.youtubeMute ?? false,
-                    tiktokAutoplay: data.tiktokAutoplay ?? true,
-                    tiktokMute: data.tiktokMute ?? false,
                     backgroundMusicYoutubeId: data.backgroundMusicYoutubeId || "",
+                    backgroundMusicUrl: data.backgroundMusicUrl || "",
                     status: data.status
                 });
+                setMusicFile(null);
                 setMemories((data.memories || []).map((m: any) => ({
                     ...m,
                     localId: m.id || Math.random().toString(36).substr(2, 9)
@@ -495,13 +488,11 @@ export default function ValentineAdminPage() {
             message: "",
             signer: "",
             backgroundColor: "#FFF0F3",
-            youtubeAutoplay: true,
-            youtubeMute: false,
-            tiktokAutoplay: true,
-            tiktokMute: false,
             backgroundMusicYoutubeId: "",
+            backgroundMusicUrl: "",
             status: "active"
         });
+        setMusicFile(null);
         setMemories([]);
         setEditId(null);
         setOpen(true);
@@ -592,6 +583,37 @@ export default function ValentineAdminPage() {
         setSaving(true);
         try {
             // 1. Upload any pending files
+            let currentBackgroundMusicUrl = formData.backgroundMusicUrl;
+            let currentUrlsToDelete = [...urlsToDelete];
+
+            // Upload background music if new file selected
+            if (musicFile) {
+                try {
+                    const musicFormData = new FormData();
+                    musicFormData.append("file", musicFile);
+                    musicFormData.append("folder", "valentine/music");
+
+                    const res = await fetch("/api/upload", {
+                        method: "POST",
+                        body: musicFormData
+                    });
+
+                    if (res.ok) {
+                        const data = await res.json();
+                        // If there was an old music file, track it for deletion
+                        if (formData.backgroundMusicUrl && formData.backgroundMusicUrl.startsWith('/uploads')) {
+                            currentUrlsToDelete.push(formData.backgroundMusicUrl);
+                        }
+                        currentBackgroundMusicUrl = data.url;
+                    } else {
+                        throw new Error("Failed to upload background music");
+                    }
+                } catch (error) {
+                    console.error("Music upload failed:", error);
+                    throw error;
+                }
+            }
+
             const uploadResults = await Promise.all(memories.map(async (memory, idx) => {
                 if (memory.file) {
                     try {
@@ -610,7 +632,7 @@ export default function ValentineAdminPage() {
 
                             // If this memory had an old URL, track it for deletion
                             if (memory.url && memory.url.startsWith('/uploads')) {
-                                setUrlsToDelete(prev => [...prev, memory.url]);
+                                currentUrlsToDelete.push(memory.url);
                             }
 
                             return { ...memory, url: data.url, file: undefined, previewUrl: undefined };
@@ -630,8 +652,9 @@ export default function ValentineAdminPage() {
 
             const payload = {
                 ...formData,
+                backgroundMusicUrl: currentBackgroundMusicUrl,
                 memories: finalMemories,
-                urlsToDelete
+                urlsToDelete: currentUrlsToDelete
             };
 
             const method = editId ? "PUT" : "POST";
@@ -998,78 +1021,96 @@ export default function ValentineAdminPage() {
                                         />
                                     </Box>
 
-                                    {/* YouTube Settings */}
-                                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#fcfcfc' }}>
-                                        <Typography variant="caption" sx={{ display: 'block', mb: 1, fontWeight: 700, color: '#FF0000', textTransform: 'uppercase' }}>
-                                            ▶ YouTube Video Settings
-                                        </Typography>
-                                        <Stack direction="row" spacing={3}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        size="small"
-                                                        checked={formData.youtubeAutoplay}
-                                                        onChange={(e) => setFormData({ ...formData, youtubeAutoplay: e.target.checked })}
-                                                    />
-                                                }
-                                                label={<Typography variant="body2">Autoplay</Typography>}
-                                            />
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        size="small"
-                                                        checked={formData.youtubeMute}
-                                                        onChange={(e) => setFormData({ ...formData, youtubeMute: e.target.checked })}
-                                                    />
-                                                }
-                                                label={<Typography variant="body2">Muted</Typography>}
-                                            />
-                                        </Stack>
-                                    </Paper>
-
-                                    {/* TikTok Settings */}
-                                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#fcfcfc' }}>
-                                        <Typography variant="caption" sx={{ display: 'block', mb: 1, fontWeight: 700, color: '#000', textTransform: 'uppercase' }}>
-                                            🎵 TikTok Video Settings
-                                        </Typography>
-                                        <Stack direction="row" spacing={3}>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        size="small"
-                                                        checked={formData.tiktokAutoplay}
-                                                        onChange={(e) => setFormData({ ...formData, tiktokAutoplay: e.target.checked })}
-                                                    />
-                                                }
-                                                label={<Typography variant="body2">Autoplay</Typography>}
-                                            />
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        size="small"
-                                                        checked={formData.tiktokMute}
-                                                        onChange={(e) => setFormData({ ...formData, tiktokMute: e.target.checked })}
-                                                    />
-                                                }
-                                                label={<Typography variant="body2">Muted</Typography>}
-                                            />
-                                        </Stack>
-                                    </Paper>
 
                                     {/* Background Music */}
                                     <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#fff5f7', border: '1px solid #ffccd5' }}>
                                         <Typography variant="caption" sx={{ display: 'block', mb: 1.5, fontWeight: 700, color: '#FF3366', textTransform: 'uppercase' }}>
-                                            🎶 Background Music (YouTube)
+                                            🎶 Background Music
                                         </Typography>
-                                        <TextField
-                                            size="small"
-                                            fullWidth
-                                            label="YouTube Video ID"
-                                            value={formData.backgroundMusicYoutubeId}
-                                            onChange={(e) => setFormData({ ...formData, backgroundMusicYoutubeId: e.target.value })}
-                                            placeholder="e.g. dQw4w9WgXcQ"
-                                            helperText="เพลงจะเล่นอัตโนมัติเมื่อผู้ใช้เปิดการ์ด"
-                                        />
+                                        <Typography variant="caption" sx={{ display: 'block', mb: 2, color: 'text.secondary' }}>
+                                            เลือกใช้ได้ทีละอันเท่านั้น (MP3 จะถูกใช้ก่อนถ้ามีทั้งคู่)
+                                        </Typography>
+                                        <Stack spacing={2}>
+                                            <TextField
+                                                size="small"
+                                                fullWidth
+                                                label="YouTube Video ID"
+                                                value={formData.backgroundMusicYoutubeId}
+                                                onChange={(e) => setFormData({ ...formData, backgroundMusicYoutubeId: e.target.value })}
+                                                placeholder="e.g. dQw4w9WgXcQ"
+                                                helperText="เพลงจาก YouTube (พิมพ์ ID เท่านั้น)"
+                                                InputProps={{
+                                                    startAdornment: <Typography sx={{ mr: 1, color: '#FF0000', fontWeight: 700, fontSize: '0.75rem' }}>▶</Typography>
+                                                }}
+                                                disabled={!!musicFile || !!formData.backgroundMusicUrl}
+                                            />
+                                            <Divider><Chip label="หรือ" size="small" /></Divider>
+
+                                            <Box>
+                                                <Button
+                                                    component="label"
+                                                    variant="outlined"
+                                                    fullWidth
+                                                    startIcon={<Music size="18" color="#FF3366" />}
+                                                    sx={{ borderRadius: 2, height: '40px', borderColor: '#FF3366', color: '#FF3366' }}
+                                                    disabled={!!formData.backgroundMusicYoutubeId}
+                                                >
+                                                    {musicFile ? "เปลี่ยนไฟล์ MP3" : formData.backgroundMusicUrl ? "เปลี่ยนไฟล์ MP3" : "อัปโหลดไฟล์ MP3"}
+                                                    <input
+                                                        type="file"
+                                                        hidden
+                                                        accept="audio/mpeg,audio/mp3"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) setMusicFile(file);
+                                                        }}
+                                                    />
+                                                </Button>
+                                                {(musicFile || formData.backgroundMusicUrl) && (
+                                                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                        <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 700 }}>
+                                                            {musicFile ? `ไฟล์ใหม่: ${musicFile.name}` : `ไฟล์ปัจจุบัน: ${formData.backgroundMusicUrl.split('/').pop()}`}
+                                                        </Typography>
+                                                        <IconButton
+                                                            size="small"
+                                                            onClick={() => {
+                                                                if (musicFile) {
+                                                                    setMusicFile(null);
+                                                                } else if (formData.backgroundMusicUrl) {
+                                                                    if (formData.backgroundMusicUrl.startsWith('/uploads')) {
+                                                                        setUrlsToDelete(prev => [...prev, formData.backgroundMusicUrl!]);
+                                                                    }
+                                                                    setFormData({ ...formData, backgroundMusicUrl: '' });
+                                                                }
+                                                            }}
+                                                            sx={{ color: '#ef4444' }}
+                                                        >
+                                                            <Trash size="14" />
+                                                        </IconButton>
+                                                    </Box>
+                                                )}
+                                                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, color: 'text.secondary', fontSize: '0.7rem' }}>
+                                                    แนะนำไฟล์ .mp3 ความยาวไม่เกิน 1-2 นาที
+                                                </Typography>
+                                            </Box>
+
+                                            {(formData.backgroundMusicYoutubeId || musicFile || formData.backgroundMusicUrl) && (
+                                                <Button
+                                                    size="small"
+                                                    color="error"
+                                                    variant="text"
+                                                    onClick={() => {
+                                                        setMusicFile(null);
+                                                        if (formData.backgroundMusicUrl && formData.backgroundMusicUrl.startsWith('/uploads')) {
+                                                            setUrlsToDelete(prev => [...prev, formData.backgroundMusicUrl!]);
+                                                        }
+                                                        setFormData({ ...formData, backgroundMusicYoutubeId: '', backgroundMusicUrl: '' });
+                                                    }}
+                                                >
+                                                    ล้าง Background Music ทั้งหมด
+                                                </Button>
+                                            )}
+                                        </Stack>
                                     </Paper>
                                 </Stack>
                             </Box>

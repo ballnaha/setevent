@@ -27,7 +27,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { slug, jobName, title, openingText, greeting, subtitle, message, signer, backgroundColor, youtubeAutoplay, youtubeMute, tiktokAutoplay, tiktokMute, backgroundMusicYoutubeId, status, memories } = body;
+        const { slug, jobName, title, openingText, greeting, subtitle, message, signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, memories } = body;
 
         if (!slug || !title) {
             return NextResponse.json({ error: "Slug and title are required" }, { status: 400 });
@@ -44,11 +44,8 @@ export async function POST(req: NextRequest) {
                 message: message || null,
                 signer: signer || null,
                 backgroundColor: backgroundColor || "#FFF0F3",
-                youtubeAutoplay: youtubeAutoplay ?? true,
-                youtubeMute: youtubeMute ?? false,
-                tiktokAutoplay: tiktokAutoplay ?? true,
-                tiktokMute: tiktokMute ?? false,
                 backgroundMusicYoutubeId: backgroundMusicYoutubeId || null,
+                backgroundMusicUrl: backgroundMusicUrl || null,
                 status: status || "active",
                 memories: {
                     create: memories && Array.isArray(memories) ? memories.map((m: any, index: number) => ({

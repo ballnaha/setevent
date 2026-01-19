@@ -94,11 +94,12 @@ export default function DesignsAdminPage() {
     }, []);
 
     // Reset activeTab to "All" if current tab is not in allCategories
+    // Only run this check after designs have loaded to prevent infinite loop during initial load
     useEffect(() => {
-        if (activeTab !== "All" && !allCategories.includes(activeTab)) {
+        if (!loading && activeTab !== "All" && allCategories.length > 0 && !allCategories.includes(activeTab)) {
             setActiveTab("All");
         }
-    }, [activeTab, allCategories]);
+    }, [loading, activeTab, allCategories]);
 
     const fetchDesigns = async () => {
         setLoading(true);

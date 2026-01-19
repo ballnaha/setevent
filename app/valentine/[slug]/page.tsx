@@ -22,11 +22,8 @@ const DEFAULT_CONTENT = {
   I Love You Forever ❤️`,
     signer: "Love, Make",
     backgroundColor: "#FFF0F3",
-    youtubeAutoplay: true,
-    youtubeMute: false,
-    tiktokAutoplay: true,
-    tiktokMute: false,
     backgroundMusicYoutubeId: "",
+    backgroundMusicUrl: "",
 };
 
 const DEFAULT_MEMORIES = [
@@ -71,11 +68,8 @@ interface ValentineContent {
     message: string;
     signer: string;
     backgroundColor: string;
-    youtubeAutoplay: boolean;
-    youtubeMute: boolean;
-    tiktokAutoplay: boolean;
-    tiktokMute: boolean;
     backgroundMusicYoutubeId: string;
+    backgroundMusicUrl: string;
 }
 
 export default function ValentineSlugPage() {
@@ -96,6 +90,7 @@ export default function ValentineSlugPage() {
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
     const [isMusicMuted, setIsMusicMuted] = useState(false);
     const musicPlayerRef = React.useRef<HTMLIFrameElement>(null);
+    const musicAudioRef = React.useRef<HTMLAudioElement>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -112,11 +107,8 @@ export default function ValentineSlugPage() {
                         message: data.message || DEFAULT_CONTENT.message,
                         signer: data.signer || DEFAULT_CONTENT.signer,
                         backgroundColor: data.backgroundColor || DEFAULT_CONTENT.backgroundColor,
-                        youtubeAutoplay: data.youtubeAutoplay ?? DEFAULT_CONTENT.youtubeAutoplay,
-                        youtubeMute: data.youtubeMute ?? DEFAULT_CONTENT.youtubeMute,
-                        tiktokAutoplay: data.tiktokAutoplay ?? DEFAULT_CONTENT.tiktokAutoplay,
-                        tiktokMute: data.tiktokMute ?? DEFAULT_CONTENT.tiktokMute,
                         backgroundMusicYoutubeId: data.backgroundMusicYoutubeId || "",
+                        backgroundMusicUrl: data.backgroundMusicUrl || "",
                     });
                     if (data.memories && data.memories.length > 0) {
                         setMemories(data.memories);
@@ -132,50 +124,94 @@ export default function ValentineSlugPage() {
         fetchData();
     }, [slug]);
 
-    useEffect(() => {
-        // Generate static border hearts like the image
+    // Memoize border hearts to prevent regeneration and infinite loops
+    const borderHearts = React.useMemo(() => {
         const colors = ["#FF3366", "#FF99AA", "#FF5577", "#D41442"];
-        const borderHearts = [];
+        const heartsArr = [];
         // Top border
-        for (let i = 0; i < 8; i++) borderHearts.push({ id: i, top: 2, left: i * 14, size: 24 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
+        for (let i = 0; i < 8; i++) heartsArr.push({ id: `t-${i}`, top: 2, left: i * 14, size: 24 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
         // Bottom border
-        for (let i = 0; i < 8; i++) borderHearts.push({ id: i + 10, top: 92, left: i * 14, size: 24 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
+        for (let i = 0; i < 8; i++) heartsArr.push({ id: `b-${i}`, top: 92, left: i * 14, size: 24 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
         // Left border
-        for (let i = 0; i < 10; i++) borderHearts.push({ id: i + 20, top: i * 10, left: 2, size: 20 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
+        for (let i = 0; i < 10; i++) heartsArr.push({ id: `l-${i}`, top: i * 10, left: 2, size: 20 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
         // Right border
-        for (let i = 0; i < 10; i++) borderHearts.push({ id: i + 30, top: i * 10, left: 90, size: 20 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
+        for (let i = 0; i < 10; i++) heartsArr.push({ id: `r-${i}`, top: i * 10, left: 90, size: 20 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
+        return heartsArr;
+    }, []);
 
-        setHearts(borderHearts);
-
-        // Preload all images
+    useEffect(() => {
+        // Preload all images and mark other types as loaded
+        const newLoaded = new Set<number>();
         memories.forEach((memory, index) => {
             if (memory.type === 'image') {
                 const img = new Image();
-                img.onload = () => setLoadedImages(prev => new Set(prev).add(index));
+                img.onload = () => setLoadedImages(prev => {
+                    if (prev.has(index)) return prev;
+                    return new Set(prev).add(index);
+                });
                 img.src = memory.url;
             } else if (memory.type === 'youtube') {
                 const img = new Image();
-                img.onload = () => setLoadedImages(prev => new Set(prev).add(index));
+                img.onload = () => setLoadedImages(prev => {
+                    if (prev.has(index)) return prev;
+                    return new Set(prev).add(index);
+                });
                 img.src = `https://img.youtube.com/vi/${memory.url}/hqdefault.jpg`;
             } else {
-                setLoadedImages(prev => new Set(prev).add(index));
+                newLoaded.add(index);
             }
         });
+
+        if (newLoaded.size > 0) {
+            setLoadedImages(prev => {
+                const updated = new Set(prev);
+                let changed = false;
+                newLoaded.forEach(idx => {
+                    if (!updated.has(idx)) {
+                        updated.add(idx);
+                        changed = true;
+                    }
+                });
+                return changed ? updated : prev;
+            });
+        }
     }, [memories]);
 
     const displayContent = content || DEFAULT_CONTENT;
 
     const handleOpen = () => {
         setIsOpen(true);
-        // Start background music if available
-        if (displayContent.backgroundMusicYoutubeId) {
+        // Start background music if available (MP3 has priority)
+        if (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) {
             setIsMusicPlaying(true);
         }
     };
 
     const toggleMusic = () => {
-        setIsMusicMuted(!isMusicMuted);
+        const newMuted = !isMusicMuted;
+        setIsMusicMuted(newMuted);
+
+        // Control MP3 audio element
+        if (musicAudioRef.current) {
+            musicAudioRef.current.muted = newMuted;
+        }
     };
+
+    // Effect to handle music play/pause
+    useEffect(() => {
+        if (isOpen && isMusicPlaying) {
+            if (musicAudioRef.current) {
+                musicAudioRef.current.play().catch(e => console.log("Autoplay blocked:", e));
+            }
+        }
+    }, [isOpen, isMusicPlaying]);
+
+    // Effect to handle mute state
+    useEffect(() => {
+        if (musicAudioRef.current) {
+            musicAudioRef.current.muted = isMusicMuted;
+        }
+    }, [isMusicMuted]);
 
     // Pause music when video modal opens
     const handleOpenVideoModal = (memory: any) => {
@@ -312,7 +348,17 @@ export default function ValentineSlugPage() {
                 </div>
 
                 {/* 🎵 Hidden Background Music Player */}
-                {isOpen && isMusicPlaying && displayContent.backgroundMusicYoutubeId && (
+                {isOpen && isMusicPlaying && displayContent.backgroundMusicUrl && (
+                    <audio
+                        ref={musicAudioRef}
+                        src={displayContent.backgroundMusicUrl}
+                        loop
+                        playsInline
+                        autoPlay
+                        style={{ display: 'none' }}
+                    />
+                )}
+                {isOpen && isMusicPlaying && !displayContent.backgroundMusicUrl && displayContent.backgroundMusicYoutubeId && (
                     <iframe
                         ref={musicPlayerRef}
                         src={`https://www.youtube.com/embed/${displayContent.backgroundMusicYoutubeId}?autoplay=1&mute=${isMusicMuted ? 1 : 0}&loop=1&playlist=${displayContent.backgroundMusicYoutubeId}&controls=0`}
@@ -325,12 +371,12 @@ export default function ValentineSlugPage() {
                             pointerEvents: 'none',
                             zIndex: -1
                         }}
-                        title="Background Music"
+                        title="Background Music YouTube"
                     />
                 )}
 
                 {/* 🎵 Music Control Button */}
-                {isOpen && displayContent.backgroundMusicYoutubeId && (
+                {isOpen && (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) && (
                     <button
                         onClick={toggleMusic}
                         className="fixed top-4 right-4 z-[60] w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
@@ -354,7 +400,7 @@ export default function ValentineSlugPage() {
                         <div className="absolute top-0 left-0 w-full h-[16%] bg-[#8B1D36] rounded-b-[2.5rem] z-0" />
 
                         {/* Floating Hearts Border */}
-                        {hearts.map((h) => (
+                        {borderHearts.map((h) => (
                             <Heart
                                 key={h.id}
                                 variant="Bold"
@@ -495,6 +541,8 @@ export default function ValentineSlugPage() {
                                     resistanceRatio={0.85}
                                     followFinger={true}
                                     threshold={5}
+                                    observer={true}
+                                    observeParents={true}
                                 >
                                     {memories.map((memory, index) => (
                                         <SwiperSlide key={index} className="rounded-xl bg-white shadow-xl overflow-hidden border-[6px] border-white">
@@ -634,7 +682,7 @@ export default function ValentineSlugPage() {
                         >
                             {activeVideo.type === 'youtube' ? (
                                 <iframe
-                                    src={`https://www.youtube.com/embed/${activeVideo.url}?autoplay=${displayContent.youtubeAutoplay ? 1 : 0}&mute=${displayContent.youtubeMute ? 1 : 0}&controls=1&rel=0`}
+                                    src={`https://www.youtube.com/embed/${activeVideo.url}?autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&controls=1&rel=0`}
                                     className="w-full h-full"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     title="YouTube video"
@@ -642,7 +690,7 @@ export default function ValentineSlugPage() {
                                 />
                             ) : activeVideo.type === 'tiktok' ? (
                                 <iframe
-                                    src={`https://www.tiktok.com/player/v1/${activeVideo.url}?music_info=1&description=1&autoplay=${displayContent.tiktokAutoplay ? 1 : 0}&mute=${displayContent.tiktokMute ? 1 : 0}&volume_control=1&loop=1`}
+                                    src={`https://www.tiktok.com/player/v1/${activeVideo.url}?music_info=1&description=1&autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&volume_control=1&loop=1`}
                                     className="w-full h-full"
                                     allow="encrypted-media;"
                                     title="TikTok video"
@@ -655,6 +703,7 @@ export default function ValentineSlugPage() {
                                     controls
                                     autoPlay
                                     playsInline
+                                    muted={!!(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl)}
                                 />
                             )}
                         </div>
