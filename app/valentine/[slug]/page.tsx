@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectCards, Pagination } from "swiper/modules";
+import { EffectCreative, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
-import "swiper/css/effect-cards";
+import "swiper/css/effect-creative";
 import "swiper/css/pagination";
 import { Heart, Music, Play, Pause, Gift } from "iconsax-react";
 import { Button, Typography, Box, Paper, IconButton, CircularProgress } from "@mui/material";
@@ -92,6 +92,11 @@ export default function ValentineSlugPage() {
     const musicPlayerRef = React.useRef<HTMLIFrameElement>(null);
     const musicAudioRef = React.useRef<HTMLAudioElement>(null);
 
+    // Throttle ref for heart burst effect
+    const lastBurstTimeRef = useRef<number>(0);
+    const BURST_THROTTLE_MS = 600; // Minimum time between bursts
+    const MAX_HEARTS = 15; // Maximum hearts allowed at once (reduced for mobile)
+
     useEffect(() => {
         const fetchData = async () => {
             if (!slug) return;
@@ -124,18 +129,18 @@ export default function ValentineSlugPage() {
         fetchData();
     }, [slug]);
 
-    // Memoize border hearts to prevent regeneration and infinite loops
+    // Memoize border hearts - reduced count for mobile performance
     const borderHearts = React.useMemo(() => {
         const colors = ["#FF3366", "#FF99AA", "#FF5577", "#D41442"];
         const heartsArr = [];
-        // Top border
-        for (let i = 0; i < 8; i++) heartsArr.push({ id: `t-${i}`, top: 2, left: i * 14, size: 24 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
-        // Bottom border
-        for (let i = 0; i < 8; i++) heartsArr.push({ id: `b-${i}`, top: 92, left: i * 14, size: 24 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
-        // Left border
-        for (let i = 0; i < 10; i++) heartsArr.push({ id: `l-${i}`, top: i * 10, left: 2, size: 20 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
-        // Right border
-        for (let i = 0; i < 10; i++) heartsArr.push({ id: `r-${i}`, top: i * 10, left: 90, size: 20 + Math.random() * 10, rotation: Math.random() * 30 - 15, color: colors[i % 4] });
+        // Top border (reduced from 8 to 4)
+        for (let i = 0; i < 4; i++) heartsArr.push({ id: `t-${i}`, top: 2, left: 10 + i * 25, size: 22 + Math.random() * 8, rotation: Math.random() * 20 - 10, color: colors[i % 4] });
+        // Bottom border (reduced from 8 to 4)
+        for (let i = 0; i < 4; i++) heartsArr.push({ id: `b-${i}`, top: 92, left: 10 + i * 25, size: 22 + Math.random() * 8, rotation: Math.random() * 20 - 10, color: colors[i % 4] });
+        // Left border (reduced from 10 to 4)
+        for (let i = 0; i < 4; i++) heartsArr.push({ id: `l-${i}`, top: 10 + i * 22, left: 2, size: 18 + Math.random() * 8, rotation: Math.random() * 20 - 10, color: colors[i % 4] });
+        // Right border (reduced from 10 to 4)
+        for (let i = 0; i < 4; i++) heartsArr.push({ id: `r-${i}`, top: 10 + i * 22, left: 90, size: 18 + Math.random() * 8, rotation: Math.random() * 20 - 10, color: colors[i % 4] });
         return heartsArr;
     }, []);
 
@@ -251,27 +256,48 @@ export default function ValentineSlugPage() {
         setActiveVideo(null);
     };
 
-    const handleSlideChange = (swiper: { activeIndex: number }) => {
+    const handleSlideChange = useCallback((swiper: { activeIndex: number }) => {
         // Update current slide index
         setCurrentSlideIndex(swiper.activeIndex);
 
-        // Create 10-15 burst hearts
-        const count = 12;
-        const newHearts = Array.from({ length: count }).map((_, i) => ({
-            id: Date.now() + i,
-            left: 20 + Math.random() * 60, // Center-ish
-            size: 20 + Math.random() * 30, // Random sizes
-            duration: 1 + Math.random() * 1.5, // 1s to 2.5s duration
-            delay: Math.random() * 0.5,
-        }));
+        // Throttle: prevent burst if too soon after last one
+        const now = Date.now();
+        if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS) {
+            return; // Skip burst, too soon
+        }
+        lastBurstTimeRef.current = now;
 
-        setBurstHearts((prev) => [...prev, ...newHearts]);
+        // Limit total hearts on screen
+        setBurstHearts((prev) => {
+            // If already at max, don't add more
+            if (prev.length >= MAX_HEARTS) {
+                return prev;
+            }
 
-        // Cleanup after animation
-        setTimeout(() => {
-            setBurstHearts((current) => current.filter(h => !newHearts.find(nh => nh.id === h.id)));
-        }, 2500);
-    };
+            // Calculate how many we can add (reduced for mobile performance)
+            const availableSlots = MAX_HEARTS - prev.length;
+            const count = Math.min(4, availableSlots); // Reduced to 4 hearts per burst
+
+            if (count <= 0) return prev;
+
+            const newHearts = Array.from({ length: count }).map((_, i) => ({
+                id: now + i,
+                left: 25 + Math.random() * 50,
+                size: 14 + Math.random() * 14, // Smaller hearts
+                duration: 1 + Math.random() * 0.8, // Faster animation
+                delay: Math.random() * 0.2,
+            }));
+
+            // Schedule cleanup
+            setTimeout(() => {
+                setBurstHearts((current) =>
+                    current.filter(h => !newHearts.find(nh => nh.id === h.id))
+                );
+            }, 2000);
+
+            return [...prev, ...newHearts];
+        });
+    }, []);
 
     if (isLoading) {
         return (
@@ -325,6 +351,10 @@ export default function ValentineSlugPage() {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
+        @keyframes scaleIn {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
         .image-loading {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
@@ -338,50 +368,75 @@ export default function ValentineSlugPage() {
           );
         }
         
-        /* Valentine Swiper - Hardware Acceleration & Smooth Transitions */
-        .swiper {
-            will-change: transform;
+        /* Valentine Swiper - Optimized for Mobile */
+        .valentine-swiper {
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
+            perspective: 1200px;
+            overflow: visible !important;
         }
-        .swiper-slide {
-            will-change: transform;
+        .valentine-swiper .swiper-wrapper {
+            overflow: visible !important;
+        }
+        .valentine-swiper .swiper-slide {
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+            /* Let Swiper handle transitions for native feel */
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+            overflow: visible !important;
+            border-radius: 16px !important;
+            background: white;
+            border: 6px solid white;
         }
-        .swiper-slide img {
+        .valentine-swiper .swiper-slide-active {
+            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.25);
+        }
+        /* Next slides: darker appearance using brightness filter (not opacity) */
+        .valentine-swiper .swiper-slide-next {
+            filter: brightness(0.85);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+        }
+        .valentine-swiper .swiper-slide-next + .swiper-slide {
+            filter: brightness(0.7);
+            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.25);
+        }
+        .valentine-swiper .swiper-slide img {
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+        }
+        /* Inner content wrapper */
+        .valentine-swiper .slide-content {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 10px;
+            position: relative;
         }
         
-        /* Smooth image reveal */
+        /* Smooth image reveal - only transition on first load */
         .memory-image {
             opacity: 0;
-            transition: opacity 0.3s ease-in-out;
         }
         .memory-image.loaded {
             opacity: 1;
+            /* No transition after loaded to prevent flicker on swipe back */
         }
         
-        /* Valentine Swiper Bullets - Heart Style */
+        /* Valentine Swiper Bullets - Simple Style */
         .swiper-pagination-bullet {
-            width: 12px !important;
-            height: 12px !important;
-            background: #FFB6C1 !important;
-            opacity: 0.6 !important;
+            width: 8px !important;
+            height: 8px !important;
+            background: rgba(255, 255, 255, 0.5) !important;
+            opacity: 1 !important;
             border-radius: 50% !important;
             transition: all 0.3s ease !important;
+            margin: 0 4px !important;
         }
         .swiper-pagination-bullet-active {
-            width: 14px !important;
-            height: 14px !important;
-            background: linear-gradient(135deg, #FF6B6B, #D32F2F) !important;
-            opacity: 1 !important;
-            box-shadow: 0 0 10px rgba(211, 47, 47, 0.5) !important;
+            width: 20px !important;
+            height: 8px !important;
+            background: #D32F2F !important;
+            border-radius: 4px !important;
         }
       `}</style>
 
@@ -586,24 +641,56 @@ export default function ValentineSlugPage() {
                             {/* Cards (Center Stage) */}
                             <div className="flex-1 flex items-center justify-center w-full py-2">
                                 <Swiper
-                                    effect={"cards"}
+                                    effect={"creative"}
                                     grabCursor={true}
-                                    modules={[EffectCards, Pagination]}
-                                    className="w-[300px] h-[450px] sm:w-[360px] sm:h-[540px]"
+                                    modules={[EffectCreative, Pagination, Autoplay]}
+                                    className="valentine-swiper w-[300px] h-[450px] sm:w-[360px] sm:h-[540px]"
                                     pagination={{ clickable: true, dynamicBullets: true }}
                                     onSlideChange={handleSlideChange}
-                                    speed={300}
-                                    touchRatio={1.5}
-                                    resistance={true}
-                                    resistanceRatio={0.85}
+                                    // Speed & Timing - Dramatic fade feel
+                                    speed={800}
+                                    // Touch handling - Native feel (like iOS Photos)
+                                    touchRatio={1}
+                                    touchAngle={45}
+                                    shortSwipes={true}
+                                    longSwipes={true}
+                                    longSwipesRatio={0.2}  // 20% = native feel
+                                    longSwipesMs={80}      // Faster response
                                     followFinger={true}
-                                    threshold={5}
+                                    threshold={3}          // Start detecting earlier
+                                    touchStartPreventDefault={false}
+                                    touchMoveStopPropagation={true}
+                                    // Resistance at edges
+                                    resistance={true}
+                                    resistanceRatio={0.7}
+                                    // Performance
+                                    watchSlidesProgress={true}
                                     observer={true}
                                     observeParents={true}
+                                    creativeEffect={{
+                                        // Previous slide: exit to left like a card flip
+                                        prev: {
+                                            translate: ['-120%', 0, -300],
+                                            rotate: [0, 0, -5],
+                                            scale: 0.8,
+                                            opacity: 0,
+                                        },
+                                        // Next slide: stack behind, ready to fade in
+                                        next: {
+                                            translate: ['10px', '12px', -80],
+                                            rotate: [0, 0, 2],
+                                            scale: 0.92,
+                                            opacity: 0.4, // Start faded, will animate to 1
+                                        },
+                                        perspective: true,
+                                        limitProgress: 4,
+                                        progressMultiplier: 1.2,
+                                        shadowPerProgress: true,
+                                    }}
                                 >
                                     {memories.map((memory, index) => (
-                                        <SwiperSlide key={index} className="rounded-xl bg-white shadow-xl overflow-hidden border-[6px] border-white">
-                                            <div className="w-full h-full relative">
+                                        <SwiperSlide key={index}>
+                                            <div className="slide-content">
                                                 {memory.type === 'video' ? (
                                                     <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-rose-500">
                                                         <div className="absolute inset-0 flex items-center justify-center">
@@ -650,16 +737,20 @@ export default function ValentineSlugPage() {
                                                     <div className="w-full h-full relative">
                                                         {/* Loading skeleton - only show if not loaded */}
                                                         {!loadedImages.has(index) && (
-                                                            <div className="absolute inset-0 image-loading flex items-center justify-center z-5">
+                                                            <div className="absolute inset-0 image-loading flex items-center justify-center" style={{ zIndex: 5 }}>
                                                                 <div className="text-4xl animate-pulse">💖</div>
                                                             </div>
                                                         )}
-                                                        {/* Actual image - hidden until loaded */}
+                                                        {/* Actual image */}
                                                         <img
                                                             src={memory.url}
                                                             alt={memory.caption || ""}
-                                                            className={`w-full h-full object-cover memory-image ${loadedImages.has(index) ? 'loaded' : ''}`}
-                                                            style={{ position: 'relative', zIndex: loadedImages.has(index) ? 10 : 1 }}
+                                                            className="w-full h-full object-cover"
+                                                            style={{
+                                                                position: 'relative',
+                                                                zIndex: 10,
+                                                                opacity: loadedImages.has(index) ? 1 : 0
+                                                            }}
                                                             onLoad={() => handleImageLoaded(index)}
                                                         />
                                                     </div>
@@ -675,27 +766,32 @@ export default function ValentineSlugPage() {
                                     ))}
                                 </Swiper>
 
-                                {/* 🎬 EXTERNAL PLAY BUTTON - Outside Swiper */}
+                                {/* 🎬 FLOATING PLAY BUTTON - Positioned over the card */}
                                 {(memories[currentSlideIndex]?.type === 'youtube' ||
                                     memories[currentSlideIndex]?.type === 'tiktok' ||
                                     memories[currentSlideIndex]?.type === 'video') && (
-                                        <Button
-                                            variant="contained"
-                                            onClick={() => handleOpenVideoModal(memories[currentSlideIndex])}
-                                            className="mt-4 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600"
-                                            startIcon={<Play size="20" variant="Bold" color="white" />}
-                                            sx={{
-                                                borderRadius: '50px',
-                                                px: 4,
-                                                py: 1.5,
-                                                textTransform: 'none',
-                                                fontWeight: 'bold',
-                                                boxShadow: '0 4px 15px rgba(239, 68, 68, 0.4)',
-                                                animation: 'pulse 2s infinite',
-                                            }}
-                                        >
-                                            ▶ เล่นวิดีโอ
-                                        </Button>
+                                        <div className="absolute bottom-[80px] left-1/2 transform -translate-x-1/2 z-20">
+                                            <button
+                                                onClick={() => handleOpenVideoModal(memories[currentSlideIndex])}
+                                                className="group relative flex items-center gap-2 px-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                                                style={{
+                                                    boxShadow: '0 8px 30px rgba(211, 47, 47, 0.3)',
+                                                }}
+                                            >
+                                                {/* Animated ring */}
+                                                <span className="absolute inset-0 rounded-full border-2 border-red-400 animate-ping opacity-30" />
+
+                                                {/* Play icon */}
+                                                <span className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-red-500 to-pink-500 rounded-full">
+                                                    <Play size="16" variant="Bold" color="white" />
+                                                </span>
+
+                                                {/* Text */}
+                                                <span className="font-bold text-gray-800 text-sm pr-1">
+                                                    เล่นวิดีโอ
+                                                </span>
+                                            </button>
+                                        </div>
                                     )}
                             </div>
 
@@ -720,58 +816,104 @@ export default function ValentineSlugPage() {
                 }
             </Box >
 
-            {/* 🎬 VIDEO MODAL */}
-            {
-                activeVideo && (
-                    <div
-                        className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4"
-                        onClick={handleCloseVideoModal}
-                    >
+            {/* 🎬 VIDEO MODAL - Premium UI */}
+            {activeVideo && (
+                <div
+                    className="fixed inset-0 z-[100] flex items-center justify-center animate-[fadeIn_0.3s_ease-out]"
+                    onClick={handleCloseVideoModal}
+                    style={{
+                        background: 'linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(20,0,10,0.98) 100%)',
+                    }}
+                >
+                    {/* Romantic glow effects */}
+                    <div className="absolute top-20 left-1/4 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl pointer-events-none" />
+                    <div className="absolute bottom-20 right-1/4 w-40 h-40 bg-red-500/20 rounded-full blur-3xl pointer-events-none" />
+
+                    {/* Header with close button */}
+                    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between z-[102]">
+                        <div className="flex items-center gap-2">
+                            <span className="text-2xl">💕</span>
+                            <span className="text-white/80 text-sm font-medium">Video Memory</span>
+                        </div>
                         <button
-                            className="absolute top-4 right-4 w-12 h-12 bg-white/20 hover:bg-white/40 rounded-full flex items-center justify-center text-white text-2xl font-bold transition-colors z-[101]"
+                            className="w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all hover:scale-110"
                             onClick={handleCloseVideoModal}
                         >
-                            ✕
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
                         </button>
+                    </div>
 
-                        <div
-                            className="bg-black rounded-xl overflow-hidden shadow-2xl w-[85vw] max-w-[360px] h-[85vh] max-h-[640px]"
-                            onClick={(e) => e.stopPropagation()}
+                    {/* Video Container */}
+                    <div
+                        className="relative bg-black rounded-2xl overflow-hidden shadow-2xl animate-[scaleIn_0.3s_ease-out]"
+                        style={{
+                            width: 'min(90vw, 380px)',
+                            height: 'min(80vh, 680px)',
+                            boxShadow: '0 25px 80px -20px rgba(255, 100, 150, 0.3), 0 0 60px rgba(0,0,0,0.5)',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {/* Video type badge */}
+                        <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-xs font-bold text-white flex items-center gap-1"
+                            style={{
+                                background: activeVideo.type === 'youtube'
+                                    ? 'linear-gradient(135deg, #FF0000, #CC0000)'
+                                    : activeVideo.type === 'tiktok'
+                                        ? 'linear-gradient(135deg, #25F4EE, #FE2C55)'
+                                        : 'linear-gradient(135deg, #FF6B6B, #D32F2F)'
+                            }}
                         >
-                            {activeVideo.type === 'youtube' ? (
-                                <iframe
-                                    src={`https://www.youtube.com/embed/${activeVideo.url}?autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&controls=1&rel=0`}
-                                    className="w-full h-full"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                    title="YouTube video"
-                                    allowFullScreen
-                                />
-                            ) : activeVideo.type === 'tiktok' ? (
-                                <iframe
-                                    src={`https://www.tiktok.com/player/v1/${activeVideo.url}?music_info=1&description=1&autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&volume_control=1&loop=1`}
-                                    className="w-full h-full"
-                                    allow="encrypted-media;"
-                                    title="TikTok video"
-                                    allowFullScreen
-                                />
-                            ) : (
-                                <video
-                                    src={activeVideo.url}
-                                    className="w-full h-full object-contain"
-                                    controls
-                                    autoPlay
-                                    playsInline
-                                    muted={!!(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl)}
-                                />
-                            )}
+                            {activeVideo.type === 'youtube' ? '▶ YouTube' : activeVideo.type === 'tiktok' ? '♪ TikTok' : '🎬 Video'}
                         </div>
 
-                        <Typography className="absolute bottom-8 text-white text-center font-medium">
-                            {activeVideo.caption}
-                        </Typography>
+                        {activeVideo.type === 'youtube' ? (
+                            <iframe
+                                src={`https://www.youtube.com/embed/${activeVideo.url}?autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&controls=1&rel=0&modestbranding=1`}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                title="YouTube video"
+                                allowFullScreen
+                            />
+                        ) : activeVideo.type === 'tiktok' ? (
+                            <iframe
+                                src={`https://www.tiktok.com/player/v1/${activeVideo.url}?music_info=1&description=1&autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&volume_control=1&loop=1`}
+                                className="w-full h-full"
+                                allow="encrypted-media;"
+                                title="TikTok video"
+                                allowFullScreen
+                            />
+                        ) : (
+                            <video
+                                src={activeVideo.url}
+                                className="w-full h-full object-contain bg-black"
+                                controls
+                                autoPlay
+                                playsInline
+                                muted={!!(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl)}
+                            />
+                        )}
                     </div>
-                )
-            }
+
+                    {/* Caption at bottom */}
+                    {activeVideo.caption && (
+                        <div className="absolute bottom-6 left-4 right-4 text-center">
+                            <div className="inline-block px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl">
+                                <Typography className="text-white font-medium text-sm">
+                                    {activeVideo.caption}
+                                </Typography>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Swipe hint */}
+                    <div className="absolute bottom-20 left-0 right-0 text-center">
+                        <span className="text-white/40 text-xs">แตะด้านนอกเพื่อปิด</span>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
