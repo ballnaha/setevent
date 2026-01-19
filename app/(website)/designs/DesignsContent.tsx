@@ -5,13 +5,14 @@ import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, S
 import { CloseCircle, Gallery, Heart, Eye, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, EffectCoverflow, Zoom } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-coverflow";
+import "swiper/css/zoom";
 
 // Design interface
 interface Design {
@@ -439,10 +440,11 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     {/* Lightbox Swiper */}
                     <Swiper
                         onSwiper={(swiper) => { lightboxSwiperRef.current = swiper; }}
-                        modules={[Navigation, Pagination]}
+                        modules={[Navigation, Pagination, Zoom]}
                         initialSlide={lightboxIndex}
                         navigation
                         pagination={{ clickable: true }}
+                        zoom={{ maxRatio: 3 }}
                         loop={filteredItems.length > 1}
                         style={{ height: '100%', borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
                     >
@@ -453,12 +455,32 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     width: '100%',
                                     height: '100%',
                                     bgcolor: '#000',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
+                                    overflow: 'hidden'
                                 }}>
-                                    {/* Image Loading State */}
-                                    <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)' }}>
+
+                                    <div className="swiper-zoom-container" style={{ width: '100%', height: '100%' }}>
+                                        <Image
+                                            src={item.image || '/images/placeholder.jpg'}
+                                            alt={item.title}
+                                            fill
+                                            priority={filteredItems.indexOf(item) === lightboxIndex}
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                                            style={{
+                                                objectFit: 'contain',
+                                                zIndex: 2
+                                            }}
+                                            onLoadingComplete={(img) => {
+                                                const parent = img.closest('.MuiBox-root');
+                                                if (parent) {
+                                                    const skeleton = parent.querySelector('.skeleton-loader');
+                                                    if (skeleton) (skeleton as HTMLElement).style.display = 'none';
+                                                }
+                                            }}
+                                        />
+                                    </div>
+
+                                    {/* Image Loading State - Outside zoom container */}
+                                    <Box className="skeleton-loader" sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)', zIndex: 1, pointerEvents: 'none' }}>
                                         <Skeleton
                                             variant="rectangular"
                                             width="100%"
@@ -469,34 +491,11 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                             }}
                                         />
                                         <Typography sx={{ color: 'white', opacity: 0.3, fontFamily: 'var(--font-prompt)', zIndex: 1 }}>
-                                            Loading Image...
+                                            Loading...
                                         </Typography>
                                     </Box>
 
-                                    <Image
-                                        src={item.image || '/images/placeholder.jpg'}
-                                        alt={item.title}
-                                        fill
-                                        priority={filteredItems.indexOf(item) === lightboxIndex}
-                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                                        style={{
-                                            objectFit: 'contain',
-                                            zIndex: 2,
-                                            transition: 'opacity 0.3s ease-in-out'
-                                        }}
-                                        onLoadingComplete={(img) => {
-                                            // Optional: Hide the skeleton when loaded
-                                            const parent = img.parentElement;
-                                            if (parent) {
-                                                const skeleton = parent.querySelector('.MuiSkeleton-root');
-                                                const loadingText = parent.querySelector('.MuiTypography-root');
-                                                if (skeleton) (skeleton as HTMLElement).style.display = 'none';
-                                                if (loadingText) (loadingText as HTMLElement).style.display = 'none';
-                                            }
-                                        }}
-                                    />
-
-                                    {/* Title Overlay */}
+                                    {/* Title Overlay - Outside zoom container */}
                                     <Box sx={{
                                         position: 'absolute',
                                         bottom: 0,
@@ -506,27 +505,30 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         pb: { xs: 8, md: 4 },
                                         zIndex: 10,
                                         background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+                                        pointerEvents: 'none' // Allow touches to pass through mostly, but maybe we want text selection? Usually for lightbox overlays pointer-events: none is safer for zoom gestures unless it contains buttons.
                                     }}>
-                                        <Typography
-                                            sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontWeight: 600,
-                                                fontSize: '1.5rem',
-                                                color: 'white',
-                                            }}
-                                        >
-                                            {item.title}
-                                        </Typography>
-                                        <Chip
-                                            label={item.category}
-                                            size="small"
-                                            sx={{
-                                                mt: 2,
-                                                bgcolor: '#8B5CF6',
-                                                color: 'white',
-                                                fontFamily: 'var(--font-prompt)',
-                                            }}
-                                        />
+                                        <Box sx={{ pointerEvents: 'auto' }}>
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontWeight: 600,
+                                                    fontSize: '1.5rem',
+                                                    color: 'white',
+                                                }}
+                                            >
+                                                {item.title}
+                                            </Typography>
+                                            <Chip
+                                                label={item.category}
+                                                size="small"
+                                                sx={{
+                                                    mt: 2,
+                                                    bgcolor: '#8B5CF6',
+                                                    color: 'white',
+                                                    fontFamily: 'var(--font-prompt)',
+                                                }}
+                                            />
+                                        </Box>
                                     </Box>
                                 </Box>
                             </SwiperSlide>
