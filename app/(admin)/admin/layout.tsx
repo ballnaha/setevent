@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Container, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, AppBar, Toolbar, Typography, IconButton, Avatar, Paper, BottomNavigation, BottomNavigationAction, Tooltip, Menu, MenuItem, Divider } from '@mui/material';
-import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle, Box1, Category2, Ticket, Gallery, Brush2, MessageQuestion, Book } from 'iconsax-react';
+import { Home3, Calendar, People, Message, Setting2, Logout, HambergerMenu, ProfileCircle, Box1, Category2, Ticket, Gallery, Brush2, MessageQuestion, Book, Heart } from 'iconsax-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -25,6 +25,7 @@ const sidebarGroups = [
             { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
             { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
             { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
+            { label: 'Valentine', href: '/admin/valentine', icon: Heart, roles: ['admin'] },
         ]
     },
     {
