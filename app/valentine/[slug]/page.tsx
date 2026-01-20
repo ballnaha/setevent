@@ -7,7 +7,7 @@ import { EffectCreative, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
-import { Heart, Music, Play, Pause, Gift } from "iconsax-react";
+import { Heart, Music, Play, Pause, Gift, Maximize, CloseCircle } from "iconsax-react";
 import { Button, Typography, Box, Paper, IconButton, CircularProgress } from "@mui/material";
 
 // ==========================================
@@ -80,6 +80,7 @@ export default function ValentineSlugPage() {
     const [memories, setMemories] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [isOpen, setIsOpen] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
     const [hearts, setHearts] = useState<{ id: number; top: number; left: number; size: number; rotation: number; color: string }[]>([]);
     const [burstHearts, setBurstHearts] = useState<{ id: number; left: number; size: number; duration: number; delay: number }[]>([]);
     const [activeVideo, setActiveVideo] = useState<{ type: string; url: string; caption: string } | null>(null);
@@ -92,10 +93,45 @@ export default function ValentineSlugPage() {
     const musicPlayerRef = React.useRef<HTMLIFrameElement>(null);
     const musicAudioRef = React.useRef<HTMLAudioElement>(null);
 
+    const [isFullscreen, setIsFullscreen] = useState(false);
+
+    const toggleFullscreen = useCallback(() => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch((err) => {
+                console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+            });
+            setIsFullscreen(true);
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+                setIsFullscreen(false);
+            }
+        }
+    }, []);
+
     // Throttle ref for heart burst effect
     const lastBurstTimeRef = useRef<number>(0);
     const BURST_THROTTLE_MS = 600; // Minimum time between bursts
     const MAX_HEARTS = 15; // Maximum hearts allowed at once (reduced for mobile)
+
+    const triggerHeartBurst = useCallback(() => {
+        const now = Date.now();
+        if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS) return;
+        lastBurstTimeRef.current = now;
+
+        const newHearts = Array.from({ length: 15 }).map((_, i) => ({
+            id: now + i,
+            left: Math.random() * 100,
+            size: Math.random() * 20 + 20,
+            duration: Math.random() * 2 + 3,
+            delay: Math.random() * 0.5,
+        }));
+
+        setBurstHearts(newHearts);
+        setTimeout(() => {
+            setBurstHearts([]);
+        }, 5000);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -213,11 +249,37 @@ export default function ValentineSlugPage() {
     const displayContent = content || DEFAULT_CONTENT;
 
     const handleOpen = () => {
-        setIsOpen(true);
-        // Start background music if available (MP3 has priority)
-        if (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) {
-            setIsMusicPlaying(true);
+        setIsTransitioning(true);
+
+        // 🚀 Auto Fullscreen on Open (Triggered immediately to satisfy user gesture)
+        if (typeof document !== 'undefined' && !document.fullscreenElement) {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(() => { /* Silent skip */ });
+                setIsFullscreen(true);
+            }
         }
+
+        // Delay the reveal slightly to mask the "black flicker"
+        setTimeout(() => {
+            setIsOpen(true);
+            setIsMusicMuted(false);
+
+            // Start background music
+            if (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) {
+                setIsMusicPlaying(true);
+            }
+
+            // Trigger heart burst
+            if (typeof triggerHeartBurst === 'function') {
+                triggerHeartBurst();
+            }
+
+            // Fade out the mask after a short delay
+            setTimeout(() => {
+                setIsTransitioning(false);
+            }, 300);
+        }, 400); // 400ms is usually enough for the browser to scale
     };
 
     const toggleMusic = () => {
@@ -315,7 +377,7 @@ export default function ValentineSlugPage() {
                 <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <Heart size="80" variant="Bulk" color="#FF3366" className="animate-bounce" />
                     <CircularProgress size={100} thickness={2} sx={{ position: 'absolute', top: -10, color: '#FF3366', opacity: 0.3 }} />
-                    <Typography sx={{ mt: 4, color: '#4A151B', fontWeight: 800, fontFamily: 'cursive', letterSpacing: 2 }}>
+                    <Typography sx={{ mt: 4, color: '#4A151B', fontWeight: 800, fontFamily: 'cursive', letterSpacing: 2, fontSize: '1.5rem' }}>
                         Preparing your surprise...
                     </Typography>
                 </Box>
@@ -324,22 +386,20 @@ export default function ValentineSlugPage() {
     }
 
     return (
-        <>
-            <Box
-                sx={{
-                    height: "100dvh",
-                    width: "100vw",
-                    background: displayContent.backgroundColor || "#FFF0F3",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
-                    position: "relative",
-                    fontFamily: "'Comfortaa', sans-serif",
-                }}
-            >
-                <style jsx global>{`
+        <Box
+            sx={{
+                height: "100dvh",
+                width: "100vw",
+                background: displayContent.backgroundColor || "#FFF0F3",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                overflow: "hidden",
+                position: "relative",
+                fontFamily: "'Comfortaa', sans-serif",
+            }}
+        >
+            <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Charm:wght@400;700&display=swap');
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         @keyframes float-lid { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
@@ -423,7 +483,30 @@ export default function ValentineSlugPage() {
             /* No transition after loaded to prevent flicker on swipe back */
         }
         
-        /* Valentine Swiper Bullets - Simple Style */
+        html, body {
+            background-color: #FFF0F3;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        /* Continuous Transition Mask */
+        .fullscreen-mask {
+            position: fixed;
+            inset: 0;
+            background: #FFF0F3;
+            z-index: 9999;
+            display: flex;
+            items-center;
+            justify-content: center;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .fullscreen-mask.active {
+            opacity: 1;
+        }
+        
+        /* Swiper Bullet Styles */
         .swiper-pagination-bullet {
             width: 8px !important;
             height: 8px !important;
@@ -480,416 +563,475 @@ export default function ValentineSlugPage() {
         .music-icon-spin {
             animation: music-spin 4s linear infinite;
         }
+        @keyframes petal-fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0.3; }
+        }
+        .petal {
+            position: absolute;
+            background: #FFCDD2;
+            border-radius: 150% 0 150% 0;
+            z-index: 1;
+            pointer-events: none;
+        }
+        @keyframes radiant-pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.4)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 30px rgba(255, 51, 102, 0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 10px rgba(255, 51, 102, 0.4)); }
+        }
+        .radiant-heart {
+            animation: radiant-pulse 2s ease-in-out infinite;
+        }
       `}</style>
 
-                {/* ❤️ Burst Hearts Animation Overlay */}
-                <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
-                    {burstHearts.map((h) => (
-                        <div
-                            key={h.id}
-                            className="absolute text-red-500 drop-shadow-md"
-                            style={{
-                                left: `${h.left}%`,
-                                bottom: '20%', // Start from near bottom of cards
-                                fontSize: `${h.size}px`,
-                                animation: `burst-float ${h.duration}s ease-out forwards`,
-                                animationDelay: `${h.delay}s`,
-                            }}
-                        >
-                            ❤️
-                        </div>
-                    ))}
-                </div>
-
-                {/* 🎵 Hidden Background Music Player */}
-                {isOpen && isMusicPlaying && displayContent.backgroundMusicUrl && (
-                    <audio
-                        ref={musicAudioRef}
-                        src={displayContent.backgroundMusicUrl}
-                        loop
-                        playsInline
-                        autoPlay
-                        style={{ display: 'none' }}
-                    />
-                )}
-                {isOpen && isMusicPlaying && !displayContent.backgroundMusicUrl && displayContent.backgroundMusicYoutubeId && (
-                    <iframe
-                        ref={musicPlayerRef}
-                        src={`https://www.youtube.com/embed/${displayContent.backgroundMusicYoutubeId}?autoplay=1&mute=${isMusicMuted ? 1 : 0}&loop=1&playlist=${displayContent.backgroundMusicYoutubeId}&controls=0`}
-                        allow="autoplay; encrypted-media"
+            {/* 🎭 Love Transition Mask */}
+            <div className={`fullscreen-mask flex flex-col items-center justify-center overflow-hidden ${isTransitioning ? 'active' : ''}`}>
+                {/* Visual Petals falling */}
+                {isTransitioning && Array.from({ length: 15 }).map((_, i) => (
+                    <div
+                        key={i}
+                        className="petal"
                         style={{
-                            position: 'absolute',
-                            width: '1px',
-                            height: '1px',
+                            width: Math.random() * 15 + 10 + 'px',
+                            height: Math.random() * 15 + 10 + 'px',
+                            left: Math.random() * 100 + '%',
+                            top: '-20px',
+                            animation: `petal-fall ${Math.random() * 3 + 2}s linear infinite`,
+                            animationDelay: `${Math.random() * 2}s`,
                             opacity: 0,
-                            pointerEvents: 'none',
-                            zIndex: -1
+                            background: i % 2 === 0 ? '#FF3366' : '#FFCDD2',
+                            transform: `rotate(${Math.random() * 360}deg)`
                         }}
-                        title="Background Music YouTube"
                     />
-                )}
+                ))}
 
-                {/* 🎵 Music Control Button - Cute Style */}
-                {isOpen && (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) && (
-                    <button
-                        onClick={toggleMusic}
-                        className={`fixed top-5 right-5 z-[60] w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${!isMusicMuted ? 'music-playing' : ''}`}
+                <div className="radiant-heart mb-6 z-10">
+                    <Heart size="80" variant="Bold" color="#FF3366" />
+                </div>
+                <Typography
+                    variant="h5"
+                    className="text-[#8B1D36] font-bold tracking-[0.4em] z-10"
+                    sx={{
+                        fontFamily: 'Dancing Script',
+                        textShadow: '0 0 20px rgba(255,255,255,0.8)',
+                        animation: 'fadeIn 1s ease-out'
+                    }}
+                >
+                    PREPARING LOVE...
+                </Typography>
+            </div>
+
+            {/* ❤️ Burst Hearts Animation Overlay */}
+            <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+                {burstHearts.map((h) => (
+                    <div
+                        key={h.id}
+                        className="absolute text-red-500 drop-shadow-md"
                         style={{
-                            background: isMusicMuted
-                                ? 'linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%)'
-                                : 'linear-gradient(135deg, #FF99AC 0%, #FF3366 100%)',
-                            border: '3px solid white',
-                            boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
+                            left: `${h.left}%`,
+                            bottom: '20%', // Start from near bottom of cards
+                            fontSize: `${h.size}px`,
+                            animation: `burst-float ${h.duration}s ease-out forwards`,
+                            animationDelay: `${h.delay}s`,
                         }}
                     >
-                        <div className={`relative flex items-center justify-center ${!isMusicMuted ? 'music-icon-spin' : ''}`}>
-                            <Music
-                                size="24"
-                                variant={isMusicMuted ? "Linear" : "Bold"}
-                                color={isMusicMuted ? "#9ca3af" : "white"}
-                            />
-                            {isMusicMuted && (
-                                <div className="absolute w-full h-[2px] bg-gray-400 rotate-45 rounded-full" />
-                            )}
-                        </div>
+                        ❤️
+                    </div>
+                ))}
+            </div>
 
-                        {/* Decorative floating notes when playing */}
-                        {!isMusicMuted && (
-                            <div className="absolute -top-1 -right-1 pointer-events-none">
-                                <span className="text-[10px] animate-bounce">♪</span>
+            {/* 🎵 Hidden Background Music Player */}
+            {isOpen && isMusicPlaying && displayContent.backgroundMusicUrl && (
+                <audio
+                    ref={musicAudioRef}
+                    src={displayContent.backgroundMusicUrl}
+                    loop
+                    playsInline
+                    autoPlay
+                    style={{ display: 'none' }}
+                />
+            )}
+            {isOpen && isMusicPlaying && !displayContent.backgroundMusicUrl && displayContent.backgroundMusicYoutubeId && (
+                <iframe
+                    ref={musicPlayerRef}
+                    src={`https://www.youtube.com/embed/${displayContent.backgroundMusicYoutubeId}?autoplay=1&mute=${isMusicMuted ? 1 : 0}&loop=1&playlist=${displayContent.backgroundMusicYoutubeId}&controls=0`}
+                    allow="autoplay; encrypted-media"
+                    style={{
+                        position: 'absolute',
+                        width: '1px',
+                        height: '1px',
+                        opacity: 0,
+                        pointerEvents: 'none',
+                        zIndex: -1
+                    }}
+                    title="Background Music YouTube"
+                />
+            )}
+
+            {/*  Controls (Right Side: Music) */}
+            {isOpen && (
+                <div className="fixed top-5 right-5 z-[60] flex flex-col gap-3">
+                    {(displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) && (
+                        <button
+                            onClick={toggleMusic}
+                            className={`w-11 h-11 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${!isMusicMuted ? 'music-playing' : ''}`}
+                            style={{
+                                background: isMusicMuted
+                                    ? 'linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%)'
+                                    : 'linear-gradient(135deg, #FF99AC 0%, #FF3366 100%)',
+                                border: '3px solid white',
+                                boxShadow: '0 8px 15px rgba(0,0,0,0.1)',
+                            }}
+                        >
+                            <div className={`relative flex items-center justify-center ${!isMusicMuted ? 'music-icon-spin' : ''}`}>
+                                <Music
+                                    size="20"
+                                    variant={isMusicMuted ? "Linear" : "Bold"}
+                                    color={isMusicMuted ? "#9ca3af" : "white"}
+                                />
+                                {isMusicMuted && (
+                                    <div className="absolute w-full h-[2px] bg-gray-400 rotate-45 rounded-full" />
+                                )}
                             </div>
-                        )}
-                        {!isMusicMuted && (
-                            <div className="absolute -bottom-1 -left-1 pointer-events-none">
-                                <span className="text-[10px] animate-bounce" style={{ animationDelay: '0.5s' }}>♫</span>
+                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* 🔳 Controls (Left Side: Fullscreen) */}
+            {isOpen && (
+                <div className="fixed top-5 left-5 z-[60]">
+                    <button
+                        onClick={toggleFullscreen}
+                        className="group w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 overflow-hidden"
+                        style={{
+                            background: isFullscreen
+                                ? 'rgba(255, 255, 255, 0.15)'
+                                : 'rgba(255, 255, 255, 0.08)',
+                            backdropFilter: 'blur(8px)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
+                            boxShadow: '0 4px 15px -1px rgba(0,0,0,0.1)',
+                        }}
+                    >
+                        {/* Subtle Background Glow */}
+                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                        {isFullscreen ? (
+                            <div className="relative transform rotate-180 transition-transform duration-500 opacity-60 group-hover:opacity-100">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M8 3V9H2M16 3V9H22M8 21V15H2M16 21V15H22" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </div>
+                        ) : (
+                            <div className="relative transition-transform duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-100">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2 9V2H9M15 2H22V9M2 15V22H9M15 22H22V15" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
                             </div>
                         )}
                     </button>
-                )}
+                </div>
+            )}
 
-                {/* 🏙️ Background Decoration */}
-                {isOpen ? (
-                    <div className="absolute inset-0 pointer-events-none">
-                        {/* Top colored Shape */}
-                        <div className="absolute top-0 left-0 w-full h-[16%] bg-[#8B1D36] rounded-b-[2.5rem] z-0" />
+            {/* 🏙️ Background Decoration */}
+            {isOpen ? (
+                <div className="absolute inset-0 pointer-events-none">
+                    {/* Top colored Shape */}
+                    <div className="absolute top-0 left-0 w-full h-[16%] bg-[#8B1D36] rounded-b-[2.5rem] z-0" />
 
-                        {/* Floating Hearts Border */}
-                        {borderHearts.map((h) => (
-                            <Heart
-                                key={h.id}
-                                variant="Bold"
-                                color={h.color}
-                                style={{
-                                    position: 'absolute',
-                                    top: `${h.top}%`,
-                                    left: `${h.left}%`,
-                                    width: h.size,
-                                    height: h.size,
-                                    transform: `rotate(${h.rotation}deg)`,
-                                    zIndex: 1,
-                                    opacity: 0.9
-                                }}
-                            />
-                        ))}
+                    {/* Floating Hearts Border */}
+                    {borderHearts.map((h) => (
+                        <Heart
+                            key={h.id}
+                            variant="Bold"
+                            color={h.color}
+                            style={{
+                                position: 'absolute',
+                                top: `${h.top}%`,
+                                left: `${h.left}%`,
+                                width: h.size,
+                                height: h.size,
+                                transform: `rotate(${h.rotation}deg)`,
+                                zIndex: 1,
+                                opacity: 0.9
+                            }}
+                        />
+                    ))}
+                </div>
+            ) : (
+                /* Intro Background */
+                <div className="absolute inset-0 sunburst-bg z-0" />
+            )}
+
+            {/* 🎁 LOCK SCREEN (INTRO) */}
+            {!isOpen && (
+                <div className="w-full h-full flex flex-col justify-between items-center z-10 relative overflow-hidden" onClick={handleOpen}>
+
+                    {/* Top Logo - Centered Header Style (Aligned with icons) */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 animate-[fadeIn_0.5s_ease-out] z-20">
+                        <img
+                            src="/images/logo1.png"
+                            alt="SetEvent Logo"
+                            className="h-7 w-auto object-contain drop-shadow-md opacity-90"
+                        />
                     </div>
-                ) : (
-                    /* Intro Background */
-                    <div className="absolute inset-0 sunburst-bg z-0" />
-                )}
 
-                {/* 🎁 LOCK SCREEN (INTRO) */}
-                {!isOpen && (
-                    <div className="w-full h-full flex flex-col justify-between items-center z-10 relative overflow-hidden" onClick={handleOpen}>
+                    {/* Top Spacer - Increased to push the gift box down and avoid overlap */}
+                    <div className="h-24 flex-none" />
 
-                        {/* Top Logo */}
-                        <div className="pt-8 animate-fade-in-up">
-                            <img
-                                src="/images/logo1.png"
-                                alt="SetEvent Logo"
-                                className="h-5 w-auto object-contain drop-shadow-md opacity-90"
-                            />
+                    {/* Middle: Gift Box & Title */}
+                    <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95">
+
+                        {/* Floating Lid */}
+                        <div className="relative w-48 h-16 bg-[#D32F2F] rounded-t-lg shadow-xl mb-4 animate-[float-lid_3s_ease-in-out_infinite]">
+                            {/* Ribbon H */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80]" />
+                            {/* Bow */}
+                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-end">
+                                <div className="w-8 h-8 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
+                                <div className="w-4 h-4 bg-[#FF5252] rounded-full z-10" />
+                                <div className="w-8 h-8 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
+                            </div>
                         </div>
 
-                        {/* Top Spacer reduced */}
-                        <div className="flex-1 max-h-16" />
-
-                        {/* Middle: Gift Box & Title */}
-                        <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95">
-
-                            {/* Floating Lid */}
-                            <div className="relative w-48 h-16 bg-[#D32F2F] rounded-t-lg shadow-xl mb-4 animate-[float-lid_3s_ease-in-out_infinite]">
-                                {/* Ribbon H */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80]" />
-                                {/* Bow */}
-                                <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-end">
-                                    <div className="w-8 h-8 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
-                                    <div className="w-4 h-4 bg-[#FF5252] rounded-full z-10" />
-                                    <div className="w-8 h-8 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
-                                </div>
-                            </div>
-
-                            {/* Text */}
-                            <div className="text-center py-4 z-20">
-                                <Typography variant="overline" className="text-gray-700 tracking-[0.3em] font-bold">
-                                    HAPPY
-                                </Typography>
-                                <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'dancing script' }}>
-                                    {displayContent.title}
-                                </Typography>
-                            </div>
-
-                            {/* Box Body */}
-                            <div className="relative w-40 h-32 bg-[#E53935] shadow-2xl skew-x-1">
-                                {/* Ribbon V */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80]" />
-                                {/* Ribbon H */}
-                                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-8 bg-[#FF8A80]" />
-                                {/* Side Shadow */}
-                                <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[15px] border-r-[#B71C1C] border-b-[128px] border-b-transparent opacity-50" />
-                            </div>
-
-                        </div>
-
-                        {/* Footer White Area */}
-                        <div className="w-full bg-white mt-auto pt-8 pb-12 px-6 rounded-t-[3rem] text-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-                            <div className="flex justify-between items-center max-w-xs mx-auto">
-                                <div className="text-left">
-                                    <Typography className="text-[#6D2128] font-black text-xl leading-none">
-                                        LOVE
-                                    </Typography>
-                                    <Typography className="text-[#6D2128] text-xs tracking-widest my-1">
-                                        IS IN THE
-                                    </Typography>
-                                    <Typography className="text-[#6D2128] font-black text-2xl leading-none">
-                                        AIR
-                                    </Typography>
-                                </div>
-
-                                <Button
-                                    variant="contained"
-                                    size="medium"
-                                    startIcon={<Heart variant="Bold" size="18" color="white" />}
-                                    className="bg-gradient-to-r from-[#D32F2F] to-[#FF5252] hover:from-[#B71C1C] hover:to-[#D32F2F] text-white rounded-full px-8 py-3 text-sm font-bold tracking-wider shadow-lg shadow-red-200 transform transition-all hover:-translate-y-1"
-                                    sx={{
-                                        borderRadius: '50px',
-                                        textTransform: 'none',
-                                        boxShadow: '0 8px 16px rgba(211, 47, 47, 0.3)'
-                                    }}
-                                >
-                                    {displayContent.openingText || "Be Mine"}
-                                </Button>
-                            </div>
-                            <Typography variant="caption" className="block text-gray-300 mt-6 text-[10px] tracking-[0.2em]">
-                                HAPPY VALENTINE'S DAY {new Date().getFullYear()}
+                        {/* Text */}
+                        <div className="text-center py-4 z-20">
+                            <Typography variant="overline" className="text-gray-700 tracking-[0.3em] font-bold">
+                                HAPPY
                             </Typography>
-                        </div>       </div>
-                )
-                }
-                {/* 🌹 MAIN CONTENT (Full Screen, No Scroll) */}
-                {
-                    isOpen && (
-                        <div className="w-full h-full flex flex-col items-center justify-between py-4 px-4 z-10 animate-[fadeIn_0.8s_ease-out]">
+                            <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'Dancing Script' }}>
+                                {displayContent.title}
+                            </Typography>
+                        </div>
 
-                            {/* Header Text */}
-                            <div className="text-center">
-                                <Typography variant="h6" className="text-[#FFD7E0] font-bold tracking-wider" sx={{ fontFamily: 'cursive' }}>
-                                    {displayContent.greeting?.split(' ')[0] || "Happy"}
+                        {/* Box Body */}
+                        <div className="relative w-40 h-32 bg-[#E53935] shadow-2xl skew-x-1">
+                            {/* Ribbon V */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80]" />
+                            {/* Ribbon H */}
+                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-8 bg-[#FF8A80]" />
+                            {/* Side Shadow */}
+                            <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[15px] border-r-[#B71C1C] border-b-[128px] border-b-transparent opacity-50" />
+                        </div>
+
+                    </div>
+
+                    {/* Footer White Area */}
+                    <div className="w-full bg-white mt-auto pt-8 pb-12 px-6 rounded-t-[3rem] text-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
+                        <div className="flex justify-between items-center max-w-xs mx-auto">
+                            <div className="text-left">
+                                <Typography className="text-[#6D2128] font-black text-xl leading-none">
+                                    LOVE
                                 </Typography>
-                                <Typography variant="subtitle1" className="text-white font-black tracking-widest uppercase drop-shadow-sm" sx={{ fontFamily: 'var(--font-prompt)' }}>
-                                    {displayContent.greeting?.split(' ').slice(1).join(' ') || "VALENTINE"}
+                                <Typography className="text-[#6D2128] text-xs tracking-widest my-1">
+                                    IS IN THE
+                                </Typography>
+                                <Typography className="text-[#6D2128] font-black text-2xl leading-none">
+                                    AIR
                                 </Typography>
                             </div>
 
-                            {/* Cards (Center Stage) */}
-                            <div className="flex-1 flex items-center justify-center w-full py-2">
-                                <Swiper
-                                    effect={"creative"}
-                                    grabCursor={true}
-                                    modules={[EffectCreative, Pagination, Autoplay]}
-                                    className="valentine-swiper w-[300px] h-[450px] sm:w-[360px] sm:h-[540px]"
-                                    pagination={{ clickable: true, dynamicBullets: true }}
-                                    onSlideChange={handleSlideChange}
-                                    // Speed & Timing - Dramatic fade feel
-                                    speed={800}
-                                    // Touch handling - Native feel (like iOS Photos)
-                                    touchRatio={1}
-                                    touchAngle={45}
-                                    shortSwipes={true}
-                                    longSwipes={true}
-                                    longSwipesRatio={0.2}  // 20% = native feel
-                                    longSwipesMs={80}      // Faster response
-                                    followFinger={true}
-                                    threshold={3}          // Start detecting earlier
-                                    touchStartPreventDefault={false}
-                                    touchMoveStopPropagation={true}
-                                    // Resistance at edges
-                                    resistance={true}
-                                    resistanceRatio={0.7}
-                                    // Performance
-                                    watchSlidesProgress={true}
-                                    observer={true}
-                                    observeParents={true}
-                                    creativeEffect={{
-                                        // Previous slide: exit to left like a card flip
-                                        prev: {
-                                            translate: ['-120%', 0, -300],
-                                            rotate: [0, 0, -5],
-                                            scale: 0.8,
-                                            opacity: 0,
-                                        },
-                                        // Next slide: stack behind, ready to fade in
-                                        next: {
-                                            translate: ['10px', '12px', -80],
-                                            rotate: [0, 0, 2],
-                                            scale: 0.92,
-                                            opacity: 0.4, // Start faded, will animate to 1
-                                        },
-                                        perspective: true,
-                                        limitProgress: 4,
-                                        progressMultiplier: 1.2,
-                                        shadowPerProgress: true,
-                                    }}
-                                >
-                                    {memories.map((memory, index) => (
-                                        <SwiperSlide key={index}>
-                                            {({ isActive }) => (
-                                                <div className="slide-content">
-                                                    {memory.type === 'video' ? (
-                                                        <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-rose-500">
-                                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                                <Typography className="text-white text-4xl">🎬</Typography>
+                            <Button
+                                variant="contained"
+                                size="medium"
+                                startIcon={<Heart variant="Bold" size="18" color="white" />}
+                                className="bg-gradient-to-r from-[#D32F2F] to-[#FF5252] hover:from-[#B71C1C] hover:to-[#D32F2F] text-white rounded-full px-8 py-3 text-sm font-bold tracking-wider shadow-lg shadow-red-200 transform transition-all hover:-translate-y-1"
+                                sx={{
+                                    borderRadius: '50px',
+                                    textTransform: 'none',
+                                    boxShadow: '0 8px 16px rgba(211, 47, 47, 0.3)'
+                                }}
+                            >
+                                {displayContent.openingText || "Be Mine"}
+                            </Button>
+                        </div>
+
+                    </div>
+                </div>
+            )}
+
+            {/* 🌹 MAIN CONTENT (Stable Layout) */}
+            {isOpen && (
+                <>
+                    {/* 🏆 Header Section (Fixed outside the animated container to prevent jumping) */}
+                    <div className="fixed top-5 left-0 right-0 text-center z-[70] pointer-events-none px-16">
+                        <Typography variant="h6" className="text-[#FFD7E0] font-bold tracking-wider" sx={{ fontFamily: 'cursive', lineHeight: 2.5, fontSize: '1.2rem' }}>
+                            {displayContent.greeting?.split(' ')[0] || "Happy"}
+                        </Typography>
+                        <Typography variant="subtitle1" className="text-white font-black tracking-widest uppercase drop-shadow-sm" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1, fontSize: '1rem' }}>
+                            {displayContent.greeting?.split(' ').slice(1).join(' ') || "VALENTINE"}
+                        </Typography>
+                    </div>
+
+                    <div className="w-full h-full flex flex-col items-center z-10 animate-[fadeIn_0.8s_ease-out] overflow-hidden relative">
+                        <div className="w-full h-full flex flex-col items-center justify-between overflow-y-auto">
+                            <div className="w-full h-20 flex-none" /> {/* Safe area for the fixed header bar */}
+
+                            {/* Cards Section (Flexible) */}
+                            <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 relative">
+                                <div className="relative">
+                                    <Swiper
+                                        effect={"creative"}
+                                        grabCursor={true}
+                                        modules={[EffectCreative, Pagination, Autoplay]}
+                                        className="valentine-swiper w-[290px] h-[430px] sm:w-[360px] sm:h-[540px]"
+                                        pagination={{ clickable: true, dynamicBullets: true }}
+                                        onSlideChange={handleSlideChange}
+                                        speed={800}
+                                        touchRatio={1}
+                                        touchAngle={45}
+                                        shortSwipes={true}
+                                        longSwipes={true}
+                                        longSwipesRatio={0.2}
+                                        longSwipesMs={80}
+                                        followFinger={true}
+                                        threshold={3}
+                                        touchStartPreventDefault={false}
+                                        touchMoveStopPropagation={true}
+                                        resistance={true}
+                                        resistanceRatio={0.7}
+                                        watchSlidesProgress={true}
+                                        observer={true}
+                                        observeParents={true}
+                                        creativeEffect={{
+                                            prev: {
+                                                translate: ['-120%', 0, -300],
+                                                rotate: [0, 0, -5],
+                                                scale: 0.8,
+                                                opacity: 0,
+                                            },
+                                            next: {
+                                                translate: ['10px', '12px', -80],
+                                                rotate: [0, 0, 2],
+                                                scale: 0.92,
+                                                opacity: 0.4,
+                                            },
+                                            perspective: true,
+                                            limitProgress: 4,
+                                            progressMultiplier: 1.2,
+                                            shadowPerProgress: true,
+                                        }}
+                                    >
+                                        {memories.map((memory, index) => (
+                                            <SwiperSlide key={index}>
+                                                {({ isActive }) => (
+                                                    <div className="slide-content">
+                                                        {memory.type === 'video' ? (
+                                                            <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-rose-500">
+                                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                                    <Typography className="text-white text-4xl">🎬</Typography>
+                                                                </div>
+                                                                <Typography className="absolute top-4 left-4 text-white text-sm bg-black/50 px-2 py-1 rounded">Video</Typography>
                                                             </div>
-                                                            <Typography className="absolute top-4 left-4 text-white text-sm bg-black/50 px-2 py-1 rounded">Video</Typography>
-                                                        </div>
-                                                    ) : memory.type === 'youtube' ? (
-                                                        <div className="w-full h-full relative">
-                                                            <img
-                                                                src={`https://img.youtube.com/vi/${memory.url}/hqdefault.jpg`}
-                                                                alt={memory.caption || ""}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                                            <Typography className="absolute top-4 left-4 text-white text-sm bg-red-600/80 px-2 py-1 rounded">▶ YouTube</Typography>
-                                                        </div>
-                                                    ) : memory.type === 'tiktok' ? (
-                                                        <div className="w-full h-full relative">
-                                                            {memory.thumbnail ? (
+                                                        ) : memory.type === 'youtube' ? (
+                                                            <div className="w-full h-full relative">
                                                                 <img
-                                                                    src={memory.thumbnail}
+                                                                    src={`https://img.youtube.com/vi/${memory.url}/hqdefault.jpg`}
                                                                     alt={memory.caption || ""}
                                                                     className="w-full h-full object-cover"
                                                                 />
-                                                            ) : (
-                                                                <div className="w-full h-full bg-black flex flex-col items-center justify-center relative overflow-hidden">
-                                                                    {/* TikTok style glowing orbs */}
-                                                                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#25F4EE] rounded-full blur-3xl opacity-60" />
-                                                                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#FE2C55] rounded-full blur-3xl opacity-60" />
-                                                                    <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-white rounded-full blur-2xl opacity-20" />
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                                                <Typography className="absolute top-4 left-4 text-white text-sm bg-red-600/80 px-2 py-1 rounded">▶ YouTube</Typography>
+                                                            </div>
+                                                        ) : memory.type === 'tiktok' ? (
+                                                            <div className="w-full h-full relative">
+                                                                {memory.thumbnail ? (
+                                                                    <img
+                                                                        src={memory.thumbnail}
+                                                                        alt={memory.caption || ""}
+                                                                        className="w-full h-full object-cover"
+                                                                    />
+                                                                ) : (
+                                                                    <div className="w-full h-full bg-black flex flex-col items-center justify-center relative overflow-hidden">
+                                                                        <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#25F4EE] rounded-full blur-3xl opacity-60" />
+                                                                        <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#FE2C55] rounded-full blur-3xl opacity-60" />
+                                                                        <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-white rounded-full blur-2xl opacity-20" />
+                                                                        <div className="relative z-10 flex flex-col items-center text-white">
+                                                                            <span className="text-6xl mb-2">♪</span>
+                                                                            <span className="font-bold text-lg tracking-wider">TikTok</span>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                                                <Typography className="absolute top-4 left-4 text-white text-sm bg-black/70 px-2 py-1 rounded">🎵 TikTok</Typography>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="w-full h-full relative">
+                                                                {!loadedImages.has(index) && (
+                                                                    <div className="absolute inset-0 image-loading flex items-center justify-center" style={{ zIndex: 5 }}>
+                                                                        <div className="text-4xl animate-pulse">💖</div>
+                                                                    </div>
+                                                                )}
+                                                                <img
+                                                                    src={memory.url}
+                                                                    alt={memory.caption || ""}
+                                                                    className="w-full h-full object-cover"
+                                                                    style={{
+                                                                        position: 'relative',
+                                                                        zIndex: 10,
+                                                                        opacity: loadedImages.has(index) ? 1 : 0
+                                                                    }}
+                                                                    onLoad={() => handleImageLoaded(index)}
+                                                                />
+                                                            </div>
+                                                        )}
 
-                                                                    {/* TikTok Logo Style */}
-                                                                    <div className="relative z-10 flex flex-col items-center text-white">
-                                                                        <span className="text-6xl mb-2">♪</span>
-                                                                        <span className="font-bold text-lg tracking-wider">TikTok</span>
+                                                        {memory.caption && isActive && (
+                                                            <div className="absolute bottom-12 left-0 right-0 px-6 z-30 pointer-events-none">
+                                                                <div className="animate-caption-fade flex flex-col items-center">
+                                                                    <div className="mb-2" style={{ animation: 'heartPulse 1.5s ease-in-out infinite' }}>
+                                                                        <Heart variant="Bold" color="#FF3366" size="24" style={{ filter: 'drop-shadow(0 0 5px #FF3366)' }} />
+                                                                    </div>
+                                                                    <div className="px-8 py-4 elegant-caption-box backdrop-blur-md rounded-lg shadow-xl relative">
+                                                                        <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent rounded-lg pointer-events-none" />
+                                                                        <Typography
+                                                                            variant="h5"
+                                                                            className="romantic-text text-white text-center leading-relaxed"
+                                                                            style={{ fontSize: '1.8rem' }}
+                                                                        >
+                                                                            {memory.caption}
+                                                                        </Typography>
                                                                     </div>
                                                                 </div>
-                                                            )}
-                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                                            <Typography className="absolute top-4 left-4 text-white text-sm bg-black/70 px-2 py-1 rounded">🎵 TikTok</Typography>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="w-full h-full relative">
-                                                            {/* Loading skeleton - only show if not loaded */}
-                                                            {!loadedImages.has(index) && (
-                                                                <div className="absolute inset-0 image-loading flex items-center justify-center" style={{ zIndex: 5 }}>
-                                                                    <div className="text-4xl animate-pulse">💖</div>
-                                                                </div>
-                                                            )}
-                                                            {/* Actual image */}
-                                                            <img
-                                                                src={memory.url}
-                                                                alt={memory.caption || ""}
-                                                                className="w-full h-full object-cover"
-                                                                style={{
-                                                                    position: 'relative',
-                                                                    zIndex: 10,
-                                                                    opacity: loadedImages.has(index) ? 1 : 0
-                                                                }}
-                                                                onLoad={() => handleImageLoaded(index)}
-                                                            />
-                                                        </div>
-                                                    )}
-
-                                                    {/* ✨ Romantic Caption Overlay */}
-                                                    {memory.caption && isActive && (
-                                                        <div className="absolute bottom-12 left-0 right-0 px-6 z-30 pointer-events-none">
-                                                            <div className="animate-caption-fade flex flex-col items-center">
-                                                                {/* Glowing Heart Icon */}
-                                                                <div className="mb-2" style={{ animation: 'heartPulse 1.5s ease-in-out infinite' }}>
-                                                                    <Heart variant="Bold" color="#FF3366" size="24" style={{ filter: 'drop-shadow(0 0 5px #FF3366)' }} />
-                                                                </div>
-
-                                                                {/* Handwritten Note Style */}
-                                                                <div className="px-8 py-4 elegant-caption-box backdrop-blur-md rounded-lg shadow-xl relative">
-                                                                    {/* Subtle Shine Effect */}
-                                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent rounded-lg pointer-events-none" />
-
-                                                                    <Typography
-                                                                        variant="h5"
-                                                                        className="romantic-text text-white text-center leading-relaxed"
-                                                                        style={{ fontSize: '1.8rem' }}
-                                                                    >
-                                                                        {memory.caption}
-                                                                    </Typography>
-                                                                </div>
                                                             </div>
-                                                        </div>
-                                                    )}
+                                                        )}
+                                                        <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
+                                                    </div>
+                                                )}
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
 
-                                                    {/* Persistent light gradient at bottom for contrast */}
-                                                    <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
-                                                </div>
-                                            )}
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-
-                                {/* 🎬 FLOATING PLAY BUTTON - Positioned over the card */}
-                                {(memories[currentSlideIndex]?.type === 'youtube' ||
-                                    memories[currentSlideIndex]?.type === 'tiktok' ||
-                                    memories[currentSlideIndex]?.type === 'video') && (
-                                        <div className="absolute bottom-[80px] left-1/2 transform -translate-x-1/2 z-20">
-                                            <button
-                                                onClick={() => handleOpenVideoModal(memories[currentSlideIndex])}
-                                                className="group relative flex items-center gap-2 px-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
-                                                style={{
-                                                    boxShadow: '0 8px 30px rgba(211, 47, 47, 0.3)',
-                                                }}
-                                            >
-                                                {/* Animated ring */}
-                                                <span className="absolute inset-0 rounded-full border-2 border-red-400 animate-ping opacity-30" />
-
-                                                {/* Play icon */}
-                                                <span className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-red-500 to-pink-500 rounded-full">
-                                                    <Play size="16" variant="Bold" color="white" />
-                                                </span>
-
-                                                {/* Text */}
-                                                <span className="font-bold text-gray-800 text-sm pr-1">
-                                                    เล่นวิดีโอ
-                                                </span>
-                                            </button>
-                                        </div>
-                                    )}
+                                    {/* 🎬 FLOATING PLAY BUTTON */}
+                                    {(memories[currentSlideIndex]?.type === 'youtube' ||
+                                        memories[currentSlideIndex]?.type === 'tiktok' ||
+                                        memories[currentSlideIndex]?.type === 'video') && (
+                                            <div className="absolute bottom-[30px] left-1/2 transform -translate-x-1/2 z-20">
+                                                <button
+                                                    onClick={() => handleOpenVideoModal(memories[currentSlideIndex])}
+                                                    className="group relative flex items-center gap-2 px-5 py-3 bg-white rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                                                    style={{ boxShadow: '0 8px 30px rgba(211, 47, 47, 0.3)' }}
+                                                >
+                                                    <span className="absolute inset-0 rounded-full border-2 border-red-400 animate-ping opacity-30" />
+                                                    <span className="w-8 h-8 flex items-center justify-center bg-gradient-to-br from-red-500 to-pink-500 rounded-full">
+                                                        <Play size="16" variant="Bold" color="white" />
+                                                    </span>
+                                                    <span className="font-bold text-gray-800 text-sm pr-1">เล่นวิดีโอ</span>
+                                                </button>
+                                            </div>
+                                        )}
+                                </div>
                             </div>
 
-                            {/* Bottom Message & Controls */}
-                            <div className="w-full max-w-sm text-center pb-4">
-                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                            {/* Bottom Message & Controls (Fixed Spacing from Bottom) */}
+                            <div className="w-full max-w-sm text-center pt-6 pb-14 px-4 flex-none">
+                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
                                     {displayContent.subtitle}
                                 </Typography>
 
                                 <Paper elevation={0} sx={{ background: "rgba(255,255,255,0.6)", borderRadius: 3, p: 2, backdropFilter: 'blur(4px)' }}>
-                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
                                         {displayContent.message}
                                     </Typography>
                                     <Typography variant="caption" className="block text-[#D41442] font-bold mt-2">
@@ -897,11 +1039,10 @@ export default function ValentineSlugPage() {
                                     </Typography>
                                 </Paper>
                             </div>
-
                         </div>
-                    )
-                }
-            </Box >
+                    </div>
+                </>
+            )}
 
             {/* 🎬 VIDEO MODAL - Premium UI */}
             {activeVideo && (
@@ -945,27 +1086,27 @@ export default function ValentineSlugPage() {
                         {/* Video type badge */}
                         <div className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-xs font-bold text-white flex items-center gap-1"
                             style={{
-                                background: activeVideo.type === 'youtube'
+                                background: activeVideo?.type === 'youtube'
                                     ? 'linear-gradient(135deg, #FF0000, #CC0000)'
-                                    : activeVideo.type === 'tiktok'
+                                    : activeVideo?.type === 'tiktok'
                                         ? 'linear-gradient(135deg, #25F4EE, #FE2C55)'
                                         : 'linear-gradient(135deg, #FF6B6B, #D32F2F)'
                             }}
                         >
-                            {activeVideo.type === 'youtube' ? '▶ YouTube' : activeVideo.type === 'tiktok' ? '♪ TikTok' : '🎬 Video'}
+                            {activeVideo?.type === 'youtube' ? '▶ YouTube' : activeVideo?.type === 'tiktok' ? '♪ TikTok' : '🎬 Video'}
                         </div>
 
-                        {activeVideo.type === 'youtube' ? (
+                        {activeVideo?.type === 'youtube' ? (
                             <iframe
-                                src={`https://www.youtube.com/embed/${activeVideo.url}?autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&controls=1&rel=0&modestbranding=1`}
+                                src={`https://www.youtube.com/embed/${activeVideo?.url}?autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&controls=1&rel=0&modestbranding=1`}
                                 className="w-full h-full"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 title="YouTube video"
                                 allowFullScreen
                             />
-                        ) : activeVideo.type === 'tiktok' ? (
+                        ) : activeVideo?.type === 'tiktok' ? (
                             <iframe
-                                src={`https://www.tiktok.com/player/v1/${activeVideo.url}?music_info=1&description=1&autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&volume_control=1&loop=1`}
+                                src={`https://www.tiktok.com/player/v1/${activeVideo?.url}?music_info=1&description=1&autoplay=1&mute=${(displayContent.backgroundMusicYoutubeId || displayContent.backgroundMusicUrl) ? 1 : 0}&volume_control=1&loop=1`}
                                 className="w-full h-full"
                                 allow="encrypted-media;"
                                 title="TikTok video"
@@ -973,7 +1114,7 @@ export default function ValentineSlugPage() {
                             />
                         ) : (
                             <video
-                                src={activeVideo.url}
+                                src={activeVideo?.url}
                                 className="w-full h-full object-contain bg-black"
                                 controls
                                 autoPlay
@@ -984,19 +1125,17 @@ export default function ValentineSlugPage() {
                     </div>
 
                     {/* Caption at bottom */}
-                    {activeVideo.caption && (
+                    {activeVideo?.caption && (
                         <div className="absolute bottom-6 left-4 right-4 text-center">
                             <div className="inline-block px-6 py-3 bg-white/10 backdrop-blur-md rounded-2xl">
                                 <Typography className="text-white font-medium text-sm">
-                                    {activeVideo.caption}
+                                    {activeVideo?.caption}
                                 </Typography>
                             </div>
                         </div>
                     )}
-
-
                 </div>
             )}
-        </>
+        </Box>
     );
 }
