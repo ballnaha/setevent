@@ -1009,11 +1009,33 @@ export default function ValentineSlugPage() {
                                                 {({ isActive }) => (
                                                     <div className="slide-content">
                                                         {memory.type === 'video' ? (
-                                                            <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-rose-500">
-                                                                <div className="absolute inset-0 flex items-center justify-center">
-                                                                    <Typography className="text-white text-4xl">🎬</Typography>
+                                                            <div className="w-full h-full relative bg-gradient-to-br from-[#FF99AC] to-[#FF3366] overflow-hidden">
+                                                                {/* Decorative elements */}
+                                                                <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/20 rounded-full blur-2xl" />
+                                                                <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-pink-300/30 rounded-full blur-3xl opacity-60" />
+
+                                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                                    <div className="relative">
+                                                                        <div className="absolute inset-0 bg-white/20 rounded-full blur-xl scale-150 animate-pulse" />
+                                                                        <Heart
+                                                                            size={64}
+                                                                            variant="Bold"
+                                                                            color="white"
+                                                                            className="relative z-10 animate-[heartPulse_2s_ease-in-out_infinite]"
+                                                                        />
+                                                                    </div>
+                                                                    <Typography
+                                                                        className="text-white font-bold mt-4 tracking-widest text-xs uppercase opacity-80"
+                                                                        sx={{ fontFamily: 'var(--font-prompt)' }}
+                                                                    >
+                                                                        Romantic Moment
+                                                                    </Typography>
                                                                 </div>
-                                                                <Typography className="absolute top-4 left-4 text-white text-sm bg-black/50 px-2 py-1 rounded">Video</Typography>
+
+                                                                <div className="absolute top-4 left-4 flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2 py-1 rounded-lg border border-white/30">
+                                                                    <Play size={12} variant="Bold" color="white" />
+                                                                    <Typography className="text-white text-[10px] font-bold uppercase tracking-tighter">Video</Typography>
+                                                                </div>
                                                             </div>
                                                         ) : memory.type === 'youtube' ? (
                                                             <div className="w-full h-full relative">

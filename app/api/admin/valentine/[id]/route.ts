@@ -139,7 +139,7 @@ export async function DELETE(
         const fs = require('fs/promises');
         const path = require('path');
         for (const memory of card.memories) {
-            if (memory.type === 'image' && memory.url.startsWith('/uploads')) {
+            if ((memory.type === 'image' || memory.type === 'video') && memory.url.startsWith('/uploads')) {
                 try {
                     const filepath = path.join(process.cwd(), 'public', memory.url.substring(1));
                     await fs.unlink(filepath).catch((err: any) => {

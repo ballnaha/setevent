@@ -241,6 +241,16 @@ const SortableMemoryItem = ({
                                         <Play size="40" variant="Bulk" />
                                         <Typography variant="caption" sx={{ mt: 0.5, fontWeight: 800, letterSpacing: 1 }}>TIKTOK</Typography>
                                     </Box>
+                                ) : memory.type === 'video' ? (
+                                    <Box sx={{ width: '100%', height: '100%', bgcolor: 'black', position: 'relative' }}>
+                                        <video
+                                            src={memory.previewUrl || memory.url}
+                                            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                        />
+                                        <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', bgcolor: 'rgba(0,0,0,0.3)' }}>
+                                            <Play size="32" variant="Bulk" />
+                                        </Box>
+                                    </Box>
                                 ) : (
                                     <img src={memory.previewUrl || memory.url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="Memory" />
                                 )
@@ -253,7 +263,7 @@ const SortableMemoryItem = ({
                                 </Box>
                             )}
 
-                            {memory.type === 'image' && (
+                            {(memory.type === 'image' || memory.type === 'video') && (
                                 <Box
                                     className="upload-overlay"
                                     sx={{
@@ -319,7 +329,7 @@ const SortableMemoryItem = ({
                                 type="file"
                                 id={`file-input-${index}`}
                                 hidden
-                                accept="image/*"
+                                accept={memory.type === 'video' ? "video/*" : "image/*"}
                                 onChange={(e) => handleFileChange(index, e)}
                             />
                         </Box>
@@ -335,29 +345,31 @@ const SortableMemoryItem = ({
                             <option value="image">Image</option>
                             <option value="youtube">YouTube ID</option>
                             <option value="tiktok">TikTok ID</option>
-                            <option value="video">Video URL</option>
+                            <option value="video">Video (MP4/URL)</option>
                         </TextField>
                     </Box>
                     <Box>
                         <Stack spacing={2}>
-                            {memory.type === 'image' ? (
+                            {(memory.type === 'image' || memory.type === 'video') && (
                                 <Button
                                     component="label"
                                     variant="outlined"
                                     fullWidth
-                                    startIcon={<Gallery size="18" color="#FF3366" />}
+                                    startIcon={memory.type === 'video' ? <Play size="18" color="#FF3366" /> : <Gallery size="18" color="#FF3366" />}
                                     sx={{ borderRadius: 2, height: '40px' }}
                                 >
-                                    {memory.url ? "Change Image" : "Upload Image"}
-                                    <input type="file" hidden accept="image/*" onChange={(e) => handleFileChange(index, e)} />
+                                    {memory.url ? `Change ${memory.type === 'video' ? 'Video' : 'Image'}` : `Upload ${memory.type === 'video' ? 'Video' : 'Image'}`}
+                                    <input type="file" hidden accept={memory.type === 'video' ? "video/*" : "image/*"} onChange={(e) => handleFileChange(index, e)} />
                                 </Button>
-                            ) : (
+                            )}
+
+                            {(memory.type !== 'image') && (
                                 <TextField
                                     size="small"
-                                    label={memory.type === 'youtube' ? "YouTube Video ID" : memory.type === 'tiktok' ? "TikTok Video ID" : "Video URL"}
+                                    label={memory.type === 'youtube' ? "YouTube Video ID" : memory.type === 'tiktok' ? "TikTok Video ID" : "Video URL / Path"}
                                     fullWidth
                                     required
-                                    placeholder={memory.type === 'youtube' ? "e.g. dQw4w9WgXcQ" : "https://..."}
+                                    placeholder={memory.type === 'youtube' ? "e.g. dQw4w9WgXcQ" : "https://... or auto-filled by upload"}
                                     value={memory.url}
                                     onChange={(e) => handleMemoryChange(index, 'url', e.target.value)}
                                 />
@@ -655,7 +667,7 @@ export default function ValentineAdminPage() {
 
     const handleRemoveMemory = (index: number) => {
         const memory = memories[index];
-        if (memory.url && memory.type === 'image' && memory.url.startsWith('/uploads')) {
+        if (memory.url && (memory.type === 'image' || memory.type === 'video') && memory.url.startsWith('/uploads')) {
             setUrlsToDelete(prev => [...prev, memory.url]);
         }
         const updated = memories.filter((_, i) => i !== index);
@@ -674,7 +686,7 @@ export default function ValentineAdminPage() {
 
         const newMemories = files.map((file, i) => ({
             localId: Math.random().toString(36).substr(2, 9),
-            type: "image",
+            type: file.type.startsWith('video/') ? "video" : "image",
             url: "",
             file: file,
             previewUrl: URL.createObjectURL(file),
@@ -703,6 +715,7 @@ export default function ValentineAdminPage() {
             ...updated[index],
             file: file,
             previewUrl: previewUrl,
+            type: file.type.startsWith('video/') ? "video" : "image",
             // Keep the old URL in memory until we actually save/upload
         };
         setMemories(updated);
@@ -1435,7 +1448,7 @@ export default function ValentineAdminPage() {
                                         sx={{ borderRadius: '8px', color: '#FF3366', borderColor: '#FF3366' }}
                                     >
                                         Bulk Upload
-                                        <input type="file" multiple hidden accept="image/*" onChange={handleBulkUpload} />
+                                        <input type="file" multiple hidden accept="image/*,video/*" onChange={handleBulkUpload} />
                                     </Button>
                                     <Button
                                         variant="contained"
