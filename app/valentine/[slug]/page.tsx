@@ -95,6 +95,7 @@ export default function ValentineSlugPage() {
 
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isMusicStarted, setIsMusicStarted] = useState(false); // New state to trigger music immediately on click
+    const [countdown, setCountdown] = useState<number | null>(null);
 
     const toggleFullscreen = useCallback(() => {
         if (!document.fullscreenElement) {
@@ -251,6 +252,7 @@ export default function ValentineSlugPage() {
 
     const handleOpen = () => {
         setIsTransitioning(true);
+        setCountdown(3);
 
         // 🚀 Auto Fullscreen on Open (Triggered immediately to satisfy user gesture)
         if (typeof document !== 'undefined' && !document.fullscreenElement) {
@@ -273,20 +275,34 @@ export default function ValentineSlugPage() {
             }
         }
 
-        // Delay the reveal slightly to mask the "black flicker"
-        setTimeout(() => {
-            setIsOpen(true);
+        // 🕒 Countdown Logic
+        const timer = setInterval(() => {
+            setCountdown((prev) => {
+                if (prev === null) return null;
+                if (prev <= 1) {
+                    clearInterval(timer);
 
-            // Trigger heart burst
-            if (typeof triggerHeartBurst === 'function') {
-                triggerHeartBurst();
-            }
+                    // Final transition to open
+                    setTimeout(() => {
+                        setIsOpen(true);
+                        setCountdown(null);
 
-            // Fade out the mask after a short delay
-            setTimeout(() => {
-                setIsTransitioning(false);
-            }, 300);
-        }, 400); // 400ms is usually enough for the browser to scale
+                        // Trigger heart burst
+                        if (typeof triggerHeartBurst === 'function') {
+                            triggerHeartBurst();
+                        }
+
+                        // Fade out the mask after a short delay
+                        setTimeout(() => {
+                            setIsTransitioning(false);
+                        }, 300);
+                    }, 800);
+
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
     };
 
     const toggleMusic = () => {
@@ -432,6 +448,19 @@ export default function ValentineSlugPage() {
             0% { transform: scale(0.9); opacity: 0; }
             100% { transform: scale(1); opacity: 1; }
         }
+        @keyframes countdown-pop {
+            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; filter: blur(10px); }
+            50% { transform: scale(1.4) rotate(5deg); opacity: 0.8; filter: blur(0px); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes aurora-pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 102, 0.4), 0 0 40px rgba(255, 51, 102, 0.2); }
+            50% { box-shadow: 0 0 50px rgba(255, 51, 102, 0.8), 0 0 100px rgba(255, 51, 102, 0.4); }
+        }
+        @keyframes heart-beat-scale {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
         .image-loading {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
             background-size: 200% 100%;
@@ -505,14 +534,12 @@ export default function ValentineSlugPage() {
             padding: 0;
             overflow: hidden;
         }
-        /* Continuous Transition Mask */
         .fullscreen-mask {
             position: fixed;
             inset: 0;
-            background: #FFF0F3;
             z-index: 9999;
             display: flex;
-            items-center;
+            align-items: center;
             justify-content: center;
             pointer-events: none;
             opacity: 0;
@@ -602,7 +629,13 @@ export default function ValentineSlugPage() {
       `}</style>
 
             {/* 🎭 Love Transition Mask */}
-            <div className={`fullscreen-mask flex flex-col items-center justify-center overflow-hidden ${isTransitioning ? 'active' : ''}`}>
+            <div
+                className={`fullscreen-mask flex flex-col items-center justify-center overflow-hidden ${isTransitioning ? 'active' : ''}`}
+                style={{
+                    background: displayContent.backgroundColor || "#FFF0F3",
+                    pointerEvents: isTransitioning ? 'auto' : 'none'
+                }}
+            >
                 {/* Visual Petals falling */}
                 {isTransitioning && Array.from({ length: 15 }).map((_, i) => (
                     <div
@@ -622,24 +655,55 @@ export default function ValentineSlugPage() {
                     />
                 ))}
 
-                <div className="radiant-heart mb-6 z-10">
-                    <Heart size="80" variant="Bold" color="#FF3366" />
-                </div>
-                <Typography
-                    className="text-[#8B1D36] z-10"
-                    sx={{
-                        fontFamily: "'Dancing Script', cursive",
-                        fontWeight: 700,
-                        fontSize: '1.3rem',
-                        letterSpacing: '0.15em',
-                        textShadow: '0 0 20px rgba(255,255,255,0.8)',
-                        animation: 'fadeIn 1s ease-out',
-                        textAlign: 'center',
-                        textTransform: ''
-                    }}
-                >
-                    Preparing your surprise...
-                </Typography>
+                {/* Only show the top heart when NOT counting down to avoid overlap */}
+                {countdown === null && (
+                    <div
+                        className="radiant-heart mb-6 z-10"
+                        style={{
+                            animation: 'radiant-pulse 2s ease-in-out infinite'
+                        }}
+                    >
+                        <Heart size={80} variant="Bold" color="#FF3366" />
+                    </div>
+                )}
+
+                {countdown !== null ? (
+                    <div className="relative flex items-center justify-center">
+                        {/* Aurora Background for the number - Enlarged for better blending */}
+                        <div className="absolute inset-0 w-64 h-64 bg-[#FF3366]/10 rounded-full blur-[80px] animate-pulse -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" />
+
+                        <Typography
+                            key={countdown}
+                            className="text-[#FF3366] font-black z-20"
+                            sx={{
+                                fontSize: countdown === 0 ? '8rem' : '7.5rem',
+                                fontFamily: "'Dancing Script', cursive",
+                                textShadow: '0 0 40px rgba(255, 51, 102, 0.3)',
+                                lineHeight: 1,
+                                animation: 'countdown-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+                                transformOrigin: 'center center',
+                            }}
+                        >
+                            {countdown > 0 ? countdown : "❤️"}
+                        </Typography>
+                    </div>
+                ) : (
+                    <Typography
+                        className="text-[#8B1D36] z-10"
+                        sx={{
+                            fontFamily: "'Dancing Script', cursive",
+                            fontWeight: 700,
+                            fontSize: '1.3rem',
+                            letterSpacing: '0.15em',
+                            textShadow: '0 0 20px rgba(255,255,255,0.8)',
+                            animation: 'fadeIn 1s ease-out',
+                            textAlign: 'center',
+                            textTransform: ''
+                        }}
+                    >
+                        Preparing your surprise...
+                    </Typography>
+                )}
             </div>
 
             {/* ❤️ Burst Hearts Animation Overlay */}
