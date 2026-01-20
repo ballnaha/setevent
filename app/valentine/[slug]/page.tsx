@@ -466,6 +466,20 @@ export default function ValentineSlugPage() {
             border-right: 2px solid rgba(255, 182, 193, 0.5);
             transform: rotate(-1.5deg);
         }
+        @keyframes music-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes music-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(255, 51, 102, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 25px rgba(255, 51, 102, 0.5); }
+        }
+        .music-playing {
+            animation: music-pulse 2s ease-in-out infinite;
+        }
+        .music-icon-spin {
+            animation: music-spin 4s linear infinite;
+        }
       `}</style>
 
                 {/* ❤️ Burst Hearts Animation Overlay */}
@@ -515,20 +529,40 @@ export default function ValentineSlugPage() {
                     />
                 )}
 
-                {/* 🎵 Music Control Button */}
+                {/* 🎵 Music Control Button - Cute Style */}
                 {isOpen && (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) && (
                     <button
                         onClick={toggleMusic}
-                        className="fixed top-4 right-4 z-[60] w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+                        className={`fixed top-5 right-5 z-[60] w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${!isMusicMuted ? 'music-playing' : ''}`}
                         style={{
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.15)',
-                            border: '2px solid #FF3366'
+                            background: isMusicMuted
+                                ? 'linear-gradient(135deg, #f3f4f6 0%, #d1d5db 100%)'
+                                : 'linear-gradient(135deg, #FF99AC 0%, #FF3366 100%)',
+                            border: '3px solid white',
+                            boxShadow: '0 8px 20px rgba(0,0,0,0.15)',
                         }}
                     >
-                        {isMusicMuted ? (
-                            <span className="text-xl">🔇</span>
-                        ) : (
-                            <span className="text-xl animate-pulse">🎵</span>
+                        <div className={`relative flex items-center justify-center ${!isMusicMuted ? 'music-icon-spin' : ''}`}>
+                            <Music
+                                size="24"
+                                variant={isMusicMuted ? "Linear" : "Bold"}
+                                color={isMusicMuted ? "#9ca3af" : "white"}
+                            />
+                            {isMusicMuted && (
+                                <div className="absolute w-full h-[2px] bg-gray-400 rotate-45 rounded-full" />
+                            )}
+                        </div>
+
+                        {/* Decorative floating notes when playing */}
+                        {!isMusicMuted && (
+                            <div className="absolute -top-1 -right-1 pointer-events-none">
+                                <span className="text-[10px] animate-bounce">♪</span>
+                            </div>
+                        )}
+                        {!isMusicMuted && (
+                            <div className="absolute -bottom-1 -left-1 pointer-events-none">
+                                <span className="text-[10px] animate-bounce" style={{ animationDelay: '0.5s' }}>♫</span>
+                            </div>
                         )}
                     </button>
                 )}
