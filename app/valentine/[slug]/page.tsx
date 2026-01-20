@@ -780,8 +780,8 @@ export default function ValentineSlugPage() {
 
                     {/* Top Logo - Centered Header Style (Aligned with icons) */}
 
-                    {/* Top Spacer - Reduced to pull content up on mobile */}
-                    <div className="h-10 flex-none" />
+                    {/* Top Spacer - Consistent across environments */}
+                    <div className="flex-none" style={{ height: 'calc(1.5rem + env(safe-area-inset-top))' }} />
 
                     {/* Middle: Gift Box & Title */}
                     <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95">
@@ -830,7 +830,8 @@ export default function ValentineSlugPage() {
                     </div>
 
                     {/* Footer White Area - Redesigned for Premium Look */}
-                    <div className="w-full bg-white/95 backdrop-blur-sm mt-auto pt-6 pb-12 px-8 rounded-t-[2.5rem] text-center shadow-[0_-15px_50px_rgba(211,47,47,0.15)] flex flex-col items-center border-t border-red-50/50 relative">
+                    <div className="w-full bg-white/95 backdrop-blur-sm mt-auto pt-6 px-8 rounded-t-[2.5rem] text-center shadow-[0_-15px_50px_rgba(211,47,47,0.15)] flex flex-col items-center border-t border-red-50/50 relative"
+                        style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
                         {/* Slogan with Elegant Typography - Optimized Size for Mobile */}
                         <div className="flex flex-col items-center">
                             <Typography className="text-[#D32F2F] font-black text-2xl tracking-[0.2em] leading-none mb-1 opacity-90" sx={{ fontFamily: 'var(--font-prompt)' }}>
@@ -874,12 +875,12 @@ export default function ValentineSlugPage() {
                     </div>
 
                     <div className="w-full h-full flex flex-col items-center z-10 animate-[fadeIn_0.8s_ease-out] overflow-hidden relative">
-                        <div className="w-full h-full flex flex-col items-center justify-between pt-2 pb-6 overflow-hidden">
-                            {/* 1. Header Guard (Top Section) */}
-                            <div className="w-full h-[10dvh] min-h-[70px] flex-none" />
+                        <div className="w-full h-full flex flex-col items-center justify-between overflow-hidden">
+                            {/* 1. Header Guard (Top Section) - Consistent with Fixed Header */}
+                            <div className="w-full flex-none" style={{ height: 'calc(4.5rem + env(safe-area-inset-top))' }} />
 
                             {/* 2. Flexible Body (Middle Section - The Heart of the card) */}
-                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4" style={{ top: '-30px' }}>
+                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4">
                                 <div className="relative w-full flex justify-center items-center">
                                     <Swiper
                                         effect={"creative"}
@@ -1035,7 +1036,7 @@ export default function ValentineSlugPage() {
                             </div>
 
                             {/* 3. Message Footer (Bottom Section) */}
-                            <div className="w-full max-w-sm text-center pt-4 pb-8 px-6 flex-none z-[50] relative" style={{ top: '20px' }}>
+                            <div className="w-full max-w-sm text-center pt-4 px-6 flex-none z-[50] relative" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}>
                                 <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
                                     {displayContent.subtitle}
                                 </Typography>
