@@ -450,93 +450,96 @@ export default function ValentineAdminPage() {
         setQrOpen(true);
     };
 
-    const handleDownloadQR = async () => {
-        if (!qrData) return;
+    const generateAndDownloadCard = async (targetUrl: string, targetTitle: string) => {
         try {
             // 1. Create a high quality QR Code with Error Correction Level H (30%)
             // This allows the logo to be placed in the center without breaking the scan.
             const qrSize = 1000;
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=20`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(targetUrl)}&ecc=H&margin=0`;
 
-            // 2. Load the QR image
-            const qrImage = new Image();
-            qrImage.crossOrigin = "anonymous";
-            qrImage.src = qrUrl;
-
-            await new Promise((resolve, reject) => {
-                qrImage.onload = resolve;
-                qrImage.onerror = () => reject(new Error("Failed to load QR code image"));
+            // 2. Load images
+            const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = "anonymous";
+                img.src = src;
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error(`Failed to load: ${src}`));
             });
 
-            // 3. Load the Logo image
-            const logoImage = new Image();
-            logoImage.crossOrigin = "anonymous";
-            logoImage.src = "/images/logo.png"; // Company Logo
+            const [qrImage, templateImage, logoImage] = await Promise.all([
+                loadImage(qrUrl),
+                loadImage("/images/card_empty.png"),
+                loadImage("/images/favicon.png").catch(() => {
+                    console.warn("Logo failed to load, falling back to logo");
+                    return loadImage("/images/favicon.png").catch(() => null);
+                })
+            ]);
 
-            await new Promise((resolve) => {
-                logoImage.onload = resolve;
-                logoImage.onerror = () => {
-                    console.warn("Logo failed to load, downloading QR without logo");
-                    resolve(null);
-                };
-            });
-
-            // 4. Create Canvas
+            // 3. Create Canvas based on Template Dimensions
             const canvas = document.createElement("canvas");
-            canvas.width = qrSize;
-            canvas.height = qrSize;
-            const ctx = canvas.getContext("2d");
+            if (!templateImage) throw new Error("Template image missing");
 
+            const cardWidth = templateImage.naturalWidth;
+            const cardHeight = templateImage.naturalHeight;
+            canvas.width = cardWidth;
+            canvas.height = cardHeight;
+
+            const ctx = canvas.getContext("2d");
             if (!ctx) throw new Error("Could not get canvas context");
 
+            // 4. Draw Template
+            ctx.drawImage(templateImage, 0, 0, cardWidth, cardHeight);
+
+            // 5. Calculate QR position on Template
+            // Fine-tuned for tighter fit in the frame
+            const qrSizeOnCard = cardWidth * 0.31;
+            const qrX = (cardWidth - qrSizeOnCard) / 2;
+            const qrY = cardHeight * 0.665; // Moved further down to 0.665
+
             // Draw QR Code
-            ctx.drawImage(qrImage, 0, 0, qrSize, qrSize);
+            ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
 
-            // Draw Logo in transition (if loaded)
-            if (logoImage.complete && logoImage.naturalWidth > 0) {
-                const logoSize = qrSize * 0.20; // 20% is perfect for most logos
-                const x = (qrSize - logoSize) / 2;
-                const y = (qrSize - logoSize) / 2;
-                const centerX = qrSize / 2;
-                const centerY = qrSize / 2;
+            // 6. Draw Logo in center of QR
+            if (logoImage) {
+                const logoSize = qrSizeOnCard * 0.20; // Refined proportion (20%)
+                const centerX = qrX + (qrSizeOnCard / 2);
+                const centerY = qrY + (qrSizeOnCard / 2);
+                const lX = centerX - (logoSize / 2);
+                const lY = centerY - (logoSize / 2);
 
-                // 🌟 Professional "Island" style: Circular with soft shadow
                 ctx.save();
 
-                // Add Shadow for depth
-                ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
-                ctx.shadowBlur = 20;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 4;
-
-                // Draw white circle background
-                ctx.fillStyle = "white";
+                // Professional Circular Island for Logo
                 ctx.beginPath();
-                ctx.arc(centerX, centerY, (logoSize / 2) + 12, 0, Math.PI * 2);
+                ctx.arc(centerX, centerY, (logoSize / 2) + 6, 0, Math.PI * 2); // Increased padding
+                ctx.fillStyle = "white";
                 ctx.fill();
 
-                // Add a very thin border to look crisp
-                ctx.strokeStyle = "rgba(0,0,0,0.05)";
-                ctx.lineWidth = 1;
-                ctx.stroke();
+                ctx.shadowColor = "rgba(0, 0, 0, 0.12)";
+                ctx.shadowBlur = 10;
+                ctx.stroke(); // Subtle border
 
                 ctx.restore();
 
-                // Draw Logo (Centered in circle)
-                ctx.drawImage(logoImage, x, y, logoSize, logoSize);
+                ctx.drawImage(logoImage, lX, lY, logoSize, logoSize);
             }
 
-            // 5. Download
+            // 7. Download Results
             const link = document.createElement("a");
-            link.download = `QR_${qrData.title.replace(/\s+/g, '_')}.png`;
-            link.href = canvas.toDataURL("image/png");
+            link.download = `ValentineCard_${targetTitle.replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
 
-            showSnackbar("QR Code downloaded with logo!");
+            showSnackbar("Valentine Card downloaded!");
         } catch (error) {
-            console.error("QR Download Error:", error);
-            showSnackbar("Failed to generate QR with logo", "error");
+            console.error("Download Error:", error);
+            showSnackbar("Failed to generate card", "error");
         }
+    };
+
+    const handleDownloadQR = async () => {
+        if (!qrData) return;
+        await generateAndDownloadCard(qrData.url, qrData.title);
     };
 
     // DND Sensors
@@ -973,6 +976,13 @@ export default function ValentineAdminPage() {
                                 </Button>
                                 <Button
                                     size="small"
+                                    startIcon={<DirectDown size="16" variant="Bulk" color="#FF3366" />}
+                                    onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title)}
+                                >
+                                    Download Card
+                                </Button>
+                                <Button
+                                    size="small"
                                     startIcon={<Edit size="16" variant="Bulk" color="#3b82f6" />}
                                     onClick={() => handleOpen(card)}
                                 >
@@ -1042,6 +1052,13 @@ export default function ValentineAdminPage() {
                                         <TableCell align="right">
                                             <IconButton onClick={() => handleOpenQR(card)} sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }} title="QR Code">
                                                 <Scan size="18" variant="Bulk" color="#FF3366" />
+                                            </IconButton>
+                                            <IconButton
+                                                onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title)}
+                                                sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }}
+                                                title="Download Card Image"
+                                            >
+                                                <DirectDown size="18" variant="Bulk" color="#FF3366" />
                                             </IconButton>
                                             <IconButton onClick={() => handleOpen(card)} sx={{ color: '#3b82f6', '&:hover': { bgcolor: 'rgba(59, 130, 246, 0.1)' } }}>
                                                 <Edit size="18" variant="Bulk" color="#3b82f6" />
@@ -1592,8 +1609,8 @@ export default function ValentineAdminPage() {
                                 top: '50%',
                                 left: '50%',
                                 transform: 'translate(-50%, -50%)',
-                                width: '22%',
-                                height: '22%',
+                                width: '20%',
+                                height: '20%',
                                 bgcolor: 'white',
                                 borderRadius: '50%', // Perfect Circle
                                 p: 0.75,
@@ -1604,10 +1621,12 @@ export default function ValentineAdminPage() {
                                 border: '1px solid rgba(0,0,0,0.05)'
                             }}>
                                 <img
-                                    src="/images/logo.png"
+                                    src="/images/favicon.png"
                                     alt="Logo"
                                     style={{ width: '85%', height: '85%', objectFit: 'contain' }}
-                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                    onError={(e) => {
+                                        e.currentTarget.src = "/images/favicon.png";
+                                    }}
                                 />
                             </Box>
                         </Box>

@@ -655,19 +655,7 @@ export default function ValentineSlugPage() {
                     />
                 ))}
 
-                {/* Only show the top heart when NOT counting down to avoid overlap */}
-                {countdown === null && (
-                    <div
-                        className="radiant-heart mb-6 z-10"
-                        style={{
-                            animation: 'radiant-pulse 2s ease-in-out infinite'
-                        }}
-                    >
-                        <Heart size={80} variant="Bold" color="#FF3366" />
-                    </div>
-                )}
-
-                {countdown !== null ? (
+                {countdown !== null && (
                     <div className="relative flex items-center justify-center">
                         {/* Aurora Background for the number - Enlarged for better blending */}
                         <div className="absolute inset-0 w-64 h-64 bg-[#FF3366]/10 rounded-full blur-[80px] animate-pulse -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" />
@@ -687,22 +675,6 @@ export default function ValentineSlugPage() {
                             {countdown > 0 ? countdown : "❤️"}
                         </Typography>
                     </div>
-                ) : (
-                    <Typography
-                        className="text-[#8B1D36] z-10"
-                        sx={{
-                            fontFamily: "'Dancing Script', cursive",
-                            fontWeight: 700,
-                            fontSize: '1.3rem',
-                            letterSpacing: '0.15em',
-                            textShadow: '0 0 20px rgba(255,255,255,0.8)',
-                            animation: 'fadeIn 1s ease-out',
-                            textAlign: 'center',
-                            textTransform: ''
-                        }}
-                    >
-                        Preparing your surprise...
-                    </Typography>
                 )}
             </div>
 
