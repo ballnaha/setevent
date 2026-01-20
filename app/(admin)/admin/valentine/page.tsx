@@ -441,19 +441,89 @@ export default function ValentineAdminPage() {
     const handleDownloadQR = async () => {
         if (!qrData) return;
         try {
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(qrData.url)}`;
-            const response = await fetch(qrUrl);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `QR_${qrData.title.replace(/\s+/g, '_')}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            window.URL.revokeObjectURL(url);
+            // 1. Create a high quality QR Code with Error Correction Level H (30%)
+            // This allows the logo to be placed in the center without breaking the scan.
+            const qrSize = 1000;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=20`;
+
+            // 2. Load the QR image
+            const qrImage = new Image();
+            qrImage.crossOrigin = "anonymous";
+            qrImage.src = qrUrl;
+
+            await new Promise((resolve, reject) => {
+                qrImage.onload = resolve;
+                qrImage.onerror = () => reject(new Error("Failed to load QR code image"));
+            });
+
+            // 3. Load the Logo image
+            const logoImage = new Image();
+            logoImage.crossOrigin = "anonymous";
+            logoImage.src = "/images/logo.png"; // Company Logo
+
+            await new Promise((resolve) => {
+                logoImage.onload = resolve;
+                logoImage.onerror = () => {
+                    console.warn("Logo failed to load, downloading QR without logo");
+                    resolve(null);
+                };
+            });
+
+            // 4. Create Canvas
+            const canvas = document.createElement("canvas");
+            canvas.width = qrSize;
+            canvas.height = qrSize;
+            const ctx = canvas.getContext("2d");
+
+            if (!ctx) throw new Error("Could not get canvas context");
+
+            // Draw QR Code
+            ctx.drawImage(qrImage, 0, 0, qrSize, qrSize);
+
+            // Draw Logo in transition (if loaded)
+            if (logoImage.complete && logoImage.naturalWidth > 0) {
+                const logoSize = qrSize * 0.20; // 20% is perfect for most logos
+                const x = (qrSize - logoSize) / 2;
+                const y = (qrSize - logoSize) / 2;
+                const centerX = qrSize / 2;
+                const centerY = qrSize / 2;
+
+                // 🌟 Professional "Island" style: Circular with soft shadow
+                ctx.save();
+
+                // Add Shadow for depth
+                ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+
+                // Draw white circle background
+                ctx.fillStyle = "white";
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, (logoSize / 2) + 12, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Add a very thin border to look crisp
+                ctx.strokeStyle = "rgba(0,0,0,0.05)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                ctx.restore();
+
+                // Draw Logo (Centered in circle)
+                ctx.drawImage(logoImage, x, y, logoSize, logoSize);
+            }
+
+            // 5. Download
+            const link = document.createElement("a");
+            link.download = `QR_${qrData.title.replace(/\s+/g, '_')}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            showSnackbar("QR Code downloaded with logo!");
         } catch (error) {
-            showSnackbar("Failed to download QR code", "error");
+            console.error("QR Download Error:", error);
+            showSnackbar("Failed to generate QR with logo", "error");
         }
     };
 
@@ -1492,13 +1562,41 @@ export default function ValentineAdminPage() {
                             bgcolor: 'white',
                             borderRadius: 4,
                             boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-                            border: '1px solid #eee'
+                            border: '1px solid #eee',
+                            position: 'relative', // To absolute center the logo
+                            overflow: 'hidden'
                         }}>
+                            {/* QR Image with ECC Level H for center logo support */}
                             <img
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.url)}`}
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=10`}
                                 alt="QR Code"
                                 style={{ width: '100%', height: 'auto', display: 'block' }}
                             />
+
+                            {/* Logo Overlay - Center (Professional Circle Style) */}
+                            <Box sx={{
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                transform: 'translate(-50%, -50%)',
+                                width: '22%',
+                                height: '22%',
+                                bgcolor: 'white',
+                                borderRadius: '50%', // Perfect Circle
+                                p: 0.75,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: '0 4px 15px rgba(0,0,0,0.12)',
+                                border: '1px solid rgba(0,0,0,0.05)'
+                            }}>
+                                <img
+                                    src="/images/logo.png"
+                                    alt="Logo"
+                                    style={{ width: '85%', height: '85%', objectFit: 'contain' }}
+                                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                                />
+                            </Box>
                         </Box>
                     )}
                     <Typography
