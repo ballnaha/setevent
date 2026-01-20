@@ -94,6 +94,7 @@ export default function ValentineSlugPage() {
     const musicAudioRef = React.useRef<HTMLAudioElement>(null);
 
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [isMusicStarted, setIsMusicStarted] = useState(false); // New state to trigger music immediately on click
 
     const toggleFullscreen = useCallback(() => {
         if (!document.fullscreenElement) {
@@ -260,15 +261,21 @@ export default function ValentineSlugPage() {
             }
         }
 
+        // 🎵 Start background music IMMEDIATELY (Crucial for mobile autoplay)
+        if (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) {
+            setIsMusicStarted(true);
+            setIsMusicPlaying(true);
+            setIsMusicMuted(false);
+
+            // For native audio element
+            if (musicAudioRef.current) {
+                musicAudioRef.current.play().catch(e => console.log("Direct play blocked:", e));
+            }
+        }
+
         // Delay the reveal slightly to mask the "black flicker"
         setTimeout(() => {
             setIsOpen(true);
-            setIsMusicMuted(false);
-
-            // Start background music
-            if (displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) {
-                setIsMusicPlaying(true);
-            }
 
             // Trigger heart burst
             if (typeof triggerHeartBurst === 'function') {
@@ -642,17 +649,20 @@ export default function ValentineSlugPage() {
             </div>
 
             {/* 🎵 Hidden Background Music Player */}
-            {isOpen && isMusicPlaying && displayContent.backgroundMusicUrl && (
+            {/* Native Audio (MP3) - Preloaded but paused */}
+            {displayContent.backgroundMusicUrl && (
                 <audio
                     ref={musicAudioRef}
                     src={displayContent.backgroundMusicUrl}
                     loop
                     playsInline
-                    autoPlay
+                    preload="auto"
                     style={{ display: 'none' }}
                 />
             )}
-            {isOpen && isMusicPlaying && !displayContent.backgroundMusicUrl && displayContent.backgroundMusicYoutubeId && (
+
+            {/* YouTube Audio - Triggered immediately on click (not waiting for isOpen) */}
+            {isMusicStarted && !displayContent.backgroundMusicUrl && displayContent.backgroundMusicYoutubeId && (
                 <iframe
                     ref={musicPlayerRef}
                     src={`https://www.youtube.com/embed/${displayContent.backgroundMusicYoutubeId}?autoplay=1&mute=${isMusicMuted ? 1 : 0}&loop=1&playlist=${displayContent.backgroundMusicYoutubeId}&controls=0`}
@@ -671,7 +681,7 @@ export default function ValentineSlugPage() {
 
             {/*  Controls (Right Side: Music) */}
             {isOpen && (
-                <div className="fixed top-5 right-5 z-[60] flex flex-col gap-3">
+                <div className="fixed right-5 z-[60] flex flex-col gap-3" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
                     {(displayContent.backgroundMusicUrl || displayContent.backgroundMusicYoutubeId) && (
                         <button
                             onClick={toggleMusic}
@@ -701,7 +711,7 @@ export default function ValentineSlugPage() {
 
             {/* 🔳 Controls (Left Side: Fullscreen) */}
             {isOpen && (
-                <div className="fixed top-5 left-5 z-[60]">
+                <div className="fixed left-5 z-[60]" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
                     <button
                         onClick={toggleFullscreen}
                         className="group w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 overflow-hidden"
@@ -769,7 +779,7 @@ export default function ValentineSlugPage() {
                 <div className="w-full h-full flex flex-col justify-between items-center z-10 relative overflow-hidden" onClick={handleOpen}>
 
                     {/* Top Logo - Centered Header Style (Aligned with icons) */}
-                    <div className="absolute top-3 left-1/2 -translate-x-1/2 animate-[fadeIn_0.5s_ease-out] z-20">
+                    <div className="absolute left-1/2 -translate-x-1/2 animate-[fadeIn_0.5s_ease-out] z-20" style={{ top: 'calc(0.75rem + env(safe-area-inset-top))' }}>
                         <img
                             src="/images/logo1.png"
                             alt="SetEvent Logo"
@@ -855,7 +865,7 @@ export default function ValentineSlugPage() {
             {isOpen && (
                 <>
                     {/* 🏆 Header Section (Fixed outside the animated container to prevent jumping) */}
-                    <div className="fixed top-5 left-0 right-0 text-center z-[70] pointer-events-none px-16">
+                    <div className="fixed left-0 right-0 text-center z-[70] pointer-events-none px-16" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
                         <Typography variant="h6" className="text-[#FFD7E0] font-bold tracking-wider" sx={{ fontFamily: 'cursive', lineHeight: 2.5, fontSize: '1.2rem' }}>
                             {displayContent.greeting?.split(' ')[0] || "Happy"}
                         </Typography>
