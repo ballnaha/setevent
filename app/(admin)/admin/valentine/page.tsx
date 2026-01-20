@@ -65,6 +65,7 @@ interface ValentineMemory {
     thumbnail?: string;
     order: number;
     uploading?: boolean;
+    progress?: number;
 }
 
 interface ValentineCard {
@@ -92,6 +93,7 @@ interface SortableMemoryItemProps {
     handleRemoveMemory: (index: number) => void;
     handleFileChange: (index: number, e: React.ChangeEvent<HTMLInputElement>) => void;
     handleMemoryChange: (index: number, field: keyof ValentineMemory, value: any) => void;
+    disabled?: boolean;
 }
 
 const SortableMemoryItem = ({
@@ -100,7 +102,8 @@ const SortableMemoryItem = ({
     index,
     handleRemoveMemory,
     handleFileChange,
-    handleMemoryChange
+    handleMemoryChange,
+    disabled
 }: SortableMemoryItemProps) => {
     const {
         attributes,
@@ -109,7 +112,10 @@ const SortableMemoryItem = ({
         transform,
         transition,
         isDragging
-    } = useSortable({ id });
+    } = useSortable({
+        id,
+        disabled: disabled // This officially disables the item in dnd-kit
+    });
 
     const style = {
         transform: CSS.Transform.toString(transform),
@@ -139,18 +145,19 @@ const SortableMemoryItem = ({
         >
             {/* Drag Handle */}
             <Box
-                {...attributes}
-                {...listeners}
+                {...(disabled ? {} : attributes)}
+                {...(disabled ? {} : listeners)}
                 sx={{
                     position: 'absolute',
                     top: 12,
                     left: 12,
-                    cursor: 'grab',
+                    cursor: disabled ? 'default' : 'grab',
                     color: 'text.disabled',
-                    '&:hover': { color: '#FF3366' },
+                    '&:hover': { color: disabled ? 'text.disabled' : '#FF3366' },
                     zIndex: 10,
                     display: 'flex',
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    opacity: disabled ? 0.3 : 1
                 }}
             >
                 <HambergerMenu size="20" color="currentColor" />
@@ -269,13 +276,42 @@ const SortableMemoryItem = ({
                                 <Box sx={{
                                     position: 'absolute',
                                     inset: 0,
-                                    bgcolor: 'rgba(255,255,255,0.7)',
+                                    bgcolor: 'rgba(255,255,255,0.85)',
                                     display: 'flex',
+                                    flexDirection: 'column',
                                     alignItems: 'center',
                                     justifyContent: 'center',
-                                    zIndex: 2
+                                    zIndex: 10,
+                                    backdropFilter: 'blur(4px)'
                                 }}>
-                                    <CircularProgress size={24} color="primary" />
+                                    <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                                        <CircularProgress
+                                            variant="determinate"
+                                            value={memory.progress || 0}
+                                            size={50}
+                                            thickness={4}
+                                            sx={{ color: '#FF3366' }}
+                                        />
+                                        <Box
+                                            sx={{
+                                                top: 0,
+                                                left: 0,
+                                                bottom: 0,
+                                                right: 0,
+                                                position: 'absolute',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                            }}
+                                        >
+                                            <Typography variant="caption" component="div" color="text.secondary" sx={{ fontWeight: 800 }}>
+                                                {`${Math.round(memory.progress || 0)}%`}
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                    <Typography variant="caption" sx={{ mt: 1, fontWeight: 700, color: '#FF3366' }}>
+                                        Uploading...
+                                    </Typography>
                                 </Box>
                             )}
 
@@ -376,6 +412,7 @@ export default function ValentineAdminPage() {
         status: "active"
     });
     const [musicFile, setMusicFile] = useState<File | null>(null);
+    const [musicProgress, setMusicProgress] = useState(0);
     const [memories, setMemories] = useState<ValentineMemory[]>([]);
 
     // Delete Confirmation State
@@ -579,6 +616,48 @@ export default function ValentineAdminPage() {
         setDeleteDialogOpen(true);
     };
 
+    const uploadFileWithProgress = (file: File, folder: string, onProgress: (percent: number) => void) => {
+        return new Promise<any>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("folder", folder);
+            formData.append("watermark", "false");
+
+            let lastUpdate = 0;
+            xhr.upload.addEventListener("progress", (event) => {
+                if (event.lengthComputable) {
+                    const now = Date.now();
+                    const percent = (event.loaded / event.total) * 100;
+
+                    // Only update state if it's been more than 100ms since last update OR if it's 100%
+                    if (now - lastUpdate > 100 || percent === 100) {
+                        onProgress(percent);
+                        lastUpdate = now;
+                    }
+                }
+            });
+
+            xhr.onreadystatechange = () => {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            resolve(JSON.parse(xhr.responseText));
+                        } catch (e) {
+                            reject(new Error("Failed to parse response"));
+                        }
+                    } else {
+                        reject(new Error(`Upload failed with status ${xhr.status}`));
+                    }
+                }
+            };
+
+            xhr.onerror = () => reject(new Error("Network error during upload"));
+            xhr.open("POST", "/api/upload");
+            xhr.send(formData);
+        });
+    };
+
     const handleSubmit = async () => {
         setSaving(true);
         try {
@@ -589,63 +668,61 @@ export default function ValentineAdminPage() {
             // Upload background music if new file selected
             if (musicFile) {
                 try {
-                    const musicFormData = new FormData();
-                    musicFormData.append("file", musicFile);
-                    musicFormData.append("folder", "valentine/music");
-
-                    const res = await fetch("/api/upload", {
-                        method: "POST",
-                        body: musicFormData
+                    setMusicProgress(0);
+                    const data = await uploadFileWithProgress(musicFile, "valentine/music", (percent) => {
+                        setMusicProgress(percent);
                     });
 
-                    if (res.ok) {
-                        const data = await res.json();
-                        // If there was an old music file, track it for deletion
-                        if (formData.backgroundMusicUrl && formData.backgroundMusicUrl.startsWith('/uploads')) {
-                            currentUrlsToDelete.push(formData.backgroundMusicUrl);
-                        }
-                        currentBackgroundMusicUrl = data.url;
-                    } else {
-                        throw new Error("Failed to upload background music");
+                    if (formData.backgroundMusicUrl && formData.backgroundMusicUrl.startsWith('/uploads')) {
+                        currentUrlsToDelete.push(formData.backgroundMusicUrl);
                     }
+                    currentBackgroundMusicUrl = data.url;
                 } catch (error) {
                     console.error("Music upload failed:", error);
                     throw error;
+                } finally {
+                    setMusicProgress(0);
                 }
             }
 
-            const uploadResults = await Promise.all(memories.map(async (memory, idx) => {
+            const uploadResults = [];
+            for (let idx = 0; idx < memories.length; idx++) {
+                const memory = memories[idx];
                 if (memory.file) {
                     try {
-                        const uploadFormData = new FormData();
-                        uploadFormData.append("file", memory.file);
-                        uploadFormData.append("folder", "valentine");
-                        uploadFormData.append("watermark", "false");
-
-                        const res = await fetch("/api/upload", {
-                            method: "POST",
-                            body: uploadFormData
+                        // Mark as uploading
+                        setMemories(prev => {
+                            const updated = [...prev];
+                            updated[idx] = { ...updated[idx], uploading: true, progress: 0 };
+                            return updated;
                         });
 
-                        if (res.ok) {
-                            const data = await res.json();
+                        const data = await uploadFileWithProgress(memory.file, "valentine", (percent) => {
+                            setMemories(prev => {
+                                const updated = [...prev];
+                                updated[idx] = { ...updated[idx], progress: percent };
+                                return updated;
+                            });
+                        });
 
-                            // If this memory had an old URL, track it for deletion
-                            if (memory.url && memory.url.startsWith('/uploads')) {
-                                currentUrlsToDelete.push(memory.url);
-                            }
-
-                            return { ...memory, url: data.url, file: undefined, previewUrl: undefined };
-                        } else {
-                            throw new Error(`Failed to upload image ${idx + 1}`);
+                        if (memory.url && memory.url.startsWith('/uploads')) {
+                            currentUrlsToDelete.push(memory.url);
                         }
+
+                        uploadResults.push({ ...memory, url: data.url, file: undefined, previewUrl: undefined, uploading: false, progress: 100 });
                     } catch (error) {
-                        console.error("Upload failed in submit:", error);
+                        console.error(`Upload failed for memory ${idx + 1}:`, error);
+                        setMemories(prev => {
+                            const updated = [...prev];
+                            updated[idx] = { ...updated[idx], uploading: false };
+                            return updated;
+                        });
                         throw error;
                     }
+                } else {
+                    uploadResults.push(memory);
                 }
-                return memory;
-            }));
+            }
 
             // Clean up temporary fields before sending to API
             const finalMemories = uploadResults.map(({ file, previewUrl, localId, ...rest }) => rest);
@@ -1066,7 +1143,20 @@ export default function ValentineAdminPage() {
                                                         }}
                                                     />
                                                 </Button>
-                                                {(musicFile || formData.backgroundMusicUrl) && (
+
+                                                {musicProgress > 0 && musicProgress < 100 && (
+                                                    <Box sx={{ mt: 1.5 }}>
+                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                                                            <Typography variant="caption" sx={{ color: '#FF3366', fontWeight: 800 }}>Uploading Music...</Typography>
+                                                            <Typography variant="caption" sx={{ color: '#FF3366', fontWeight: 800 }}>{Math.round(musicProgress)}%</Typography>
+                                                        </Box>
+                                                        <Box sx={{ height: 6, width: '100%', bgcolor: '#FFE3E8', borderRadius: 3, overflow: 'hidden' }}>
+                                                            <Box sx={{ height: '100%', width: `${musicProgress}%`, bgcolor: '#FF3366', transition: 'width 0.2s' }} />
+                                                        </Box>
+                                                    </Box>
+                                                )}
+
+                                                {(musicFile || formData.backgroundMusicUrl) && musicProgress === 0 && (
                                                     <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                                                         <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 700 }}>
                                                             {musicFile ? `ไฟล์ใหม่: ${musicFile.name}` : `ไฟล์ปัจจุบัน: ${formData.backgroundMusicUrl.split('/').pop()}`}
@@ -1282,7 +1372,7 @@ export default function ValentineAdminPage() {
                                     modifiers={[restrictToVerticalAxis]}
                                 >
                                     <SortableContext
-                                        items={memories.map((m) => m.localId)}
+                                        items={saving ? [] : memories.map((m) => m.localId)}
                                         strategy={verticalListSortingStrategy}
                                     >
                                         {memories.map((memory, index) => (
@@ -1294,6 +1384,7 @@ export default function ValentineAdminPage() {
                                                 handleRemoveMemory={handleRemoveMemory}
                                                 handleFileChange={handleFileChange}
                                                 handleMemoryChange={handleMemoryChange}
+                                                disabled={saving}
                                             />
                                         ))}
                                     </SortableContext>

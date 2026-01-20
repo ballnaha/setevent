@@ -15,14 +15,37 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
         }
 
+        const isGif = file.type === "image/gif";
+        const fileSizeInMB = file.size / (1024 * 1024);
+
+        // 🚀 ULTRA FAST PATH: Bypass EVERYTHING for small GIFs (< 2MB)
+        if (isGif && fileSizeInMB < 2) {
+            const buffer = Buffer.from(await file.arrayBuffer());
+            const safeFolder = folder.replace(/[^a-zA-Z0-9\-_]/g, "_").toLowerCase();
+            const relativeUploadDir = path.join("uploads", safeFolder);
+            const uploadDir = path.join(process.cwd(), "public", relativeUploadDir);
+
+            try { await fs.access(uploadDir); } catch { await fs.mkdir(uploadDir, { recursive: true }); }
+
+            const filename = `${Date.now()}_${file.name.replace(/\s+/g, "_")}`;
+            const filepath = path.join(uploadDir, filename);
+            await fs.writeFile(filepath, buffer);
+
+            return NextResponse.json({
+                url: `/${relativeUploadDir.replace(/\\/g, "/")}/${filename}`
+            });
+        }
+
         let buffer: Buffer = Buffer.from(await file.arrayBuffer());
 
         // Resize logic using sharp
         let isWebP = false;
+
         if (file.type.startsWith("image/")) {
             try {
                 // 1. First resize the image (1200px max for faster loading)
-                let pipeline = sharp(buffer)
+                // For GIF: use animated: true to preserve animation frames
+                let pipeline = sharp(buffer, { animated: isGif })
                     .resize(1200, 1200, {
                         fit: 'inside',
                         withoutEnlargement: true
@@ -115,15 +138,29 @@ export async function POST(req: NextRequest) {
                     }
                 }
 
-                // 3. Final WebP conversion
-                buffer = await sharp(intermediateBuffer)
-                    .webp({ quality: 80 })
-                    .toBuffer();
-
-                isWebP = true;
+                // 3. Final format conversion
+                // For GIF: skip processing if file is already small (< 2MB) to save CPU time
+                if (isGif) {
+                    const fileSizeInMB = file.size / (1024 * 1024);
+                    if (fileSizeInMB < 2) {
+                        // Skip sharp processing for small GIFs - just use original buffer
+                        buffer = Buffer.from(await file.arrayBuffer());
+                    } else {
+                        // Only process large GIFs
+                        buffer = await pipeline.gif().toBuffer();
+                    }
+                    isWebP = false;
+                } else {
+                    buffer = await intermediateBuffer;
+                    // Note: intermediateBuffer already contains the WebP converted data from pipeline.webp() 
+                    // Wait, let's fix the logic to be more efficient
+                    buffer = await pipeline.webp({ quality: 80 }).toBuffer();
+                    isWebP = true;
+                }
             } catch (err) {
                 console.error("Image processing error:", err);
-                // Continue with original buffer if resizing fails
+                // Continue with original buffer if processing fails
+                buffer = Buffer.from(await file.arrayBuffer());
             }
         }
 

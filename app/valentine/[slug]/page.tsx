@@ -340,6 +340,7 @@ export default function ValentineSlugPage() {
                 }}
             >
                 <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Charm:wght@400;700&display=swap');
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         @keyframes float-lid { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes burst-float {
@@ -437,6 +438,33 @@ export default function ValentineSlugPage() {
             height: 8px !important;
             background: #D32F2F !important;
             border-radius: 4px !important;
+        }
+
+        /* Caption Animation */
+        @keyframes captionFadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            10% { opacity: 1; transform: translateY(0); }
+            80% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-5px); }
+        }
+        .animate-caption-fade {
+            animation: captionFadeInOut 5s ease-out forwards;
+        }
+        @keyframes heartPulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .romantic-text {
+            font-family: 'Dancing Script', 'Charm', cursive;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2), 0 0 15px rgba(255, 182, 193, 0.4);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .elegant-caption-box {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+            border-left: 2px solid rgba(255, 182, 193, 0.5);
+            border-right: 2px solid rgba(255, 182, 193, 0.5);
+            transform: rotate(-1.5deg);
         }
       `}</style>
 
@@ -571,7 +599,7 @@ export default function ValentineSlugPage() {
                                 <Typography variant="overline" className="text-gray-700 tracking-[0.3em] font-bold">
                                     HAPPY
                                 </Typography>
-                                <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'cursive' }}>
+                                <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'dancing script' }}>
                                     {displayContent.title}
                                 </Typography>
                             </div>
@@ -690,78 +718,103 @@ export default function ValentineSlugPage() {
                                 >
                                     {memories.map((memory, index) => (
                                         <SwiperSlide key={index}>
-                                            <div className="slide-content">
-                                                {memory.type === 'video' ? (
-                                                    <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-rose-500">
-                                                        <div className="absolute inset-0 flex items-center justify-center">
-                                                            <Typography className="text-white text-4xl">🎬</Typography>
+                                            {({ isActive }) => (
+                                                <div className="slide-content">
+                                                    {memory.type === 'video' ? (
+                                                        <div className="w-full h-full relative bg-gradient-to-br from-pink-400 to-rose-500">
+                                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                                <Typography className="text-white text-4xl">🎬</Typography>
+                                                            </div>
+                                                            <Typography className="absolute top-4 left-4 text-white text-sm bg-black/50 px-2 py-1 rounded">Video</Typography>
                                                         </div>
-                                                        <Typography className="absolute top-4 left-4 text-white text-sm bg-black/50 px-2 py-1 rounded">Video</Typography>
-                                                    </div>
-                                                ) : memory.type === 'youtube' ? (
-                                                    <div className="w-full h-full relative">
-                                                        <img
-                                                            src={`https://img.youtube.com/vi/${memory.url}/hqdefault.jpg`}
-                                                            alt={memory.caption || ""}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                                        <Typography className="absolute top-4 left-4 text-white text-sm bg-red-600/80 px-2 py-1 rounded">▶ YouTube</Typography>
-                                                    </div>
-                                                ) : memory.type === 'tiktok' ? (
-                                                    <div className="w-full h-full relative">
-                                                        {memory.thumbnail ? (
+                                                    ) : memory.type === 'youtube' ? (
+                                                        <div className="w-full h-full relative">
                                                             <img
-                                                                src={memory.thumbnail}
+                                                                src={`https://img.youtube.com/vi/${memory.url}/hqdefault.jpg`}
                                                                 alt={memory.caption || ""}
                                                                 className="w-full h-full object-cover"
                                                             />
-                                                        ) : (
-                                                            <div className="w-full h-full bg-black flex flex-col items-center justify-center relative overflow-hidden">
-                                                                {/* TikTok style glowing orbs */}
-                                                                <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#25F4EE] rounded-full blur-3xl opacity-60" />
-                                                                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#FE2C55] rounded-full blur-3xl opacity-60" />
-                                                                <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-white rounded-full blur-2xl opacity-20" />
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                                            <Typography className="absolute top-4 left-4 text-white text-sm bg-red-600/80 px-2 py-1 rounded">▶ YouTube</Typography>
+                                                        </div>
+                                                    ) : memory.type === 'tiktok' ? (
+                                                        <div className="w-full h-full relative">
+                                                            {memory.thumbnail ? (
+                                                                <img
+                                                                    src={memory.thumbnail}
+                                                                    alt={memory.caption || ""}
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-black flex flex-col items-center justify-center relative overflow-hidden">
+                                                                    {/* TikTok style glowing orbs */}
+                                                                    <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#25F4EE] rounded-full blur-3xl opacity-60" />
+                                                                    <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[#FE2C55] rounded-full blur-3xl opacity-60" />
+                                                                    <div className="absolute top-1/4 right-1/4 w-20 h-20 bg-white rounded-full blur-2xl opacity-20" />
 
-                                                                {/* TikTok Logo Style */}
-                                                                <div className="relative z-10 flex flex-col items-center text-white">
-                                                                    <span className="text-6xl mb-2">♪</span>
-                                                                    <span className="font-bold text-lg tracking-wider">TikTok</span>
+                                                                    {/* TikTok Logo Style */}
+                                                                    <div className="relative z-10 flex flex-col items-center text-white">
+                                                                        <span className="text-6xl mb-2">♪</span>
+                                                                        <span className="font-bold text-lg tracking-wider">TikTok</span>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                                            <Typography className="absolute top-4 left-4 text-white text-sm bg-black/70 px-2 py-1 rounded">🎵 TikTok</Typography>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="w-full h-full relative">
+                                                            {/* Loading skeleton - only show if not loaded */}
+                                                            {!loadedImages.has(index) && (
+                                                                <div className="absolute inset-0 image-loading flex items-center justify-center" style={{ zIndex: 5 }}>
+                                                                    <div className="text-4xl animate-pulse">💖</div>
+                                                                </div>
+                                                            )}
+                                                            {/* Actual image */}
+                                                            <img
+                                                                src={memory.url}
+                                                                alt={memory.caption || ""}
+                                                                className="w-full h-full object-cover"
+                                                                style={{
+                                                                    position: 'relative',
+                                                                    zIndex: 10,
+                                                                    opacity: loadedImages.has(index) ? 1 : 0
+                                                                }}
+                                                                onLoad={() => handleImageLoaded(index)}
+                                                            />
+                                                        </div>
+                                                    )}
+
+                                                    {/* ✨ Romantic Caption Overlay */}
+                                                    {memory.caption && isActive && (
+                                                        <div className="absolute bottom-12 left-0 right-0 px-6 z-30 pointer-events-none">
+                                                            <div className="animate-caption-fade flex flex-col items-center">
+                                                                {/* Glowing Heart Icon */}
+                                                                <div className="mb-2" style={{ animation: 'heartPulse 1.5s ease-in-out infinite' }}>
+                                                                    <Heart variant="Bold" color="#FF3366" size="24" style={{ filter: 'drop-shadow(0 0 5px #FF3366)' }} />
+                                                                </div>
+
+                                                                {/* Handwritten Note Style */}
+                                                                <div className="px-8 py-4 elegant-caption-box backdrop-blur-md rounded-lg shadow-xl relative">
+                                                                    {/* Subtle Shine Effect */}
+                                                                    <div className="absolute inset-0 bg-gradient-to-tr from-white/5 to-transparent rounded-lg pointer-events-none" />
+
+                                                                    <Typography
+                                                                        variant="h5"
+                                                                        className="romantic-text text-white text-center leading-relaxed"
+                                                                        style={{ fontSize: '1.8rem' }}
+                                                                    >
+                                                                        {memory.caption}
+                                                                    </Typography>
                                                                 </div>
                                                             </div>
-                                                        )}
-                                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                                                        <Typography className="absolute top-4 left-4 text-white text-sm bg-black/70 px-2 py-1 rounded">🎵 TikTok</Typography>
-                                                    </div>
-                                                ) : (
-                                                    <div className="w-full h-full relative">
-                                                        {/* Loading skeleton - only show if not loaded */}
-                                                        {!loadedImages.has(index) && (
-                                                            <div className="absolute inset-0 image-loading flex items-center justify-center" style={{ zIndex: 5 }}>
-                                                                <div className="text-4xl animate-pulse">💖</div>
-                                                            </div>
-                                                        )}
-                                                        {/* Actual image */}
-                                                        <img
-                                                            src={memory.url}
-                                                            alt={memory.caption || ""}
-                                                            className="w-full h-full object-cover"
-                                                            style={{
-                                                                position: 'relative',
-                                                                zIndex: 10,
-                                                                opacity: loadedImages.has(index) ? 1 : 0
-                                                            }}
-                                                            onLoad={() => handleImageLoaded(index)}
-                                                        />
-                                                    </div>
-                                                )}
+                                                        </div>
+                                                    )}
 
-                                                <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/70 to-transparent p-4 text-center pointer-events-none">
-                                                    <Typography className="text-white font-medium shadow-black drop-shadow-md">
-                                                        {memory.caption}
-                                                    </Typography>
+                                                    {/* Persistent light gradient at bottom for contrast */}
+                                                    <div className="absolute bottom-0 w-full h-24 bg-gradient-to-t from-black/40 to-transparent pointer-events-none" />
                                                 </div>
-                                            </div>
+                                            )}
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>
@@ -820,7 +873,6 @@ export default function ValentineSlugPage() {
             {activeVideo && (
                 <div
                     className="fixed inset-0 z-[100] flex items-center justify-center animate-[fadeIn_0.3s_ease-out]"
-                    onClick={handleCloseVideoModal}
                     style={{
                         background: 'linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(20,0,10,0.98) 100%)',
                     }}
@@ -908,10 +960,7 @@ export default function ValentineSlugPage() {
                         </div>
                     )}
 
-                    {/* Swipe hint */}
-                    <div className="absolute bottom-20 left-0 right-0 text-center">
-                        <span className="text-white/40 text-xs">แตะด้านนอกเพื่อปิด</span>
-                    </div>
+
                 </div>
             )}
         </>
