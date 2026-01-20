@@ -390,9 +390,9 @@ export default function ValentineSlugPage() {
                         fontWeight: 700,
                         fontFamily: "'Dancing Script', cursive",
                         letterSpacing: '0.15em',
-                        fontSize: '1.6rem',
+                        fontSize: '1.3rem',
                         textAlign: 'center',
-                        textTransform: 'uppercase'
+                        textTransform: ''
                     }}>
                         Preparing your surprise...
                     </Typography>
@@ -630,12 +630,12 @@ export default function ValentineSlugPage() {
                     sx={{
                         fontFamily: "'Dancing Script', cursive",
                         fontWeight: 700,
-                        fontSize: '1.6rem',
+                        fontSize: '1.3rem',
                         letterSpacing: '0.15em',
                         textShadow: '0 0 20px rgba(255,255,255,0.8)',
                         animation: 'fadeIn 1s ease-out',
                         textAlign: 'center',
-                        textTransform: 'uppercase'
+                        textTransform: ''
                     }}
                 >
                     Preparing your surprise...
