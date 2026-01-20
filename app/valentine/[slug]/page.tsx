@@ -1052,8 +1052,8 @@ export default function ValentineSlugPage() {
                             </div>
 
                             {/* 3. Message Footer (Bottom Section) */}
-                            <div className="w-full max-w-sm text-center pt-4 px-6 flex-none z-[50] relative" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}>
-                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                            <div className="w-full max-w-sm text-center pt-0 px-6 flex-none z-[50] relative" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}>
+                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2 mt-[-10px]" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1rem' }}>
                                     {displayContent.subtitle}
                                 </Typography>
 
