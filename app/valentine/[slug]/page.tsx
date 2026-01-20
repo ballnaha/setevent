@@ -776,55 +776,58 @@ export default function ValentineSlugPage() {
 
             {/* 🎁 LOCK SCREEN (INTRO) */}
             {!isOpen && (
-                <div className="w-full h-full flex flex-col justify-between items-center z-10 relative overflow-hidden" onClick={handleOpen}>
+                <div className="w-full h-full flex flex-col justify-start items-center z-10 relative overflow-hidden" onClick={handleOpen}>
 
                     {/* Top Logo - Centered Header Style (Aligned with icons) */}
 
-                    {/* Top Spacer - Consistent across environments */}
-                    <div className="flex-none" style={{ height: 'calc(1.5rem + env(safe-area-inset-top))' }} />
+                    {/* Top Guard - Prevent clipping and push box down to be more centered on screen */}
+                    <div className="flex-none" style={{ height: 'calc(8rem + env(safe-area-inset-top))' }} />
 
-                    {/* Middle: Gift Box & Title */}
-                    <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95">
+                    {/* Middle: Gift Box & Title - Centered in flexible space */}
+                    <div className="flex-grow w-full flex flex-col items-center justify-center overflow-visible">
+                        <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95 overflow-visible">
 
-                        {/* Floating Lid - Slightly smaller for mobile optimization */}
-                        <div className="relative w-40 h-12 bg-[#D32F2F] rounded-t-lg shadow-xl mb-3 animate-[float-lid_3s_ease-in-out_infinite]">
-                            {/* Ribbon H */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
-                            {/* Bow */}
-                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 flex items-end">
-                                <div className="w-7 h-7 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
-                                <div className="w-3.5 h-3.5 bg-[#FF5252] rounded-full z-10" />
-                                <div className="w-7 h-7 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
+                            {/* Floating Lid - Slightly smaller for mobile optimization */}
+                            <div className="relative w-40 h-12 bg-[#D32F2F] rounded-t-lg shadow-xl mb-3 animate-[float-lid_3s_ease-in-out_infinite]">
+                                {/* Ribbon H */}
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
+                                {/* Bow */}
+                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 flex items-end">
+                                    <div className="w-7 h-7 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
+                                    <div className="w-3.5 h-3.5 bg-[#FF5252] rounded-full z-10" />
+                                    <div className="w-7 h-7 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Text */}
-                        <div className="text-center py-4 z-20">
-                            <Typography variant="overline" className="text-gray-700 tracking-[0.3em] font-bold">
-                                HAPPY
-                            </Typography>
-                            <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'Dancing Script' }}>
-                                {displayContent.title}
-                            </Typography>
-                        </div>
+                            {/* Text */}
+                            <div className="text-center py-4 z-20">
+                                <Typography variant="overline" className="text-gray-700 tracking-[0.3em] font-bold">
+                                    HAPPY
+                                </Typography>
+                                <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'Dancing Script' }}>
+                                    {displayContent.title}
+                                </Typography>
+                            </div>
 
-                        {/* Box Body - Slightly smaller */}
-                        <div className="relative w-32 h-28 bg-[#E53935] shadow-2xl skew-x-1">
-                            {/* Ribbon V */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
-                            {/* Ribbon H */}
-                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-6 bg-[#FF8A80]" />
-                            {/* Side Shadow */}
-                            <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[12px] border-r-[#B71C1C] border-b-[112px] border-b-transparent opacity-50" />
-                        </div>
+                            {/* Box Body - Slightly smaller */}
+                            <div className="relative w-32 h-28 bg-[#E53935] shadow-2xl skew-x-1">
+                                {/* Ribbon V */}
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
+                                {/* Ribbon H */}
+                                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-6 bg-[#FF8A80]" />
+                                {/* Side Shadow */}
+                                <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[12px] border-r-[#B71C1C] border-b-[112px] border-b-transparent opacity-50" />
+                            </div>
 
-                        {/* Interactive Hint - Tighter margin */}
-                        <div className="mt-4 mb-2 animate-[bounce_2s_infinite] opacity-60">
-                            <Typography className="text-[#6D2128] text-[0.7rem] font-medium tracking-[.4em] uppercase flex items-center gap-3">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
-                                {displayContent.openingText || "Tap to open your surprise"}
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
-                            </Typography>
+                            {/* Interactive Hint - Tighter margin */}
+                            <div className="mt-4 mb-2 animate-[bounce_2s_infinite] opacity-60">
+                                <Typography className="text-[#6D2128] text-[0.7rem] font-medium tracking-[.4em] uppercase flex items-center gap-3">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
+                                    {displayContent.openingText || "Tap to open your surprise"}
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
+                                </Typography>
+                            </div>
+
                         </div>
 
                     </div>
@@ -877,10 +880,10 @@ export default function ValentineSlugPage() {
                     <div className="w-full h-full flex flex-col items-center z-10 animate-[fadeIn_0.8s_ease-out] overflow-hidden relative">
                         <div className="w-full h-full flex flex-col items-center justify-between overflow-hidden">
                             {/* 1. Header Guard (Top Section) - Consistent with Fixed Header */}
-                            <div className="w-full flex-none" style={{ height: 'calc(4.5rem + env(safe-area-inset-top))' }} />
+                            <div className="w-full flex-none" style={{ height: 'calc(3.2rem + env(safe-area-inset-top))' }} />
 
                             {/* 2. Flexible Body (Middle Section - The Heart of the card) */}
-                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4">
+                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4" style={{ top: '-25px' }}>
                                 <div className="relative w-full flex justify-center items-center">
                                     <Swiper
                                         effect={"creative"}
