@@ -86,6 +86,7 @@ export default function ValentineSlugPage() {
     const [activeVideo, setActiveVideo] = useState<{ type: string; url: string; caption: string } | null>(null);
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+    const [hasSwiped, setHasSwiped] = useState(false); // Track if user has swiped at least once
 
     // Background Music State
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
@@ -345,6 +346,11 @@ export default function ValentineSlugPage() {
         // Update current slide index
         setCurrentSlideIndex(swiper.activeIndex);
 
+        // Mark as swiped to hide the hint
+        if (swiper.activeIndex > 0 && !hasSwiped) {
+            setHasSwiped(true);
+        }
+
         // Throttle: prevent burst if too soon after last one
         const now = Date.now();
         if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS) {
@@ -460,6 +466,16 @@ export default function ValentineSlugPage() {
         @keyframes heart-beat-scale {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.3); }
+        }
+        @keyframes heartFlow {
+            0% { transform: translateX(80px) scale(0.8); opacity: 0; }
+            20% { opacity: 1; transform: translateX(80px) scale(1.1); }
+            80% { opacity: 1; transform: translateX(-80px) scale(0.9); }
+            100% { opacity: 0; transform: translateX(-80px) scale(0.7); }
+        }
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0.8; }
         }
         .image-loading {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -976,6 +992,39 @@ export default function ValentineSlugPage() {
                                             shadowPerProgress: true,
                                         }}
                                     >
+                                        {/* 💖 Romantic Heart Flow Hint */}
+                                        {currentSlideIndex === 0 && !hasSwiped && (
+                                            <div className="absolute inset-0 z-[60] flex items-center justify-center pointer-events-none">
+                                                <div className="flex flex-col items-center gap-6">
+                                                    <div className="relative flex items-center justify-center">
+                                                        {/* Radiant Background Pulses */}
+                                                        <div className="absolute w-32 h-32 bg-white/10 rounded-full animate-[pulse-soft_3s_infinite]" />
+                                                        <div className="absolute w-24 h-24 bg-white/20 rounded-full animate-ping" />
+
+                                                        {/* Moving Heart & Trail */}
+                                                        <div className="animate-[heartFlow_2.5s_infinite] flex items-center gap-3">
+                                                            <Heart size={48} variant="Bold" color="white" className="drop-shadow-[0_0_15px_rgba(255,255,255,0.6)]" />
+                                                            <div className="flex gap-1.5">
+                                                                <div className="w-2 h-2 rounded-full bg-white/80 animate-pulse" />
+                                                                <div className="w-1.5 h-1.5 rounded-full bg-white/60 animate-pulse delay-75" />
+                                                                <div className="w-1 h-1 rounded-full bg-white/40 animate-pulse delay-150" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="relative">
+                                                        <div className="absolute inset-0 bg-pink-500/20 blur-xl rounded-full" />
+                                                        <div className="relative bg-white/10 backdrop-blur-md px-6 py-2 rounded-full border border-white/30 shadow-2xl overflow-hidden">
+                                                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-[shimmer_2s_infinite]" />
+                                                            <Typography className="text-white font-black text-[0.8rem] tracking-[0.3em] uppercase italic relative z-10">
+                                                                Swipe for Love
+                                                            </Typography>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+
                                         {memories.map((memory, index) => (
                                             <SwiperSlide key={index}>
                                                 {({ isActive }) => (
