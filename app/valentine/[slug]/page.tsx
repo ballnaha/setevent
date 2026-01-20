@@ -384,7 +384,16 @@ export default function ValentineSlugPage() {
                 <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <Heart size="80" variant="Bulk" color="#FF3366" className="animate-bounce" />
                     <CircularProgress size={100} thickness={2} sx={{ position: 'absolute', top: -10, color: '#FF3366', opacity: 0.3 }} />
-                    <Typography sx={{ mt: 4, color: '#4A151B', fontWeight: 800, fontFamily: 'cursive', letterSpacing: 2, fontSize: '1.5rem' }}>
+                    <Typography sx={{
+                        mt: 4,
+                        color: '#4A151B',
+                        fontWeight: 700,
+                        fontFamily: "'Dancing Script', cursive",
+                        letterSpacing: '0.15em',
+                        fontSize: '1.6rem',
+                        textAlign: 'center',
+                        textTransform: 'uppercase'
+                    }}>
                         Preparing your surprise...
                     </Typography>
                 </Box>
@@ -617,15 +626,19 @@ export default function ValentineSlugPage() {
                     <Heart size="80" variant="Bold" color="#FF3366" />
                 </div>
                 <Typography
-                    variant="h5"
-                    className="text-[#8B1D36] font-bold tracking-[0.4em] z-10"
+                    className="text-[#8B1D36] z-10"
                     sx={{
-                        fontFamily: 'Dancing Script',
+                        fontFamily: "'Dancing Script', cursive",
+                        fontWeight: 700,
+                        fontSize: '1.6rem',
+                        letterSpacing: '0.15em',
                         textShadow: '0 0 20px rgba(255,255,255,0.8)',
-                        animation: 'fadeIn 1s ease-out'
+                        animation: 'fadeIn 1s ease-out',
+                        textAlign: 'center',
+                        textTransform: 'uppercase'
                     }}
                 >
-                    PREPARING LOVE...
+                    Preparing your surprise...
                 </Typography>
             </div>
 
@@ -880,10 +893,10 @@ export default function ValentineSlugPage() {
                     <div className="w-full h-full flex flex-col items-center z-10 animate-[fadeIn_0.8s_ease-out] overflow-hidden relative">
                         <div className="w-full h-full flex flex-col items-center justify-between overflow-hidden">
                             {/* 1. Header Guard (Top Section) - Consistent with Fixed Header */}
-                            <div className="w-full flex-none" style={{ height: 'calc(3.2rem + env(safe-area-inset-top))' }} />
+                            <div className="w-full flex-none" style={{ height: 'calc(4.2rem + env(safe-area-inset-top))' }} />
 
                             {/* 2. Flexible Body (Middle Section - The Heart of the card) */}
-                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4" style={{ top: '-25px' }}>
+                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4">
                                 <div className="relative w-full flex justify-center items-center">
                                     <Swiper
                                         effect={"creative"}
