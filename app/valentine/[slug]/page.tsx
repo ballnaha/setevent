@@ -769,7 +769,7 @@ export default function ValentineSlugPage() {
                 <div className="w-full h-full flex flex-col justify-between items-center z-10 relative overflow-hidden" onClick={handleOpen}>
 
                     {/* Top Logo - Centered Header Style (Aligned with icons) */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 animate-[fadeIn_0.5s_ease-out] z-20">
+                    <div className="absolute top-3 left-1/2 -translate-x-1/2 animate-[fadeIn_0.5s_ease-out] z-20">
                         <img
                             src="/images/logo1.png"
                             alt="SetEvent Logo"
