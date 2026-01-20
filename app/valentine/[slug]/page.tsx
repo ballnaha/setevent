@@ -779,29 +779,22 @@ export default function ValentineSlugPage() {
                 <div className="w-full h-full flex flex-col justify-between items-center z-10 relative overflow-hidden" onClick={handleOpen}>
 
                     {/* Top Logo - Centered Header Style (Aligned with icons) */}
-                    <div className="absolute left-1/2 -translate-x-1/2 animate-[fadeIn_0.5s_ease-out] z-20" style={{ top: 'calc(0.75rem + env(safe-area-inset-top))' }}>
-                        <img
-                            src="/images/logo1.png"
-                            alt="SetEvent Logo"
-                            className="h-7 w-auto object-contain drop-shadow-md opacity-90"
-                        />
-                    </div>
 
-                    {/* Top Spacer - Increased to push the gift box down and avoid overlap */}
-                    <div className="h-24 flex-none" />
+                    {/* Top Spacer - Reduced to pull content up on mobile */}
+                    <div className="h-10 flex-none" />
 
                     {/* Middle: Gift Box & Title */}
                     <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95">
 
-                        {/* Floating Lid */}
-                        <div className="relative w-48 h-16 bg-[#D32F2F] rounded-t-lg shadow-xl mb-4 animate-[float-lid_3s_ease-in-out_infinite]">
+                        {/* Floating Lid - Slightly smaller for mobile optimization */}
+                        <div className="relative w-40 h-12 bg-[#D32F2F] rounded-t-lg shadow-xl mb-3 animate-[float-lid_3s_ease-in-out_infinite]">
                             {/* Ribbon H */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80]" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
                             {/* Bow */}
-                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-end">
-                                <div className="w-8 h-8 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
-                                <div className="w-4 h-4 bg-[#FF5252] rounded-full z-10" />
-                                <div className="w-8 h-8 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
+                            <div className="absolute -top-7 left-1/2 -translate-x-1/2 flex items-end">
+                                <div className="w-7 h-7 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
+                                <div className="w-3.5 h-3.5 bg-[#FF5252] rounded-full z-10" />
+                                <div className="w-7 h-7 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
                             </div>
                         </div>
 
@@ -815,48 +808,54 @@ export default function ValentineSlugPage() {
                             </Typography>
                         </div>
 
-                        {/* Box Body */}
-                        <div className="relative w-40 h-32 bg-[#E53935] shadow-2xl skew-x-1">
+                        {/* Box Body - Slightly smaller */}
+                        <div className="relative w-32 h-28 bg-[#E53935] shadow-2xl skew-x-1">
                             {/* Ribbon V */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80]" />
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
                             {/* Ribbon H */}
-                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-8 bg-[#FF8A80]" />
+                            <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-6 bg-[#FF8A80]" />
                             {/* Side Shadow */}
-                            <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[15px] border-r-[#B71C1C] border-b-[128px] border-b-transparent opacity-50" />
+                            <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[12px] border-r-[#B71C1C] border-b-[112px] border-b-transparent opacity-50" />
+                        </div>
+
+                        {/* Interactive Hint - Tighter margin */}
+                        <div className="mt-4 mb-2 animate-[bounce_2s_infinite] opacity-60">
+                            <Typography className="text-[#6D2128] text-[0.7rem] font-medium tracking-[.4em] uppercase flex items-center gap-3">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
+                                {displayContent.openingText || "Tap to open your surprise"}
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
+                            </Typography>
                         </div>
 
                     </div>
 
-                    {/* Footer White Area */}
-                    <div className="w-full bg-white mt-auto pt-8 pb-12 px-6 rounded-t-[3rem] text-center shadow-[0_-10px_40px_rgba(0,0,0,0.1)]">
-                        <div className="flex justify-between items-center max-w-xs mx-auto">
-                            <div className="text-left">
-                                <Typography className="text-[#6D2128] font-black text-xl leading-none">
-                                    LOVE
+                    {/* Footer White Area - Redesigned for Premium Look */}
+                    <div className="w-full bg-white/95 backdrop-blur-sm mt-auto pt-6 pb-12 px-8 rounded-t-[2.5rem] text-center shadow-[0_-15px_50px_rgba(211,47,47,0.15)] flex flex-col items-center border-t border-red-50/50 relative">
+                        {/* Slogan with Elegant Typography - Optimized Size for Mobile */}
+                        <div className="flex flex-col items-center">
+                            <Typography className="text-[#D32F2F] font-black text-2xl tracking-[0.2em] leading-none mb-1 opacity-90" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                LOVE
+                            </Typography>
+                            <div className="flex items-center gap-3 w-full justify-center opacity-70">
+                                <div className="h-[1px] w-6 bg-[#D32F2F]" />
+                                <Typography className="text-[#6D2128] text-[0.6rem] tracking-[0.3em] font-bold uppercase">
+                                    Is In The
                                 </Typography>
-                                <Typography className="text-[#6D2128] text-xs tracking-widest my-1">
-                                    IS IN THE
-                                </Typography>
-                                <Typography className="text-[#6D2128] font-black text-2xl leading-none">
-                                    AIR
-                                </Typography>
+                                <div className="h-[1px] w-6 bg-[#D32F2F]" />
                             </div>
-
-                            <Button
-                                variant="contained"
-                                size="medium"
-                                startIcon={<Heart variant="Bold" size="18" color="white" />}
-                                className="bg-gradient-to-r from-[#D32F2F] to-[#FF5252] hover:from-[#B71C1C] hover:to-[#D32F2F] text-white rounded-full px-8 py-3 text-sm font-bold tracking-wider shadow-lg shadow-red-200 transform transition-all hover:-translate-y-1"
-                                sx={{
-                                    borderRadius: '50px',
-                                    textTransform: 'none',
-                                    boxShadow: '0 8px 16px rgba(211, 47, 47, 0.3)'
-                                }}
-                            >
-                                {displayContent.openingText || "Be Mine"}
-                            </Button>
+                            <Typography className="text-[#D32F2F] font-black text-3xl tracking-[0.1em] leading-none mt-2" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                                AIR
+                            </Typography>
                         </div>
 
+                        {/* Logo at Bottom Right */}
+                        <div className="absolute bottom-4 right-6 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
+                            <img
+                                src="/images/logo1.png"
+                                alt="SetEvent Logo"
+                                className="h-6 w-auto object-contain"
+                            />
+                        </div>
                     </div>
                 </div>
             )}
@@ -866,7 +865,7 @@ export default function ValentineSlugPage() {
                 <>
                     {/* 🏆 Header Section (Fixed outside the animated container to prevent jumping) */}
                     <div className="fixed left-0 right-0 text-center z-[70] pointer-events-none px-16" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-                        <Typography variant="h6" className="text-[#FFD7E0] font-bold tracking-wider" sx={{ fontFamily: 'cursive', lineHeight: 2.5, fontSize: '1.2rem' }}>
+                        <Typography variant="h6" className="text-[#FFD7E0] font-bold tracking-wider" sx={{ fontFamily: 'cursive', lineHeight: 1.5, fontSize: '1.2rem' }}>
                             {displayContent.greeting?.split(' ')[0] || "Happy"}
                         </Typography>
                         <Typography variant="subtitle1" className="text-white font-black tracking-widest uppercase drop-shadow-sm" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1, fontSize: '1rem' }}>
@@ -875,17 +874,18 @@ export default function ValentineSlugPage() {
                     </div>
 
                     <div className="w-full h-full flex flex-col items-center z-10 animate-[fadeIn_0.8s_ease-out] overflow-hidden relative">
-                        <div className="w-full h-full flex flex-col items-center justify-between overflow-y-auto">
-                            <div className="w-full h-20 flex-none" /> {/* Safe area for the fixed header bar */}
+                        <div className="w-full h-full flex flex-col items-center justify-between pt-2 pb-6 overflow-hidden">
+                            {/* 1. Header Guard (Top Section) */}
+                            <div className="w-full h-[10dvh] min-h-[70px] flex-none" />
 
-                            {/* Cards Section (Flexible) */}
-                            <div className="flex-1 flex flex-col items-center justify-center w-full min-h-0 relative">
-                                <div className="relative">
+                            {/* 2. Flexible Body (Middle Section - The Heart of the card) */}
+                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4" style={{ top: '-30px' }}>
+                                <div className="relative w-full flex justify-center items-center">
                                     <Swiper
                                         effect={"creative"}
                                         grabCursor={true}
                                         modules={[EffectCreative, Pagination, Autoplay]}
-                                        className="valentine-swiper w-[290px] h-[430px] sm:w-[360px] sm:h-[540px]"
+                                        className="valentine-swiper w-[310px] h-[55dvh] sm:w-[380px] sm:h-[65dvh] max-h-[600px]"
                                         pagination={{ clickable: true, dynamicBullets: true }}
                                         onSlideChange={handleSlideChange}
                                         speed={800}
@@ -1034,17 +1034,24 @@ export default function ValentineSlugPage() {
                                 </div>
                             </div>
 
-                            {/* Bottom Message & Controls (Fixed Spacing from Bottom) */}
-                            <div className="w-full max-w-sm text-center pt-6 pb-14 px-4 flex-none">
-                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
+                            {/* 3. Message Footer (Bottom Section) */}
+                            <div className="w-full max-w-sm text-center pt-4 pb-8 px-6 flex-none z-[50] relative" style={{ top: '20px' }}>
+                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
                                     {displayContent.subtitle}
                                 </Typography>
 
-                                <Paper elevation={0} sx={{ background: "rgba(255,255,255,0.6)", borderRadius: 3, p: 2, backdropFilter: 'blur(4px)' }}>
-                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                                <Paper elevation={0} sx={{
+                                    background: "rgba(255,255,255,0.7)",
+                                    borderRadius: "18px",
+                                    p: 2,
+                                    backdropFilter: 'blur(10px)',
+                                    border: '1px solid rgba(255,255,255,0.5)',
+                                    boxShadow: '0 8px 32px -4px rgba(0,0,0,0.05)'
+                                }}>
+                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line leading-relaxed" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem' }}>
                                         {displayContent.message}
                                     </Typography>
-                                    <Typography variant="caption" className="block text-[#D41442] font-bold mt-2">
+                                    <Typography variant="caption" className="block text-[#D41442] font-extrabold mt-2 tracking-wider">
                                         - {displayContent.signer} -
                                     </Typography>
                                 </Paper>
