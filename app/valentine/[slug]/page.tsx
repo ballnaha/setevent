@@ -684,12 +684,20 @@ export default function ValentineSlugPage() {
         .mystery-veil {
             position: absolute;
             inset: 0;
-            background-color: white; /* Or slightly off-white #fff0f5 */
+            background-color: white; 
             z-index: 20;
             pointer-events: none;
+            will-change: opacity;
+            backface-visibility: hidden;
         }
         .animate-veil-reveal {
-            animation: veilFadeOut 2.5s ease-in-out forwards;
+            animation: veilFadeOut 2.0s ease-in-out forwards;
+        }
+        
+        .caption-fade-up {
+            animation: simpleFadeUp 0.8s ease-out forwards;
+            will-change: opacity, transform;
+            backface-visibility: hidden;
         }
         @keyframes heartPulse {
             0%, 100% { transform: scale(1); opacity: 0.8; }
@@ -1236,7 +1244,7 @@ export default function ValentineSlugPage() {
                                                                         <div className="mb-2" style={{ animation: 'heartPulse 1.5s ease-in-out infinite' }}>
                                                                             <Heart variant="Bold" color="#FF3366" size="24" style={{ filter: 'drop-shadow(0 0 10px rgba(255,51,102,0.8))' }} />
                                                                         </div>
-                                                                        <div className="px-6 py-4 elegant-caption-box rounded-xl relative overflow-hidden animate-[simpleFadeUp_0.8s_ease-out_forwards]">
+                                                                        <div className="px-6 py-4 elegant-caption-box rounded-xl relative overflow-hidden caption-fade-up">
                                                                             <Typography
                                                                                 variant="h5"
                                                                                 className="romantic-text text-white text-center leading-relaxed"
