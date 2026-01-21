@@ -34,7 +34,7 @@ import {
     FormControlLabel,
     Switch
 } from "@mui/material";
-import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown } from "iconsax-react";
+import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown, Printer } from "iconsax-react";
 import {
     DndContext,
     closestCenter,
@@ -663,9 +663,13 @@ export default function ValentineAdminPage() {
             type: "image",
             url: "",
             caption: "",
-            order: memories.length
+            order: 0
         };
-        setMemories([...memories, newMemory]);
+        // Prepend new memory to the top and update orders
+        setMemories(prev => {
+            const updated = [newMemory, ...prev];
+            return updated.map((m, i) => ({ ...m, order: i }));
+        });
     };
 
     const handleRemoveMemory = (index: number) => {
@@ -694,11 +698,15 @@ export default function ValentineAdminPage() {
             file: file,
             previewUrl: URL.createObjectURL(file),
             caption: file.name.split('.')[0],
-            order: memories.length + i,
+            order: i,
             uploading: false
         }));
 
-        setMemories(prev => [...prev, ...newMemories]);
+        setMemories(prev => {
+            const updated = [...newMemories, ...prev];
+            // Re-map orders for the entire list
+            return updated.map((m, i) => ({ ...m, order: i }));
+        });
         e.target.value = '';
     };
 
@@ -976,7 +984,7 @@ export default function ValentineAdminPage() {
                                 </Button>
                                 <Button
                                     size="small"
-                                    startIcon={<DirectDown size="16" variant="Bulk" color="#FF3366" />}
+                                    startIcon={<Printer size="16" variant="Bulk" color="#FF3366" />}
                                     onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title)}
                                 >
                                     Download Card
@@ -1058,7 +1066,7 @@ export default function ValentineAdminPage() {
                                                 sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }}
                                                 title="Download Card Image"
                                             >
-                                                <DirectDown size="18" variant="Bulk" color="#FF3366" />
+                                                <Printer size="18" variant="Bulk" color="#FF3366" />
                                             </IconButton>
                                             <IconButton onClick={() => handleOpen(card)} sx={{ color: '#3b82f6', '&:hover': { bgcolor: 'rgba(59, 130, 246, 0.1)' } }}>
                                                 <Edit size="18" variant="Bulk" color="#3b82f6" />
