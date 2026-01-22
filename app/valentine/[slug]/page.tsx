@@ -90,6 +90,7 @@ export default function ValentineSlugPage() {
     // Initialize without 0, so even the first slide technically is "new" until we leave it, 
     // though usually handled by initial render. Keeping it empty is safer for animation logic.
     const [seenSlides, setSeenSlides] = useState<Set<number>>(new Set());
+    const [revealedSlides, setRevealedSlides] = useState<Set<number>>(new Set([0])); // Start with slide 0 revealed
     const [typedMessage, setTypedMessage] = useState("");
     const [isTyping, setIsTyping] = useState(false);
 
@@ -140,14 +141,14 @@ export default function ValentineSlugPage() {
     // Throttle ref for heart burst effect
     const lastBurstTimeRef = useRef<number>(0);
     const BURST_THROTTLE_MS = 600; // Minimum time between bursts
-    const MAX_HEARTS = 15; // Maximum hearts allowed at once (reduced for mobile)
+    const MAX_HEARTS = 10; // Maximum hearts allowed at once (reduced for mobile)
 
     const triggerHeartBurst = useCallback(() => {
         const now = Date.now();
         if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS) return;
         lastBurstTimeRef.current = now;
 
-        const newHearts = Array.from({ length: 15 }).map((_, i) => ({
+        const newHearts = Array.from({ length: 8 }).map((_, i) => ({
             id: now + i,
             left: Math.random() * 100,
             size: Math.random() * 20 + 20,
@@ -429,6 +430,14 @@ export default function ValentineSlugPage() {
             if (prev.has(previousIndex)) return prev;
             const next = new Set(prev);
             next.add(previousIndex);
+            return next;
+        });
+
+        // Mark the CURRENT slide as "revealed" so it stays revealing during drag
+        setRevealedSlides(prev => {
+            if (prev.has(activeIndex)) return prev;
+            const next = new Set(prev);
+            next.add(activeIndex);
             return next;
         });
 
@@ -963,7 +972,7 @@ export default function ValentineSlugPage() {
                 {countdown !== null && (
                     <div className="relative flex flex-col items-center justify-center z-20">
                         {/* Big Hero Heart Beating behind countdown */}
-                        <div 
+                        <div
                             className="absolute"
                             style={{
                                 animation: 'radiant-pulse 2s ease-in-out infinite',
@@ -993,7 +1002,7 @@ export default function ValentineSlugPage() {
                             {countdown > 0 ? countdown : "❤️"}
                         </Typography>
 
-                        <Typography 
+                        <Typography
                             className="text-[#D32F2F] mt-4 font-bold tracking-[0.5em] uppercase opacity-60 text-[0.7rem]"
                             sx={{
                                 animation: countdown === 0 ? 'pulse-soft 2s ease-in-out infinite' : 'none',
@@ -1463,7 +1472,7 @@ export default function ValentineSlugPage() {
 
                                                             {/* Mystery Veil Overlay - Persistent to prevent flickering */}
                                                             <div
-                                                                className={`mystery-veil ${isActive ? 'animate-veil-reveal' : 'opacity-100'}`}
+                                                                className={`mystery-veil ${revealedSlides.has(index) ? 'animate-veil-reveal' : 'opacity-100'}`}
                                                                 style={{
                                                                     opacity: isSeen ? 0 : undefined,
                                                                     visibility: isSeen ? 'hidden' : 'visible',
