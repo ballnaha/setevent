@@ -102,7 +102,7 @@ export default function ValentineSlugPage() {
             opacity: 0,
         },
         next: {
-            translate: ['25px', '20px', -100],
+            translate: ['25px', '10px', -100],
             rotate: [0, 0, 5],
             scale: 0.94,
             opacity: 0.6,
@@ -1353,10 +1353,10 @@ export default function ValentineSlugPage() {
                     <div className="w-full h-full flex flex-col items-center z-10 animate-[fadeIn_0.8s_ease-out] overflow-hidden relative">
                         <div className="w-full h-full flex flex-col items-center justify-between overflow-hidden">
                             {/* 1. Header Guard (Top Section) - Consistent with Fixed Header */}
-                            <div className="w-full flex-none" style={{ height: 'calc(4.2rem + env(safe-area-inset-top))' }} />
+                            <div className="w-full flex-none" style={{ height: 'calc(4.5rem + env(safe-area-inset-top))' }} />
 
                             {/* 2. Flexible Body (Middle Section - The Heart of the card) */}
-                            <div className="flex-1 w-full flex flex-col items-center justify-center min-h-0 relative px-4">
+                            <div className="flex-1 w-full flex flex-col items-center justify-center min-h-0 relative px-4 pb-4">
 
                                 <div className="relative w-full flex justify-center items-center">
                                     {/* 💖 Premium Heart Flow Hint - Optimized for performance */}
@@ -1447,7 +1447,8 @@ export default function ValentineSlugPage() {
                                                             <div
                                                                 className={`mystery-veil ${isActive ? 'animate-veil-reveal' : 'opacity-100'}`}
                                                                 style={{
-                                                                    display: isSeen ? 'none' : 'block',
+                                                                    opacity: isSeen ? 0 : undefined,
+                                                                    visibility: isSeen ? 'hidden' : 'visible',
                                                                     willChange: 'opacity',
                                                                     pointerEvents: 'none'
                                                                 }}
@@ -1539,7 +1540,7 @@ export default function ValentineSlugPage() {
 
                                                             {memory.caption && isActive && (
                                                                 <div className="absolute bottom-12 left-0 right-0 px-6 z-30 pointer-events-none">
-                                                                    <div className="animate-caption-mystery flex flex-col items-center">
+                                                                    <div className={`${!isSeen ? 'animate-caption-mystery' : ''} flex flex-col items-center`} style={{ opacity: isActive ? 1 : 0 }}>
                                                                         <div className="mb-2" style={{ animation: 'heartPulse 1.5s ease-in-out infinite' }}>
                                                                             <Heart variant="Bold" color="#FF3366" size="24" style={{ filter: 'drop-shadow(0 0 10px rgba(255,51,102,0.8))' }} />
                                                                         </div>
@@ -1585,8 +1586,8 @@ export default function ValentineSlugPage() {
                             </div>
 
                             {/* 3. Message Footer (Bottom Section) - Typewriter Reveal */}
-                            <div className="w-full max-w-sm text-center pt-0 px-6 flex-none z-[50] relative" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}>
-                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2 mt-[-10px]" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
+                            <div className="w-full max-w-sm text-center pt-2 px-6 flex-none z-[50] relative" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}>
+                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
                                     {displayContent.subtitle}
                                 </Typography>
 
@@ -1602,7 +1603,9 @@ export default function ValentineSlugPage() {
                                     flexDirection: 'column',
                                     justifyContent: 'center',
                                     position: 'relative',
-                                    overflow: 'hidden'
+                                    overflow: 'hidden',
+                                    willChange: 'transform',
+                                    transform: 'translateZ(0)'
                                 }}>
                                     {/* Left Accent Bar */}
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FF3366] to-transparent opacity-40" />
