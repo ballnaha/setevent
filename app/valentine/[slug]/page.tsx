@@ -1074,7 +1074,7 @@ export default function ValentineSlugPage() {
                                         effect={"creative"}
                                         grabCursor={true}
                                         modules={[EffectCreative, Pagination, Autoplay]}
-                                        className="valentine-swiper w-[310px] h-[55dvh] sm:w-[380px] sm:h-[65dvh] max-h-[600px]"
+                                        className="valentine-swiper w-[310px] h-[60dvh] sm:w-[380px] sm:h-[75dvh] max-h-[750px]"
                                         pagination={{ clickable: true, dynamicBullets: true }}
                                         onSlideChange={handleSlideChange}
                                         speed={800}
