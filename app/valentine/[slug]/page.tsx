@@ -90,6 +90,9 @@ export default function ValentineSlugPage() {
     // Initialize without 0, so even the first slide technically is "new" until we leave it, 
     // though usually handled by initial render. Keeping it empty is safer for animation logic.
     const [seenSlides, setSeenSlides] = useState<Set<number>>(new Set());
+    const [activeSlide, setActiveSlide] = useState(0);
+    const [typedMessage, setTypedMessage] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
 
     // 🎭 Swiper Creative Effect Configuration (Memoized at top level for Hooks rules)
     const swiperCreativeConfig = useMemo(() => ({
@@ -393,12 +396,34 @@ export default function ValentineSlugPage() {
         setActiveVideo(null);
     };
 
+    // Typewriter effect logic
+    useEffect(() => {
+        if (isOpen && !isTransitioning) {
+            const timeout = setTimeout(() => {
+                setIsTyping(true);
+                let i = 0;
+                const fullMsg = displayContent.message || "You are the best thing that ever happened to me...";
+                const interval = setInterval(() => {
+                    setTypedMessage(fullMsg.slice(0, i));
+                    i++;
+                    if (i > fullMsg.length) {
+                        clearInterval(interval);
+                        setIsTyping(false);
+                    }
+                }, 40);
+                return () => clearInterval(interval);
+            }, 800);
+            return () => clearTimeout(timeout);
+        }
+    }, [isOpen, isTransitioning, displayContent.message]);
+
     const handleSlideChange = useCallback((swiper: any) => {
         const activeIndex = swiper.activeIndex;
         const previousIndex = swiper.previousIndex;
 
         // Update current slide index only if changed
         setCurrentSlideIndex(activeIndex);
+        setActiveSlide(activeIndex);
 
         // Mark the PREVIOUS slide as seen (so when we come back, it's clear)
         // We don't mark the CURRENT one yet, so the mystery animation can play!
@@ -558,11 +583,32 @@ export default function ValentineSlugPage() {
             animation: shimmer 1.5s infinite;
         }
         .sunburst-bg {
+          position: absolute;
+          top: -100%;
+          left: -100%;
+          width: 300%;
+          height: 300%;
           background: repeating-conic-gradient(
             from 0deg,
-            #FFEBEE 0deg 18deg,
-            #FFCDD2 18deg 36deg
+            rgba(255, 255, 255, 0.6) 0deg 10deg,
+            rgba(255, 255, 255, 0) 10deg 20deg
           );
+          animation: music-spin 60s linear infinite;
+          mask-image: radial-gradient(circle at center, black 10%, transparent 60%);
+          mix-blend-mode: overlay;
+          opacity: 0.5;
+        }
+        @keyframes stardust {
+            0% { transform: translateY(0) scale(0.5); opacity: 0; }
+            50% { opacity: 0.8; }
+            100% { transform: translateY(-100px) scale(1.2); opacity: 0; }
+        }
+        .stardust-particle {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            pointer-events: none;
+            box-shadow: 0 0 10px white;
         }
         @keyframes subtle-float {
             0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -576,6 +622,59 @@ export default function ValentineSlugPage() {
         }
         .intro-glow-bg {
             background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 240, 243, 0) 70%);
+        }
+        
+        /* 💖 Lightweight Liquid Love Background */
+        @keyframes liquid-drift {
+            0% { transform: translate3d(0, 0, 0) scale(1); }
+            33% { transform: translate3d(5%, 10%, 0) scale(1.1) rotate(2deg); }
+            66% { transform: translate3d(-5%, 5%, 0) scale(0.9) rotate(-2deg); }
+            100% { transform: translate3d(0, 0, 0) scale(1); }
+        }
+        
+        .liquid-bg {
+            position: absolute;
+            inset: 0;
+            background: #FFF0F3;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .liquid-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            will-change: transform;
+        }
+        
+        .liquid-blob-1 {
+            width: 80vw;
+            height: 80vw;
+            background: #FFD1DC;
+            top: -10%;
+            left: -20%;
+            animation: liquid-drift 25s ease-in-out infinite;
+        }
+        
+        .liquid-blob-2 {
+            width: 100vw;
+            height: 100vw;
+            background: #FFEBEE;
+            bottom: -20%;
+            right: -10%;
+            animation: liquid-drift 30s ease-in-out infinite reverse;
+        }
+        
+        .liquid-blob-3 {
+            width: 60vw;
+            height: 60vw;
+            background: #FF99AC;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: liquid-drift 20s ease-in-out infinite 2s;
+            opacity: 0.15;
         }
         .shimmer-text {
             background: linear-gradient(90deg, #6D2128 0%, #D32F2F 25%, #6D2128 50%, #D32F2F 75%, #6D2128 100%);
@@ -700,10 +799,23 @@ export default function ValentineSlugPage() {
             justify-content: center;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            background: radial-gradient(circle at center, #FFF0F3 0%, #FFD1DC 100%);
         }
         .fullscreen-mask.active {
             opacity: 1;
+            pointer-events: auto;
+        }
+        @keyframes radiant-glow {
+            0%, 100% { transform: scale(1); opacity: 0.3; filter: blur(40px); }
+            50% { transform: scale(1.5); opacity: 0.6; filter: blur(60px); }
+        }
+        .radiant-aura {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: #FF3366;
+            border-radius: 50%;
+            animation: radiant-glow 2s ease-in-out infinite;
         }
         
         /* Swiper Bullet Styles */
@@ -821,12 +933,14 @@ export default function ValentineSlugPage() {
             <div
                 className={`fullscreen-mask flex flex-col items-center justify-center overflow-hidden ${isTransitioning ? 'active' : ''}`}
                 style={{
-                    background: displayContent.backgroundColor || "#FFF0F3",
-                    pointerEvents: isTransitioning ? 'auto' : 'none'
+                    zIndex: 9999
                 }}
             >
+                {/* 🌟 Radiant Core Background */}
+                <div className="radiant-aura" />
+
                 {/* Visual Petals falling */}
-                {isTransitioning && Array.from({ length: 15 }).map((_, i) => (
+                {isTransitioning && Array.from({ length: 20 }).map((_, i) => (
                     <div
                         key={i}
                         className="petal"
@@ -839,29 +953,36 @@ export default function ValentineSlugPage() {
                             animationDelay: `${Math.random() * 2}s`,
                             opacity: 0,
                             background: i % 2 === 0 ? '#FF3366' : '#FFCDD2',
-                            transform: `rotate(${Math.random() * 360}deg)`
+                            transform: `rotate(${Math.random() * 360}deg)`,
+                            zIndex: 10
                         }}
                     />
                 ))}
 
                 {countdown !== null && (
-                    <div className="relative flex items-center justify-center">
-                        {/* Aurora Background for the number - Enlarged for better blending */}
-                        <div className="absolute inset-0 w-64 h-64 bg-[#FF3366]/10 rounded-full blur-[80px] animate-pulse -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2" />
+                    <div className="relative flex flex-col items-center justify-center z-20">
+                        {/* Big Hero Heart Beating behind countdown */}
+                        <div className="absolute animate-pulse">
+                            <Heart size={200} variant="Bold" color="#FF3366" style={{ opacity: 0.1, filter: 'blur(20px)' }} />
+                        </div>
 
                         <Typography
                             key={countdown}
-                            className="text-[#FF3366] font-black z-20"
+                            className="text-[#FF3366] font-black"
                             sx={{
-                                fontSize: countdown === 0 ? '8rem' : '7.5rem',
+                                fontSize: countdown === 0 ? '9rem' : '8rem',
                                 fontFamily: "'Dancing Script', cursive",
-                                textShadow: '0 0 40px rgba(255, 51, 102, 0.3)',
+                                textShadow: '0 0 50px rgba(255, 51, 102, 0.4)',
                                 lineHeight: 1,
                                 animation: 'countdown-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                                 transformOrigin: 'center center',
                             }}
                         >
                             {countdown > 0 ? countdown : "❤️"}
+                        </Typography>
+
+                        <Typography className="text-[#D32F2F] mt-4 font-bold tracking-[0.5em] uppercase opacity-60 animate-pulse text-[0.7rem]">
+                            {countdown === 0 ? "Enjoy your gift" : "Preparing Love"}
                         </Typography>
                     </div>
                 )}
@@ -967,36 +1088,37 @@ export default function ValentineSlugPage() {
                 </div>
             )}
 
-            {/* 🔳 Controls (Left Side: Fullscreen) */}
+            {/* 🔳 Controls (Left Side: Fullscreen) - Minimalist Floating Glass */}
             {isOpen && (
                 <div className="fixed left-5 z-[60]" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
                     <button
                         onClick={toggleFullscreen}
-                        className="group w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-90 overflow-hidden"
+                        className="group w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 relative"
                         style={{
                             background: isFullscreen
-                                ? 'rgba(255, 255, 255, 0.15)'
-                                : 'rgba(255, 255, 255, 0.08)',
-                            backdropFilter: 'blur(8px)',
-                            border: '1px solid rgba(255, 255, 255, 0.12)',
-                            boxShadow: '0 4px 15px -1px rgba(0,0,0,0.1)',
+                                ? 'rgba(255, 255, 255, 0.2)'
+                                : 'rgba(255, 25, 60, 0.15)',
+                            backdropFilter: 'blur(12px) saturate(150%)',
+                            border: '2px solid rgba(255, 255, 255, 0.6)',
+                            boxShadow: '0 8px 32px 0 rgba(211, 47, 47, 0.15)',
                         }}
                     >
-                        {/* Subtle Background Glow */}
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {/* Glow Effect behind icon */}
+                        <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
 
                         {isFullscreen ? (
-                            <div className="relative transform rotate-180 transition-transform duration-500 opacity-60 group-hover:opacity-100">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M8 3V9H2M16 3V9H22M8 21V15H2M16 21V15H22" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                            <div className="relative transform rotate-180 transition-all duration-500 opacity-70 group-hover:opacity-100 group-hover:scale-110">
+                                <Maximize size="18" variant="Outline" color="white" />
                             </div>
                         ) : (
-                            <div className="relative transition-transform duration-500 group-hover:scale-110 opacity-60 group-hover:opacity-100">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 9V2H9M15 2H22V9M2 15V22H9M15 22H22V15" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                            <div className="relative transition-all duration-500 opacity-70 group-hover:opacity-100 group-hover:scale-110">
+                                <Maximize size="18" variant="Outline" color="white" />
                             </div>
+                        )}
+
+                        {/* Subtle breathing ring when not fullscreen */}
+                        {!isFullscreen && (
+                            <div className="absolute inset-0 rounded-full border border-white/30 animate-[pulse-soft_3s_infinite]" />
                         )}
                     </button>
                 </div>
@@ -1032,13 +1154,47 @@ export default function ValentineSlugPage() {
                 <div className="absolute inset-0 sunburst-bg z-0" />
             )}
 
-            {/* 🎁 LOCK SCREEN (INTRO) */}
-            {!isOpen && (
+            {/* 🎁 LOCK SCREEN (INTRO) - Hidden during transition for instant swap */}
+            {!isOpen && !isTransitioning && (
                 <div className="w-full h-full flex flex-col justify-start items-center z-10 relative overflow-hidden" onClick={handleOpen}>
 
-                    {/* Top Logo - Centered Header Style (Aligned with icons) */}
+                    {/* Intro Background Background (Static Layer) */}
+                    <div className="absolute inset-0 bg-[#FFF0F3] z-[-2]" />
 
-                    {/* Top Guard - Reduced for better fit on smaller screens */}
+                    {/* Rotating Rays Layer */}
+                    <div className="absolute inset-0 overflow-hidden z-[-1] pointer-events-none">
+                        <div className="sunburst-bg" />
+                    </div>
+
+                    {/* Sparkling Stardust Layer */}
+                    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                        {[...Array(20)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="stardust-particle animate-[stardust_4s_ease-out_infinite]"
+                                style={{
+                                    width: Math.random() * 3 + 1 + 'px',
+                                    height: Math.random() * 3 + 1 + 'px',
+                                    left: Math.random() * 100 + '%',
+                                    bottom: Math.random() * 40 + '%',
+                                    animationDelay: Math.random() * 4 + 's',
+                                    opacity: 0
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Top Logo - Moved to corner to avoid overlap with floating lid */}
+                    <div className="absolute z-20 opacity-350 grayscale pointer-events-none"
+                        style={{ top: 'calc(1.5rem + env(safe-area-inset-top))', right: '1.5rem' }}>
+                        <img
+                            src="/images/logo1.png"
+                            alt="SetEvent Logo"
+                            className="h-5 w-auto object-contain"
+                        />
+                    </div>
+
+                    {/* Top Guard - Reduced for better fit on older screens */}
                     <div className="flex-none" style={{ height: 'calc(3.5rem + env(safe-area-inset-top))' }} />
 
                     {/* Middle: Gift Box & Title - Centered in flexible space */}
@@ -1119,7 +1275,8 @@ export default function ValentineSlugPage() {
                                         className="text-[#6D2128] font-bold tracking-[0.6em] text-[0.7rem] uppercase text-center"
                                         sx={{
                                             fontFamily: 'var(--font-prompt)',
-                                            textShadow: '0 0 10px rgba(255,255,255,0.8)'
+                                            textShadow: '0 0 10px rgba(255,255,255,0.8)',
+                                            fontSize: '0.9rem',
                                         }}
                                     >
                                         {displayContent.openingText || "Tap to open"}
@@ -1132,33 +1289,30 @@ export default function ValentineSlugPage() {
 
                     </div>
 
-                    {/* Footer White Area - Adjusted for Small Screens */}
-                    <div className="w-full bg-white/95 backdrop-blur-xl mt-auto pt-5 px-8 rounded-t-[2.5rem] text-center shadow-[0_-15px_50px_rgba(211,47,47,0.12)] flex flex-col items-center border-t border-red-50/30 relative"
-                        style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
-                        {/* Slogan - More Compact */}
-                        <div className="flex flex-col items-center">
-                            <Typography className="text-[#D32F2F] font-black text-xl tracking-[0.2em] leading-none mb-1 opacity-90" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                    {/* Footer Area - Minimalist Glass Design (Tighter Layout) */}
+                    <div className="w-full bg-white/70 backdrop-blur-2xl mt-auto pt-4 px-8 rounded-t-[3rem] text-center shadow-[0_-20px_60px_rgba(211,47,47,0.08)] flex flex-col items-center border-t border-white/60 relative"
+                        style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
+
+                        {/* Decorative top dot */}
+                        <div className="w-8 h-1 bg-gray-200/50 rounded-full mb-3" />
+
+                        {/* Slogan - Elegant & Romantic */}
+                        <div className="flex flex-col items-center animate-[fadeIn_1s_else-out_0.5s_both]">
+                            <Typography className="text-[#D32F2F] font-black text-xl tracking-[0.25em] mb-0.5 opacity-90" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1 }}>
                                 LOVE
                             </Typography>
-                            <div className="flex items-center gap-3 w-full justify-center opacity-60 scale-90">
-                                <div className="h-[1px] w-5 bg-[#D32F2F]" />
-                                <Typography className="text-[#6D2128] text-[0.55rem] tracking-[0.3em] font-bold uppercase">
-                                    Is In The
+
+                            <div className="flex items-center gap-4 py-0.5">
+                                <Heart size={8} variant="Bold" color="#FF99AC" className="animate-pulse" />
+                                <Typography className="text-[#6D2128] text-[0.95rem] lowercase opacity-70" sx={{ fontFamily: 'Dancing Script', fontWeight: 700 }}>
+                                    is in the
                                 </Typography>
-                                <div className="h-[1px] w-5 bg-[#D32F2F]" />
+                                <Heart size={8} variant="Bold" color="#FF99AC" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
                             </div>
-                            <Typography className="text-[#D32F2F] font-black text-2xl tracking-[0.1em] leading-none mt-1" sx={{ fontFamily: 'var(--font-prompt)' }}>
+
+                            <Typography className="text-[#D32F2F] font-black text-2xl tracking-[0.15em]" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1 }}>
                                 AIR
                             </Typography>
-                        </div>
-
-                        {/* Logo at Bottom Right */}
-                        <div className="absolute bottom-4 right-6 opacity-50 grayscale hover:grayscale-0 transition-all duration-300">
-                            <img
-                                src="/images/logo1.png"
-                                alt="SetEvent Logo"
-                                className="h-6 w-auto object-contain"
-                            />
                         </div>
                     </div>
                 </div>
@@ -1167,12 +1321,30 @@ export default function ValentineSlugPage() {
             {/* 🌹 MAIN CONTENT (Stable Layout) */}
             {isOpen && (
                 <>
+                    {/* Lightweight Liquid Love Background */}
+                    <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+                        <div className="liquid-bg">
+                            <div className="liquid-blob liquid-blob-1" />
+                            <div className="liquid-blob liquid-blob-2" />
+                            <div className="liquid-blob liquid-blob-3" />
+                        </div>
+                    </div>
                     {/* 🏆 Header Section (Fixed outside the animated container to prevent jumping) */}
                     <div className="fixed left-0 right-0 text-center z-[70] pointer-events-none px-16" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-                        <Typography variant="h6" className="text-[#FFD7E0] font-bold tracking-wider" sx={{ fontFamily: 'cursive', lineHeight: 1.5, fontSize: '1.2rem' }}>
+                        <Typography variant="h6" className="text-[#FF3366] font-bold tracking-wider" sx={{
+                            fontFamily: 'cursive',
+                            lineHeight: 1.5,
+                            fontSize: '1.2rem',
+                            textShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        }}>
                             {displayContent.greeting?.split(' ')[0] || "Happy"}
                         </Typography>
-                        <Typography variant="subtitle1" className="text-white font-black tracking-widest uppercase drop-shadow-sm" sx={{ fontFamily: 'var(--font-prompt)', lineHeight: 1, fontSize: '1rem' }}>
+                        <Typography variant="subtitle1" className="text-[#6D2128] font-black tracking-widest uppercase" sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            lineHeight: 1,
+                            fontSize: '1rem',
+                            textShadow: '0 2px 15px rgba(255,255,255,0.8)'
+                        }}>
                             {displayContent.greeting?.split(' ').slice(1).join(' ') || "VALENTINE"}
                         </Typography>
                     </div>
@@ -1183,7 +1355,8 @@ export default function ValentineSlugPage() {
                             <div className="w-full flex-none" style={{ height: 'calc(4.2rem + env(safe-area-inset-top))' }} />
 
                             {/* 2. Flexible Body (Middle Section - The Heart of the card) */}
-                            <div className="flex-1 w-full flex items-center justify-center min-h-0 relative px-4">
+                            <div className="flex-1 w-full flex flex-col items-center justify-center min-h-0 relative px-4">
+
                                 <div className="relative w-full flex justify-center items-center">
                                     <Swiper
                                         effect={"creative"}
@@ -1403,9 +1576,9 @@ export default function ValentineSlugPage() {
                                 </div>
                             </div>
 
-                            {/* 3. Message Footer (Bottom Section) */}
+                            {/* 3. Message Footer (Bottom Section) - Typewriter Reveal */}
                             <div className="w-full max-w-sm text-center pt-0 px-6 flex-none z-[50] relative" style={{ paddingBottom: 'calc(2rem + env(safe-area-inset-bottom))' }}>
-                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2 mt-[-10px]" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1rem' }}>
+                                <Typography variant="h6" className="text-[#8B1D36] font-bold uppercase tracking-widest mb-2 mt-[-10px]" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
                                     {displayContent.subtitle}
                                 </Typography>
 
@@ -1415,12 +1588,23 @@ export default function ValentineSlugPage() {
                                     p: 2,
                                     backdropFilter: 'blur(10px)',
                                     border: '1px solid rgba(255,255,255,0.5)',
-                                    boxShadow: '0 8px 32px -4px rgba(0,0,0,0.05)'
+                                    boxShadow: '0 8px 32px -4px rgba(0,0,0,0.05)',
+                                    minHeight: '80px',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    position: 'relative',
+                                    overflow: 'hidden'
                                 }}>
-                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line leading-relaxed" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem' }}>
-                                        {displayContent.message}
+                                    {/* Left Accent Bar */}
+                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FF3366] to-transparent opacity-40" />
+
+                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line leading-relaxed italic" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                                        "{typedMessage}"
+                                        {isTyping && <span className="inline-block w-[2px] h-4 bg-[#FF3366] ml-1 animate-pulse align-middle" />}
                                     </Typography>
-                                    <Typography variant="caption" className="block text-[#D41442] font-extrabold mt-2 tracking-wider">
+
+                                    <Typography variant="caption" className="block text-[#D41442] font-black mt-2 tracking-wider animate-[fadeIn_0.5s_ease-out_both] opacity-80" style={{ animationDelay: isTyping ? '0s' : '0.5s' }}>
                                         - {displayContent.signer} -
                                     </Typography>
                                 </Paper>
