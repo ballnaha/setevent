@@ -90,7 +90,6 @@ export default function ValentineSlugPage() {
     // Initialize without 0, so even the first slide technically is "new" until we leave it, 
     // though usually handled by initial render. Keeping it empty is safer for animation logic.
     const [seenSlides, setSeenSlides] = useState<Set<number>>(new Set());
-    const [activeSlide, setActiveSlide] = useState(0);
     const [typedMessage, setTypedMessage] = useState("");
     const [isTyping, setIsTyping] = useState(false);
 
@@ -111,7 +110,7 @@ export default function ValentineSlugPage() {
         perspective: true,
         limitProgress: 4,
         progressMultiplier: 1.2,
-        shadowPerProgress: true,
+        shadowPerProgress: false,
     }), []);
 
     // Background Music State
@@ -423,7 +422,6 @@ export default function ValentineSlugPage() {
 
         // Update current slide index only if changed
         setCurrentSlideIndex(activeIndex);
-        setActiveSlide(activeIndex);
 
         // Mark the PREVIOUS slide as seen (so when we come back, it's clear)
         // We don't mark the CURRENT one yet, so the mystery animation can play!
@@ -753,13 +751,10 @@ export default function ValentineSlugPage() {
         .valentine-swiper .swiper-slide-active {
             box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.25);
         }
-        /* Next slides: darker appearance using brightness filter (not opacity) */
         .valentine-swiper .swiper-slide-next {
-            filter: brightness(0.85);
             box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
         }
         .valentine-swiper .swiper-slide-next + .swiper-slide {
-            filter: brightness(0.7);
             box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.25);
         }
         .valentine-swiper .swiper-slide img {
@@ -846,11 +841,17 @@ export default function ValentineSlugPage() {
             45%, 98% { color: #fff; text-shadow: 2px 2px 10px rgba(0,0,0,0.3); letter-spacing: 0.5px; }
             100% { color: transparent; }
         }
+        @keyframes captionMysteryReveal {
+            0% { opacity: 0; transform: translateY(20px) scale(0.9); filter: blur(10px); }
+            5% { opacity: 1; transform: translateY(0) scale(1.1); filter: blur(0px); }
+            10% { transform: scale(1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
         .animate-caption-mystery {
-            animation: captionMysteryReveal 16s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            animation: captionMysteryReveal 12s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
         .mystery-text-emergence {
-            animation: text-glow-reveal 16s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+            animation: text-glow-reveal 12s cubic-bezier(0.19, 1, 0.22, 1) forwards;
         }
         
         /* Media (Photo/Video) Mystery Reveal - Low Blur Optimized */
@@ -1358,6 +1359,55 @@ export default function ValentineSlugPage() {
                             <div className="flex-1 w-full flex flex-col items-center justify-center min-h-0 relative px-4">
 
                                 <div className="relative w-full flex justify-center items-center">
+                                    {/* 💖 Premium Heart Flow Hint - Optimized for performance */}
+                                    {currentSlideIndex === 0 && !hasSwiped && (
+                                        <div className="absolute inset-x-0 top-10 z-[60] flex flex-col items-center pointer-events-none">
+                                            <div className="flex flex-col items-center gap-4 animate-[swipeHint_3.5s_infinite]">
+
+                                                {/* Advanced Heart Pulse with Rings */}
+                                                <div className="relative flex items-center justify-center">
+                                                    {/* Expanding Love Rings */}
+                                                    <div className="absolute w-8 h-8 rounded-full border border-white/40 animate-[ring-spread_2s_infinite]" />
+                                                    <div className="absolute w-8 h-8 rounded-full border border-white/20 animate-[ring-spread_2s_infinite_0.5s]" />
+
+                                                    <div className="relative z-10 animate-[heart-beat-glow_1.5s_infinite]">
+                                                        <Heart size={32} variant="Bold" color="white" className="drop-shadow-[0_0_15px_rgba(255,51,102,0.6)]" />
+                                                    </div>
+
+                                                    {/* Floating companion hearts */}
+                                                    <div className="absolute -top-4 -right-4 opacity-70 animate-[heart-float_2.5s_infinite]">
+                                                        <Heart size={14} variant="Bold" color="white" />
+                                                    </div>
+                                                    <div className="absolute -bottom-2 -left-3 opacity-50 animate-[heart-float_2s_infinite_400ms]">
+                                                        <Heart size={10} variant="Bold" color="white" />
+                                                    </div>
+                                                </div>
+
+                                                {/* Elegant Shimmer Text */}
+                                                <div className="flex flex-col items-center">
+                                                    <Typography
+                                                        sx={{
+                                                            fontSize: '0.7rem',
+                                                            fontWeight: 800,
+                                                            letterSpacing: '0.5em',
+                                                            textTransform: 'uppercase',
+                                                            background: 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, #ffffff 50%, rgba(255,255,255,0.2) 100%)',
+                                                            backgroundSize: '200% auto',
+                                                            WebkitBackgroundClip: 'text',
+                                                            WebkitTextFillColor: 'transparent',
+                                                            animation: 'text-shine 3s linear infinite',
+                                                            textAlign: 'center',
+                                                            fontFamily: 'var(--font-prompt)'
+                                                        }}
+                                                    >
+                                                        Swipe to see more
+                                                    </Typography>
+                                                    <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent mt-1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <Swiper
                                         effect={"creative"}
                                         grabCursor={true}
@@ -1383,54 +1433,6 @@ export default function ValentineSlugPage() {
                                         observeParents={true}
                                         creativeEffect={swiperCreativeConfig}
                                     >
-                                        {/* 💖 Premium Heart Flow Hint */}
-                                        {currentSlideIndex === 0 && !hasSwiped && (
-                                            <div className="absolute inset-x-0 top-10 z-[60] flex flex-col items-center pointer-events-none">
-                                                <div className="flex flex-col items-center gap-4 animate-[swipeHint_3.5s_infinite]">
-
-                                                    {/* Advanced Heart Pulse with Rings */}
-                                                    <div className="relative flex items-center justify-center">
-                                                        {/* Expanding Love Rings */}
-                                                        <div className="absolute w-8 h-8 rounded-full border border-white/40 animate-[ring-spread_2s_infinite]" />
-                                                        <div className="absolute w-8 h-8 rounded-full border border-white/20 animate-[ring-spread_2s_infinite_0.5s]" />
-
-                                                        <div className="relative z-10 animate-[heart-beat-glow_1.5s_infinite]">
-                                                            <Heart size={32} variant="Bold" color="white" className="drop-shadow-[0_0_15px_rgba(255,51,102,0.6)]" />
-                                                        </div>
-
-                                                        {/* Floating companion hearts */}
-                                                        <div className="absolute -top-4 -right-4 opacity-70 animate-[heart-float_2.5s_infinite]">
-                                                            <Heart size={14} variant="Bold" color="white" />
-                                                        </div>
-                                                        <div className="absolute -bottom-2 -left-3 opacity-50 animate-[heart-float_2s_infinite_400ms]">
-                                                            <Heart size={10} variant="Bold" color="white" />
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Elegant Shimmer Text */}
-                                                    <div className="flex flex-col items-center">
-                                                        <Typography
-                                                            sx={{
-                                                                fontSize: '0.7rem',
-                                                                fontWeight: 800,
-                                                                letterSpacing: '0.5em',
-                                                                textTransform: 'uppercase',
-                                                                background: 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, #ffffff 50%, rgba(255,255,255,0.2) 100%)',
-                                                                backgroundSize: '200% auto',
-                                                                WebkitBackgroundClip: 'text',
-                                                                WebkitTextFillColor: 'transparent',
-                                                                animation: 'text-shine 3s linear infinite',
-                                                                textAlign: 'center',
-                                                                fontFamily: 'var(--font-prompt)'
-                                                            }}
-                                                        >
-                                                            Swipe to see more
-                                                        </Typography>
-                                                        <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent mt-1" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
 
                                         {memories.map((memory, index) => {
                                             const isSeen = seenSlides.has(index);
@@ -1441,12 +1443,15 @@ export default function ValentineSlugPage() {
                                                             {/* Premium Shine Effect - Always on for luster */}
                                                             <div className="card-shine animate-shine opacity-40" />
 
-                                                            {/* Mystery Veil Overlay - Only for Unseen + Active, or if manually hidden */}
-                                                            {(!isSeen || !isActive) && !isSeen && (
-                                                                <div
-                                                                    className={`mystery-veil ${isActive ? 'animate-veil-reveal' : 'opacity-100'}`}
-                                                                />
-                                                            )}
+                                                            {/* Mystery Veil Overlay - Persistent to prevent flickering */}
+                                                            <div
+                                                                className={`mystery-veil ${isActive ? 'animate-veil-reveal' : 'opacity-100'}`}
+                                                                style={{
+                                                                    display: isSeen ? 'none' : 'block',
+                                                                    willChange: 'opacity',
+                                                                    pointerEvents: 'none'
+                                                                }}
+                                                            />
                                                             {memory.type === 'video' ? (
                                                                 <div className="w-full h-full relative bg-gradient-to-br from-[#FF99AC] to-[#FF3366] overflow-hidden">
                                                                     {/* Decorative elements */}
@@ -1522,7 +1527,10 @@ export default function ValentineSlugPage() {
                                                                         style={{
                                                                             position: 'relative',
                                                                             zIndex: 10,
-                                                                            opacity: loadedImages.has(index) ? 1 : 0
+                                                                            opacity: loadedImages.has(index) ? 1 : 0,
+                                                                            transition: 'opacity 0.4s ease-out',
+                                                                            willChange: 'opacity, transform',
+                                                                            transform: 'translateZ(0)'
                                                                         }}
                                                                         onLoad={() => handleImageLoaded(index)}
                                                                     />
