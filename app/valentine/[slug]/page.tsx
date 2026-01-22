@@ -564,7 +564,73 @@ export default function ValentineSlugPage() {
             #FFCDD2 18deg 36deg
           );
         }
+        @keyframes subtle-float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(1deg); }
+        }
+        @keyframes intro-heart-drift {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            15% { opacity: 0.6; }
+            85% { opacity: 0.6; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+        .intro-glow-bg {
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 240, 243, 0) 70%);
+        }
+        .shimmer-text {
+            background: linear-gradient(90deg, #6D2128 0%, #D32F2F 25%, #6D2128 50%, #D32F2F 75%, #6D2128 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fillColor: transparent;
+            animation: text-shine 4s linear infinite;
+        }
+        @keyframes aura-ripple {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            100% { transform: scale(1.8); opacity: 0; }
+        }
+        .aura-ring {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px solid rgba(211, 47, 47, 0.3);
+            animation: aura-ripple 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
         
+        /* Music Visualizer */
+        @keyframes music-bar {
+            0%, 100% { height: 4px; }
+            50% { height: 16px; }
+        }
+        .music-bar {
+            width: 3px;
+            background-color: white;
+            border-radius: 2px;
+            animation: music-bar 0.8s ease-in-out infinite;
+        }
+        
+        /* Card Premium Shine */
+        @keyframes shine-sweep {
+            0% { transform: translateX(-200%) skewX(-30deg); }
+            100% { transform: translateX(200%) skewX(-30deg); }
+        }
+        .card-shine {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0) 100%
+            );
+            z-index: 15;
+            pointer-events: none;
+        }
+        .animate-shine {
+            animation: shine-sweep 2.5s ease-in-out infinite;
+        }
+
         /* Valentine Swiper - Optimized for Mobile */
         .valentine-swiper {
             -webkit-transform: translateZ(0);
@@ -885,8 +951,15 @@ export default function ValentineSlugPage() {
                                     variant={isMusicMuted ? "Linear" : "Bold"}
                                     color={isMusicMuted ? "#9ca3af" : "white"}
                                 />
-                                {isMusicMuted && (
+                                {isMusicMuted ? (
                                     <div className="absolute w-full h-[2px] bg-gray-400 rotate-45 rounded-full" />
+                                ) : (
+                                    /* Active Music Visualizer Bars */
+                                    <div className="absolute -right-6 flex items-end gap-[2px] h-4">
+                                        <div className="music-bar" style={{ animationDelay: '0s' }} />
+                                        <div className="music-bar" style={{ animationDelay: '0.2s', height: '12px' }} />
+                                        <div className="music-bar" style={{ animationDelay: '0.4s', height: '8px' }} />
+                                    </div>
                                 )}
                             </div>
                         </button>
@@ -965,74 +1038,116 @@ export default function ValentineSlugPage() {
 
                     {/* Top Logo - Centered Header Style (Aligned with icons) */}
 
-                    {/* Top Guard - Prevent clipping and push box down to be more centered on screen */}
-                    <div className="flex-none" style={{ height: 'calc(8rem + env(safe-area-inset-top))' }} />
+                    {/* Top Guard - Reduced for better fit on smaller screens */}
+                    <div className="flex-none" style={{ height: 'calc(3.5rem + env(safe-area-inset-top))' }} />
 
                     {/* Middle: Gift Box & Title - Centered in flexible space */}
                     <div className="flex-grow w-full flex flex-col items-center justify-center overflow-visible">
-                        <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-transform duration-300 active:scale-95 overflow-visible">
 
-                            {/* Floating Lid - Slightly smaller for mobile optimization */}
-                            <div className="relative w-40 h-12 bg-[#D32F2F] rounded-t-lg shadow-xl mb-3 animate-[float-lid_3s_ease-in-out_infinite]">
+                        {/* Background Ambient Hearts - Improved Visibility */}
+                        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                            {[...Array(10)].map((_, i) => (
+                                <div key={i} className="absolute opacity-0" style={{
+                                    left: `${(i * 10) + (Math.random() * 5)}%`,
+                                    bottom: '-10%',
+                                    animation: `intro-heart-drift ${12 + (i % 5) * 3}s linear infinite`,
+                                    animationDelay: `${i * 1.5}s`
+                                }}>
+                                    <Heart
+                                        size={18 + (i % 4) * 8}
+                                        variant={(i % 2 === 0) ? "Bold" : "Bulk"}
+                                        color={i % 3 === 0 ? "#FF3366" : i % 3 === 1 ? "#FF99AC" : "#D32F2F"}
+                                        style={{ filter: 'drop-shadow(0 0 10px rgba(255,51,102,0.2))' }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Radial Glow behind the box */}
+                        <div className="absolute w-[300px] h-[300px] intro-glow-bg rounded-full blur-3xl opacity-60 pointer-events-none" />
+
+                        <div className="flex flex-col items-center justify-center cursor-pointer group transform transition-all duration-500 active:scale-90 hover:scale-105 overflow-visible animate-[subtle-float_4s_ease-in-out_infinite]">
+
+                            {/* Floating Lid */}
+                            <div className="relative w-44 h-14 bg-[#D32F2F] rounded-t-xl shadow-2xl mb-3 animate-[float-lid_3s_ease-in-out_infinite] z-30">
                                 {/* Ribbon H */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
-                                {/* Bow */}
-                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 flex items-end">
-                                    <div className="w-7 h-7 bg-[#FF8A80] rounded-tl-full rounded-bl-full mr-1" />
-                                    <div className="w-3.5 h-3.5 bg-[#FF5252] rounded-full z-10" />
-                                    <div className="w-7 h-7 bg-[#FF8A80] rounded-tr-full rounded-br-full ml-1" />
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80] shadow-inner" />
+                                {/* Bow - More Detailed */}
+                                <div className="absolute -top-10 left-1/2 -translate-x-1/2 flex items-end">
+                                    <div className="w-10 h-10 bg-[#FF8A80] rounded-tl-[80%] rounded-bl-[20%] mr-1 shadow-lg transform -rotate-12 border-b-2 border-red-600/20" />
+                                    <div className="w-5 h-5 bg-[#FF5252] rounded-full z-10 shadow-md border-2 border-white/20" />
+                                    <div className="w-10 h-10 bg-[#FF8A80] rounded-tr-[80%] rounded-br-[20%] ml-1 shadow-lg transform rotate-12 border-b-2 border-red-600/20" />
                                 </div>
                             </div>
 
-                            {/* Text */}
-                            <div className="text-center py-4 z-20">
-                                <Typography variant="overline" className="text-gray-700 tracking-[0.3em] font-bold">
-                                    HAPPY
+                            {/* Text Area */}
+                            <div className="text-center py-4 z-40 relative">
+                                <Typography variant="overline" className="text-red-800/60 tracking-[0.5em] font-black text-[0.65rem]">
+                                    SPECIAL DELIVERY
                                 </Typography>
-                                <Typography variant="h3" className="text-[#6D2128] font-bold" sx={{ fontFamily: 'Dancing Script' }}>
+                                <Typography variant="h2" className="shimmer-text font-bold drop-shadow-sm" sx={{ fontFamily: 'Dancing Script', fontSize: '3rem' }}>
                                     {displayContent.title}
                                 </Typography>
                             </div>
 
-                            {/* Box Body - Slightly smaller */}
-                            <div className="relative w-32 h-28 bg-[#E53935] shadow-2xl skew-x-1">
+                            {/* Box Body */}
+                            <div className="relative w-36 h-32 bg-[#E53935] shadow-[0_20px_50px_rgba(183,28,28,0.4)] rounded-b-lg overflow-hidden">
+                                {/* Inner Shadow */}
+                                <div className="absolute inset-0 bg-gradient-to-tr from-black/20 to-transparent pointer-events-none" />
                                 {/* Ribbon V */}
-                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-full bg-[#FF8A80]" />
+                                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-full bg-[#FF8A80] shadow-md" />
                                 {/* Ribbon H */}
-                                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-6 bg-[#FF8A80]" />
-                                {/* Side Shadow */}
-                                <div className="absolute top-0 right-0 w-0 h-0 border-t-[0px] border-r-[12px] border-r-[#B71C1C] border-b-[112px] border-b-transparent opacity-50" />
+                                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-full h-8 bg-[#FF8A80] shadow-sm" />
+
+                                {/* Sparkles on Box */}
+                                <div className="absolute top-2 left-4 w-1 h-1 bg-white/40 rounded-full animate-pulse" />
+                                <div className="absolute bottom-6 right-8 w-1.5 h-1.5 bg-white/30 rounded-full animate-pulse delay-700" />
                             </div>
 
-                            {/* Interactive Hint - Tighter margin */}
-                            <div className="mt-4 mb-2 animate-[bounce_2s_infinite] opacity-60">
-                                <Typography className="text-[#6D2128] text-[0.7rem] font-medium tracking-[.4em] uppercase flex items-center gap-3">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
-                                    {displayContent.openingText || "Tap to open your surprise"}
-                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D32F2F] animate-pulse" />
-                                </Typography>
+                            {/* Interactive Hint - Minimalist Ripple Aura Design */}
+                            <div className="mt-8 mb-4 relative flex flex-col items-center">
+                                {/* Expanding Aura Rings */}
+                                <div className="aura-ring w-16 h-16" style={{ animationDelay: '0s' }} />
+                                <div className="aura-ring w-16 h-16" style={{ animationDelay: '0.6s' }} />
+                                <div className="aura-ring w-16 h-16" style={{ animationDelay: '1.2s' }} />
+
+                                <div className="relative z-10 flex flex-col items-center gap-2 group/hint opacity-80 hover:opacity-100 transition-opacity">
+                                    <div className="bg-white/60 p-2 rounded-full backdrop-blur-md shadow-sm">
+                                        <Heart size={20} variant="Bold" color="#D32F2F" className="animate-pulse" />
+                                    </div>
+                                    <Typography
+                                        className="text-[#6D2128] font-bold tracking-[0.6em] text-[0.7rem] uppercase text-center"
+                                        sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            textShadow: '0 0 10px rgba(255,255,255,0.8)'
+                                        }}
+                                    >
+                                        {displayContent.openingText || "Tap to open"}
+                                    </Typography>
+                                    <div className="w-8 h-[2px] bg-gradient-to-r from-transparent via-[#D32F2F]/40 to-transparent mt-1" />
+                                </div>
                             </div>
 
                         </div>
 
                     </div>
 
-                    {/* Footer White Area - Redesigned for Premium Look */}
-                    <div className="w-full bg-white/95 backdrop-blur-sm mt-auto pt-6 px-8 rounded-t-[2.5rem] text-center shadow-[0_-15px_50px_rgba(211,47,47,0.15)] flex flex-col items-center border-t border-red-50/50 relative"
-                        style={{ paddingBottom: 'calc(3rem + env(safe-area-inset-bottom))' }}>
-                        {/* Slogan with Elegant Typography - Optimized Size for Mobile */}
+                    {/* Footer White Area - Adjusted for Small Screens */}
+                    <div className="w-full bg-white/95 backdrop-blur-xl mt-auto pt-5 px-8 rounded-t-[2.5rem] text-center shadow-[0_-15px_50px_rgba(211,47,47,0.12)] flex flex-col items-center border-t border-red-50/30 relative"
+                        style={{ paddingBottom: 'calc(1.5rem + env(safe-area-inset-bottom))' }}>
+                        {/* Slogan - More Compact */}
                         <div className="flex flex-col items-center">
-                            <Typography className="text-[#D32F2F] font-black text-2xl tracking-[0.2em] leading-none mb-1 opacity-90" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                            <Typography className="text-[#D32F2F] font-black text-xl tracking-[0.2em] leading-none mb-1 opacity-90" sx={{ fontFamily: 'var(--font-prompt)' }}>
                                 LOVE
                             </Typography>
-                            <div className="flex items-center gap-3 w-full justify-center opacity-70">
-                                <div className="h-[1px] w-6 bg-[#D32F2F]" />
-                                <Typography className="text-[#6D2128] text-[0.6rem] tracking-[0.3em] font-bold uppercase">
+                            <div className="flex items-center gap-3 w-full justify-center opacity-60 scale-90">
+                                <div className="h-[1px] w-5 bg-[#D32F2F]" />
+                                <Typography className="text-[#6D2128] text-[0.55rem] tracking-[0.3em] font-bold uppercase">
                                     Is In The
                                 </Typography>
-                                <div className="h-[1px] w-6 bg-[#D32F2F]" />
+                                <div className="h-[1px] w-5 bg-[#D32F2F]" />
                             </div>
-                            <Typography className="text-[#D32F2F] font-black text-3xl tracking-[0.1em] leading-none mt-2" sx={{ fontFamily: 'var(--font-prompt)' }}>
+                            <Typography className="text-[#D32F2F] font-black text-2xl tracking-[0.1em] leading-none mt-1" sx={{ fontFamily: 'var(--font-prompt)' }}>
                                 AIR
                             </Typography>
                         </div>
@@ -1150,6 +1265,9 @@ export default function ValentineSlugPage() {
                                                 <SwiperSlide key={index}>
                                                     {({ isActive }) => (
                                                         <div className="slide-content relative w-full h-full">
+                                                            {/* Premium Shine Effect - Always on for luster */}
+                                                            <div className="card-shine animate-shine opacity-40" />
+
                                                             {/* Mystery Veil Overlay - Only for Unseen + Active, or if manually hidden */}
                                                             {(!isSeen || !isActive) && !isSeen && (
                                                                 <div
