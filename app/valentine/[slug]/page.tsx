@@ -533,9 +533,9 @@ export default function ValentineSlugPage() {
             100% { transform: scale(1); opacity: 1; }
         }
         @keyframes countdown-pop {
-            0% { transform: scale(0.5) rotate(-10deg); opacity: 0; filter: blur(10px); }
-            50% { transform: scale(1.4) rotate(5deg); opacity: 0.8; filter: blur(0px); }
-            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            0% { transform: scale(0.5) rotate(-10deg) translateZ(0); opacity: 0; }
+            50% { transform: scale(1.4) rotate(5deg) translateZ(0); opacity: 0.9; }
+            100% { transform: scale(1) rotate(0deg) translateZ(0); opacity: 1; }
         }
         @keyframes aurora-pulse {
             0%, 100% { box-shadow: 0 0 20px rgba(255, 51, 102, 0.4), 0 0 40px rgba(255, 51, 102, 0.2); }
@@ -963,7 +963,14 @@ export default function ValentineSlugPage() {
                 {countdown !== null && (
                     <div className="relative flex flex-col items-center justify-center z-20">
                         {/* Big Hero Heart Beating behind countdown */}
-                        <div className="absolute animate-pulse">
+                        <div 
+                            className="absolute"
+                            style={{
+                                animation: 'radiant-pulse 2s ease-in-out infinite',
+                                willChange: 'transform, opacity',
+                                transform: 'translateZ(0)',
+                            }}
+                        >
                             <Heart size={200} variant="Bold" color="#FF3366" style={{ opacity: 0.1, filter: 'blur(20px)' }} />
                         </div>
 
@@ -977,12 +984,23 @@ export default function ValentineSlugPage() {
                                 lineHeight: 1,
                                 animation: 'countdown-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
                                 transformOrigin: 'center center',
+                                willChange: 'transform, opacity',
+                                transform: 'translateZ(0)',
+                                backfaceVisibility: 'hidden',
+                                WebkitFontSmoothing: 'antialiased',
                             }}
                         >
                             {countdown > 0 ? countdown : "❤️"}
                         </Typography>
 
-                        <Typography className="text-[#D32F2F] mt-4 font-bold tracking-[0.5em] uppercase opacity-60 animate-pulse text-[0.7rem]">
+                        <Typography 
+                            className="text-[#D32F2F] mt-4 font-bold tracking-[0.5em] uppercase opacity-60 text-[0.7rem]"
+                            sx={{
+                                animation: countdown === 0 ? 'pulse-soft 2s ease-in-out infinite' : 'none',
+                                willChange: 'opacity',
+                                transform: 'translateZ(0)',
+                            }}
+                        >
                             {countdown === 0 ? "Enjoy your gift" : "Preparing Love"}
                         </Typography>
                     </div>
