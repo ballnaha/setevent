@@ -89,10 +89,11 @@ export default function ValentineSlugPage() {
     const [hasSwiped, setHasSwiped] = useState(false); // Track if user has swiped at least once
     // Initialize without 0, so even the first slide technically is "new" until we leave it, 
     // though usually handled by initial render. Keeping it empty is safer for animation logic.
-    const [seenSlides, setSeenSlides] = useState<Set<number>>(new Set());
+    const [seenSlides, setSeenSlides] = useState<Set<number>>(new Set([0]));
     const [revealedSlides, setRevealedSlides] = useState<Set<number>>(new Set([0])); // Start with slide 0 revealed
     const [typedMessage, setTypedMessage] = useState("");
     const [isTyping, setIsTyping] = useState(false);
+    const [fontsLoaded, setFontsLoaded] = useState(false); // 🔤 Wait for Google Fonts to load
 
     // 🎭 Swiper Creative Effect Configuration (Memoized at top level for Hooks rules)
     const swiperCreativeConfig = useMemo(() => ({
@@ -142,6 +143,11 @@ export default function ValentineSlugPage() {
     const lastBurstTimeRef = useRef<number>(0);
     const BURST_THROTTLE_MS = 600; // Minimum time between bursts
     const MAX_HEARTS = 10; // Maximum hearts allowed at once (reduced for mobile)
+
+    // 🛡️ Swipe throttle to prevent rapid swiping
+    const swiperRef = useRef<any>(null);
+    const lastSwipeTimeRef = useRef<number>(0);
+    const SWIPE_COOLDOWN_MS = 400; // Minimum time between swipes (prevents rapid swiping)
 
     const triggerHeartBurst = useCallback(() => {
         const now = Date.now();
@@ -193,6 +199,45 @@ export default function ValentineSlugPage() {
 
         fetchData();
     }, [slug]);
+
+    // 🔤 Wait for Google Fonts to load before showing intro
+    useEffect(() => {
+        const loadFonts = async () => {
+            try {
+                // Use CSS Font Loading API to wait for fonts
+                if (typeof document !== 'undefined' && document.fonts) {
+                    // Wait for all fonts to be ready
+                    await document.fonts.ready;
+
+                    // Additionally check if our specific fonts are loaded
+                    const fontFamilies = ['Dancing Script', 'Charm', 'Mali', 'Sriracha'];
+                    const fontChecks = fontFamilies.map(font =>
+                        document.fonts.check(`16px "${font}"`)
+                    );
+
+                    // If any font isn't loaded yet, wait a bit more
+                    if (!fontChecks.every(Boolean)) {
+                        await new Promise(resolve => setTimeout(resolve, 300));
+                    }
+                }
+                setFontsLoaded(true);
+            } catch (error) {
+                // Fallback: show content anyway after timeout
+                console.warn('Font loading check failed:', error);
+                setFontsLoaded(true);
+            }
+        };
+
+        // Start loading fonts immediately
+        loadFonts();
+
+        // Fallback timeout to prevent infinite loading
+        const fallbackTimer = setTimeout(() => {
+            setFontsLoaded(true);
+        }, 2000);
+
+        return () => clearTimeout(fallbackTimer);
+    }, []);
 
     // Memoize border hearts - reduced count for mobile performance
     const borderHearts = React.useMemo(() => {
@@ -421,6 +466,23 @@ export default function ValentineSlugPage() {
         const activeIndex = swiper.activeIndex;
         const previousIndex = swiper.previousIndex;
 
+        // 🛡️ Swipe Throttle: Temporarily disable swiping to prevent rapid swipes
+        const now = Date.now();
+        if (now - lastSwipeTimeRef.current < SWIPE_COOLDOWN_MS) {
+            // Too fast! Revert to previous slide
+            swiper.slideTo(previousIndex, 0);
+            return;
+        }
+        lastSwipeTimeRef.current = now;
+
+        // Temporarily disable touch to prevent rapid swiping during transition
+        swiper.allowTouchMove = false;
+        setTimeout(() => {
+            if (swiper && !swiper.destroyed) {
+                swiper.allowTouchMove = true;
+            }
+        }, SWIPE_COOLDOWN_MS);
+
         // Update current slide index only if changed
         setCurrentSlideIndex(activeIndex);
 
@@ -447,7 +509,6 @@ export default function ValentineSlugPage() {
         }
 
         // Throttle: prevent burst if too soon after last one
-        const now = Date.now();
         if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS) {
             return;
         }
@@ -475,9 +536,10 @@ export default function ValentineSlugPage() {
 
             return [...prev, ...newHearts];
         });
-    }, [hasSwiped]); // Added hasSwiped dependency
+    }, [hasSwiped]);
 
-    if (isLoading) {
+    // 🔄 Show loading until BOTH data AND fonts are ready
+    if (isLoading || !fontsLoaded) {
         return (
             <Box
                 sx={{
@@ -497,11 +559,11 @@ export default function ValentineSlugPage() {
                         mt: 4,
                         color: '#4A151B',
                         fontWeight: 700,
-                        fontFamily: "'Dancing Script', cursive",
+                        // Use system font first, Google Font will load in background
+                        fontFamily: fontsLoaded ? "'Dancing Script', cursive" : "cursive, sans-serif",
                         letterSpacing: '0.15em',
                         fontSize: '1.3rem',
                         textAlign: 'center',
-                        textTransform: ''
                     }}>
                         Preparing your surprise...
                     </Typography>
@@ -631,11 +693,11 @@ export default function ValentineSlugPage() {
             background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, rgba(255, 240, 243, 0) 70%);
         }
         
-        /* 💖 Lightweight Liquid Love Background */
+        /* 💖 Lightweight Liquid Love Background - GPU Optimized */
         @keyframes liquid-drift {
             0% { transform: translate3d(0, 0, 0) scale(1); }
-            33% { transform: translate3d(5%, 10%, 0) scale(1.1) rotate(2deg); }
-            66% { transform: translate3d(-5%, 5%, 0) scale(0.9) rotate(-2deg); }
+            33% { transform: translate3d(5%, 10%, 0) scale(1.05) rotate(1deg); }
+            66% { transform: translate3d(-5%, 5%, 0) scale(0.95) rotate(-1deg); }
             100% { transform: translate3d(0, 0, 0) scale(1); }
         }
         
@@ -645,14 +707,19 @@ export default function ValentineSlugPage() {
             background: #FFF0F3;
             overflow: hidden;
             z-index: -1;
+            contain: strict;
         }
         
         .liquid-blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.4;
+            /* Reduced blur for better performance on older devices */
+            filter: blur(60px);
+            opacity: 0.35;
             will-change: transform;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            contain: layout style paint;
         }
         
         .liquid-blob-1 {
@@ -661,7 +728,8 @@ export default function ValentineSlugPage() {
             background: #FFD1DC;
             top: -10%;
             left: -20%;
-            animation: liquid-drift 25s ease-in-out infinite;
+            /* Slower animation for smoother rendering */
+            animation: liquid-drift 35s ease-in-out infinite;
         }
         
         .liquid-blob-2 {
@@ -670,7 +738,7 @@ export default function ValentineSlugPage() {
             background: #FFEBEE;
             bottom: -20%;
             right: -10%;
-            animation: liquid-drift 30s ease-in-out infinite reverse;
+            animation: liquid-drift 40s ease-in-out infinite reverse;
         }
         
         .liquid-blob-3 {
@@ -680,8 +748,8 @@ export default function ValentineSlugPage() {
             top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            animation: liquid-drift 20s ease-in-out infinite 2s;
-            opacity: 0.15;
+            animation: liquid-drift 30s ease-in-out infinite 2s;
+            opacity: 0.12;
         }
         .shimmer-text {
             background: linear-gradient(90deg, #6D2128 0%, #D32F2F 25%, #6D2128 50%, #D32F2F 75%, #6D2128 100%);
@@ -713,10 +781,10 @@ export default function ValentineSlugPage() {
             animation: music-bar 0.8s ease-in-out infinite;
         }
         
-        /* Card Premium Shine */
+        /* Card Premium Shine - GPU Optimized */
         @keyframes shine-sweep {
-            0% { transform: translateX(-200%) skewX(-30deg); }
-            100% { transform: translateX(200%) skewX(-30deg); }
+            0% { transform: translate3d(-200%, 0, 0) skewX(-30deg); }
+            100% { transform: translate3d(200%, 0, 0) skewX(-30deg); }
         }
         .card-shine {
             position: absolute;
@@ -727,56 +795,87 @@ export default function ValentineSlugPage() {
             background: linear-gradient(
                 90deg,
                 rgba(255, 255, 255, 0) 0%,
-                rgba(255, 255, 255, 0.3) 50%,
+                rgba(255, 255, 255, 0.25) 50%,
                 rgba(255, 255, 255, 0) 100%
             );
             z-index: 15;
             pointer-events: none;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            will-change: transform;
         }
         .animate-shine {
-            animation: shine-sweep 2.5s ease-in-out infinite;
+            animation: shine-sweep 4s ease-in-out infinite;
         }
 
-        /* Valentine Swiper - Optimized for Mobile */
+        /* Valentine Swiper - Optimized for Mobile & Older Devices */
         .valentine-swiper {
-            -webkit-transform: translateZ(0);
-            transform: translateZ(0);
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
             perspective: 1200px;
             overflow: visible !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         .valentine-swiper .swiper-wrapper {
             overflow: visible !important;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
         }
         .valentine-swiper .swiper-slide {
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            /* Let Swiper handle transitions for native feel */
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            /* Simplified shadow for better performance */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
             overflow: visible !important;
             border-radius: 16px !important;
             background: white;
             border: 6px solid white;
+            /* GPU acceleration hints */
+            will-change: transform, opacity;
+            contain: layout style paint;
         }
         .valentine-swiper .swiper-slide-active {
-            box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
         }
         .valentine-swiper .swiper-slide-next {
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
         }
         .valentine-swiper .swiper-slide-next + .swiper-slide {
-            box-shadow: 0 8px 20px -8px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
         .valentine-swiper .swiper-slide img {
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            image-rendering: -webkit-optimize-contrast;
         }
-        /* Inner content wrapper */
+        /* Inner content wrapper - Enhanced GPU layer */
         .valentine-swiper .slide-content {
             width: 100%;
             height: 100%;
             overflow: hidden;
             border-radius: 10px;
             position: relative;
+            -webkit-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            contain: content;
+        }
+        
+        /* Reduce motion for users who prefer it & older devices */
+        @media (prefers-reduced-motion: reduce) {
+            .valentine-swiper .swiper-slide,
+            .valentine-swiper .slide-content,
+            .card-shine,
+            .caption-fade-up {
+                animation: none !important;
+                transition: none !important;
+            }
         }
         
         /* Smooth image reveal - only transition on first load */
@@ -1441,6 +1540,7 @@ export default function ValentineSlugPage() {
                                         modules={[EffectCreative, Pagination, Autoplay]}
                                         className="valentine-swiper w-[310px] h-[60dvh] sm:w-[380px] sm:h-[75dvh] max-h-[750px]"
                                         pagination={{ clickable: true, dynamicBullets: true }}
+                                        onSwiper={(swiper) => { swiperRef.current = swiper; }}
                                         onSlideChange={handleSlideChange}
                                         speed={800}
                                         touchRatio={1}
@@ -1470,16 +1570,16 @@ export default function ValentineSlugPage() {
                                                             {/* Premium Shine Effect - Always on for luster */}
                                                             <div className="card-shine animate-shine opacity-40" />
 
-                                                            {/* Mystery Veil Overlay - Persistent to prevent flickering */}
-                                                            <div
-                                                                className={`mystery-veil ${revealedSlides.has(index) ? 'animate-veil-reveal' : 'opacity-100'}`}
-                                                                style={{
-                                                                    opacity: isSeen ? 0 : undefined,
-                                                                    visibility: isSeen ? 'hidden' : 'visible',
-                                                                    willChange: 'opacity',
-                                                                    pointerEvents: 'none'
-                                                                }}
-                                                            />
+                                                            {/* Mystery Veil Overlay - Only animate on first reveal, hide instantly if seen */}
+                                                            {!isSeen && (
+                                                                <div
+                                                                    className={`mystery-veil ${revealedSlides.has(index) ? 'animate-veil-reveal' : ''}`}
+                                                                    style={{
+                                                                        willChange: 'opacity',
+                                                                        pointerEvents: 'none'
+                                                                    }}
+                                                                />
+                                                            )}
                                                             {memory.type === 'video' ? (
                                                                 <div className="w-full h-full relative bg-gradient-to-br from-[#FF99AC] to-[#FF3366] overflow-hidden">
                                                                     {/* Decorative elements */}
@@ -1556,9 +1656,11 @@ export default function ValentineSlugPage() {
                                                                             position: 'relative',
                                                                             zIndex: 10,
                                                                             opacity: loadedImages.has(index) ? 1 : 0,
-                                                                            transition: 'opacity 0.4s ease-out',
-                                                                            willChange: 'opacity, transform',
-                                                                            transform: 'translateZ(0)'
+                                                                            // Only apply transition on first load, not when returning to seen cards
+                                                                            transition: isSeen ? 'none' : 'opacity 0.4s ease-out',
+                                                                            transform: 'translate3d(0, 0, 0)',
+                                                                            WebkitBackfaceVisibility: 'hidden',
+                                                                            backfaceVisibility: 'hidden'
                                                                         }}
                                                                         onLoad={() => handleImageLoaded(index)}
                                                                     />
@@ -1567,11 +1669,11 @@ export default function ValentineSlugPage() {
 
                                                             {memory.caption && isActive && (
                                                                 <div className="absolute bottom-12 left-0 right-0 px-6 z-30 pointer-events-none">
-                                                                    <div className={`${!isSeen ? 'animate-caption-mystery' : ''} flex flex-col items-center`} style={{ opacity: isActive ? 1 : 0 }}>
-                                                                        <div className="mb-2" style={{ animation: 'heartPulse 1.5s ease-in-out infinite' }}>
+                                                                    <div className="flex flex-col items-center" style={{ opacity: 1 }}>
+                                                                        <div className="mb-2" style={{ animation: isSeen ? 'none' : 'heartPulse 1.5s ease-in-out infinite' }}>
                                                                             <Heart variant="Bold" color="#FF3366" size="24" style={{ filter: 'drop-shadow(0 0 10px rgba(255,51,102,0.8))' }} />
                                                                         </div>
-                                                                        <div className="px-6 py-4 elegant-caption-box rounded-xl relative overflow-hidden caption-fade-up">
+                                                                        <div className={`px-6 py-4 elegant-caption-box rounded-xl relative overflow-hidden ${!isSeen ? 'caption-fade-up' : ''}`}>
                                                                             <Typography
                                                                                 variant="h5"
                                                                                 className="romantic-text text-white text-center leading-relaxed"
