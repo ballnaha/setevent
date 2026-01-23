@@ -1,12 +1,22 @@
 import { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
+    const baseUrl = 'https://seteventthailand.com';
+
     return {
-        rules: {
-            userAgent: '*',
-            allow: '/',
-            disallow: ['/admin/', '/api/', '/liff/'],
-        },
-        sitemap: 'https://seteventthailand.com/sitemap.xml',
+        rules: [
+            {
+                userAgent: 'Googlebot',
+                allow: '/',
+                disallow: ['/admin/', '/api/', '/liff/', '/valentine/'],
+            },
+            {
+                userAgent: '*',
+                allow: '/',
+                disallow: ['/admin/', '/api/', '/liff/', '/valentine/'],
+            },
+        ],
+        sitemap: `${baseUrl}/sitemap.xml`,
+        host: baseUrl,
     };
 }

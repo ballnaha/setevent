@@ -16,11 +16,11 @@ interface FooterProps {
 }
 
 const DEFAULT_SETTINGS = {
-    address: "123/45 ถนนนวมินทร์ แขวงนวลจันทร์ เขตบึงกุ่ม กทม. 10240",
-    phone: "081-234-5678",
-    email: "contact@seteventthailand.com",
-    line: "@setevent",
-    lineUrl: "https://line.me/ti/p/~@setevent",
+    address: "",
+    phone: "",
+    email: "",
+    line: "",
+    lineUrl: "",
     facebook: "",
     instagram: "",
     tiktok: "",
