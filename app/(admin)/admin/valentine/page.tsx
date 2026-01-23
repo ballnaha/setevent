@@ -497,14 +497,18 @@ export default function ValentineAdminPage() {
 
     const handleOpenQR = (card: ValentineCard) => {
         const url = `${window.location.origin}/valentine/${card.slug}`;
-        setQrData({ url, title: card.jobName || card.title });
+        setQrData({ url, title: card.jobName || card.title || "Valentine" });
         setQrOpen(true);
     };
 
-    const generateAndDownloadCard = async (targetUrl: string, targetTitle: string) => {
+    const generateAndDownloadCard = async (
+        targetUrl: string,
+        targetTitle: string,
+        templateUrl: string = "/images/card_vertical_2.png",
+        options: { qrSize: number; qrY: number; qrX?: number; showTitle?: boolean } = { qrSize: 0.60, qrY: 0.43, showTitle: true }
+    ) => {
         try {
             // 1. Create a high quality QR Code with Error Correction Level H (30%)
-            // This allows the logo to be placed in the center without breaking the scan.
             const qrSize = 1000;
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(targetUrl)}&ecc=H&margin=0`;
 
@@ -519,7 +523,7 @@ export default function ValentineAdminPage() {
 
             const [qrImage, templateImage] = await Promise.all([
                 loadImage(qrUrl),
-                loadImage("/images/card_empty.png"),
+                loadImage(templateUrl),
             ]);
 
             // 3. Create Canvas based on Template Dimensions
@@ -538,21 +542,47 @@ export default function ValentineAdminPage() {
             ctx.drawImage(templateImage, 0, 0, cardWidth, cardHeight);
 
             // 5. Calculate QR position on Template
-            // Fine-tuned for tighter fit in the frame
-            const qrSizeOnCard = cardWidth * 0.31;
-            const qrX = (cardWidth - qrSizeOnCard) / 2;
-            const qrY = cardHeight * 0.665; // Moved further down to 0.665
+            const qrSizeOnCard = cardWidth * options.qrSize;
+            const qrX = options.qrX !== undefined ? cardWidth * options.qrX : (cardWidth - qrSizeOnCard) / 2;
+            const qrY = cardHeight * options.qrY;
 
-            // Draw QR Code
+            // 6. Draw owner's name above QR code if showTitle is true
+            if (options.showTitle && targetTitle) {
+                // Increased font size to 0.020 scale for a clear "16px" feel on high-res cards
+                const fontSize = Math.round(((cardWidth + cardHeight) / 2) * 0.03);
+                ctx.font = `normal ${fontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                ctx.fillStyle = "#4A151B";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+
+                // Position text centered above the QR code
+                const textX = qrX + qrSizeOnCard / 2;
+                const textY = qrY - (fontSize * 0.2); // Small gap above QR
+
+                // Draw subtle shadow for better readability
+                ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+                ctx.shadowBlur = 6;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                ctx.fillText(targetTitle.toUpperCase(), textX, textY);
+
+                // Reset shadow
+                ctx.shadowColor = "transparent";
+                ctx.shadowBlur = 0;
+            }
+
+            // 7. Draw QR Code
             ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
 
-            // 6. Download Results
+            // 8. Download Results
             const link = document.createElement("a");
-            link.download = `ValentineCard_${targetTitle.replace(/\s+/g, '_')}.png`;
+            const suffix = templateUrl.includes('horizontal') ? 'Horizontal' : 'Normal';
+            link.download = `ValentineCard_${suffix}_${targetTitle.replace(/\s+/g, '_')}.png`;
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
 
-            showSnackbar("Valentine Card downloaded!");
+            showSnackbar(`Valentine ${suffix} Card downloaded!`);
         } catch (error) {
             console.error("Download Error:", error);
             showSnackbar("Failed to generate card", "error");
@@ -562,6 +592,35 @@ export default function ValentineAdminPage() {
     const handleDownloadQR = async () => {
         if (!qrData) return;
         await generateAndDownloadCard(qrData.url, qrData.title);
+    };
+
+    const handleDownloadHorizontalQR = async () => {
+        if (!qrData) return;
+        await generateAndDownloadCard(
+            qrData.url,
+            qrData.title,
+            "/images/card_horizontal_2.png",
+            { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true }
+        );
+    };
+
+    const handleDownloadOnlyQR = async () => {
+        if (!qrData) return;
+        try {
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=10`;
+            const response = await fetch(qrUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `QRCode_${qrData.title.replace(/\s+/g, '_')}.png`;
+            link.click();
+            window.URL.revokeObjectURL(url);
+            showSnackbar("QR Code downloaded!");
+        } catch (error) {
+            console.error("QR Download Error:", error);
+            showSnackbar("Failed to download QR code", "error");
+        }
     };
 
     // DND Sensors
@@ -1030,20 +1089,27 @@ export default function ValentineAdminPage() {
                                 </Stack>
                             </CardContent>
                             <Divider />
-                            <CardActions sx={{ justifyContent: 'flex-end', px: 2 }}>
+                            <CardActions sx={{ justifyContent: 'flex-end', px: 2, flexWrap: 'wrap', gap: 0.5 }}>
                                 <Button
                                     size="small"
                                     startIcon={<Scan size="16" variant="Bulk" color="#FF3366" />}
                                     onClick={() => handleOpenQR(card)}
                                 >
-                                    QR Code
+                                    QR
                                 </Button>
                                 <Button
                                     size="small"
                                     startIcon={<Printer size="16" variant="Bulk" color="#FF3366" />}
                                     onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title)}
                                 >
-                                    Download Card
+                                    Normal
+                                </Button>
+                                <Button
+                                    size="small"
+                                    startIcon={<DirectDown size="16" variant="Bulk" color="#FF3366" />}
+                                    onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title, "/images/card_horizontal_2.png", { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true })}
+                                >
+                                    Horizontal
                                 </Button>
                                 <Button
                                     size="small"
@@ -1161,20 +1227,28 @@ export default function ValentineAdminPage() {
                                             {new Date(card.createdAt).toLocaleDateString('th-TH')}
                                         </TableCell>
                                         <TableCell align="right">
-                                            <IconButton onClick={() => handleOpenQR(card)} sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }} title="QR Code">
+                                            <IconButton onClick={() => handleOpenQR(card)} sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }} title="QR Code Dialog">
                                                 <Scan size="18" variant="Bulk" color="#FF3366" />
                                             </IconButton>
+
                                             <IconButton
                                                 onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title)}
                                                 sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }}
-                                                title="Download Card Image"
+                                                title="Download Card (Normal)"
                                             >
                                                 <Printer size="18" variant="Bulk" color="#FF3366" />
                                             </IconButton>
-                                            <IconButton onClick={() => handleOpen(card)} sx={{ color: '#3b82f6', '&:hover': { bgcolor: 'rgba(59, 130, 246, 0.1)' } }}>
+                                            <IconButton
+                                                onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title, "/images/card_horizontal_2.png", { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true })}
+                                                sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }}
+                                                title="Download Card (Horizontal)"
+                                            >
+                                                <DirectDown size="18" variant="Bulk" color="#FF3366" />
+                                            </IconButton>
+                                            <IconButton onClick={() => handleOpen(card)} sx={{ color: '#3b82f6', '&:hover': { bgcolor: 'rgba(59, 130, 246, 0.1)' } }} title="Edit">
                                                 <Edit size="18" variant="Bulk" color="#3b82f6" />
                                             </IconButton>
-                                            <IconButton onClick={() => handleDeleteClick(card.id)} sx={{ color: '#ef4444', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' } }}>
+                                            <IconButton onClick={() => handleDeleteClick(card.id)} sx={{ color: '#ef4444', '&:hover': { bgcolor: 'rgba(239, 68, 68, 0.1)' } }} title="Delete">
                                                 <Trash size="18" variant="Bulk" color="#ef4444" />
                                             </IconButton>
                                         </TableCell>
@@ -1529,100 +1603,141 @@ export default function ValentineAdminPage() {
             <Dialog
                 open={qrOpen}
                 onClose={() => setQrOpen(false)}
+                maxWidth="sm"
+                fullWidth
                 PaperProps={{
                     sx: {
                         borderRadius: 4,
-                        p: 1,
-                        maxWidth: '350px',
-                        width: '100%',
-                        textAlign: 'center'
+                        p: 0,
+                        overflow: 'hidden'
                     }
                 }}
             >
-                <DialogTitle sx={{
-                    fontFamily: 'var(--font-prompt)',
-                    fontWeight: 800,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 1,
-                    pt: 3
-                }}>
-                    <Box sx={{ p: 1.5, bgcolor: '#FFF0F3', borderRadius: '15px', mb: 1 }}>
-                        <Scan size="32" variant="Bulk" color="#FF3366" />
-                    </Box>
-                    <Typography component="span" sx={{ variant: 'h6', fontWeight: 800, color: '#4A151B', display: 'block' }}>
-                        QR Code Card
-                    </Typography>
-                    <Typography component="span" variant="caption" color="text.secondary" sx={{ fontWeight: 600, display: 'block' }}>
-                        {qrData?.title}
-                    </Typography>
-                </DialogTitle>
-                <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 2 }}>
-                    {qrData && (
-                        <Box sx={{
-                            p: 2,
-                            bgcolor: 'white',
-                            borderRadius: 4,
-                            boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
-                            border: '1px solid #eee',
-                            position: 'relative', // To absolute center the logo
-                            overflow: 'hidden'
-                        }}>
-                            {/* QR Image with ECC Level H for center logo support */}
-                            <img
-                                src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=10`}
-                                alt="QR Code"
-                                style={{ width: '100%', height: 'auto', display: 'block' }}
-                            />
+                <DialogContent sx={{ p: 0 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 240px' } }}>
+                        {/* Left Side: Info & Actions */}
+                        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                                <Box sx={{ p: 1, bgcolor: '#FFF0F3', borderRadius: '12px' }}>
+                                    <Scan size="24" variant="Bulk" color="#FF3366" />
+                                </Box>
+                                <Box>
+                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#4A151B', lineHeight: 1.2 }}>
+                                        QR Code Card
+                                    </Typography>
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                        {qrData?.title}
+                                    </Typography>
+                                </Box>
+                            </Box>
 
+                            <Typography
+                                variant="caption"
+                                sx={{
+                                    mb: 3,
+                                    p: 1.5,
+                                    bgcolor: '#f8f9fa',
+                                    borderRadius: 2,
+                                    color: 'text.secondary',
+                                    fontFamily: 'monospace',
+                                    fontSize: '0.75rem',
+                                    width: '100%',
+                                    wordBreak: 'break-all',
+                                    border: '1px solid #eee'
+                                }}
+                            >
+                                {qrData?.url}
+                            </Typography>
 
+                            <Stack spacing={1.5}>
+                                <Button
+                                    fullWidth
+                                    onClick={handleDownloadQR}
+                                    variant="contained"
+                                    startIcon={<Printer size="20" variant="Bulk" color="white" />}
+                                    sx={{
+                                        borderRadius: '12px',
+                                        py: 1.2,
+                                        fontWeight: 700,
+                                        bgcolor: '#FF3366',
+                                        '&:hover': { bgcolor: '#dc2626' },
+                                        boxShadow: '0 4px 15px rgba(255, 51, 102, 0.2)'
+                                    }}
+                                >
+                                    Download Card (Normal)
+                                </Button>
+                                <Button
+                                    fullWidth
+                                    onClick={handleDownloadHorizontalQR}
+                                    variant="outlined"
+                                    startIcon={<DirectDown size="20" variant="Bulk" color="#FF3366" />}
+                                    sx={{
+                                        borderRadius: '12px',
+                                        py: 1.2,
+                                        fontWeight: 700,
+                                        color: '#FF3366',
+                                        borderColor: '#FF3366',
+                                        '&:hover': { bgcolor: '#FFF0F3', borderColor: '#FF3366' },
+                                    }}
+                                >
+                                    Download Card (Horizontal)
+                                </Button>
+                                <Button
+                                    fullWidth
+                                    onClick={handleDownloadOnlyQR}
+                                    variant="outlined"
+                                    color="inherit"
+                                    startIcon={<Scan size="20" variant="Bulk" color="inherit" />}
+                                    sx={{
+                                        borderRadius: '12px',
+                                        py: 1.2,
+                                        fontWeight: 700,
+                                        color: 'text.secondary',
+                                        borderColor: '#eee',
+                                        '&:hover': { bgcolor: '#f5f5f5', borderColor: '#ddd' },
+                                    }}
+                                >
+                                    Download QR Code Only
+                                </Button>
+                                <Button
+                                    fullWidth
+                                    onClick={() => setQrOpen(false)}
+                                    variant="text"
+                                    sx={{ fontWeight: 600, color: 'text.secondary', mt: 1 }}
+                                >
+                                    Close
+                                </Button>
+                            </Stack>
                         </Box>
-                    )}
-                    <Typography
-                        variant="caption"
-                        sx={{
-                            mt: 3,
-                            p: 1.5,
-                            bgcolor: '#f8f9fa',
-                            borderRadius: 2,
-                            color: 'text.secondary',
-                            fontFamily: 'monospace',
-                            fontSize: '0.7rem',
-                            width: '100%',
-                            wordBreak: 'break-all',
-                            border: '1px solid #eee'
-                        }}
-                    >
-                        {qrData?.url}
-                    </Typography>
+
+                        {/* Right Side: QR Image */}
+                        <Box sx={{
+                            bgcolor: '#fcfcfc',
+                            p: 3,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderLeft: '1px solid #eee'
+                        }}>
+                            {qrData && (
+                                <Box sx={{
+                                    p: 1.5,
+                                    bgcolor: 'white',
+                                    borderRadius: 3,
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
+                                    border: '1px solid #eee',
+                                    width: '100%'
+                                }}>
+                                    <img
+                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=10`}
+                                        alt="QR Code"
+                                        style={{ width: '100%', height: 'auto', display: 'block' }}
+                                    />
+                                </Box>
+                            )}
+                        </Box>
+                    </Box>
                 </DialogContent>
-                <DialogActions sx={{ p: 3, pt: 1, flexDirection: 'column', gap: 1.5 }}>
-                    <Button
-                        fullWidth
-                        onClick={handleDownloadQR}
-                        variant="contained"
-                        startIcon={<DirectDown size="20" variant="Bulk" color="white" />}
-                        sx={{
-                            borderRadius: '12px',
-                            py: 1.5,
-                            fontWeight: 700,
-                            bgcolor: '#FF3366',
-                            '&:hover': { bgcolor: '#dc2626' },
-                            boxShadow: '0 4px 15px rgba(255, 51, 102, 0.3)'
-                        }}
-                    >
-                        Download Image
-                    </Button>
-                    <Button
-                        fullWidth
-                        onClick={() => setQrOpen(false)}
-                        variant="text"
-                        sx={{ fontWeight: 600, color: 'text.secondary' }}
-                    >
-                        Close
-                    </Button>
-                </DialogActions>
             </Dialog>
 
             {/* Delete Dialog */}
