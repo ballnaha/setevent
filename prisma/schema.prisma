@@ -307,7 +307,8 @@ model ValentineCard {
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  memories ValentineMemory[]
+  memories        ValentineMemory[]
+  orderedProducts ValentineProduct[]
 }
 
 model ValentineMemory {
@@ -322,4 +323,35 @@ model ValentineMemory {
   updatedAt DateTime @updatedAt
 
   card ValentineCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+}
+
+// Valentine Catalog Models
+model ValentineProduct {
+  id            String   @id @default(cuid())
+  name          String
+  category      String   @default("General")
+  price         Float
+  originalPrice Float?   // For discount display
+  description   String?  @db.Text
+  image         String?  // Main image URL (will be used as thumbnail in list)
+  isHot         Boolean  @default(false)
+  isNew         Boolean  @default(false)
+  status        String   @default("active") // active, inactive, out_of_stock
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  images        ValentineProductImage[]
+  cards         ValentineCard[]
+}
+
+model ValentineProductImage {
+  id        String   @id @default(cuid())
+  productId String
+  url       String   @db.Text
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product ValentineProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
 }

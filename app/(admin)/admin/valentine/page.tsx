@@ -32,14 +32,24 @@ import {
     useTheme,
     useMediaQuery,
     FormControlLabel,
-    Switch
+    Switch,
+    Autocomplete,
+    Checkbox,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Tabs,
+    Tab,
+    LinearProgress,
+    Tooltip
 } from "@mui/material";
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/th';
-import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown, Printer } from "iconsax-react";
+import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown, Printer, ShoppingBag } from "iconsax-react";
 import {
     DndContext,
     closestCenter,
@@ -73,6 +83,14 @@ interface ValentineMemory {
     progress?: number;
 }
 
+interface ValentineProduct {
+    id: string;
+    name: string;
+    image: string | null;
+    price: number;
+    category: string;
+}
+
 interface ValentineCard {
     id: string;
     slug: string;
@@ -90,6 +108,7 @@ interface ValentineCard {
     disabledAt: string | null;
     createdAt: string;
     _count?: { memories: number };
+    orderedProducts?: ValentineProduct[];
 }
 
 interface SortableMemoryItemProps {
@@ -403,6 +422,28 @@ const generateRandomSlug = () => {
     return Math.random().toString(36).substring(2, 6) + '-' + Math.random().toString(36).substring(2, 6);
 };
 
+interface TabPanelProps {
+    children?: React.ReactNode;
+    index: number;
+    value: number;
+}
+
+function CustomTabPanel(props: TabPanelProps) {
+    const { children, value, index, ...other } = props;
+
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`valentine-tabpanel-${index}`}
+            aria-labelledby={`valentine-tab-${index}`}
+            {...other}
+        >
+            {value === index && children}
+        </div>
+    );
+}
+
 export default function ValentineAdminPage() {
     const theme = useTheme();
     const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -433,6 +474,9 @@ export default function ValentineAdminPage() {
     const [musicFile, setMusicFile] = useState<File | null>(null);
     const [musicProgress, setMusicProgress] = useState(0);
     const [memories, setMemories] = useState<ValentineMemory[]>([]);
+    const [availableProducts, setAvailableProducts] = useState<ValentineProduct[]>([]);
+    const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+    const [currentTab, setCurrentTab] = useState(0);
 
     // Delete Confirmation State
     const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -473,13 +517,9 @@ export default function ValentineAdminPage() {
                 img.onerror = () => reject(new Error(`Failed to load: ${src}`));
             });
 
-            const [qrImage, templateImage, logoImage] = await Promise.all([
+            const [qrImage, templateImage] = await Promise.all([
                 loadImage(qrUrl),
                 loadImage("/images/card_empty.png"),
-                loadImage("/images/favicon.png").catch(() => {
-                    console.warn("Logo failed to load, falling back to logo");
-                    return loadImage("/images/favicon.png").catch(() => null);
-                })
             ]);
 
             // 3. Create Canvas based on Template Dimensions
@@ -506,32 +546,7 @@ export default function ValentineAdminPage() {
             // Draw QR Code
             ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
 
-            // 6. Draw Logo in center of QR
-            if (logoImage) {
-                const logoSize = qrSizeOnCard * 0.20; // Refined proportion (20%)
-                const centerX = qrX + (qrSizeOnCard / 2);
-                const centerY = qrY + (qrSizeOnCard / 2);
-                const lX = centerX - (logoSize / 2);
-                const lY = centerY - (logoSize / 2);
-
-                ctx.save();
-
-                // Professional Circular Island for Logo
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, (logoSize / 2) + 6, 0, Math.PI * 2); // Increased padding
-                ctx.fillStyle = "white";
-                ctx.fill();
-
-                ctx.shadowColor = "rgba(0, 0, 0, 0.12)";
-                ctx.shadowBlur = 10;
-                ctx.stroke(); // Subtle border
-
-                ctx.restore();
-
-                ctx.drawImage(logoImage, lX, lY, logoSize, logoSize);
-            }
-
-            // 7. Download Results
+            // 6. Download Results
             const link = document.createElement("a");
             link.download = `ValentineCard_${targetTitle.replace(/\s+/g, '_')}.png`;
             link.href = canvas.toDataURL("image/png", 1.0);
@@ -576,7 +591,20 @@ export default function ValentineAdminPage() {
 
     useEffect(() => {
         fetchCards();
+        fetchProducts();
     }, []);
+
+    const fetchProducts = async () => {
+        try {
+            const res = await fetch("/api/valentine/products");
+            if (res.ok) {
+                const data = await res.json();
+                setAvailableProducts(data);
+            }
+        } catch (error) {
+            console.error("Fetch products failed:", error);
+        }
+    };
 
     const fetchCards = async () => {
         setLoading(true);
@@ -624,6 +652,7 @@ export default function ValentineAdminPage() {
                     ...m,
                     localId: m.id || Math.random().toString(36).substr(2, 9)
                 })));
+                setSelectedProductIds((data.orderedProducts || []).map((p: any) => p.id));
                 setUrlsToDelete([]);
                 // setOpen(true); // Already opened in handleOpen
             }
@@ -656,7 +685,9 @@ export default function ValentineAdminPage() {
         });
         setMusicFile(null);
         setMemories([]);
+        setSelectedProductIds([]);
         setEditId(null);
+        setCurrentTab(0);
         setOpen(true);
 
         if (card) {
@@ -865,6 +896,7 @@ export default function ValentineAdminPage() {
                 ...formData,
                 backgroundMusicUrl: currentBackgroundMusicUrl,
                 memories: finalMemories,
+                orderedProducts: selectedProductIds,
                 urlsToDelete: currentUrlsToDelete
             };
 
@@ -981,6 +1013,17 @@ export default function ValentineAdminPage() {
                                         <Chip label={`${card._count?.memories || 0} memories`} size="small" variant="outlined" />
                                     </Box>
 
+                                    {card.orderedProducts && card.orderedProducts.length > 0 && (
+                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, py: 1 }}>
+                                            {card.orderedProducts.map((p: any) => (
+                                                <Stack key={p.id} direction="row" spacing={1} alignItems="center" sx={{ bgcolor: '#FFF0F3', px: 1, py: 0.5, borderRadius: 2, border: '1px solid #FFE3E8' }}>
+                                                    <Avatar src={p.image} variant="rounded" sx={{ width: 20, height: 20 }} />
+                                                    <Typography variant="caption" sx={{ fontWeight: 700, color: '#4A151B' }}>{p.name}</Typography>
+                                                </Stack>
+                                            ))}
+                                        </Box>
+                                    )}
+
                                     <Typography variant="caption" color="text.secondary">
                                         Created: {new Date(card.createdAt).toLocaleDateString('th-TH')}
                                     </Typography>
@@ -1030,6 +1073,7 @@ export default function ValentineAdminPage() {
                                 <TableRow>
                                     <TableCell>Card Title</TableCell>
                                     <TableCell>Slug</TableCell>
+                                    <TableCell sx={{ minWidth: 150 }}>Flowers / Bouquet</TableCell>
                                     <TableCell>Memories</TableCell>
                                     <TableCell>Status</TableCell>
                                     <TableCell>Expires</TableCell>
@@ -1057,6 +1101,39 @@ export default function ValentineAdminPage() {
                                                 onClick={() => window.open(`/valentine/${card.slug}`, '_blank')}
                                                 sx={{ cursor: 'pointer' }}
                                             />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Stack spacing={0.5} sx={{ maxWidth: 200 }}>
+                                                {card.orderedProducts && card.orderedProducts.length > 0 ? (
+                                                    card.orderedProducts.map((p: any) => (
+                                                        <Tooltip key={p.id} title={`฿${p.price.toLocaleString()}`}>
+                                                            <Stack direction="row" spacing={1} alignItems="center">
+                                                                <Avatar
+                                                                    src={p.image}
+                                                                    variant="rounded"
+                                                                    sx={{ width: 28, height: 28, border: '1px solid #eee', flexShrink: 0 }}
+                                                                >
+                                                                    <ShoppingBag size="14" />
+                                                                </Avatar>
+                                                                <Typography
+                                                                    variant="caption"
+                                                                    sx={{
+                                                                        fontWeight: 700,
+                                                                        color: '#4A151B',
+                                                                        overflow: 'hidden',
+                                                                        textOverflow: 'ellipsis',
+                                                                        whiteSpace: 'nowrap'
+                                                                    }}
+                                                                >
+                                                                    {p.name}
+                                                                </Typography>
+                                                            </Stack>
+                                                        </Tooltip>
+                                                    ))
+                                                ) : (
+                                                    <Typography variant="caption" color="text.disabled">-</Typography>
+                                                )}
+                                            </Stack>
                                         </TableCell>
                                         <TableCell>
                                             <Chip label={`${card._count?.memories || 0} memories`} size="small" variant="outlined" />
@@ -1156,439 +1233,273 @@ export default function ValentineAdminPage() {
                             </Typography>
                         </Box>
                     )}
-                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '5fr 7fr' }, gap: 4 }}>
-                        {/* Settings Column */}
-                        <Box>
-                            <Box sx={{ p: 2.5, bgcolor: 'white', borderRadius: 3, border: '1px solid #eee', mb: 3 }}>
-                                <Typography variant="subtitle1" sx={{ mb: 3, fontWeight: 800, color: '#FF3366', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Save2 size="20" variant="Bulk" color="#FF3366" /> Card Information
-                                </Typography>
-                                <Stack spacing={2.5}>
-                                    <TextField
-                                        label="Internal Job Name (Not visible to user)"
-                                        fullWidth
-                                        value={formData.jobName}
-                                        onChange={(e) => setFormData({ ...formData, jobName: e.target.value })}
-                                        placeholder="e.g. คุณสมชาย - การ์ดครบรอบ"
-                                        variant="outlined"
-                                        sx={{ bgcolor: 'rgba(255, 51, 102, 0.02)' }}
-                                    />
-                                    <TextField
-                                        label="Title (Display on gift box)"
-                                        fullWidth
-                                        required
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        placeholder="e.g. For My Love"
-                                        variant="outlined"
-                                    />
-                                    <TextField
-                                        label="Slug"
-                                        fullWidth
-                                        required
-                                        value={formData.slug}
-                                        onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
-                                        helperText="Unique Random ID"
-                                        variant="outlined"
-                                        InputProps={{
-                                            endAdornment: (
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => setFormData({ ...formData, slug: generateRandomSlug() })}
-                                                    title="Generate Random Slug"
-                                                >
-                                                    <Global size="18" color="#FF3366" />
-                                                </IconButton>
-                                            )
-                                        }}
-                                    />
-                                    <TextField
-                                        label="Greeting Text"
-                                        fullWidth
-                                        value={formData.greeting}
-                                        onChange={(e) => setFormData({ ...formData, greeting: e.target.value })}
-                                        placeholder="e.g. Happy Valentine's Day"
-                                    />
-                                    <TextField
-                                        label="Subtitle"
-                                        fullWidth
-                                        value={formData.subtitle}
-                                        onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                                        placeholder="e.g. Take My Heart"
-                                    />
-                                    <TextField
-                                        label="Opening Button Text"
-                                        fullWidth
-                                        value={formData.openingText}
-                                        onChange={(e) => setFormData({ ...formData, openingText: e.target.value })}
-                                    />
-                                </Stack>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) 320px' }, gap: 4, alignItems: 'start' }}>
+                        {/* Left Content Column */}
+                        <Box sx={{ minWidth: 0 }}>
+                            <Box sx={{ mb: 3, borderBottom: '1px solid #eee' }}>
+                                <Tabs
+                                    value={currentTab}
+                                    onChange={(e, v) => setCurrentTab(v)}
+                                    variant="scrollable"
+                                    scrollButtons="auto"
+                                    sx={{
+                                        '& .MuiTabs-indicator': { height: 3, borderRadius: '3px 3px 0 0', bgcolor: '#FF3366' },
+                                        '& .MuiTab-root': {
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontWeight: 700,
+                                            fontSize: '0.95rem',
+                                            pb: 2,
+                                            color: 'text.secondary',
+                                            '&.Mui-selected': { color: '#FF3366' }
+                                        }
+                                    }}
+                                >
+                                    <Tab label="ข้อมูลทั่วไป & สินค้า" />
+                                    <Tab label="เนื้อหา & ดีไซน์" />
+                                    <Tab label="แกลเลอรี่รูปภาพ" />
+                                </Tabs>
                             </Box>
 
-                            <Box sx={{ p: 2.5, bgcolor: 'white', borderRadius: 3, border: '1px solid #eee' }}>
-                                <Typography variant="subtitle1" sx={{ mb: 3, fontWeight: 800, color: '#FF3366', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <Gallery size="20" variant="Bulk" color="#FF3366" /> Card Message & Media
-                                </Typography>
-                                <Stack spacing={2.5}>
-                                    <TextField
-                                        label="Main Message"
-                                        multiline
-                                        rows={4}
-                                        fullWidth
-                                        value={formData.message}
-                                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                                    />
-                                    <TextField
-                                        label="Signer"
-                                        fullWidth
-                                        value={formData.signer}
-                                        onChange={(e) => setFormData({ ...formData, signer: e.target.value })}
-                                    />
-                                    <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                                        <Box sx={{ position: 'relative' }}>
+                            <CustomTabPanel value={currentTab} index={0}>
+                                <Stack spacing={3}>
+                                    <Box sx={{ p: 3, bgcolor: 'white', borderRadius: 4, border: '1px solid #eee', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 800, color: '#4A151B', display: 'flex', alignItems: 'center', gap: 1, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            <Save2 size="18" variant="Bulk" color="#FF3366" /> Basic Information
+                                        </Typography>
+                                        <Stack spacing={2.5}>
                                             <TextField
-                                                label="BG Color"
+                                                label="Internal Job Name"
                                                 fullWidth
-                                                type="color"
-                                                value={formData.backgroundColor || "#FFF0F3"}
-                                                onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })}
-                                                sx={{
-                                                    '& input': { height: '40px', p: 0.5, cursor: 'pointer' }
-                                                }}
+                                                value={formData.jobName}
+                                                onChange={(e) => setFormData({ ...formData, jobName: e.target.value })}
+                                                placeholder="e.g. คุณสมชาย - การ์ดครบรอบ"
+                                                variant="outlined"
                                             />
-                                        </Box>
-                                        <FormControlLabel
-                                            control={
-                                                <Switch
-                                                    checked={formData.status === 'active'}
-                                                    onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 'active' : 'inactive' })}
-                                                    color="success"
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                                                <TextField
+                                                    label="Title (Display on gift box)"
+                                                    fullWidth
+                                                    required
+                                                    value={formData.title}
+                                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                                    placeholder="e.g. For My Love"
                                                 />
-                                            }
-                                            label="Status"
-                                        />
+                                                <TextField
+                                                    label="Slug (URL Path)"
+                                                    fullWidth
+                                                    required
+                                                    value={formData.slug}
+                                                    onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                                                    InputProps={{
+                                                        endAdornment: (
+                                                            <IconButton size="small" onClick={() => setFormData({ ...formData, slug: generateRandomSlug() })}>
+                                                                <Global size="18" color="#FF3366" />
+                                                            </IconButton>
+                                                        )
+                                                    }}
+                                                />
+                                            </Box>
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                                                <FormControlLabel
+                                                    control={<Switch checked={formData.status === 'active'} onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 'active' : 'inactive' })} color="success" />}
+                                                    label="การ์ดเปิดใช้งานอยู่ (Active)"
+                                                />
+                                                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
+                                                    <DateTimePicker
+                                                        label="วันที่ปิดการ์ดอัตโนมัติ"
+                                                        value={formData.disabledAt ? dayjs(formData.disabledAt) : null}
+                                                        onChange={(newValue) => setFormData({ ...formData, disabledAt: newValue ? newValue.toISOString() : '' })}
+                                                        slotProps={{ textField: { size: 'small', fullWidth: true } }}
+                                                    />
+                                                </LocalizationProvider>
+                                            </Box>
+                                        </Stack>
                                     </Box>
 
-                                    {/* Auto Disable Date */}
-                                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
-                                        <DateTimePicker
-                                            label="วันที่ปิดการ์ดอัตโนมัติ (ไม่บังคับ)"
-                                            value={formData.disabledAt ? dayjs(formData.disabledAt) : null}
-                                            onChange={(newValue: Dayjs | null) => {
-                                                setFormData({
-                                                    ...formData,
-                                                    disabledAt: newValue ? newValue.toISOString() : ''
-                                                });
+                                    <Box sx={{ p: 3, bgcolor: 'white', borderRadius: 4, border: '1px solid #eee', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 800, color: '#4A151B', display: 'flex', alignItems: 'center', gap: 1, textTransform: 'uppercase', letterSpacing: 0.5 }}>
+                                            <ShoppingBag size="18" variant="Bulk" color="#FF3366" /> Ordered Products
+                                        </Typography>
+                                        <Autocomplete
+                                            multiple
+                                            options={availableProducts}
+                                            getOptionLabel={(option) => option.name}
+                                            value={availableProducts.filter(p => selectedProductIds.includes(p.id))}
+                                            onChange={(e, v) => setSelectedProductIds(v.map(item => item.id))}
+                                            disableCloseOnSelect
+                                            renderInput={(params) => <TextField {...params} variant="outlined" label="เลือกดอกไม้จากแคตตาล็อก" />}
+                                            renderOption={(props, option, { selected }) => {
+                                                const { key, ...otherProps } = props as any;
+                                                return (
+                                                    <li key={key} {...otherProps}>
+                                                        <Checkbox icon={<Heart size="20" variant="Bold" color="#ccc" />} checkedIcon={<Heart size="20" variant="Bold" color="#FF3366" />} checked={selected} sx={{ mr: 1 }} />
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                            {option.image && <Avatar src={option.image} variant="rounded" sx={{ width: 40, height: 40 }} />}
+                                                            <Box>
+                                                                <Typography variant="body2" sx={{ fontWeight: 700 }}>{option.name}</Typography>
+                                                                <Typography variant="caption" color="text.secondary">฿{option.price.toLocaleString()}</Typography>
+                                                            </Box>
+                                                        </Box>
+                                                    </li>
+                                                );
                                             }}
-                                            sx={{ width: '100%' }}
-                                            slotProps={{
-                                                textField: {
-                                                    fullWidth: true,
-                                                    helperText: "ถ้าไม่กำหนด การ์ดจะแสดงตลอดไป",
-                                                    InputProps: { sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } },
-                                                    InputLabelProps: { sx: { fontFamily: 'var(--font-prompt)' } },
-                                                    FormHelperTextProps: { sx: { fontFamily: 'var(--font-prompt)' } }
-                                                },
-                                                actionBar: {
-                                                    actions: ['clear', 'today', 'accept']
-                                                }
-                                            }}
-                                            ampm={false}
                                         />
-                                    </LocalizationProvider>
+                                    </Box>
+                                </Stack>
+                            </CustomTabPanel>
 
-
-                                    {/* Background Music */}
-                                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#fff5f7', border: '1px solid #ffccd5' }}>
-                                        <Typography variant="caption" sx={{ display: 'block', mb: 1.5, fontWeight: 700, color: '#FF3366', textTransform: 'uppercase' }}>
-                                            🎶 Background Music
+                            <CustomTabPanel value={currentTab} index={1}>
+                                <Stack spacing={3}>
+                                    <Box sx={{ p: 3, bgcolor: 'white', borderRadius: 4, border: '1px solid #eee' }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 800, color: '#4A151B', display: 'flex', alignItems: 'center', gap: 1, textTransform: 'uppercase' }}>
+                                            <Music size="18" variant="Bulk" color="#FF3366" /> Content & Greetings
                                         </Typography>
-                                        <Typography variant="caption" sx={{ display: 'block', mb: 2, color: 'text.secondary' }}>
-                                            เลือกใช้ได้ทีละอันเท่านั้น (MP3 จะถูกใช้ก่อนถ้ามีทั้งคู่)
+                                        <Stack spacing={2.5}>
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+                                                <TextField label="Greeting Title" fullWidth value={formData.greeting} onChange={(e) => setFormData({ ...formData, greeting: e.target.value })} />
+                                                <TextField label="Greeting Subtitle" fullWidth value={formData.subtitle} onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })} />
+                                            </Box>
+                                            <TextField label="Gift Box Button Text" fullWidth value={formData.openingText} onChange={(e) => setFormData({ ...formData, openingText: e.target.value })} />
+                                            <TextField label="Main Message" multiline rows={4} fullWidth value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })} />
+                                            <TextField label="Signer Name" fullWidth value={formData.signer} onChange={(e) => setFormData({ ...formData, signer: e.target.value })} />
+                                        </Stack>
+                                    </Box>
+
+                                    <Box sx={{ p: 3, bgcolor: 'white', borderRadius: 4, border: '1px solid #eee' }}>
+                                        <Typography variant="subtitle2" sx={{ mb: 3, fontWeight: 800, color: '#4A151B', display: 'flex', alignItems: 'center', gap: 1, textTransform: 'uppercase' }}>
+                                            <Gallery size="18" variant="Bulk" color="#FF3366" /> Style & Background
                                         </Typography>
-                                        <Stack spacing={2}>
-                                            <TextField
-                                                size="small"
-                                                fullWidth
-                                                label="YouTube Video ID"
-                                                value={formData.backgroundMusicYoutubeId}
-                                                onChange={(e) => setFormData({ ...formData, backgroundMusicYoutubeId: e.target.value })}
-                                                placeholder="e.g. dQw4w9WgXcQ"
-                                                helperText="เพลงจาก YouTube (พิมพ์ ID เท่านั้น)"
-                                                InputProps={{
-                                                    startAdornment: <Typography sx={{ mr: 1, color: '#FF0000', fontWeight: 700, fontSize: '0.75rem' }}>▶</Typography>
-                                                }}
-                                                disabled={!!musicFile || !!formData.backgroundMusicUrl}
-                                            />
-                                            <Divider><Chip label="หรือ" size="small" /></Divider>
-
-                                            <Box>
-                                                <Button
-                                                    component="label"
-                                                    variant="outlined"
-                                                    fullWidth
-                                                    startIcon={<Music size="18" color="#FF3366" />}
-                                                    sx={{ borderRadius: 2, height: '40px', borderColor: '#FF3366', color: '#FF3366' }}
-                                                    disabled={!!formData.backgroundMusicYoutubeId}
-                                                >
-                                                    {musicFile ? "เปลี่ยนไฟล์ MP3" : formData.backgroundMusicUrl ? "เปลี่ยนไฟล์ MP3" : "อัปโหลดไฟล์ MP3"}
-                                                    <input
-                                                        type="file"
-                                                        hidden
-                                                        accept="audio/mpeg,audio/mp3"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) setMusicFile(file);
-                                                        }}
-                                                    />
-                                                </Button>
-
-                                                {musicProgress > 0 && musicProgress < 100 && (
-                                                    <Box sx={{ mt: 1.5 }}>
-                                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                            <Typography variant="caption" sx={{ color: '#FF3366', fontWeight: 800 }}>Uploading Music...</Typography>
-                                                            <Typography variant="caption" sx={{ color: '#FF3366', fontWeight: 800 }}>{Math.round(musicProgress)}%</Typography>
-                                                        </Box>
-                                                        <Box sx={{ height: 6, width: '100%', bgcolor: '#FFE3E8', borderRadius: 3, overflow: 'hidden' }}>
-                                                            <Box sx={{ height: '100%', width: `${musicProgress}%`, bgcolor: '#FF3366', transition: 'width 0.2s' }} />
-                                                        </Box>
-                                                    </Box>
-                                                )}
-
-                                                {(musicFile || formData.backgroundMusicUrl) && musicProgress === 0 && (
-                                                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                        <Typography variant="caption" sx={{ color: 'success.main', fontWeight: 700 }}>
-                                                            {musicFile ? `ไฟล์ใหม่: ${musicFile.name}` : `ไฟล์ปัจจุบัน: ${formData.backgroundMusicUrl.split('/').pop()}`}
-                                                        </Typography>
-                                                        <IconButton
-                                                            size="small"
-                                                            onClick={() => {
-                                                                if (musicFile) {
-                                                                    setMusicFile(null);
-                                                                } else if (formData.backgroundMusicUrl) {
-                                                                    if (formData.backgroundMusicUrl.startsWith('/uploads')) {
-                                                                        setUrlsToDelete(prev => [...prev, formData.backgroundMusicUrl!]);
-                                                                    }
-                                                                    setFormData({ ...formData, backgroundMusicUrl: '' });
-                                                                }
-                                                            }}
-                                                            sx={{ color: '#ef4444' }}
-                                                        >
-                                                            <Trash size="14" />
-                                                        </IconButton>
-                                                    </Box>
-                                                )}
-                                                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, color: 'text.secondary', fontSize: '0.7rem' }}>
-                                                    แนะนำไฟล์ .mp3 ความยาวไม่เกิน 1-2 นาที
-                                                </Typography>
+                                        <Stack spacing={3}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 700 }}>Background Color:</Typography>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    <input type="color" value={formData.backgroundColor || "#FFF0F3"} onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })} style={{ width: 50, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
+                                                    <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 700, p: 1, bgcolor: '#f5f5f5', borderRadius: 1 }}>{formData.backgroundColor}</Typography>
+                                                </Box>
                                             </Box>
 
-                                            {(formData.backgroundMusicYoutubeId || musicFile || formData.backgroundMusicUrl) && (
-                                                <Button
-                                                    size="small"
-                                                    color="error"
-                                                    variant="text"
-                                                    onClick={() => {
-                                                        setMusicFile(null);
-                                                        if (formData.backgroundMusicUrl && formData.backgroundMusicUrl.startsWith('/uploads')) {
-                                                            setUrlsToDelete(prev => [...prev, formData.backgroundMusicUrl!]);
-                                                        }
-                                                        setFormData({ ...formData, backgroundMusicYoutubeId: '', backgroundMusicUrl: '' });
-                                                    }}
-                                                >
-                                                    ล้าง Background Music ทั้งหมด
-                                                </Button>
-                                            )}
-                                        </Stack>
-                                    </Paper>
-                                </Stack>
-                            </Box>
+                                            <Divider />
 
-                            {/* Enhanced Live Preview Section */}
-                            <Box sx={{ p: 2.5, bgcolor: '#fdf2f4', borderRadius: 4, border: '1px solid #ffccd5' }}>
-                                <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 800, color: '#FF3366', display: 'flex', alignItems: 'center', gap: 1, textTransform: 'uppercase', letterSpacing: 1 }}>
-                                    <Play size="18" variant="Bulk" color="#FF3366" /> Live Mobile Preview
+                                            <Box>
+                                                <Typography variant="body2" sx={{ mb: 2, fontWeight: 700 }}>Background Music:</Typography>
+                                                <Stack spacing={2}>
+                                                    <TextField
+                                                        size="small"
+                                                        label="YouTube Video ID"
+                                                        fullWidth
+                                                        value={formData.backgroundMusicYoutubeId}
+                                                        onChange={(e) => setFormData({ ...formData, backgroundMusicYoutubeId: e.target.value })}
+                                                        helperText="MP3 will take priority if both are set"
+                                                        disabled={!!musicFile || !!formData.backgroundMusicUrl}
+                                                    />
+                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                        <Button component="label" variant="outlined" startIcon={<Music />} size="small" disabled={!!formData.backgroundMusicYoutubeId}>
+                                                            {musicFile || formData.backgroundMusicUrl ? "Change MP3" : "Upload MP3"}
+                                                            <input type="file" hidden accept="audio/mp3,audio/mpeg" onChange={(e) => setMusicFile(e.target.files?.[0] || null)} />
+                                                        </Button>
+                                                        {(musicFile || formData.backgroundMusicUrl) && (
+                                                            <Chip
+                                                                label={musicFile ? musicFile.name : "Current Music"}
+                                                                onDelete={() => { setMusicFile(null); setFormData({ ...formData, backgroundMusicUrl: '' }); }}
+                                                                size="small"
+                                                                color="primary"
+                                                                variant="outlined"
+                                                            />
+                                                        )}
+                                                    </Box>
+                                                    {musicProgress > 0 && musicProgress < 100 && <LinearProgress variant="determinate" value={musicProgress} sx={{ height: 6, borderRadius: 3 }} />}
+                                                </Stack>
+                                            </Box>
+                                        </Stack>
+                                    </Box>
+                                </Stack>
+                            </CustomTabPanel>
+
+                            <CustomTabPanel value={currentTab} index={2}>
+                                <Box>
+                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FF3366', display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                            <Gallery size="24" variant="Bulk" /> Card Memories
+                                            <Chip label={memories.length} size="small" sx={{ bgcolor: '#FFF0F3', color: '#FF3366', fontWeight: 700 }} />
+                                        </Typography>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            <Button component="label" variant="outlined" startIcon={<Add />} size="small" sx={{ borderRadius: 2 }}>
+                                                Bulk Upload
+                                                <input type="file" multiple hidden accept="image/*,video/*" onChange={handleBulkUpload} />
+                                            </Button>
+                                            <Button variant="contained" startIcon={<Add color="white" />} size="small" onClick={handleAddMemory} sx={{ borderRadius: 2, bgcolor: '#FF3366', '&:hover': { bgcolor: '#E02D59' } }}>
+                                                Add URL
+                                            </Button>
+                                        </Box>
+                                    </Box>
+                                    <Stack spacing={2.5}>
+                                        <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+                                            <SortableContext items={saving ? [] : memories.map(m => m.localId)} strategy={verticalListSortingStrategy}>
+                                                {memories.map((memory, index) => (
+                                                    <SortableMemoryItem key={memory.localId} id={memory.localId} memory={memory} index={index} handleRemoveMemory={handleRemoveMemory} handleFileChange={handleFileChange} handleMemoryChange={handleMemoryChange} disabled={saving} />
+                                                ))}
+                                            </SortableContext>
+                                        </DndContext>
+                                        {memories.length === 0 && <Box sx={{ p: 8, textAlign: 'center', border: '2px dashed #eee', borderRadius: 4, bgcolor: '#fcfcfc' }}>
+                                            <Gallery size="48" color="#FF3366" variant="Bulk" style={{ opacity: 0.2, marginBottom: 16 }} />
+                                            <Typography color="text.secondary" fontWeight={600}>No memories added yet</Typography>
+                                        </Box>}
+                                    </Stack>
+                                </Box>
+                            </CustomTabPanel>
+                        </Box>
+
+                        {/* Right Column: Preview Column (Sticky) */}
+                        <Box sx={{ position: { lg: 'sticky' }, top: 0, pt: { xs: 2, lg: 0 } }}>
+                            <Box sx={{ p: 2, bgcolor: '#fdf2f4', borderRadius: 5, border: '1px solid #ffccd5', boxShadow: '0 10px 30px rgba(255, 51, 102, 0.05)' }}>
+                                <Typography variant="caption" sx={{ mb: 2, fontWeight: 900, color: '#FF3366', display: 'flex', alignItems: 'center', gap: 1, textTransform: 'uppercase', letterSpacing: 1.5 }}>
+                                    <Play size="14" variant="Bulk" /> Mobile Live Preview
                                 </Typography>
                                 <Box sx={{
                                     width: '100%',
-                                    maxWidth: '280px',
-                                    mx: 'auto',
                                     aspectRatio: '9/19',
                                     bgcolor: formData.backgroundColor || "#FFF0F3",
-                                    borderRadius: '32px',
+                                    borderRadius: '35px',
                                     overflow: 'hidden',
-                                    boxShadow: '0 20px 40px rgba(0,0,0,0.12), inset 0 0 0 4px #333',
+                                    boxShadow: '0 20px 50px rgba(0,0,0,0.15), inset 0 0 0 4px #1a1a1a',
                                     display: 'flex',
                                     flexDirection: 'column',
-                                    position: 'relative',
-                                    border: '8px solid #1a1a1a',
+                                    border: '6px solid #1a1a1a',
+                                    position: 'relative'
                                 }}>
-                                    {/* Phone Notch */}
-                                    <Box sx={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '40%', height: '18px', bgcolor: '#1a1a1a', borderBottomLeftRadius: '10px', borderBottomRightRadius: '10px', zIndex: 5 }} />
+                                    {/* Notch */}
+                                    <Box sx={{ position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', width: '35%', height: '18px', bgcolor: '#1a1a1a', borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px', zIndex: 10 }} />
 
-                                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', p: 2, pt: 4 }}>
-                                        {/* Header Preview */}
+                                    <Box sx={{ flex: 1, p: 2, pt: 4, display: 'flex', flexDirection: 'column' }}>
                                         <Box sx={{ textAlign: 'center', mb: 2 }}>
-                                            <Typography sx={{ color: '#FF3366', fontSize: '0.8rem', fontWeight: 700, fontFamily: 'cursive', opacity: 0.8 }}>
-                                                {formData.greeting?.split(' ')[0] || "Happy"}
-                                            </Typography>
-                                            <Typography sx={{ color: '#4A151B', fontSize: '1rem', fontWeight: 900, letterSpacing: 1.5, textTransform: 'uppercase' }}>
-                                                {formData.greeting?.split(' ').slice(1).join(' ') || "VALENTINE"}
-                                            </Typography>
+                                            <Typography sx={{ color: '#FF3366', fontSize: '0.7rem', fontWeight: 800, fontFamily: 'cursive' }}>{formData.greeting?.split(' ')[0] || "Happy"}</Typography>
+                                            <Typography sx={{ color: '#4A151B', fontSize: '0.9rem', fontWeight: 900, textTransform: 'uppercase', mt: -0.5 }}>{formData.greeting?.split(' ').slice(1).join(' ') || "VALENTINE"}</Typography>
                                         </Box>
 
-                                        {/* Center Placeholder (Swiper Animation) */}
-                                        <Box sx={{
-                                            flex: 1,
-                                            my: 1,
-                                            position: 'relative',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center'
-                                        }}>
-                                            {/* Stacked Cards Representation */}
-                                            <Box sx={{ position: 'absolute', width: '80%', height: '80%', bgcolor: 'white', opacity: 0.3, borderRadius: 2, transform: 'rotate(-5deg) translate(-10px, -5px)', border: '1px solid #ddd' }} />
-                                            <Box sx={{ position: 'absolute', width: '80%', height: '80%', bgcolor: 'white', opacity: 0.5, borderRadius: 2, transform: 'rotate(3deg) translate(5px, 2px)', border: '1px solid #ddd' }} />
-                                            <Box sx={{
-                                                width: '85%',
-                                                height: '85%',
-                                                bgcolor: 'white',
-                                                borderRadius: 3,
-                                                boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
-                                                display: 'flex',
-                                                flexDirection: 'column',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                zIndex: 2,
-                                                overflow: 'hidden',
-                                                border: '4px solid white',
-                                                textAlign: 'center'
-                                            }}>
-                                                <Gallery size="32" variant="Bulk" color="#FF3366" />
-                                                <Typography sx={{ fontSize: '0.7rem', color: '#FF3366', mt: 1, fontWeight: 700 }}>
-                                                    {memories.length} Memories<br />(Swiper View)
-                                                </Typography>
+                                        <Box sx={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', my: 1 }}>
+                                            <Box sx={{ width: '85%', height: '80%', bgcolor: 'white', borderRadius: 3, boxShadow: '0 10px 20px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '3px solid white', overflow: 'hidden' }}>
+                                                <Gallery size="28" variant="Bulk" color="#FF3366" />
+                                                <Typography sx={{ fontSize: '0.65rem', mt: 1, fontWeight: 800, color: '#FF3366' }}>{memories.length} Memories</Typography>
                                             </Box>
                                         </Box>
 
-                                        {/* Footer Preview */}
-                                        <Box sx={{ textAlign: 'center', mt: 2 }}>
-                                            <Typography sx={{ color: '#8B1D36', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: 1, mb: 1 }}>
-                                                {formData.subtitle || "Subtitle"}
-                                            </Typography>
-                                            <Paper elevation={0} sx={{
-                                                background: 'rgba(255, 255, 255, 0.7)',
-                                                backdropFilter: 'blur(8px)',
-                                                p: 1.5,
-                                                borderRadius: '16px',
-                                                border: '1px solid rgba(255,255,255,0.5)'
-                                            }}>
-                                                <Typography sx={{
-                                                    fontSize: '0.75rem',
-                                                    color: '#4A151B',
-                                                    lineHeight: 1.4,
-                                                    whiteSpace: 'pre-line',
-                                                    maxHeight: '60px',
-                                                    overflow: 'hidden'
-                                                }}>
-                                                    {formData.message || "Your sweet message..."}
-                                                </Typography>
-                                                <Typography sx={{ fontSize: '0.65rem', color: '#FF3366', fontWeight: 800, mt: 1 }}>
-                                                    - {formData.signer || "Signer Name"} -
-                                                </Typography>
-                                            </Paper>
+                                        <Box sx={{ textAlign: 'center', mt: 1 }}>
+                                            <Typography sx={{ color: '#8B1D36', fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', mb: 1 }}>{formData.subtitle || "Your Subtitle"}</Typography>
+                                            <Box sx={{ bgcolor: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(10px)', p: 1.5, borderRadius: 3, border: '1px solid rgba(255,255,255,0.5)' }}>
+                                                <Typography sx={{ fontSize: '0.7rem', color: '#4A151B', lineHeight: 1.4, maxHeight: 60, overflow: 'hidden' }}>{formData.message || "Your sweet message here..."}</Typography>
+                                                <Typography sx={{ fontSize: '0.6rem', color: '#FF3366', fontWeight: 900, mt: 1 }}>- {formData.signer || "Signer"} -</Typography>
+                                            </Box>
                                         </Box>
                                     </Box>
 
-                                    {/* Decorative Hearts */}
-                                    <Heart size="12" variant="Bulk" color="#FF3366" style={{ position: 'absolute', top: '15%', right: '15%', opacity: 0.3 }} />
-                                    <Heart size="16" variant="Bulk" color="#FF3366" style={{ position: 'absolute', bottom: '15%', left: '10%', opacity: 0.2 }} />
-                                    <Music size="16" color="#8B1D36" variant="Bulk" style={{ position: 'absolute', bottom: '20px', right: '20px', opacity: 0.5 }} />
+                                    {/* Decorations */}
+                                    <Heart size="10" variant="Bulk" color="#FF3366" style={{ position: 'absolute', top: '12%', right: '12%', opacity: 0.3 }} />
+                                    <Music size="12" color="#8B1D36" variant="Bulk" style={{ position: 'absolute', bottom: '15px', right: '15px', opacity: 0.4 }} />
                                 </Box>
-                                <Typography variant="caption" sx={{ display: 'block', mt: 2, textAlign: 'center', color: '#FF3366', fontWeight: 600 }}>
-                                    Real-time Mobile View
+                                <Typography variant="caption" sx={{ display: 'block', mt: 2, textAlign: 'center', color: '#FF3366', fontWeight: 800, fontSize: '0.7rem' }}>
+                                    REAL-TIME PREVIEW
                                 </Typography>
                             </Box>
-                        </Box>
-
-                        {/* Memories Column */}
-                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-                                <Typography variant="subtitle1" sx={{ fontWeight: 800, color: '#FF3366', display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Gallery size="24" variant="Bulk" /> Memories (Swiper Cards)
-                                    <Chip label={memories.length} size="small" sx={{ bgcolor: '#FFF0F3', color: '#FF3366', fontWeight: 700 }} />
-                                </Typography>
-                                <Box sx={{ display: 'flex', gap: 1 }}>
-                                    <Button
-                                        component="label"
-                                        variant="outlined"
-                                        startIcon={<Gallery size="20" variant="Bulk" color="#FF3366" />}
-                                        size="small"
-                                        sx={{ borderRadius: '8px', color: '#FF3366', borderColor: '#FF3366' }}
-                                    >
-                                        Bulk Upload
-                                        <input type="file" multiple hidden accept="image/*,video/*" onChange={handleBulkUpload} />
-                                    </Button>
-                                    <Button
-                                        variant="contained"
-                                        startIcon={<Add size="20" variant="Bulk" color="white" />}
-                                        size="small"
-                                        onClick={handleAddMemory}
-                                        sx={{ bgcolor: '#FF3366', '&:hover': { bgcolor: '#E02D59' }, borderRadius: '8px' }}
-                                    >
-                                        Add URL
-                                    </Button>
-                                </Box>
-                            </Box>
-
-                            <Stack spacing={3} sx={{
-                                width: '100%',
-                                pb: 4
-                            }}>
-                                {memories.length === 0 && (
-                                    <Box sx={{
-                                        p: 6,
-                                        textAlign: 'center',
-                                        border: '2px dashed #eee',
-                                        borderRadius: 4,
-                                        bgcolor: 'rgba(255, 255, 255, 0.5)',
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        gap: 2
-                                    }}>
-                                        <Gallery size="48" color="#FF3366" variant="Bulk" />
-                                        <Typography sx={{ color: 'text.secondary', fontWeight: 600 }}>No memories added yet.</Typography>
-                                        <Typography variant="caption" color="text.disabled">Click "Add Memory" to start building your gallery.</Typography>
-                                    </Box>
-                                )}
-
-                                <DndContext
-                                    id={dndId}
-                                    sensors={sensors}
-                                    collisionDetection={closestCenter}
-                                    onDragEnd={handleDragEnd}
-                                    modifiers={[restrictToVerticalAxis]}
-                                >
-                                    <SortableContext
-                                        items={saving ? [] : memories.map((m) => m.localId)}
-                                        strategy={verticalListSortingStrategy}
-                                    >
-                                        {memories.map((memory, index) => (
-                                            <SortableMemoryItem
-                                                key={memory.localId}
-                                                id={memory.localId}
-                                                memory={memory}
-                                                index={index}
-                                                handleRemoveMemory={handleRemoveMemory}
-                                                handleFileChange={handleFileChange}
-                                                handleMemoryChange={handleMemoryChange}
-                                                disabled={saving}
-                                            />
-                                        ))}
-                                    </SortableContext>
-                                </DndContext>
-                            </Stack>
                         </Box>
                     </Box>
                 </DialogContent>
@@ -1665,32 +1576,7 @@ export default function ValentineAdminPage() {
                                 style={{ width: '100%', height: 'auto', display: 'block' }}
                             />
 
-                            {/* Logo Overlay - Center (Professional Circle Style) */}
-                            <Box sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                width: '20%',
-                                height: '20%',
-                                bgcolor: 'white',
-                                borderRadius: '50%', // Perfect Circle
-                                p: 0.75,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                boxShadow: '0 4px 15px rgba(0,0,0,0.12)',
-                                border: '1px solid rgba(0,0,0,0.05)'
-                            }}>
-                                <img
-                                    src="/images/favicon.png"
-                                    alt="Logo"
-                                    style={{ width: '85%', height: '85%', objectFit: 'contain' }}
-                                    onError={(e) => {
-                                        e.currentTarget.src = "/images/favicon.png";
-                                    }}
-                                />
-                            </Box>
+
                         </Box>
                     )}
                     <Typography

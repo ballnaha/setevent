@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
 
 // GET - Get single valentine card with memories
 export async function GET(
@@ -17,7 +15,8 @@ export async function GET(
             include: {
                 memories: {
                     orderBy: { order: 'asc' }
-                }
+                },
+                orderedProducts: true
             }
         });
 
@@ -42,7 +41,7 @@ export async function PUT(
         const body = await req.json();
         const {
             slug, jobName, title, openingText, greeting, subtitle, message,
-            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories
+            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories, orderedProducts
         } = body;
 
         // Update main card data
@@ -61,7 +60,10 @@ export async function PUT(
                 backgroundMusicYoutubeId,
                 backgroundMusicUrl,
                 status,
-                disabledAt: disabledAt ? new Date(disabledAt) : null
+                disabledAt: disabledAt ? new Date(disabledAt) : null,
+                orderedProducts: {
+                    set: orderedProducts && Array.isArray(orderedProducts) ? orderedProducts.map((id: string) => ({ id })) : []
+                }
             }
         });
 

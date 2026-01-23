@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-
-const prisma = new PrismaClient();
 
 // GET - List all valentine cards for admin
 export async function GET() {
@@ -11,7 +9,8 @@ export async function GET() {
             include: {
                 _count: {
                     select: { memories: true }
-                }
+                },
+                orderedProducts: true
             },
             orderBy: { createdAt: 'desc' }
         });
@@ -27,7 +26,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { slug, jobName, title, openingText, greeting, subtitle, message, signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories } = body;
+        const { slug, jobName, title, openingText, greeting, subtitle, message, signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories, orderedProducts } = body;
 
         if (!slug || !title) {
             return NextResponse.json({ error: "Slug and title are required" }, { status: 400 });
@@ -56,6 +55,9 @@ export async function POST(req: NextRequest) {
                         thumbnail: m.thumbnail,
                         order: m.order ?? index
                     })) : []
+                },
+                orderedProducts: {
+                    connect: orderedProducts && Array.isArray(orderedProducts) ? orderedProducts.map((id: string) => ({ id })) : []
                 }
             }
         });

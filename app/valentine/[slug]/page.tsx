@@ -344,10 +344,17 @@ export default function ValentineSlugPage() {
         setCountdown(3);
 
         // 🚀 Auto Fullscreen on Open (Triggered immediately to satisfy user gesture)
-        if (typeof document !== 'undefined' && !document.fullscreenElement) {
-            const elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(() => { /* Silent skip */ });
+        if (typeof document !== 'undefined') {
+            const elem = document.documentElement as any;
+            const requestMethod = elem.requestFullscreen ||
+                elem.webkitRequestFullscreen ||
+                elem.mozRequestFullScreen ||
+                elem.msRequestFullscreen;
+
+            if (requestMethod && !document.fullscreenElement) {
+                requestMethod.call(elem).catch((err: any) => {
+                    console.log(`Fullscreen request failed or was blocked: ${err.message}`);
+                });
                 setIsFullscreen(true);
             }
         }
@@ -639,17 +646,7 @@ export default function ValentineSlugPage() {
                             กลับสู่หน้าหลัก
                         </Button>
 
-                        {/* Branding Footer */}
-                        <div className="mt-8 flex flex-col items-center gap-2 opacity-60">
-                            <img
-                                src="/images/logo1.png"
-                                alt="Logo"
-                                className="h-8 w-auto object-contain opacity-70 transition-all duration-500"
-                            />
-                            <Typography className="text-[0.7rem] tracking-[0.2em] uppercase text-[#D41442]" style={{ fontFamily: 'var(--font-mali)' }}>
-                                ขอบคุณที่ใช้เราได้ส่งความสุขให้กับคนรักของคุณ
-                            </Typography>
-                        </div>
+
                     </div>
                 </div>
 
@@ -1412,15 +1409,7 @@ export default function ValentineSlugPage() {
                         ))}
                     </div>
 
-                    {/* Top Logo - Moved to corner to avoid overlap with floating lid */}
-                    <div className="absolute z-20 opacity-350 grayscale pointer-events-none"
-                        style={{ top: 'calc(1.5rem + env(safe-area-inset-top))', right: '1.5rem' }}>
-                        <img
-                            src="/images/logo1.png"
-                            alt="SetEvent Logo"
-                            className="h-5 w-auto object-contain"
-                        />
-                    </div>
+
 
                     {/* Top Guard - Reduced for better fit on older screens */}
                     <div className="flex-none" style={{ height: 'calc(3.5rem + env(safe-area-inset-top))' }} />
@@ -1556,6 +1545,28 @@ export default function ValentineSlugPage() {
                             <div className="liquid-blob liquid-blob-2" />
                             <div className="liquid-blob liquid-blob-3" />
                         </div>
+                    </div>
+
+                    {/* 💖 Background Ambient Hearts - Consistent with Intro Screen */}
+                    <div className="fixed inset-0 z-[1] pointer-events-none overflow-hidden">
+                        {[...Array(12)].map((_, i) => (
+                            <div key={`bg-heart-${i}`} className="absolute opacity-0" style={{
+                                left: `${(i * 8) + (Math.random() * 5)}%`,
+                                bottom: '-10%',
+                                animation: `intro-heart-drift ${15 + (i % 6) * 4}s linear infinite`,
+                                animationDelay: `${i * 2}s`
+                            }}>
+                                <Heart
+                                    size={14 + (i % 5) * 8}
+                                    variant={(i % 2 === 0) ? "Bold" : "Bulk"}
+                                    color={i % 3 === 0 ? "#FF3366" : i % 3 === 1 ? "#FF99AC" : "#D32F2F"}
+                                    style={{
+                                        opacity: 0.5,
+                                        filter: 'drop-shadow(0 0 10px rgba(255,51,102,0.15))'
+                                    }}
+                                />
+                            </div>
+                        ))}
                     </div>
                     {/* 🏆 Header Section (Fixed outside the animated container to prevent jumping) */}
                     <div className="fixed left-0 right-0 text-center z-[70] pointer-events-none px-16" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
