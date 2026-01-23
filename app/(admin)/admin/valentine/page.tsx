@@ -34,6 +34,11 @@ import {
     FormControlLabel,
     Switch
 } from "@mui/material";
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/th';
 import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown, Printer } from "iconsax-react";
 import {
     DndContext,
@@ -82,6 +87,7 @@ interface ValentineCard {
     backgroundMusicYoutubeId: string | null;
     backgroundMusicUrl: string | null;
     status: string;
+    disabledAt: string | null;
     createdAt: string;
     _count?: { memories: number };
 }
@@ -421,7 +427,8 @@ export default function ValentineAdminPage() {
         backgroundColor: "#FFF0F3",
         backgroundMusicYoutubeId: "",
         backgroundMusicUrl: "",
-        status: "active"
+        status: "active",
+        disabledAt: "" // วันที่จะ disabled อัตโนมัติ (format: YYYY-MM-DDTHH:mm)
     });
     const [musicFile, setMusicFile] = useState<File | null>(null);
     const [musicProgress, setMusicProgress] = useState(0);
@@ -593,6 +600,10 @@ export default function ValentineAdminPage() {
             if (res.ok) {
                 const data = await res.json();
                 setEditId(data.id);
+                // Format disabledAt for datetime-local input (YYYY-MM-DDTHH:mm)
+                const formatDisabledAt = data.disabledAt
+                    ? dayjs(data.disabledAt).format('YYYY-MM-DDTHH:mm')
+                    : "";
                 setFormData({
                     slug: data.slug,
                     jobName: data.jobName || "",
@@ -605,7 +616,8 @@ export default function ValentineAdminPage() {
                     backgroundColor: data.backgroundColor || "#FFF0F3",
                     backgroundMusicYoutubeId: data.backgroundMusicYoutubeId || "",
                     backgroundMusicUrl: data.backgroundMusicUrl || "",
-                    status: data.status
+                    status: data.status,
+                    disabledAt: formatDisabledAt
                 });
                 setMusicFile(null);
                 setMemories((data.memories || []).map((m: any) => ({
@@ -639,7 +651,8 @@ export default function ValentineAdminPage() {
             backgroundColor: "#FFF0F3",
             backgroundMusicYoutubeId: "",
             backgroundMusicUrl: "",
-            status: "active"
+            status: "active",
+            disabledAt: ""
         });
         setMusicFile(null);
         setMemories([]);
@@ -1019,6 +1032,7 @@ export default function ValentineAdminPage() {
                                     <TableCell>Slug</TableCell>
                                     <TableCell>Memories</TableCell>
                                     <TableCell>Status</TableCell>
+                                    <TableCell>Expires</TableCell>
                                     <TableCell>Created At</TableCell>
                                     <TableCell align="right">Actions</TableCell>
                                 </TableRow>
@@ -1053,6 +1067,18 @@ export default function ValentineAdminPage() {
                                                 color={card.status === 'active' ? 'success' : 'default'}
                                                 size="small"
                                             />
+                                        </TableCell>
+                                        <TableCell sx={{ fontSize: '0.8rem' }}>
+                                            {card.disabledAt ? (
+                                                <Chip
+                                                    label={new Date(card.disabledAt).toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                    size="small"
+                                                    color={new Date(card.disabledAt) < new Date() ? 'error' : new Date(card.disabledAt) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) ? 'warning' : 'default'}
+                                                    variant="outlined"
+                                                />
+                                            ) : (
+                                                <Typography variant="caption" color="text.secondary">ไม่หมดอายุ</Typography>
+                                            )}
                                         </TableCell>
                                         <TableCell sx={{ fontSize: '0.8rem', color: 'text.secondary' }}>
                                             {new Date(card.createdAt).toLocaleDateString('th-TH')}
@@ -1242,6 +1268,34 @@ export default function ValentineAdminPage() {
                                             label="Status"
                                         />
                                     </Box>
+
+                                    {/* Auto Disable Date */}
+                                    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
+                                        <DateTimePicker
+                                            label="วันที่ปิดการ์ดอัตโนมัติ (ไม่บังคับ)"
+                                            value={formData.disabledAt ? dayjs(formData.disabledAt) : null}
+                                            onChange={(newValue: Dayjs | null) => {
+                                                setFormData({
+                                                    ...formData,
+                                                    disabledAt: newValue ? newValue.toISOString() : ''
+                                                });
+                                            }}
+                                            sx={{ width: '100%' }}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    helperText: "ถ้าไม่กำหนด การ์ดจะแสดงตลอดไป",
+                                                    InputProps: { sx: { fontFamily: 'var(--font-prompt)', borderRadius: 2 } },
+                                                    InputLabelProps: { sx: { fontFamily: 'var(--font-prompt)' } },
+                                                    FormHelperTextProps: { sx: { fontFamily: 'var(--font-prompt)' } }
+                                                },
+                                                actionBar: {
+                                                    actions: ['clear', 'today', 'accept']
+                                                }
+                                            }}
+                                            ampm={false}
+                                        />
+                                    </LocalizationProvider>
 
 
                                     {/* Background Music */}

@@ -79,6 +79,7 @@ export default function ValentineSlugPage() {
     const [content, setContent] = useState<ValentineContent | null>(null);
     const [memories, setMemories] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isExpired, setIsExpired] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [hearts, setHearts] = useState<{ id: number; top: number; left: number; size: number; rotation: number; color: string }[]>([]);
@@ -189,6 +190,8 @@ export default function ValentineSlugPage() {
                     if (data.memories && data.memories.length > 0) {
                         setMemories(data.memories);
                     }
+                } else if (response.status === 404) {
+                    setIsExpired(true);
                 }
             } catch (error) {
                 console.error("Failed to fetch valentine data:", error);
@@ -569,6 +572,104 @@ export default function ValentineSlugPage() {
                     </Typography>
                 </Box>
             </Box>
+        );
+    }
+
+    if (isExpired) {
+        return (
+            <div className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden p-6 text-center z-[10000]" style={{ backgroundColor: '#FFF0F3' }}>
+                <div className="absolute inset-0 pointer-events-none opacity-20">
+                    {[...Array(12)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute animate-float"
+                            style={{
+                                top: `${Math.random() * 100}%`,
+                                left: `${Math.random() * 100}%`,
+                                animationDelay: `${i * 0.5}s`,
+                                animationDuration: `${5 + Math.random() * 5}s`
+                            }}
+                        >
+                            <Heart size={20 + Math.random() * 30} variant="Bulk" className="text-[#FF3366]" />
+                        </div>
+                    ))}
+                </div>
+
+                <div className="relative z-10 max-w-md w-full animate-fade-in">
+                    <div className="mb-8 relative inline-block">
+                        <Heart size="100" variant="Bulk" color="#FF3366" className="text-[#FF3366] opacity-20 transform scale-110" />
+                        <Heart size="80" variant="Bulk" color="#FF3366" className="text-[#FF3366] absolute inset-0 m-auto drop-shadow-lg" />
+                    </div>
+
+                    <h1 className="text-3xl font-bold mb-4 text-[#FF3366]" style={{ fontFamily: 'var(--font-charm)' }}>
+                        Love Remains Forever
+                    </h1>
+
+                    <div className="space-y-4 px-4">
+                        <Typography className="text-lg leading-relaxed text-[#D41442]" style={{ fontFamily: 'var(--font-mali)', fontWeight: 600 }}>
+                            "ความหวานของกล่องจดหมายนี้<br />ได้ถูกบันทึกไว้เป็นความทรงจำที่แสนพิเศษเรียบร้อยแล้ว..."
+                        </Typography>
+
+                        <div className="h-px w-24 bg-[#FFC1CC] mx-auto my-6" />
+
+                        <Typography className="text-base text-[#FF85A1] italic" style={{ fontFamily: 'var(--font-dancing)', fontSize: '1.25rem' }}>
+                            Even though time passes,<br />the beauty of love always stays the same.
+                        </Typography>
+                    </div>
+
+                    <div className="mt-12">
+                        <Button
+                            onClick={() => window.location.href = "/"}
+                            variant="outlined"
+                            sx={{
+                                color: '#FF3366',
+                                borderColor: '#FF3366',
+                                borderRadius: '50px',
+                                px: 4,
+                                py: 1.5,
+                                fontFamily: 'var(--font-mali)',
+                                fontWeight: 700,
+                                mb: 6, // Add margin bottom for the logo
+                                '&:hover': {
+                                    bgcolor: '#FFF5F7',
+                                    borderColor: '#FF3366',
+                                }
+                            }}
+                        >
+                            กลับสู่หน้าหลัก
+                        </Button>
+
+                        {/* Branding Footer */}
+                        <div className="mt-8 flex flex-col items-center gap-2 opacity-60">
+                            <img
+                                src="/images/logo1.png"
+                                alt="Logo"
+                                className="h-8 w-auto object-contain opacity-70 transition-all duration-500"
+                            />
+                            <Typography className="text-[0.7rem] tracking-[0.2em] uppercase text-[#D41442]" style={{ fontFamily: 'var(--font-mali)' }}>
+                                ขอบคุณที่ใช้เราได้ส่งความสุขให้กับคนรักของคุณ
+                            </Typography>
+                        </div>
+                    </div>
+                </div>
+
+                <style jsx>{`
+                    @keyframes float {
+                        0%, 100% { transform: translateY(0) rotate(0); }
+                        50% { transform: translateY(-20px) rotate(10deg); }
+                    }
+                    .animate-float {
+                        animation: float normal ease-in-out infinite;
+                    }
+                    .animate-fade-in {
+                        animation: fadeIn 1s ease-out forwards;
+                    }
+                    @keyframes fadeIn {
+                        from { opacity: 0; transform: translateY(20px); }
+                        to { opacity: 1; transform: translateY(0); }
+                    }
+                `}</style>
+            </div>
         );
     }
 

@@ -7,11 +7,17 @@ export async function GET(
 ) {
     try {
         const { slug } = await params;
+        const now = new Date();
 
         const valentine = await prisma.valentineCard.findFirst({
             where: {
                 slug: slug,
-                status: 'active'
+                status: 'active',
+                // Check that card is not expired (disabledAt is null OR in the future)
+                OR: [
+                    { disabledAt: null },
+                    { disabledAt: { gt: now } }
+                ]
             },
             include: {
                 memories: {
@@ -24,7 +30,7 @@ export async function GET(
 
         if (!valentine) {
             return NextResponse.json(
-                { error: 'Valentine card not found' },
+                { error: 'Valentine card not found or expired' },
                 { status: 404 }
             );
         }

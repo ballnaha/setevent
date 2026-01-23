@@ -298,6 +298,7 @@ model ValentineCard {
   signer          String?
   backgroundColor String?  @default("#FFF0F3")
   status          String   @default("active") // active, inactive
+  disabledAt      DateTime? // วันที่จะ disabled อัตโนมัติ (ถ้าไม่ใส่ = ไม่มีวันหมดอายุ)
 
   // Background Music (เลือกใช้ได้ทีละอันเท่านั้น - MP3 จะถูกใช้ก่อนถ้ามีทั้งคู่)
   backgroundMusicYoutubeId String?  // YouTube Video ID for background music

@@ -42,7 +42,7 @@ export async function PUT(
         const body = await req.json();
         const {
             slug, jobName, title, openingText, greeting, subtitle, message,
-            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, memories
+            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories
         } = body;
 
         // Update main card data
@@ -60,7 +60,8 @@ export async function PUT(
                 backgroundColor,
                 backgroundMusicYoutubeId,
                 backgroundMusicUrl,
-                status
+                status,
+                disabledAt: disabledAt ? new Date(disabledAt) : null
             }
         });
 
