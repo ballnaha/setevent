@@ -12,7 +12,7 @@ export async function GET() {
                 },
                 orderedProducts: true
             },
-            orderBy: { createdAt: 'desc' }
+            orderBy: { createdAt: 'asc' }
         });
 
         return NextResponse.json(cards);
