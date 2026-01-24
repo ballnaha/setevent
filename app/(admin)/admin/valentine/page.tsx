@@ -489,6 +489,7 @@ export default function ValentineAdminPage() {
     const [availableProducts, setAvailableProducts] = useState<ValentineProduct[]>([]);
     const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
     const [currentTab, setCurrentTab] = useState(0);
+    const memoriesEndRef = React.useRef<HTMLDivElement>(null);
 
     // Delete Confirmation State
     const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -502,6 +503,13 @@ export default function ValentineAdminPage() {
     const showSnackbar = (message: string, severity: AlertColor = "success") => {
         setSnackbar({ open: true, message, severity });
     };
+
+    // Auto-scroll to bottom when new memories are added
+    useEffect(() => {
+        if (currentTab === 2 && memories.length > 0) {
+            memoriesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [memories.length, currentTab]);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleting, setDeleting] = useState(false);
     const [qrOpen, setQrOpen] = useState(false);
@@ -1063,9 +1071,9 @@ export default function ValentineAdminPage() {
             caption: "",
             order: 0
         };
-        // Prepend new memory to the top and update orders
+        // Append new memory to the bottom and update orders
         setMemories(prev => {
-            const updated = [newMemory, ...prev];
+            const updated = [...prev, newMemory];
             return updated.map((m, i) => ({ ...m, order: i }));
         });
     };
@@ -1101,7 +1109,7 @@ export default function ValentineAdminPage() {
         }));
 
         setMemories(prev => {
-            const updated = [...newMemories, ...prev];
+            const updated = [...prev, ...newMemories];
             // Re-map orders for the entire list
             return updated.map((m, i) => ({ ...m, order: i }));
         });
@@ -1854,15 +1862,6 @@ export default function ValentineAdminPage() {
                                             <Gallery size="24" variant="Bulk" /> Card Memories
                                             <Chip label={memories.length} size="small" sx={{ bgcolor: '#FFF0F3', color: '#FF3366', fontWeight: 700 }} />
                                         </Typography>
-                                        <Box sx={{ display: 'flex', gap: 1 }}>
-                                            <Button component="label" variant="outlined" startIcon={<Add />} size="small" sx={{ borderRadius: 2 }}>
-                                                Bulk Upload
-                                                <input type="file" multiple hidden accept="image/*,video/*" onChange={handleBulkUpload} />
-                                            </Button>
-                                            <Button variant="contained" startIcon={<Add color="white" />} size="small" onClick={handleAddMemory} sx={{ borderRadius: 2, bgcolor: '#FF3366', '&:hover': { bgcolor: '#E02D59' } }}>
-                                                Add URL
-                                            </Button>
-                                        </Box>
                                     </Box>
                                     <Stack spacing={2.5}>
                                         <DndContext id={dndId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
@@ -1872,10 +1871,54 @@ export default function ValentineAdminPage() {
                                                 ))}
                                             </SortableContext>
                                         </DndContext>
+
                                         {memories.length === 0 && <Box sx={{ p: 8, textAlign: 'center', border: '2px dashed #eee', borderRadius: 4, bgcolor: '#fcfcfc' }}>
                                             <Gallery size="48" color="#FF3366" variant="Bulk" style={{ opacity: 0.2, marginBottom: 16 }} />
                                             <Typography color="text.secondary" fontWeight={600}>No memories added yet</Typography>
                                         </Box>}
+
+                                        {/* Action Buttons at Bottom */}
+                                        <Box sx={{
+                                            display: 'flex',
+                                            gap: 2,
+                                            pt: 2,
+                                            borderTop: memories.length > 0 ? '1px dashed #eee' : 'none',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <Button
+                                                component="label"
+                                                variant="outlined"
+                                                startIcon={<Add />}
+                                                sx={{
+                                                    borderRadius: 3,
+                                                    px: 3,
+                                                    py: 1,
+                                                    borderColor: '#FF3366',
+                                                    color: '#FF3366',
+                                                    '&:hover': { borderColor: '#E02D59', bgcolor: '#FFF0F3' }
+                                                }}
+                                            >
+                                                Bulk Upload Images/Videos
+                                                <input type="file" multiple hidden accept="image/*,video/*" onChange={handleBulkUpload} />
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                startIcon={<Add color="white" />}
+                                                onClick={handleAddMemory}
+                                                sx={{
+                                                    borderRadius: 3,
+                                                    px: 4,
+                                                    py: 1,
+                                                    bgcolor: '#FF3366',
+                                                    '&:hover': { bgcolor: '#E02D59' },
+                                                    boxShadow: '0 4px 12px rgba(255, 51, 102, 0.2)'
+                                                }}
+                                            >
+                                                Add New Card (URL)
+                                            </Button>
+                                        </Box>
+
+                                        <div ref={memoriesEndRef} />
                                     </Stack>
                                 </Box>
                             </CustomTabPanel>

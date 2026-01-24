@@ -1837,7 +1837,7 @@ export default function ValentineSlugPage() {
                                                                             <Typography
                                                                                 variant="h5"
                                                                                 className="romantic-text text-white text-center leading-relaxed"
-                                                                                style={{ fontSize: '1.6rem' }}
+                                                                                style={{ fontSize: '1.4rem' }}
                                                                             >
                                                                                 {memory.caption}
                                                                             </Typography>
