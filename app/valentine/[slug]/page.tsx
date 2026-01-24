@@ -24,6 +24,8 @@ const DEFAULT_CONTENT = {
     backgroundColor: "#FFF0F3",
     backgroundMusicYoutubeId: "",
     backgroundMusicUrl: "",
+    swipeHintColor: "white" as "white" | "red",
+    swipeHintText: "Swipe to see more",
 };
 
 const DEFAULT_MEMORIES = [
@@ -70,6 +72,8 @@ interface ValentineContent {
     backgroundColor: string;
     backgroundMusicYoutubeId: string;
     backgroundMusicUrl: string;
+    swipeHintColor: "white" | "red";
+    swipeHintText: string;
 }
 
 export default function ValentineSlugPage() {
@@ -92,8 +96,7 @@ export default function ValentineSlugPage() {
     // though usually handled by initial render. Keeping it empty is safer for animation logic.
     const [seenSlides, setSeenSlides] = useState<Set<number>>(new Set([0]));
     const [revealedSlides, setRevealedSlides] = useState<Set<number>>(new Set([0])); // Start with slide 0 revealed
-    const [typedMessage, setTypedMessage] = useState("");
-    const [isTyping, setIsTyping] = useState(false);
+    const [showMessage, setShowMessage] = useState(false);
     const [fontsLoaded, setFontsLoaded] = useState(false); // 🔤 Wait for Google Fonts to load
 
     // 🎭 Swiper Creative Effect Configuration (Memoized at top level for Hooks rules)
@@ -169,6 +172,28 @@ export default function ValentineSlugPage() {
         }, 5000);
     }, []);
 
+    // 📱 Inject Mobile App Meta Tags for standalone experience
+    useEffect(() => {
+        if (typeof document !== 'undefined') {
+            const metaTags = [
+                { name: 'apple-mobile-web-app-capable', content: 'yes' },
+                { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+                { name: 'mobile-web-app-capable', content: 'yes' },
+                { name: 'theme-color', content: content?.backgroundColor || '#FFF0F3' }
+            ];
+
+            metaTags.forEach(tag => {
+                let element = document.querySelector(`meta[name="${tag.name}"]`);
+                if (!element) {
+                    element = document.createElement('meta');
+                    element.setAttribute('name', tag.name);
+                    document.head.appendChild(element);
+                }
+                element.setAttribute('content', tag.content);
+            });
+        }
+    }, [content?.backgroundColor]);
+
     useEffect(() => {
         const fetchData = async () => {
             if (!slug) return;
@@ -186,6 +211,8 @@ export default function ValentineSlugPage() {
                         backgroundColor: data.backgroundColor || DEFAULT_CONTENT.backgroundColor,
                         backgroundMusicYoutubeId: data.backgroundMusicYoutubeId || "",
                         backgroundMusicUrl: data.backgroundMusicUrl || "",
+                        swipeHintColor: data.swipeHintColor || DEFAULT_CONTENT.swipeHintColor,
+                        swipeHintText: data.swipeHintText || DEFAULT_CONTENT.swipeHintText,
                     });
                     if (data.memories && data.memories.length > 0) {
                         setMemories(data.memories);
@@ -451,26 +478,15 @@ export default function ValentineSlugPage() {
         setActiveVideo(null);
     };
 
-    // Typewriter effect logic
+    // Trigger message reveal animation after opening
     useEffect(() => {
         if (isOpen && !isTransitioning) {
             const timeout = setTimeout(() => {
-                setIsTyping(true);
-                let i = 0;
-                const fullMsg = displayContent.message || "You are the best thing that ever happened to me...";
-                const interval = setInterval(() => {
-                    setTypedMessage(fullMsg.slice(0, i));
-                    i++;
-                    if (i > fullMsg.length) {
-                        clearInterval(interval);
-                        setIsTyping(false);
-                    }
-                }, 40);
-                return () => clearInterval(interval);
+                setShowMessage(true);
             }, 800);
             return () => clearTimeout(timeout);
         }
-    }, [isOpen, isTransitioning, displayContent.message]);
+    }, [isOpen, isTransitioning]);
 
     const handleSlideChange = useCallback((swiper: any) => {
         const activeIndex = swiper.activeIndex;
@@ -743,6 +759,25 @@ export default function ValentineSlugPage() {
         @keyframes letter-pop {
             0%, 100% { transform: translateY(0); opacity: 0.6; }
             50% { transform: translateY(-3px); opacity: 1; text-shadow: 0 0 8px white; }
+        }
+        @keyframes char-fade-in {
+            0% { 
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            100% { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .char-animate {
+            display: inline-block;
+            opacity: 0;
+            animation: char-fade-in 0.3s ease-out forwards;
+        }
+        .char-space {
+            display: inline;
+            width: 0.25em;
         }
         .image-loading {
             background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
@@ -1598,53 +1633,66 @@ export default function ValentineSlugPage() {
 
                                 <div className="relative w-full flex justify-center items-center">
                                     {/* 💖 Premium Heart Flow Hint - Optimized for performance */}
-                                    {currentSlideIndex === 0 && !hasSwiped && (
-                                        <div className="absolute inset-x-0 top-10 z-[60] flex flex-col items-center pointer-events-none">
-                                            <div className="flex flex-col items-center gap-4 animate-[swipeHint_3.5s_infinite]">
+                                    {currentSlideIndex === 0 && !hasSwiped && (() => {
+                                        const hintColor = displayContent.swipeHintColor || 'white';
+                                        const isWhite = hintColor === 'white';
+                                        const heartColor = isWhite ? 'white' : '#FF3366';
+                                        const ringBorderColor = isWhite ? 'border-white/40' : 'border-[#FF3366]/40';
+                                        const ringBorderColor2 = isWhite ? 'border-white/20' : 'border-[#FF3366]/20';
+                                        const dropShadow = isWhite ? 'drop-shadow-[0_0_15px_rgba(255,51,102,0.6)]' : 'drop-shadow-[0_0_15px_rgba(255,255,255,0.8)]';
+                                        const textGradient = isWhite
+                                            ? 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, #ffffff 50%, rgba(255,255,255,0.2) 100%)'
+                                            : 'linear-gradient(90deg, rgba(255,51,102,0.3) 0%, #FF3366 50%, rgba(255,51,102,0.3) 100%)';
+                                        const dividerColor = isWhite ? 'via-white/40' : 'via-[#FF3366]/40';
 
-                                                {/* Advanced Heart Pulse with Rings */}
-                                                <div className="relative flex items-center justify-center">
-                                                    {/* Expanding Love Rings */}
-                                                    <div className="absolute w-8 h-8 rounded-full border border-white/40 animate-[ring-spread_2s_infinite]" />
-                                                    <div className="absolute w-8 h-8 rounded-full border border-white/20 animate-[ring-spread_2s_infinite_0.5s]" />
+                                        return (
+                                            <div className="absolute inset-x-0 top-70 z-[60] flex flex-col items-center pointer-events-none">
+                                                <div className="flex flex-col items-center gap-4 animate-[swipeHint_3.5s_infinite]">
 
-                                                    <div className="relative z-10 animate-[heart-beat-glow_1.5s_infinite]">
-                                                        <Heart size={32} variant="Bold" color="white" className="drop-shadow-[0_0_15px_rgba(255,51,102,0.6)]" />
+                                                    {/* Advanced Heart Pulse with Rings */}
+                                                    <div className="relative flex items-center justify-center">
+                                                        {/* Expanding Love Rings */}
+                                                        <div className={`absolute w-8 h-8 rounded-full border ${ringBorderColor} animate-[ring-spread_2s_infinite]`} />
+                                                        <div className={`absolute w-8 h-8 rounded-full border ${ringBorderColor2} animate-[ring-spread_2s_infinite_0.5s]`} />
+
+                                                        <div className="relative z-10 animate-[heart-beat-glow_1.5s_infinite]">
+                                                            <Heart size={32} variant="Bold" color={heartColor} className={dropShadow} />
+                                                        </div>
+
+                                                        {/* Floating companion hearts */}
+                                                        <div className="absolute -top-4 -right-4 opacity-70 animate-[heart-float_2.5s_infinite]">
+                                                            <Heart size={14} variant="Bold" color={heartColor} />
+                                                        </div>
+                                                        <div className="absolute -bottom-2 -left-3 opacity-50 animate-[heart-float_2s_infinite_400ms]">
+                                                            <Heart size={10} variant="Bold" color={heartColor} />
+                                                        </div>
                                                     </div>
 
-                                                    {/* Floating companion hearts */}
-                                                    <div className="absolute -top-4 -right-4 opacity-70 animate-[heart-float_2.5s_infinite]">
-                                                        <Heart size={14} variant="Bold" color="white" />
+                                                    {/* Elegant Shimmer Text */}
+                                                    <div className="flex flex-col items-center">
+                                                        <Typography
+                                                            sx={{
+                                                                fontSize: '0.7rem',
+                                                                fontWeight: 800,
+                                                                letterSpacing: '0.5em',
+                                                                textTransform: 'uppercase',
+                                                                background: textGradient,
+                                                                backgroundSize: '200% auto',
+                                                                WebkitBackgroundClip: 'text',
+                                                                WebkitTextFillColor: 'transparent',
+                                                                animation: 'text-shine 3s linear infinite',
+                                                                textAlign: 'center',
+                                                                fontFamily: 'var(--font-prompt)'
+                                                            }}
+                                                        >
+                                                            {displayContent.swipeHintText || "Swipe to see more"}
+                                                        </Typography>
+                                                        <div className={`w-12 h-[1px] bg-gradient-to-r from-transparent ${dividerColor} to-transparent mt-1`} />
                                                     </div>
-                                                    <div className="absolute -bottom-2 -left-3 opacity-50 animate-[heart-float_2s_infinite_400ms]">
-                                                        <Heart size={10} variant="Bold" color="white" />
-                                                    </div>
-                                                </div>
-
-                                                {/* Elegant Shimmer Text */}
-                                                <div className="flex flex-col items-center">
-                                                    <Typography
-                                                        sx={{
-                                                            fontSize: '0.7rem',
-                                                            fontWeight: 800,
-                                                            letterSpacing: '0.5em',
-                                                            textTransform: 'uppercase',
-                                                            background: 'linear-gradient(90deg, rgba(255,255,255,0.2) 0%, #ffffff 50%, rgba(255,255,255,0.2) 100%)',
-                                                            backgroundSize: '200% auto',
-                                                            WebkitBackgroundClip: 'text',
-                                                            WebkitTextFillColor: 'transparent',
-                                                            animation: 'text-shine 3s linear infinite',
-                                                            textAlign: 'center',
-                                                            fontFamily: 'var(--font-prompt)'
-                                                        }}
-                                                    >
-                                                        Swipe to see more
-                                                    </Typography>
-                                                    <div className="w-12 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent mt-1" />
                                                 </div>
                                             </div>
-                                        </div>
-                                    )}
+                                        );
+                                    })()}
 
                                     <Swiper
                                         effect={"creative"}
@@ -1851,12 +1899,32 @@ export default function ValentineSlugPage() {
                                     {/* Left Accent Bar */}
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#FF3366] to-transparent opacity-40" />
 
-                                    <Typography variant="body2" className="text-gray-700 whitespace-pre-line leading-relaxed italic" sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
-                                        "{typedMessage}"
-                                        {isTyping && <span className="inline-block w-[2px] h-4 bg-[#FF3366] ml-1 animate-pulse align-middle" />}
+                                    <Typography
+                                        variant="body2"
+                                        component="div"
+                                        className="text-gray-700 leading-relaxed italic"
+                                        sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}
+                                    >
+                                        {showMessage ? (
+                                            <>
+                                                <span className="char-animate" style={{ animationDelay: '0ms' }}>"</span>
+                                                {(displayContent.message || 'You are the best thing that ever happened to me...').split('').map((char, i) => (
+                                                    char === '\n' ? (
+                                                        <br key={i} />
+                                                    ) : char === ' ' ? (
+                                                        <span key={i} className="char-animate char-space" style={{ animationDelay: `${(i + 1) * 25}ms` }}>&nbsp;</span>
+                                                    ) : (
+                                                        <span key={i} className="char-animate" style={{ animationDelay: `${(i + 1) * 25}ms` }}>{char}</span>
+                                                    )
+                                                ))}
+                                                <span className="char-animate" style={{ animationDelay: `${((displayContent.message || '').length + 2) * 25}ms` }}>"</span>
+                                            </>
+                                        ) : (
+                                            <span className="opacity-0">"{displayContent.message || 'You are the best thing that ever happened to me...'}"</span>
+                                        )}
                                     </Typography>
 
-                                    <Typography variant="caption" className="block text-[#D41442] font-black mt-2 tracking-wider animate-[fadeIn_0.5s_ease-out_both] opacity-80" style={{ animationDelay: isTyping ? '0s' : '0.5s' }}>
+                                    <Typography variant="caption" className={`block text-[#D41442] font-black mt-2 tracking-wider ${showMessage ? 'animate-[fadeIn_0.8s_ease-out_2s_both]' : 'opacity-0'}`}>
                                         - {displayContent.signer} -
                                     </Typography>
                                 </Paper>

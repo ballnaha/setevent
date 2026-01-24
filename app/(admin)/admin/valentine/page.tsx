@@ -49,7 +49,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/th';
-import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown, Printer, ShoppingBag } from "iconsax-react";
+import { Add, Edit, Trash, Heart, Music, Gallery, Play, Save2, CloseCircle, Global, Link as LinkIcon, HambergerMenu, Scan, DirectDown, Printer, ShoppingBag, Eye, Profile, Call, Location, ClipboardText } from "iconsax-react";
 import {
     DndContext,
     closestCenter,
@@ -104,6 +104,11 @@ interface ValentineCard {
     backgroundColor: string | null;
     backgroundMusicYoutubeId: string | null;
     backgroundMusicUrl: string | null;
+    swipeHintColor: string | null;
+    swipeHintText: string | null;
+    customerPhone: string | null;
+    customerAddress: string | null;
+    note: string | null;
     status: string;
     disabledAt: string | null;
     createdAt: string;
@@ -453,6 +458,8 @@ export default function ValentineAdminPage() {
     const [open, setOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     const [fetchingDetails, setFetchingDetails] = useState(false);
+    const [summaryOpen, setSummaryOpen] = useState(false);
+    const [selectedSummaryCard, setSelectedSummaryCard] = useState<ValentineCard | null>(null);
 
     // Form State
     const [editId, setEditId] = useState<string | null>(null);
@@ -469,7 +476,12 @@ export default function ValentineAdminPage() {
         backgroundMusicYoutubeId: "",
         backgroundMusicUrl: "",
         status: "active",
-        disabledAt: "" // วันที่จะ disabled อัตโนมัติ (format: YYYY-MM-DDTHH:mm)
+        disabledAt: "", // วันที่จะ disabled อัตโนมัติ (format: YYYY-MM-DDTHH:mm)
+        swipeHintColor: "white" as "white" | "red", // สี hint "Swipe to see more"
+        swipeHintText: "Swipe to see more", // ข้อความ hint
+        customerPhone: "", // เบอร์โทรลูกค้า
+        customerAddress: "", // ที่อยู่ลูกค้า
+        note: "", // บันทึกเพิ่มเติม
     });
     const [musicFile, setMusicFile] = useState<File | null>(null);
     const [musicProgress, setMusicProgress] = useState(0);
@@ -494,11 +506,200 @@ export default function ValentineAdminPage() {
     const [deleting, setDeleting] = useState(false);
     const [qrOpen, setQrOpen] = useState(false);
     const [qrData, setQrData] = useState<{ url: string; title: string } | null>(null);
+    const [editableTitle, setEditableTitle] = useState("");
+    const [previewVertical, setPreviewVertical] = useState<string | null>(null);
+    const [previewHorizontal, setPreviewHorizontal] = useState<string | null>(null);
+    const [generatingPreview, setGeneratingPreview] = useState(false);
 
     const handleOpenQR = (card: ValentineCard) => {
         const url = `${window.location.origin}/valentine/${card.slug}`;
-        setQrData({ url, title: card.jobName || card.title || "Valentine" });
+        const title = card.jobName || card.title || "Valentine";
+        setQrData({ url, title });
+        setEditableTitle(title);
+        setPreviewVertical(null);
+        setPreviewHorizontal(null);
         setQrOpen(true);
+        // Generate previews after modal opens
+        setTimeout(() => generatePreviews(url, title), 100);
+    };
+
+    const generatePreviews = async (url: string, title: string) => {
+        setGeneratingPreview(true);
+        try {
+            const [vertical, horizontal] = await Promise.all([
+                generateCardPreview(url, title, "/images/card_vertical_2.png", { qrSize: 0.55, qrY: 0.50, showTitle: true }),
+                generateCardPreview(url, title, "/images/card_horizontal_3.png", { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true })
+            ]);
+            setPreviewVertical(vertical);
+            setPreviewHorizontal(horizontal);
+        } catch (error) {
+            console.error("Preview generation failed:", error);
+        } finally {
+            setGeneratingPreview(false);
+        }
+    };
+
+    // Update previews when title changes
+    const handleTitleChange = (newTitle: string) => {
+        setEditableTitle(newTitle);
+        if (qrData) {
+            generatePreviews(qrData.url, newTitle);
+        }
+    };
+
+    const generateCardPreview = async (
+        targetUrl: string,
+        targetTitle: string,
+        templateUrl: string,
+        options: { qrSize: number; qrY: number; qrX?: number; showTitle?: boolean }
+    ): Promise<string> => {
+        // Business Card Standard Dimensions @300dpi
+        const isHorizontal = templateUrl.includes('horizontal');
+        const CARD_WIDTH = isHorizontal ? 1063 : 649;
+        const CARD_HEIGHT = isHorizontal ? 649 : 1063;
+
+        const qrSize = 500;
+        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(targetUrl)}&ecc=H&margin=0`;
+
+        const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "anonymous";
+            img.src = src;
+            img.onload = () => resolve(img);
+            img.onerror = () => reject(new Error(`Failed to load: ${src}`));
+        });
+
+        const canvas = document.createElement("canvas");
+        canvas.width = CARD_WIDTH;
+        canvas.height = CARD_HEIGHT;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("Could not get canvas context");
+
+        if (isHorizontal) {
+            // === HORIZONTAL CARD: Composite from card_blank.jpg + heart.png + QR ===
+            const [qrImage, bgImage, heartImage] = await Promise.all([
+                loadImage(qrUrl),
+                loadImage("/images/card_blank.jpg"),
+                loadImage("/images/heart.png"),
+            ]);
+
+            // 1. Draw background (card_blank.jpg)
+            ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+            // 2. Draw heart on left side (scaled to fit left half)
+            const heartWidth = CARD_WIDTH * 0.35;
+            const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
+            const heartX = CARD_WIDTH * 0.06;
+            const heartY = (CARD_HEIGHT - heartHeight) / 2;
+            ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
+
+            // 3. Draw title on right side above QR
+            const qrSizeOnCard = CARD_WIDTH * 0.38;
+            const qrX = CARD_WIDTH * 0.55; // moved left for more right padding
+            const qrY = CARD_HEIGHT * 0.25;
+
+            if (options.showTitle && targetTitle) {
+                const fontSize = Math.round(CARD_HEIGHT * 0.040);
+                ctx.font = `bold ${fontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                ctx.fillStyle = "#4A151B";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+                const textX = qrX + qrSizeOnCard / 2;
+                const textY = qrY - (fontSize * 0.8); // increased gap above QR
+                ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+                ctx.shadowBlur = 4;
+                ctx.fillText(targetTitle.toUpperCase(), textX, textY);
+                ctx.shadowColor = "transparent";
+                ctx.shadowBlur = 0;
+            }
+
+            // 4. Draw QR Code on right side
+            ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
+
+            // 5. Draw scan instruction below QR
+            const scanFontSize = Math.round(CARD_HEIGHT * 0.035);
+            ctx.font = `${scanFontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+            ctx.fillStyle = "#666666";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            const scanTextX = qrX + qrSizeOnCard / 2;
+            const scanTextY = qrY + qrSizeOnCard + (scanFontSize * 0.6); // increased gap below QR
+            ctx.fillText("สแกนเพื่อดูข้อความ", scanTextX, scanTextY);
+
+        } else {
+            // === VERTICAL CARD: Composite from card_blank_vertical.jpg + heart.png + QR ===
+            const [qrImage, bgImage, heartImage] = await Promise.all([
+                loadImage(qrUrl),
+                loadImage("/images/card_blank_vertical.jpg"),
+                loadImage("/images/heart.png"),
+            ]);
+
+            // 1. Draw background
+            ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+            // 2. Draw heart on top section (smaller)
+            const heartWidth = CARD_WIDTH * 0.50;
+            const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
+            const heartX = (CARD_WIDTH - heartWidth) / 2;
+            const heartY = CARD_HEIGHT * 0.06;
+            ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
+
+            // 3. Draw title above QR (larger QR)
+            const qrSizeOnCard = CARD_WIDTH * 0.65;
+            const qrX = (CARD_WIDTH - qrSizeOnCard) / 2;
+            const qrY = CARD_HEIGHT * 0.48;
+
+            if (options.showTitle && targetTitle) {
+                const fontSize = Math.round(CARD_HEIGHT * 0.028);
+                ctx.font = `bold ${fontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                ctx.fillStyle = "#4A151B";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "bottom";
+                const textX = qrX + qrSizeOnCard / 2;
+                const textY = qrY - (fontSize * 0.6);
+                ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+                ctx.shadowBlur = 4;
+                ctx.fillText(targetTitle.toUpperCase(), textX, textY);
+                ctx.shadowColor = "transparent";
+                ctx.shadowBlur = 0;
+            }
+
+            // 4. Draw QR Code
+            ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
+
+            // 5. Draw scan instruction below QR
+            const scanFontSize = Math.round(CARD_HEIGHT * 0.025);
+            ctx.font = `${scanFontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+            ctx.fillStyle = "#666666";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            const scanTextX = qrX + qrSizeOnCard / 2;
+            const scanTextY = qrY + qrSizeOnCard + (scanFontSize * 0.5);
+            ctx.fillText("สแกนเพื่อดูข้อความ", scanTextX, scanTextY);
+        }
+
+        // Crop marks for both types
+        const drawCropMark = (x: number, y: number, orientX: number, orientY: number) => {
+            const len = Math.round(CARD_WIDTH * 0.025);
+            const weight = Math.max(1.5, Math.round(CARD_WIDTH * 0.0015));
+            ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+            ctx.lineWidth = weight;
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + (len * orientX), y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x, y + (len * orientY));
+            ctx.stroke();
+        };
+        drawCropMark(0, 0, 1, 1);
+        drawCropMark(CARD_WIDTH, 0, -1, 1);
+        drawCropMark(0, CARD_HEIGHT, 1, -1);
+        drawCropMark(CARD_WIDTH, CARD_HEIGHT, -1, -1);
+
+        return canvas.toDataURL("image/png", 1.0);
     };
 
     const generateAndDownloadCard = async (
@@ -508,11 +709,14 @@ export default function ValentineAdminPage() {
         options: { qrSize: number; qrY: number; qrX?: number; showTitle?: boolean } = { qrSize: 0.60, qrY: 0.43, showTitle: true }
     ) => {
         try {
-            // 1. Create a high quality QR Code with Error Correction Level H (30%)
-            const qrSize = 1000;
+            // Business Card Standard Dimensions @300dpi
+            const isHorizontal = templateUrl.includes('horizontal');
+            const CARD_WIDTH = isHorizontal ? 1063 : 649;
+            const CARD_HEIGHT = isHorizontal ? 649 : 1063;
+
+            const qrSize = 500;
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${qrSize}x${qrSize}&data=${encodeURIComponent(targetUrl)}&ecc=H&margin=0`;
 
-            // 2. Load images
             const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
                 const img = new Image();
                 img.crossOrigin = "anonymous";
@@ -521,68 +725,144 @@ export default function ValentineAdminPage() {
                 img.onerror = () => reject(new Error(`Failed to load: ${src}`));
             });
 
-            const [qrImage, templateImage] = await Promise.all([
-                loadImage(qrUrl),
-                loadImage(templateUrl),
-            ]);
-
-            // 3. Create Canvas based on Template Dimensions
             const canvas = document.createElement("canvas");
-            if (!templateImage) throw new Error("Template image missing");
-
-            const cardWidth = templateImage.naturalWidth;
-            const cardHeight = templateImage.naturalHeight;
-            canvas.width = cardWidth;
-            canvas.height = cardHeight;
+            canvas.width = CARD_WIDTH;
+            canvas.height = CARD_HEIGHT;
 
             const ctx = canvas.getContext("2d");
             if (!ctx) throw new Error("Could not get canvas context");
 
-            // 4. Draw Template
-            ctx.drawImage(templateImage, 0, 0, cardWidth, cardHeight);
+            if (isHorizontal) {
+                // === HORIZONTAL CARD: Composite from card_blank.jpg + heart.png + QR ===
+                const [qrImage, bgImage, heartImage] = await Promise.all([
+                    loadImage(qrUrl),
+                    loadImage("/images/card_blank.jpg"),
+                    loadImage("/images/heart.png"),
+                ]);
 
-            // 5. Calculate QR position on Template
-            const qrSizeOnCard = cardWidth * options.qrSize;
-            const qrX = options.qrX !== undefined ? cardWidth * options.qrX : (cardWidth - qrSizeOnCard) / 2;
-            const qrY = cardHeight * options.qrY;
+                // 1. Draw background
+                ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-            // 6. Draw owner's name above QR code if showTitle is true
-            if (options.showTitle && targetTitle) {
-                // Increased font size to 0.020 scale for a clear "16px" feel on high-res cards
-                const fontSize = Math.round(((cardWidth + cardHeight) / 2) * 0.03);
-                ctx.font = `normal ${fontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
-                ctx.fillStyle = "#4A151B";
+                // 2. Draw heart on left side
+                const heartWidth = CARD_WIDTH * 0.35;
+                const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
+                const heartX = CARD_WIDTH * 0.06;
+                const heartY = (CARD_HEIGHT - heartHeight) / 2;
+                ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
+
+                // 3. Draw title
+                const qrSizeOnCard = CARD_WIDTH * 0.38;
+                const qrX = CARD_WIDTH * 0.52; // moved left for more right padding
+                const qrY = CARD_HEIGHT * 0.25;
+
+                if (options.showTitle && targetTitle) {
+                    const fontSize = Math.round(CARD_HEIGHT * 0.040);
+                    ctx.font = `bold ${fontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                    ctx.fillStyle = "#4A151B";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "bottom";
+                    const textX = qrX + qrSizeOnCard / 2;
+                    const textY = qrY - (fontSize * 0.8); // increased gap above QR
+                    ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(targetTitle.toUpperCase(), textX, textY);
+                    ctx.shadowColor = "transparent";
+                    ctx.shadowBlur = 0;
+                }
+
+                // 4. Draw QR Code
+                ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
+
+                // 5. Draw scan instruction below QR
+                const scanFontSize = Math.round(CARD_HEIGHT * 0.035);
+                ctx.font = `${scanFontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                ctx.fillStyle = "#666666";
                 ctx.textAlign = "center";
-                ctx.textBaseline = "bottom";
+                ctx.textBaseline = "top";
+                const scanTextX = qrX + qrSizeOnCard / 2;
+                const scanTextY = qrY + qrSizeOnCard + (scanFontSize * 0.6); // increased gap below QR
+                ctx.fillText("สแกนเพื่อดูข้อความ", scanTextX, scanTextY);
 
-                // Position text centered above the QR code
-                const textX = qrX + qrSizeOnCard / 2;
-                const textY = qrY - (fontSize * 0.2); // Small gap above QR
+            } else {
+                // === VERTICAL CARD: Composite from card_blank_vertical.jpg + heart.png + QR ===
+                const [qrImage, bgImage, heartImage] = await Promise.all([
+                    loadImage(qrUrl),
+                    loadImage("/images/card_blank_vertical.jpg"),
+                    loadImage("/images/heart.png"),
+                ]);
 
-                // Draw subtle shadow for better readability
-                ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
-                ctx.shadowBlur = 6;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
+                // 1. Draw background
+                ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-                ctx.fillText(targetTitle.toUpperCase(), textX, textY);
+                // 2. Draw heart on top section (smaller)
+                const heartWidth = CARD_WIDTH * 0.50;
+                const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
+                const heartX = (CARD_WIDTH - heartWidth) / 2;
+                const heartY = CARD_HEIGHT * 0.06;
+                ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
 
-                // Reset shadow
-                ctx.shadowColor = "transparent";
-                ctx.shadowBlur = 0;
+                // 3. Draw title above QR (larger QR)
+                const qrSizeOnCard = CARD_WIDTH * 0.65;
+                const qrX = (CARD_WIDTH - qrSizeOnCard) / 2;
+                const qrY = CARD_HEIGHT * 0.48;
+
+                if (options.showTitle && targetTitle) {
+                    const fontSize = Math.round(CARD_HEIGHT * 0.028);
+                    ctx.font = `bold ${fontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                    ctx.fillStyle = "#4A151B";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "bottom";
+                    const textX = qrX + qrSizeOnCard / 2;
+                    const textY = qrY - (fontSize * 0.6);
+                    ctx.shadowColor = "rgba(255, 255, 255, 0.9)";
+                    ctx.shadowBlur = 4;
+                    ctx.fillText(targetTitle.toUpperCase(), textX, textY);
+                    ctx.shadowColor = "transparent";
+                    ctx.shadowBlur = 0;
+                }
+
+                // 4. Draw QR Code
+                ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
+
+                // 5. Draw scan instruction below QR
+                const scanFontSize = Math.round(CARD_HEIGHT * 0.025);
+                ctx.font = `${scanFontSize}px "Prompt", "Noto Sans Thai", sans-serif`;
+                ctx.fillStyle = "#666666";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "top";
+                const scanTextX = qrX + qrSizeOnCard / 2;
+                const scanTextY = qrY + qrSizeOnCard + (scanFontSize * 0.5);
+                ctx.fillText("สแกนเพื่อดูข้อความ", scanTextX, scanTextY);
             }
 
-            // 7. Draw QR Code
-            ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
+            // Crop marks for both
+            const drawCropMark = (x: number, y: number, orientX: number, orientY: number) => {
+                const len = Math.round(CARD_WIDTH * 0.025);
+                const weight = Math.max(1.5, Math.round(CARD_WIDTH * 0.0015));
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.4)";
+                ctx.lineWidth = weight;
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + (len * orientX), y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x, y + (len * orientY));
+                ctx.stroke();
+            };
+            drawCropMark(0, 0, 1, 1);
+            drawCropMark(CARD_WIDTH, 0, -1, 1);
+            drawCropMark(0, CARD_HEIGHT, 1, -1);
+            drawCropMark(CARD_WIDTH, CARD_HEIGHT, -1, -1);
 
-            // 8. Download Results
+            // Download
             const link = document.createElement("a");
-            const suffix = templateUrl.includes('horizontal') ? 'Horizontal' : 'Normal';
+            const suffix = isHorizontal ? 'Horizontal' : 'Vertical';
             link.download = `ValentineCard_${suffix}_${targetTitle.replace(/\s+/g, '_')}.png`;
             link.href = canvas.toDataURL("image/png", 1.0);
             link.click();
 
-            showSnackbar(`Valentine ${suffix} Card downloaded!`);
+            showSnackbar(`Valentine ${suffix} Card downloaded! (90×55mm)`);
         } catch (error) {
             console.error("Download Error:", error);
             showSnackbar("Failed to generate card", "error");
@@ -591,15 +871,20 @@ export default function ValentineAdminPage() {
 
     const handleDownloadQR = async () => {
         if (!qrData) return;
-        await generateAndDownloadCard(qrData.url, qrData.title);
+        await generateAndDownloadCard(
+            qrData.url,
+            editableTitle || qrData.title,
+            "/images/card_vertical_2.png",
+            { qrSize: 0.55, qrY: 0.50, showTitle: true }
+        );
     };
 
     const handleDownloadHorizontalQR = async () => {
         if (!qrData) return;
         await generateAndDownloadCard(
             qrData.url,
-            qrData.title,
-            "/images/card_horizontal_2.png",
+            editableTitle || qrData.title,
+            "/images/card_horizontal_3.png",
             { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true }
         );
     };
@@ -704,7 +989,12 @@ export default function ValentineAdminPage() {
                     backgroundMusicYoutubeId: data.backgroundMusicYoutubeId || "",
                     backgroundMusicUrl: data.backgroundMusicUrl || "",
                     status: data.status,
-                    disabledAt: formatDisabledAt
+                    disabledAt: formatDisabledAt,
+                    swipeHintColor: data.swipeHintColor || "white",
+                    swipeHintText: data.swipeHintText || "Swipe to see more",
+                    customerPhone: data.customerPhone || "",
+                    customerAddress: data.customerAddress || "",
+                    note: data.note || ""
                 });
                 setMusicFile(null);
                 setMemories((data.memories || []).map((m: any) => ({
@@ -740,7 +1030,12 @@ export default function ValentineAdminPage() {
             backgroundMusicYoutubeId: "",
             backgroundMusicUrl: "",
             status: "active",
-            disabledAt: ""
+            disabledAt: "",
+            swipeHintColor: "white",
+            swipeHintText: "Swipe to see more",
+            customerPhone: "",
+            customerAddress: "",
+            note: ""
         });
         setMusicFile(null);
         setMemories([]);
@@ -1107,7 +1402,7 @@ export default function ValentineAdminPage() {
                                 <Button
                                     size="small"
                                     startIcon={<DirectDown size="16" variant="Bulk" color="#FF3366" />}
-                                    onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title, "/images/card_horizontal_2.png", { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true })}
+                                    onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title, "/images/card_horizontal_3.png", { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true })}
                                 >
                                     Horizontal
                                 </Button>
@@ -1227,24 +1522,20 @@ export default function ValentineAdminPage() {
                                             {new Date(card.createdAt).toLocaleDateString('th-TH')}
                                         </TableCell>
                                         <TableCell align="right">
+                                            <IconButton
+                                                onClick={() => {
+                                                    setSelectedSummaryCard(card);
+                                                    setSummaryOpen(true);
+                                                }}
+                                                sx={{ color: '#10b981', '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)' } }}
+                                                title="View Summary"
+                                            >
+                                                <Eye size="18" variant="Bulk" color="#10b981" />
+                                            </IconButton>
                                             <IconButton onClick={() => handleOpenQR(card)} sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }} title="QR Code Dialog">
                                                 <Scan size="18" variant="Bulk" color="#FF3366" />
                                             </IconButton>
 
-                                            <IconButton
-                                                onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title)}
-                                                sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }}
-                                                title="Download Card (Normal)"
-                                            >
-                                                <Printer size="18" variant="Bulk" color="#FF3366" />
-                                            </IconButton>
-                                            <IconButton
-                                                onClick={() => generateAndDownloadCard(`${window.location.origin}/valentine/${card.slug}`, card.jobName || card.title, "/images/card_horizontal_2.png", { qrSize: 0.42, qrY: 0.24, qrX: 0.52, showTitle: true })}
-                                                sx={{ color: '#FF3366', '&:hover': { bgcolor: 'rgba(255, 51, 102, 0.1)' } }}
-                                                title="Download Card (Horizontal)"
-                                            >
-                                                <DirectDown size="18" variant="Bulk" color="#FF3366" />
-                                            </IconButton>
                                             <IconButton onClick={() => handleOpen(card)} sx={{ color: '#3b82f6', '&:hover': { bgcolor: 'rgba(59, 130, 246, 0.1)' } }} title="Edit">
                                                 <Edit size="18" variant="Bulk" color="#3b82f6" />
                                             </IconButton>
@@ -1387,6 +1678,38 @@ export default function ValentineAdminPage() {
                                                     />
                                                 </LocalizationProvider>
                                             </Box>
+                                            <Divider sx={{ my: 1, borderStyle: 'dotted' }} />
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1.5fr' }, gap: 2 }}>
+                                                <TextField
+                                                    label="เบอร์โทรติดต่อ (Customer Phone)"
+                                                    fullWidth
+                                                    size="small"
+                                                    value={formData.customerPhone}
+                                                    onChange={(e) => setFormData({ ...formData, customerPhone: e.target.value })}
+                                                    placeholder="0xx-xxx-xxxx"
+                                                />
+                                                <TextField
+                                                    label="ที่อยู่ลูกค้า (Customer Address)"
+                                                    fullWidth
+                                                    size="small"
+                                                    multiline
+                                                    rows={2}
+                                                    value={formData.customerAddress}
+                                                    onChange={(e) => setFormData({ ...formData, customerAddress: e.target.value })}
+                                                    placeholder="ที่อยู่จัดส่ง..."
+                                                />
+                                            </Box>
+                                            <TextField
+                                                label="บันทึกเพิ่มเติม (Internal Note)"
+                                                fullWidth
+                                                size="small"
+                                                multiline
+                                                rows={2}
+                                                value={formData.note}
+                                                onChange={(e) => setFormData({ ...formData, note: e.target.value })}
+                                                placeholder="บันทึกช่วยจำสำหรับแอดมิน (ไม่แสดงให้ลูกค้าเห็น)..."
+                                                sx={{ mt: 1 }}
+                                            />
                                         </Stack>
                                     </Box>
 
@@ -1450,6 +1773,41 @@ export default function ValentineAdminPage() {
                                                     <input type="color" value={formData.backgroundColor || "#FFF0F3"} onChange={(e) => setFormData({ ...formData, backgroundColor: e.target.value })} style={{ width: 50, height: 40, border: 'none', borderRadius: 8, cursor: 'pointer' }} />
                                                     <Typography variant="caption" sx={{ fontFamily: 'monospace', fontWeight: 700, p: 1, bgcolor: '#f5f5f5', borderRadius: 1 }}>{formData.backgroundColor}</Typography>
                                                 </Box>
+                                            </Box>
+
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                                    <Typography variant="body2" sx={{ fontWeight: 700, minWidth: 120 }}>Swipe Hint Color:</Typography>
+                                                    <FormControl size="small" sx={{ minWidth: 150 }}>
+                                                        <Select
+                                                            value={formData.swipeHintColor || 'white'}
+                                                            onChange={(e) => setFormData({ ...formData, swipeHintColor: e.target.value as "white" | "red" })}
+                                                        >
+                                                            <MenuItem value="white">
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                    <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: 'white', border: '2px solid #ddd' }} />
+                                                                    <span>White</span>
+                                                                </Box>
+                                                            </MenuItem>
+                                                            <MenuItem value="red">
+                                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                                    <Box sx={{ width: 20, height: 20, borderRadius: '50%', bgcolor: '#FF3366' }} />
+                                                                    <span>Red</span>
+                                                                </Box>
+                                                            </MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </Box>
+
+                                                <TextField
+                                                    label="Swipe Hint Text"
+                                                    fullWidth
+                                                    size="small"
+                                                    value={formData.swipeHintText}
+                                                    onChange={(e) => setFormData({ ...formData, swipeHintText: e.target.value })}
+                                                    placeholder="e.g. Swipe to see more"
+                                                    helperText="แสดงคำแนะนำในการเลื่อนแผ่นภาพ"
+                                                />
                                             </Box>
 
                                             <Divider />
@@ -1602,8 +1960,9 @@ export default function ValentineAdminPage() {
             {/* QR Code Dialog */}
             <Dialog
                 open={qrOpen}
-                onClose={() => setQrOpen(false)}
-                maxWidth="sm"
+                onClose={() => setQrOpen(false)
+                }
+                maxWidth="md"
                 fullWidth
                 PaperProps={{
                     sx: {
@@ -1614,134 +1973,336 @@ export default function ValentineAdminPage() {
                 }}
             >
                 <DialogContent sx={{ p: 0 }}>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 240px' } }}>
-                        {/* Left Side: Info & Actions */}
-                        <Box sx={{ p: 3, display: 'flex', flexDirection: 'column' }}>
-                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                                <Box sx={{ p: 1, bgcolor: '#FFF0F3', borderRadius: '12px' }}>
-                                    <Scan size="24" variant="Bulk" color="#FF3366" />
-                                </Box>
-                                <Box>
-                                    <Typography variant="h6" sx={{ fontWeight: 800, color: '#4A151B', lineHeight: 1.2 }}>
-                                        QR Code Card
-                                    </Typography>
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
-                                        {qrData?.title}
-                                    </Typography>
-                                </Box>
+                    {/* Header */}
+                    <Box sx={{ p: 3, pb: 2, borderBottom: '1px solid #eee', background: 'linear-gradient(135deg, #FFF0F3 0%, #FFE3E8 100%)' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                            <Box sx={{ p: 1, bgcolor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(255,51,102,0.1)' }}>
+                                <Scan size="24" variant="Bulk" color="#FF3366" />
                             </Box>
+                            <Box>
+                                <Typography variant="h6" sx={{ fontWeight: 800, color: '#4A151B', lineHeight: 1.2 }}>
+                                    Print Valentine Card
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                    ขนาดมาตรฐานนามบัตร 90×55mm @300dpi
+                                </Typography>
+                            </Box>
+                        </Box>
 
-                            <Typography
-                                variant="caption"
-                                sx={{
-                                    mb: 3,
+                        {/* Editable Title */}
+                        <TextField
+                            fullWidth
+                            size="small"
+                            label="ชื่อที่แสดงบนการ์ด (แก้ไขได้)"
+                            value={editableTitle}
+                            onChange={(e) => handleTitleChange(e.target.value)}
+                            placeholder="เว้นว่างถ้าไม่ต้องการแสดงชื่อ"
+                            helperText="ชื่อจะแสดงเหนือ QR Code บนการ์ด"
+                            sx={{
+                                bgcolor: 'white',
+                                borderRadius: 2,
+                                '& .MuiOutlinedInput-root': { borderRadius: 2 }
+                            }}
+                        />
+                    </Box>
+
+                    {/* Preview Cards */}
+                    <Box sx={{ p: 3, bgcolor: '#f8f9fa' }}>
+                        <Typography variant="subtitle2" sx={{ mb: 2, fontWeight: 800, color: '#4A151B', display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Gallery size="18" variant="Bulk" color="#FF3366" />
+                            ตัวอย่างการ์ดก่อนดาวน์โหลด
+                            {generatingPreview && <CircularProgress size={16} sx={{ ml: 1 }} />}
+                        </Typography>
+
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 3 }}>
+                            {/* Vertical Card Preview */}
+                            <Box>
+                                <Typography variant="caption" sx={{ mb: 1, fontWeight: 700, color: '#FF3366', display: 'block' }}>
+                                    📱 แนวตั้ง (55×90mm)
+                                </Typography>
+                                <Box sx={{
+                                    bgcolor: 'white',
+                                    borderRadius: 3,
                                     p: 1.5,
-                                    bgcolor: '#f8f9fa',
-                                    borderRadius: 2,
-                                    color: 'text.secondary',
-                                    fontFamily: 'monospace',
-                                    fontSize: '0.75rem',
-                                    width: '100%',
-                                    wordBreak: 'break-all',
-                                    border: '1px solid #eee'
-                                }}
-                            >
-                                {qrData?.url}
-                            </Typography>
-
-                            <Stack spacing={1.5}>
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                    border: '1px solid #eee',
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }}>
+                                    {previewVertical ? (
+                                        <img
+                                            src={previewVertical}
+                                            alt="Vertical Card Preview"
+                                            style={{
+                                                maxWidth: '100%',
+                                                maxHeight: 280,
+                                                borderRadius: 8,
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                            }}
+                                        />
+                                    ) : (
+                                        <Box sx={{ height: 280, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <CircularProgress size={30} sx={{ color: '#FF3366' }} />
+                                        </Box>
+                                    )}
+                                </Box>
                                 <Button
                                     fullWidth
                                     onClick={handleDownloadQR}
                                     variant="contained"
-                                    startIcon={<Printer size="20" variant="Bulk" color="white" />}
+                                    startIcon={<Printer size="18" variant="Bulk" color="white" />}
                                     sx={{
-                                        borderRadius: '12px',
-                                        py: 1.2,
+                                        mt: 1.5,
+                                        borderRadius: '10px',
+                                        py: 1,
                                         fontWeight: 700,
                                         bgcolor: '#FF3366',
-                                        '&:hover': { bgcolor: '#dc2626' },
+                                        '&:hover': { bgcolor: '#E02D59' },
                                         boxShadow: '0 4px 15px rgba(255, 51, 102, 0.2)'
                                     }}
                                 >
-                                    Download Card (Normal)
+                                    Download แนวตั้ง
                                 </Button>
+                            </Box>
+
+                            {/* Horizontal Card Preview */}
+                            <Box>
+                                <Typography variant="caption" sx={{ mb: 1, fontWeight: 700, color: '#FF3366', display: 'block' }}>
+                                    🖼️ แนวนอน (90×55mm)
+                                </Typography>
+                                <Box sx={{
+                                    bgcolor: 'white',
+                                    borderRadius: 3,
+                                    p: 1.5,
+                                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                    border: '1px solid #eee',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    minHeight: 200
+                                }}>
+                                    {previewHorizontal ? (
+                                        <img
+                                            src={previewHorizontal}
+                                            alt="Horizontal Card Preview"
+                                            style={{
+                                                maxWidth: '100%',
+                                                maxHeight: 180,
+                                                borderRadius: 8,
+                                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                                            }}
+                                        />
+                                    ) : (
+                                        <Box sx={{ height: 180, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <CircularProgress size={30} sx={{ color: '#FF3366' }} />
+                                        </Box>
+                                    )}
+                                </Box>
                                 <Button
                                     fullWidth
                                     onClick={handleDownloadHorizontalQR}
                                     variant="outlined"
-                                    startIcon={<DirectDown size="20" variant="Bulk" color="#FF3366" />}
+                                    startIcon={<DirectDown size="18" variant="Bulk" color="#FF3366" />}
                                     sx={{
-                                        borderRadius: '12px',
-                                        py: 1.2,
+                                        mt: 1.5,
+                                        borderRadius: '10px',
+                                        py: 1,
                                         fontWeight: 700,
                                         color: '#FF3366',
                                         borderColor: '#FF3366',
                                         '&:hover': { bgcolor: '#FFF0F3', borderColor: '#FF3366' },
                                     }}
                                 >
-                                    Download Card (Horizontal)
+                                    Download แนวนอน
                                 </Button>
-                                <Button
-                                    fullWidth
-                                    onClick={handleDownloadOnlyQR}
-                                    variant="outlined"
-                                    color="inherit"
-                                    startIcon={<Scan size="20" variant="Bulk" color="inherit" />}
-                                    sx={{
-                                        borderRadius: '12px',
-                                        py: 1.2,
-                                        fontWeight: 700,
-                                        color: 'text.secondary',
-                                        borderColor: '#eee',
-                                        '&:hover': { bgcolor: '#f5f5f5', borderColor: '#ddd' },
-                                    }}
-                                >
-                                    Download QR Code Only
-                                </Button>
-                                <Button
-                                    fullWidth
-                                    onClick={() => setQrOpen(false)}
-                                    variant="text"
-                                    sx={{ fontWeight: 600, color: 'text.secondary', mt: 1 }}
-                                >
-                                    Close
-                                </Button>
-                            </Stack>
+                            </Box>
                         </Box>
+                    </Box>
 
-                        {/* Right Side: QR Image */}
-                        <Box sx={{
-                            bgcolor: '#fcfcfc',
-                            p: 3,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            borderLeft: '1px solid #eee'
-                        }}>
-                            {qrData && (
-                                <Box sx={{
-                                    p: 1.5,
-                                    bgcolor: 'white',
-                                    borderRadius: 3,
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
-                                    border: '1px solid #eee',
-                                    width: '100%'
-                                }}>
-                                    <img
-                                        src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(qrData.url)}&ecc=H&margin=10`}
-                                        alt="QR Code"
-                                        style={{ width: '100%', height: 'auto', display: 'block' }}
-                                    />
-                                </Box>
-                            )}
-                        </Box>
+                    {/* Footer Actions */}
+                    <Box sx={{ p: 2, borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Button
+                            onClick={handleDownloadOnlyQR}
+                            variant="text"
+                            startIcon={<Scan size="18" variant="Bulk" color="inherit" />}
+                            sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                            Download QR Only
+                        </Button>
+                        <Button
+                            onClick={() => setQrOpen(false)}
+                            variant="text"
+                            sx={{ fontWeight: 600, color: 'text.secondary' }}
+                        >
+                            ปิด
+                        </Button>
                     </Box>
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Dialog */}
+            {/* Customer Summary Modal */}
             <Dialog
+                open={summaryOpen}
+                onClose={() => setSummaryOpen(false)}
+                maxWidth="md"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        boxShadow: '0 20px 60px rgba(0,0,0,0.1)'
+                    }
+                }}
+            >
+                <DialogTitle sx={{
+                    background: 'linear-gradient(135deg, #fdf2f4 0%, #fff 100%)',
+                    p: 3,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderBottom: '1px solid #f0f0f0'
+                }}>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                        <Box sx={{
+                            p: 1.5,
+                            bgcolor: 'white',
+                            borderRadius: '12px',
+                            boxShadow: '0 4px 12px rgba(255, 51, 102, 0.1)',
+                            display: 'flex'
+                        }}>
+                            <Profile size="28" variant="Bulk" color="#FF3366" />
+                        </Box>
+                        <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#4A151B', lineHeight: 1.2 }}>
+                                Customer Summary
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600 }}>
+                                ข้อมูลสรุปและรายละเอียดลูกค้า
+                            </Typography>
+                        </Box>
+                    </Stack>
+                    <IconButton onClick={() => setSummaryOpen(false)} size="small" sx={{ color: '#4A151B' }}>
+                        <CloseCircle size="24" variant="Bulk" />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ p: 4 }}>
+                    <Stack spacing={4}>
+                        {/* Primary Info */}
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 900, color: '#FF3366', textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 2, mt: 3 }}>
+                                📋 ข้อมูลการสั่งซื้อ (Job Info)
+                            </Typography>
+                            <Stack spacing={1}>
+                                <Typography variant="h6" sx={{ fontWeight: 900, color: '#4A151B' }}>
+                                    {selectedSummaryCard?.jobName || "ไม่ได้ระบุชื่อเรียกงาน"}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                                    Title: <span style={{ color: '#4A151B' }}>{selectedSummaryCard?.title}</span>
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <Chip label={`Slug: /valentine/${selectedSummaryCard?.slug}`} size="small" variant="outlined" sx={{ fontWeight: 700, borderRadius: 1 }} />
+                                    <IconButton size="small" onClick={() => window.open(`/valentine/${selectedSummaryCard?.slug}`, '_blank')}>
+                                        <Global size="16" color="#FF3366" />
+                                    </IconButton>
+                                </Box>
+                            </Stack>
+                        </Box>
+
+                        <Divider />
+
+                        {/* Contact Info */}
+                        <Box>
+                            <Typography variant="caption" sx={{ fontWeight: 900, color: '#FF3366', textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 2 }}>
+                                📞 ข้อมูลติดต่อ (Contact Info)
+                            </Typography>
+                            <Stack spacing={2.5}>
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Box sx={{ color: '#FF3366', mt: 0.5 }}><Call size="20" variant="Bulk" /></Box>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#4A151B' }}>Phone Number</Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                                            {selectedSummaryCard?.customerPhone ? (
+                                                <Typography component="span" variant="body2" sx={{ color: '#FF3366', fontWeight: 700, cursor: 'pointer', "&:hover": { textDecoration: 'underline' } }} onClick={() => window.location.href = `tel:${selectedSummaryCard.customerPhone}`}>
+                                                    {selectedSummaryCard.customerPhone}
+                                                </Typography>
+                                            ) : "ไม่ได้ระบุเบอร์โทร"}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+
+                                <Box sx={{ display: 'flex', gap: 2 }}>
+                                    <Box sx={{ color: '#FF3366', mt: 0.5 }}><Location size="20" variant="Bulk" /></Box>
+                                    <Box>
+                                        <Typography variant="body2" sx={{ fontWeight: 800, color: '#4A151B' }}>Delivery Address</Typography>
+                                        <Typography variant="body2" sx={{ color: 'text.secondary', whiteSpace: 'pre-wrap' }}>
+                                            {selectedSummaryCard?.customerAddress || "ไม่ได้ระบุที่อยู่"}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                            </Stack>
+                        </Box>
+
+                        <Divider />
+
+                        {/* Notes */}
+                        <Box sx={{ p: 2, bgcolor: '#FFF0F3', borderRadius: 2, border: '1px dashed #FF3366' }}>
+                            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 1 }}>
+                                <ClipboardText size="20" variant="Bulk" color="#FF3366" />
+                                <Typography variant="body2" sx={{ fontWeight: 900, color: '#4A151B' }}>Internal Note</Typography>
+                            </Stack>
+                            <Typography variant="body2" sx={{ color: '#4A151B', fontWeight: 600, opacity: 0.8, whiteSpace: 'pre-wrap' }}>
+                                {selectedSummaryCard?.note || "ไม่มีบันทึกเพิ่มเติม"}
+                            </Typography>
+                        </Box>
+
+                        {/* Ordered Products */}
+                        {selectedSummaryCard?.orderedProducts && selectedSummaryCard.orderedProducts.length > 0 && (
+                            <Box>
+                                <Typography variant="caption" sx={{ fontWeight: 900, color: '#FF3366', textTransform: 'uppercase', letterSpacing: 1, display: 'block', mb: 2 }}>
+                                    💐 สินค้าที่สั่ง (Ordered Products)
+                                </Typography>
+                                <Stack spacing={1.5}>
+                                    {selectedSummaryCard.orderedProducts.map((product) => (
+                                        <Paper key={product.id} elevation={0} sx={{ p: 1.5, bgcolor: '#fcfcfc', border: '1px solid #eee', borderRadius: 2, display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            {product.image ? (
+                                                <Avatar src={product.image} variant="rounded" sx={{ width: 50, height: 50, border: '2px solid white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }} />
+                                            ) : (
+                                                <Avatar variant="rounded" sx={{ width: 50, height: 50, bgcolor: '#FFF0F3' }}><Heart size="24" variant="Bulk" color="#FF3366" /></Avatar>
+                                            )}
+                                            <Box sx={{ flex: 1 }}>
+                                                <Typography variant="body2" sx={{ fontWeight: 800, color: '#4A151B' }}>{product.name}</Typography>
+                                                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>{product.category}</Typography>
+                                            </Box>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 900, color: '#FF3366' }}>
+                                                ฿{product.price.toLocaleString()}
+                                            </Typography>
+                                        </Paper>
+                                    ))}
+                                </Stack>
+                            </Box>
+                        )}
+                    </Stack>
+                </DialogContent>
+                <DialogActions sx={{ p: 3, bgcolor: '#fcfcfc', borderTop: '1px solid #f0f0f0' }}>
+                    <Button
+                        fullWidth
+                        onClick={() => setSummaryOpen(false)}
+                        variant="contained"
+                        sx={{
+                            bgcolor: '#4A151B',
+                            '&:hover': { bgcolor: '#2D0D10' },
+                            borderRadius: 2,
+                            fontWeight: 700,
+                            py: 1.2
+                        }}
+                    >
+                        Close
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Dialog */}
+            < Dialog
                 open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}
                 PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
@@ -1775,7 +2336,7 @@ export default function ValentineAdminPage() {
                         {deleting ? <CircularProgress size={20} color="inherit" /> : "Delete Card"}
                     </Button>
                 </DialogActions>
-            </Dialog>
+            </Dialog >
 
             <Snackbar
                 open={snackbar.open}
@@ -1792,7 +2353,7 @@ export default function ValentineAdminPage() {
                     {snackbar.message}
                 </Alert>
             </Snackbar>
-        </Box>
+        </Box >
     );
 }
 

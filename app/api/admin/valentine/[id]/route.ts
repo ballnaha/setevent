@@ -41,7 +41,7 @@ export async function PUT(
         const body = await req.json();
         const {
             slug, jobName, title, openingText, greeting, subtitle, message,
-            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories, orderedProducts
+            signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, swipeHintColor, swipeHintText, customerPhone, customerAddress, note, status, disabledAt, memories, orderedProducts
         } = body;
 
         // Update main card data
@@ -59,6 +59,11 @@ export async function PUT(
                 backgroundColor,
                 backgroundMusicYoutubeId,
                 backgroundMusicUrl,
+                swipeHintColor,
+                swipeHintText,
+                customerPhone,
+                customerAddress,
+                note,
                 status,
                 disabledAt: disabledAt ? new Date(disabledAt) : null,
                 orderedProducts: {

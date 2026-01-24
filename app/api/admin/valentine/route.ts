@@ -26,7 +26,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { slug, jobName, title, openingText, greeting, subtitle, message, signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, status, disabledAt, memories, orderedProducts } = body;
+        const { slug, jobName, title, openingText, greeting, subtitle, message, signer, backgroundColor, backgroundMusicYoutubeId, backgroundMusicUrl, swipeHintColor, swipeHintText, customerPhone, customerAddress, note, status, disabledAt, memories, orderedProducts } = body;
 
         if (!slug || !title) {
             return NextResponse.json({ error: "Slug and title are required" }, { status: 400 });
@@ -45,6 +45,11 @@ export async function POST(req: NextRequest) {
                 backgroundColor: backgroundColor || "#FFF0F3",
                 backgroundMusicYoutubeId: backgroundMusicYoutubeId || null,
                 backgroundMusicUrl: backgroundMusicUrl || null,
+                swipeHintColor: swipeHintColor || "white",
+                swipeHintText: swipeHintText || "Swipe to see more",
+                customerPhone: customerPhone || null,
+                customerAddress: customerAddress || null,
+                note: note || null,
                 status: status || "active",
                 disabledAt: disabledAt ? new Date(disabledAt) : null,
                 memories: {

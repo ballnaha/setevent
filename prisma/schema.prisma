@@ -303,6 +303,15 @@ model ValentineCard {
   // Background Music (เลือกใช้ได้ทีละอันเท่านั้น - MP3 จะถูกใช้ก่อนถ้ามีทั้งคู่)
   backgroundMusicYoutubeId String?  // YouTube Video ID for background music
   backgroundMusicUrl       String?  @db.Text // Uploaded MP3 file URL
+  
+  // UI Customization
+  swipeHintColor           String?  @default("white") // white, red
+  swipeHintText            String?  @default("Swipe to see more")
+
+  // Customer Contact Info (Optional)
+  customerPhone            String?
+  customerAddress          String?  @db.Text
+  note                     String?  @db.Text
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
