@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from "next";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
     title: {
@@ -18,11 +21,17 @@ export const viewport: Viewport = {
     initialScale: 1,
 };
 
-export default function AdminRootLayout({
+export default async function AdminRootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+        redirect("/admin/login");
+    }
+
     return (
         <>
             {children}
