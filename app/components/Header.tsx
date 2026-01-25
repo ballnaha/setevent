@@ -130,15 +130,22 @@ export default function Header({ contactSettings }: HeaderProps) {
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current);
         }
-        setActiveMenu(menuName);
-        setAnchorEl(event.currentTarget);
+        if (activeMenu !== menuName) {
+            setActiveMenu(menuName);
+        }
+        if (anchorEl !== event.currentTarget) {
+            setAnchorEl(event.currentTarget);
+        }
     };
 
     const handleHoverClose = () => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
         timeoutRef.current = setTimeout(() => {
             setAnchorEl(null);
             setActiveMenu(null);
-        }, 150);
+        }, 300); // Increased for more stability
     };
 
     const handleMenuEnter = () => {
@@ -271,7 +278,7 @@ export default function Header({ contactSettings }: HeaderProps) {
                                         py: 0.8,
                                         px: 1.5,
                                         borderRadius: 1.5,
-                                        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                        transition: 'all 0.2s ease',
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
@@ -281,7 +288,6 @@ export default function Header({ contactSettings }: HeaderProps) {
                                         borderColor: isActive(child.href) ? 'rgba(10, 92, 90, 0.1)' : 'transparent',
                                         '&:hover': {
                                             bgcolor: 'rgba(0,0,0,0.03)',
-                                            transform: 'translateX(3px)',
                                             borderColor: 'rgba(0,0,0,0.05)'
                                         }
                                     }}
@@ -624,8 +630,8 @@ export default function Header({ contactSettings }: HeaderProps) {
                                 return (
                                     <Box
                                         key={item.label}
-                                        onMouseLeave={['PRODUCTS', 'PORTFOLIO'].includes(item.label) ? undefined : handleHoverClose}
-                                        onMouseEnter={(e) => ['PRODUCTS', 'PORTFOLIO'].includes(item.label) ? undefined : handleHoverOpen(e, item.label)}
+                                        onMouseLeave={item.isMega ? undefined : handleHoverClose}
+                                        onMouseEnter={item.isMega ? undefined : (e) => handleHoverOpen(e, item.label)}
                                     >
                                         <Box
                                             onClick={(e) => {
@@ -674,10 +680,14 @@ export default function Header({ contactSettings }: HeaderProps) {
                                         <Menu
                                             anchorEl={anchorEl}
                                             open={openDropdown && activeMenu === item.label}
-                                            onClose={handleHoverClose}
+                                            onClose={() => {
+                                                setAnchorEl(null);
+                                                setActiveMenu(null);
+                                            }}
                                             TransitionComponent={Fade}
+                                            TransitionProps={{ timeout: 200 }}
                                             disableScrollLock={true}
-                                            MenuListProps={{
+                                            MenuListProps={item.isMega ? { sx: { py: 0 } } : {
                                                 onMouseEnter: handleMenuEnter,
                                                 onMouseLeave: handleMenuLeave,
                                                 sx: { py: 0 }
@@ -685,14 +695,24 @@ export default function Header({ contactSettings }: HeaderProps) {
                                             PaperProps={{
                                                 elevation: 0,
                                                 sx: {
-                                                    mt: 2,
+                                                    mt: '12px',
                                                     overflow: 'visible',
                                                     filter: 'drop-shadow(0px 30px 60px rgba(0,0,0,0.15))',
-                                                    bgcolor: 'var(--card-bg)', // Use CSS Variable
+                                                    bgcolor: 'var(--card-bg)',
                                                     backdropFilter: 'blur(40px)',
-                                                    border: '1px solid var(--border-color)', // Use CSS Variable
+                                                    border: '1px solid var(--border-color)',
                                                     borderRadius: 2,
                                                     minWidth: item.isMega ? 700 : 260,
+                                                    // Invisible bridge to prevent closing when moving mouse into menu
+                                                    '&::before': {
+                                                        content: '""',
+                                                        display: 'block',
+                                                        position: 'absolute',
+                                                        top: '-12px',
+                                                        left: 0,
+                                                        width: '100%',
+                                                        height: '12px',
+                                                    }
                                                 },
                                             }}
                                             transformOrigin={{ horizontal: 'left', vertical: 'top' }}
