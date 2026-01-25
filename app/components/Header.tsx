@@ -339,7 +339,7 @@ export default function Header({ contactSettings }: HeaderProps) {
                                             borderRadius: '6px',
                                             bgcolor: isExpanded ? 'rgba(10, 92, 90, 0.1)' : 'transparent',
                                             color: isExpanded ? 'var(--primary)' : 'rgba(0,0,0,0.3)',
-                                            transition: 'all 0.3s ease',
+                                            transition: 'all 0.2s ease',
                                             border: '1px solid',
                                             borderColor: isExpanded ? 'rgba(10, 92, 90, 0.2)' : 'rgba(0,0,0,0.05)'
                                         }}>
@@ -353,7 +353,7 @@ export default function Header({ contactSettings }: HeaderProps) {
                                 </Box>
                             </Box>
                             {hasChildren && (
-                                <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                                <Collapse in={isExpanded} timeout={200} unmountOnExit>
                                     <Box sx={{ position: 'relative', ml: 1, borderLeft: '1px solid rgba(0,0,0,0.05)', mt: 0.5, mb: 0.5 }}>
                                         {renderDesktopTree(child.children, level + 1, childId)}
                                     </Box>
