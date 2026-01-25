@@ -25,9 +25,14 @@ const CTASection = dynamic(() => import("../components/CTASection"), {
     loading: () => <Box sx={{ minHeight: 300 }}><Skeleton variant="rectangular" height={300} /></Box>,
 });
 
+const AboutSection = dynamic(() => import("../components/AboutSection"), {
+    loading: () => <Box sx={{ minHeight: 400 }}><Skeleton variant="rectangular" height={400} /></Box>,
+});
+
 export default function HomeContent() {
     return (
         <Box>
+            <AboutSection />
             <ServicesSection />
             <FeaturedEvents />
             <PortfolioGallery />

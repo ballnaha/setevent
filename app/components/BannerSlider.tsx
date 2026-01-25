@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Box, Typography, Button, Stack } from "@mui/material";
+import Link from "next/link";
 import Image from "next/image";
 
 export default function BannerSlider() {
@@ -133,8 +134,9 @@ export default function BannerSlider() {
 
                 <Stack direction="row" spacing={2} mt={{ xs: 3, md: 4 }} justifyContent="center">
                     <Button
-                        variant="contained"
+                        component={Link}
                         href="/products"
+                        variant="contained"
                         sx={{
                             bgcolor: '#E94560',
                             color: 'white',
@@ -151,8 +153,9 @@ export default function BannerSlider() {
                         บริการของเรา
                     </Button>
                     <Button
-                        variant="contained"
+                        component={Link}
                         href="/contact"
+                        variant="contained"
                         sx={{
                             bgcolor: '#1A5F7A',
                             color: 'white',

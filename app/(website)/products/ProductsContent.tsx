@@ -256,15 +256,46 @@ export default function ProductsContent() {
                             ))}
                         </Box>
                     ) : categories.length === 0 ? (
-                        <Box sx={{ textAlign: 'center', py: 8 }}>
-                            <Category2 size="64" color="rgba(0,0,0,0.2)" variant="Bold" />
-                            <Typography sx={{
+                        <Box sx={{
+                            textAlign: 'center',
+                            py: { xs: 10, md: 15 },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            bgcolor: 'var(--card-bg)',
+                            borderRadius: '30px',
+                            border: '1px solid var(--border-color)',
+                            boxShadow: 'var(--card-shadow)',
+                        }}>
+                            <Box sx={{
+                                width: 100,
+                                height: 100,
+                                borderRadius: '50%',
+                                bgcolor: 'rgba(10, 92, 90, 0.05)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                mb: 3
+                            }}>
+                                <Category2 size="50" color="var(--primary)" variant="Bulk" />
+                            </Box>
+                            <Typography variant="h5" sx={{
                                 fontFamily: 'var(--font-prompt)',
-                                color: 'rgba(0,0,0,0.5)',
-                                mt: 2,
-                                fontSize: '1.1rem'
+                                fontWeight: 700,
+                                color: 'var(--foreground)',
+                                mb: 1
                             }}>
                                 ยังไม่มีหมวดหมู่สินค้า
+                            </Typography>
+                            <Typography sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                color: 'var(--foreground)',
+                                opacity: 0.6,
+                                maxWidth: '300px',
+                                mx: 'auto'
+                            }}>
+                                ขออภัยในความไม่สะดวก ทีมงานกำลังเร่งอัปเดตข้อมูลสินค้าให้คุณเร็วๆ นี้
                             </Typography>
                         </Box>
                     ) : (

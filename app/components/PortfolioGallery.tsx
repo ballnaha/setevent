@@ -59,9 +59,7 @@ export default function PortfolioGallery() {
                             บริการรับจัดงานอีเว้นท์ครบวงจร
                         </Typography>
                     </Box>
-                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--primary)', cursor: 'pointer', fontWeight: 'bold' }}>
-                        ดูทั้งหมด &rarr;
-                    </Typography>
+
                 </Stack>
 
                 <Box sx={{

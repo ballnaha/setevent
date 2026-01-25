@@ -80,6 +80,7 @@ export default function Header({ contactSettings }: HeaderProps) {
     // Build navItems dynamically based on fetched sections
     const navItems: NavItem[] = useMemo(() => [
         { label: "HOME", href: "/" },
+        { label: "ABOUT US", href: "/about" },
         {
             label: "PRODUCTS",
             href: "/products",
@@ -89,7 +90,6 @@ export default function Header({ contactSettings }: HeaderProps) {
         { label: "PROMOTIONS", href: "/promotions" },
         { label: "PORTFOLIO", href: "/portfolio" },
         { label: "NEW DESIGN", href: "/designs" },
-        { label: "FAQ", href: "/faq" },
     ], [productSections]);
 
     // Desktop Menu States
@@ -109,8 +109,8 @@ export default function Header({ contactSettings }: HeaderProps) {
     const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
-    const isHome = pathname === "/" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/privacy-policy" || pathname === "/terms-of-service";
-    const isDarkText = (pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact" || pathname === "/privacy-policy" || pathname === "/terms-of-service") && (mounted && resolvedTheme !== 'dark');
+    const isHome = pathname === "/" || pathname === "/about" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/privacy-policy" || pathname === "/terms-of-service";
+    const isDarkText = (pathname === "/about" || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact" || pathname === "/privacy-policy" || pathname === "/terms-of-service") && (mounted && resolvedTheme !== 'dark');
 
     // ---- Handlers ----
 

@@ -30,6 +30,7 @@ const DEFAULT_SETTINGS = {
 // Move footerLinks definition inside component or split it
 const mainLinks = [
     { label: "หน้าแรก", href: "/" },
+    { label: "เกี่ยวกับเรา", href: "/about" },
     { label: "ผลงานของเรา", href: "/portfolio" },
     { label: "โปรโมชั่น", href: "/promotions" },
     { label: "ออกแบบใหม่", href: "/designs" },
