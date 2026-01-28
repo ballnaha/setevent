@@ -118,6 +118,7 @@ export const viewport: Viewport = {
 
 import GoogleAnalytics from './components/GoogleAnalytics';
 import CookieConsentWrapper from './components/CookieConsentWrapper';
+import NextTopLoader from 'nextjs-toploader';
 
 export default function RootLayout({
   children,
@@ -243,6 +244,17 @@ export default function RootLayout({
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ margin: 0 }}
       >
+        <NextTopLoader
+          color="#0A5C5A"
+          initialPosition={0.08}
+          crawlSpeed={200}
+          height={3}
+          crawl={true}
+          showSpinner={false}
+          easing="ease"
+          speed={200}
+          shadow="0 0 10px #0A5C5A,0 0 5px #0A5C5A"
+        />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || ''} />
         <Providers>
           <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>

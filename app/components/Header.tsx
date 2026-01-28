@@ -50,6 +50,8 @@ import type { ContactSettings } from "@/lib/getContactSettings";
 // Props interface
 interface HeaderProps {
     contactSettings?: ContactSettings;
+    forceDarkText?: boolean;
+    forceTransparent?: boolean;
 }
 
 const DEFAULT_SETTINGS = {
@@ -58,7 +60,7 @@ const DEFAULT_SETTINGS = {
     lineUrl: "https://line.me/ti/p/~@setevent",
 };
 
-export default function Header({ contactSettings }: HeaderProps) {
+export default function Header({ contactSettings, forceDarkText, forceTransparent }: HeaderProps) {
     const { theme, setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
@@ -109,8 +111,13 @@ export default function Header({ contactSettings }: HeaderProps) {
     const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
-    const isHome = pathname === "/" || pathname === "/about" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/privacy-policy" || pathname === "/terms-of-service";
-    const isDarkText = (pathname === "/about" || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact" || pathname === "/privacy-policy" || pathname === "/terms-of-service") && (mounted && resolvedTheme !== 'dark');
+    const isHome = forceTransparent || pathname === "/" || pathname === "/about" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/privacy-policy" || pathname === "/terms-of-service";
+
+    // Fix: Default to true if forceDarkText is true OR it's a known light-background page, 
+    // but ONLY switch to false if we are SURE it's dark mode (after mounting)
+    const isDarkText = (forceDarkText || pathname === "/about" || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact" || pathname === "/privacy-policy" || pathname === "/terms-of-service")
+        ? (!mounted || resolvedTheme !== 'dark')
+        : (mounted && resolvedTheme === 'dark');
 
     // ---- Handlers ----
 
