@@ -33,6 +33,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [activeLightboxIndex, setActiveLightboxIndex] = useState(0);
     const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
     const swiperRef = useRef<SwiperType | null>(null);
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
@@ -116,6 +117,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
 
     const openLightbox = (item: PortfolioItem, index: number) => {
         setLightboxIndex(index);
+        setActiveLightboxIndex(index);
         setSelectedItem(item);
         handleView(item.id);
     };
@@ -439,6 +441,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                     {/* Lightbox Swiper */}
                     <Swiper
                         onSwiper={(swiper) => { lightboxSwiperRef.current = swiper; }}
+                        onSlideChange={(swiper) => setActiveLightboxIndex(swiper.realIndex)}
                         modules={[Navigation, Pagination]}
                         initialSlide={lightboxIndex}
                         navigation
@@ -446,7 +449,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                         loop={filteredItems.length > 1}
                         style={{ height: '100%', borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
                     >
-                        {filteredItems.map((item) => (
+                        {filteredItems.map((item, idx) => (
                             <SwiperSlide key={item.id}>
                                 <Box sx={{
                                     position: 'relative',
@@ -487,7 +490,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         fill
-                                        priority={portfolioItems.indexOf(item) === lightboxIndex}
+                                        priority={Math.abs(idx - activeLightboxIndex) <= 1}
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                                         quality={85}
                                         style={{

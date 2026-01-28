@@ -508,7 +508,7 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                                             alt={product.name}
                                             fill
                                             style={{ objectFit: 'contain' }}
-                                            priority
+                                            priority={idx === lightboxIndex || Math.abs(idx - lightboxIndex) <= 1}
                                         />
                                     </Box>
                                 </SwiperSlide>

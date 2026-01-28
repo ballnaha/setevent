@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Zoom } from 'swiper/modules';
 import type { Swiper as SwiperType } from "swiper";
 import Link from "next/link";
+import Image from "next/image";
 
 // Swiper styles
 import 'swiper/css';
@@ -371,19 +372,22 @@ export default function ValentineCatalogPage() {
                                     className="product-modal-swiper"
                                     style={{ height: '100%' }}
                                     onSlideChange={(swiper) => {
+                                        setSelectedItemIndex(swiper.activeIndex);
                                         const newProduct = filteredProducts[swiper.activeIndex];
                                         if (newProduct) setSelectedProduct(newProduct);
                                     }}
                                 >
                                     {filteredProducts.map((p, i) => (
                                         <SwiperSlide key={p.id}>
-                                            <div className="swiper-zoom-container">
-                                                <img
-                                                    src={p.image || (p.images?.[0]?.url)}
+                                            <Box className="swiper-zoom-container" sx={{ position: 'relative', width: '100%', height: '100%' }}>
+                                                <Image
+                                                    src={p.image || (p.images?.[0]?.url) || '/images/placeholder.jpg'}
                                                     alt={p.name}
-                                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                                    fill
+                                                    priority={Math.abs(i - selectedItemIndex) <= 1}
+                                                    style={{ objectFit: 'contain' }}
                                                 />
-                                            </div>
+                                            </Box>
                                         </SwiperSlide>
                                     ))}
                                 </Swiper>

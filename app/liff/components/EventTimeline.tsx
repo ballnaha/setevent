@@ -14,8 +14,9 @@ import {
 import { EventData, ChatLog } from '../types';
 import { format } from 'date-fns';
 import { th } from 'date-fns/locale';
-import { ArrowLeft, ArrowDown2, Clock, Message, Send2, Image, CloseCircle, InfoCircle } from 'iconsax-react';
+import { ArrowLeft, ArrowDown2, Clock, Message, Send2, Image as ImageIcon, CloseCircle, InfoCircle } from 'iconsax-react';
 import { Drawer } from 'vaul';
+import Image from 'next/image';
 
 // Swiper imports
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -78,10 +79,11 @@ export default function EventTimeline({ event }: Props) {
     const [shouldRestoreDrawer, setShouldRestoreDrawer] = useState(false);
 
     // Lightbox state for image gallery
-    const [lightbox, setLightbox] = useState<{ open: boolean; images: string[]; initialSlide: number }>({
+    const [lightbox, setLightbox] = useState<{ open: boolean; images: string[]; initialSlide: number; activeSlide: number }>({
         open: false,
         images: [],
         initialSlide: 0,
+        activeSlide: 0,
     });
 
     const openLightbox = (images: string[], index: number) => {
@@ -89,11 +91,11 @@ export default function EventTimeline({ event }: Props) {
             setShouldRestoreDrawer(true);
             setIsDrawerOpen(false);
         }
-        setLightbox({ open: true, images, initialSlide: index });
+        setLightbox({ open: true, images, initialSlide: index, activeSlide: index });
     };
 
     const closeLightbox = () => {
-        setLightbox({ open: false, images: [], initialSlide: 0 });
+        setLightbox({ open: false, images: [], initialSlide: 0, activeSlide: 0 });
         if (shouldRestoreDrawer) {
             setIsDrawerOpen(true);
             setShouldRestoreDrawer(false);
@@ -776,6 +778,7 @@ export default function EventTimeline({ event }: Props) {
                                 pagination={{ clickable: true }}
                                 zoom={{ maxRatio: 3 }}
                                 initialSlide={lightbox.initialSlide}
+                                onSlideChange={(swiper) => setLightbox(prev => ({ ...prev, activeSlide: swiper.activeIndex }))}
                                 spaceBetween={0}
                                 slidesPerView={1}
                                 observer={true}
@@ -800,13 +803,12 @@ export default function EventTimeline({ event }: Props) {
                                             height: '100%',
                                             backgroundColor: 'transparent'
                                         }}>
-                                            <Box
-                                                component="img"
+                                            <Image
                                                 src={url}
                                                 alt={`Image ${idx + 1}`}
-                                                sx={{
-                                                    maxWidth: '100%',
-                                                    maxHeight: '100%',
+                                                fill
+                                                priority={Math.abs(idx - lightbox.activeSlide) <= 1}
+                                                style={{
                                                     objectFit: 'contain',
                                                     userSelect: 'none'
                                                 }}

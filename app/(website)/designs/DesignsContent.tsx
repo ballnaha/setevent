@@ -33,6 +33,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
     const [selectedCategory, setSelectedCategory] = useState("All");
     const [selectedItem, setSelectedItem] = useState<Design | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
+    const [activeLightboxIndex, setActiveLightboxIndex] = useState(0);
     const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
     const swiperRef = useRef<SwiperType | null>(null);
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
@@ -116,6 +117,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
 
     const openLightbox = (item: Design, index: number) => {
         setLightboxIndex(index);
+        setActiveLightboxIndex(index);
         setSelectedItem(item);
         handleView(item.id);
     };
@@ -440,6 +442,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     {/* Lightbox Swiper */}
                     <Swiper
                         onSwiper={(swiper) => { lightboxSwiperRef.current = swiper; }}
+                        onSlideChange={(swiper) => setActiveLightboxIndex(swiper.realIndex)}
                         modules={[Navigation, Pagination, Zoom]}
                         initialSlide={lightboxIndex}
                         navigation
@@ -448,7 +451,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                         loop={filteredItems.length > 1}
                         style={{ height: '100%', borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
                     >
-                        {filteredItems.map((item) => (
+                        {filteredItems.map((item, idx) => (
                             <SwiperSlide key={item.id}>
                                 <Box sx={{
                                     position: 'relative',
@@ -463,7 +466,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                             src={item.image || '/images/placeholder.jpg'}
                                             alt={item.title}
                                             fill
-                                            priority={filteredItems.indexOf(item) === lightboxIndex}
+                                            priority={Math.abs(idx - activeLightboxIndex) <= 1}
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
                                             style={{
                                                 objectFit: 'contain',
