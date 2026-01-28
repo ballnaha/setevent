@@ -230,41 +230,30 @@ export default function ValentineSlugPage() {
         fetchData();
     }, [slug]);
 
-    // 🔤 Wait for Google Fonts to load before showing intro
+    // 🔤 Wait for fonts to be ready before showing content
+    // Since we use next/font/google with display: 'block', fonts are preloaded
+    // but we still check document.fonts.ready to ensure they're rendered
     useEffect(() => {
         const loadFonts = async () => {
             try {
-                // Use CSS Font Loading API to wait for fonts
                 if (typeof document !== 'undefined' && document.fonts) {
-                    // Wait for all fonts to be ready
+                    // Wait for all fonts declared in CSS to be loaded and ready
                     await document.fonts.ready;
-
-                    // Additionally check if our specific fonts are loaded
-                    const fontFamilies = ['Dancing Script', 'Charm', 'Mali', 'Sriracha'];
-                    const fontChecks = fontFamilies.map(font =>
-                        document.fonts.check(`16px "${font}"`)
-                    );
-
-                    // If any font isn't loaded yet, wait a bit more
-                    if (!fontChecks.every(Boolean)) {
-                        await new Promise(resolve => setTimeout(resolve, 300));
-                    }
                 }
                 setFontsLoaded(true);
             } catch (error) {
-                // Fallback: show content anyway after timeout
+                // Fallback: show content anyway
                 console.warn('Font loading check failed:', error);
                 setFontsLoaded(true);
             }
         };
 
-        // Start loading fonts immediately
         loadFonts();
 
-        // Fallback timeout to prevent infinite loading
+        // Fallback timeout (shorter since fonts are preloaded)
         const fallbackTimer = setTimeout(() => {
             setFontsLoaded(true);
-        }, 2000);
+        }, 1000);
 
         return () => clearTimeout(fallbackTimer);
     }, []);
@@ -585,8 +574,8 @@ export default function ValentineSlugPage() {
                         mt: 4,
                         color: '#4A151B',
                         fontWeight: 700,
-                        // Use system font first, Google Font will load in background
-                        fontFamily: fontsLoaded ? "'Dancing Script', cursive" : "cursive, sans-serif",
+                        // Use CSS variable from layout - font is preloaded via next/font/google
+                        fontFamily: "var(--font-dancing), cursive",
                         letterSpacing: '0.15em',
                         fontSize: '1.3rem',
                         textAlign: 'center',
@@ -701,7 +690,6 @@ export default function ValentineSlugPage() {
             }}
         >
             <style jsx global>{`
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Charm:wght@400;700&family=Mali:ital,wght@0,400;0,700;1,400&family=Sriracha&display=swap');
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         @keyframes float-lid { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         @keyframes burst-float {
@@ -1124,7 +1112,7 @@ export default function ValentineSlugPage() {
             50% { transform: scale(1.2); opacity: 1; }
         }
         .romantic-text {
-            font-family: 'Dancing Script', 'Mali', 'Charm', cursive;
+            font-family: var(--font-dancing), var(--font-mali), var(--font-charm), cursive;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.2), 0 0 15px rgba(255, 182, 193, 0.4);
             font-weight: 700;
             letter-spacing: 0.2px;
@@ -1220,7 +1208,7 @@ export default function ValentineSlugPage() {
                             className="text-[#FF3366] font-black"
                             sx={{
                                 fontSize: countdown === 0 ? '9rem' : '8rem',
-                                fontFamily: "'Dancing Script', cursive",
+                                fontFamily: "var(--font-dancing), cursive",
                                 textShadow: '0 0 50px rgba(255, 51, 102, 0.4)',
                                 lineHeight: 1,
                                 animation: 'countdown-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
@@ -1493,7 +1481,7 @@ export default function ValentineSlugPage() {
                                 <Typography variant="overline" className="text-red-800/60 tracking-[0.5em] font-black text-[0.65rem]">
                                     SPECIAL DELIVERY
                                 </Typography>
-                                <Typography variant="h2" className="shimmer-text font-bold drop-shadow-sm" sx={{ fontFamily: 'Dancing Script', fontSize: '3rem' }}>
+                                <Typography variant="h2" className="shimmer-text font-bold drop-shadow-sm" sx={{ fontFamily: 'var(--font-dancing), cursive', fontSize: '3rem' }}>
                                     {displayContent.title}
                                 </Typography>
                             </div>
@@ -1556,7 +1544,7 @@ export default function ValentineSlugPage() {
 
                             <div className="flex items-center gap-4 py-0.5">
                                 <Heart size={8} variant="Bold" color="#FF99AC" className="animate-pulse" />
-                                <Typography className="text-[#6D2128] text-[0.95rem] lowercase opacity-70" sx={{ fontFamily: 'Dancing Script', fontWeight: 700 }}>
+                                <Typography className="text-[#6D2128] text-[0.95rem] lowercase opacity-70" sx={{ fontFamily: 'var(--font-dancing), cursive', fontWeight: 700 }}>
                                     is in the
                                 </Typography>
                                 <Heart size={8} variant="Bold" color="#FF99AC" className="animate-pulse" style={{ animationDelay: '0.4s' }} />
@@ -1606,9 +1594,9 @@ export default function ValentineSlugPage() {
                     {/* 🏆 Header Section (Fixed outside the animated container to prevent jumping) */}
                     <div className="fixed left-0 right-0 text-center z-[70] pointer-events-none px-16" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
                         <Typography variant="h6" className="text-[#FF3366] font-bold tracking-wider" sx={{
-                            fontFamily: 'cursive',
+                            fontFamily: 'var(--font-dancing)',
                             lineHeight: 1.5,
-                            fontSize: '1.2rem',
+                            fontSize: '1.3rem',
                             textShadow: '0 2px 10px rgba(0,0,0,0.1)'
                         }}>
                             {displayContent.greeting?.split(' ')[0] || "Happy"}

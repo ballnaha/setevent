@@ -1,4 +1,39 @@
 import { Metadata } from "next";
+import { Dancing_Script, Charm, Mali, Sriracha } from "next/font/google";
+
+// 🔤 Preload Valentine-specific fonts using next/font/google
+// display: 'block' ensures text is hidden until font is loaded (prevents FOUT)
+const dancingScript = Dancing_Script({
+    subsets: ["latin"],
+    weight: ["700"],
+    variable: "--font-dancing",
+    display: "block", // Block text until font is loaded
+    preload: true,
+});
+
+const charm = Charm({
+    subsets: ["latin", "thai"],
+    weight: ["400", "700"],
+    variable: "--font-charm",
+    display: "block",
+    preload: true,
+});
+
+const mali = Mali({
+    subsets: ["latin", "thai"],
+    weight: ["400", "700"],
+    variable: "--font-mali",
+    display: "block",
+    preload: true,
+});
+
+const sriracha = Sriracha({
+    subsets: ["latin", "thai"],
+    weight: ["400"],
+    variable: "--font-sriracha",
+    display: "block",
+    preload: true,
+});
 
 export const metadata: Metadata = {
     title: "Happy Valentine's Day 💕 | ส่งความรักให้คนพิเศษ",
@@ -34,5 +69,9 @@ export default function ValentineLayout({
 }: {
     children: React.ReactNode;
 }) {
-    return <>{children}</>;
+    return (
+        <div className={`${dancingScript.variable} ${charm.variable} ${mali.variable} ${sriracha.variable}`}>
+            {children}
+        </div>
+    );
 }
