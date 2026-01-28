@@ -7,8 +7,10 @@ import { EffectCreative, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/effect-creative";
 import "swiper/css/pagination";
-import { Heart, Music, Play, Pause, Gift, Maximize, CloseCircle } from "iconsax-react";
+import { Heart, Music, Play, Pause, Gift, Maximize, CloseCircle, Star, Magicpen } from "iconsax-react";
 import { Button, Typography, Box, Paper, IconButton, CircularProgress } from "@mui/material";
+import JigsawPuzzle from "./JigsawPuzzle";
+import HeartCatcher from "./HeartCatcher";
 
 // ==========================================
 // 💖 DEFAULT CONFIGURATION (FALLBACK)
@@ -26,6 +28,7 @@ const DEFAULT_CONTENT = {
     backgroundMusicUrl: "",
     swipeHintColor: "white" as "white" | "red",
     swipeHintText: "Swipe to see more",
+    isGameEnabled: true,
 };
 
 const DEFAULT_MEMORIES = [
@@ -74,6 +77,7 @@ interface ValentineContent {
     backgroundMusicUrl: string;
     swipeHintColor: "white" | "red";
     swipeHintText: string;
+    isGameEnabled: boolean;
 }
 
 export default function ValentineSlugPage() {
@@ -98,6 +102,12 @@ export default function ValentineSlugPage() {
     const [revealedSlides, setRevealedSlides] = useState<Set<number>>(new Set([0])); // Start with slide 0 revealed
     const [showMessage, setShowMessage] = useState(false);
     const [fontsLoaded, setFontsLoaded] = useState(false); // 🔤 Wait for Google Fonts to load
+    const [isPuzzleComplete, setIsPuzzleComplete] = useState(false); // 🧩 Jigsaw puzzle state
+    const [showFinalReveal, setShowFinalReveal] = useState(false); // 🎉 Final reveal after puzzle
+    const [showGame, setShowGame] = useState(false); // 🎮 Control game modal visibility
+    const [showHeartGame, setShowHeartGame] = useState(false); // 💓 Heart Collection Game
+    const [heartGameScore, setHeartGameScore] = useState(0);
+    const [heartBurstSource, setHeartBurstSource] = useState<'interaction' | 'completion'>('interaction');
 
     // 🎭 Swiper Creative Effect Configuration (Memoized at top level for Hooks rules)
     const swiperCreativeConfig = useMemo(() => ({
@@ -153,15 +163,18 @@ export default function ValentineSlugPage() {
     const lastSwipeTimeRef = useRef<number>(0);
     const SWIPE_COOLDOWN_MS = 400; // Minimum time between swipes (prevents rapid swiping)
 
-    const triggerHeartBurst = useCallback(() => {
+    const triggerHeartBurst = useCallback((source: 'interaction' | 'completion' = 'interaction') => {
         const now = Date.now();
-        if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS) return;
+        if (now - lastBurstTimeRef.current < BURST_THROTTLE_MS && source === 'interaction') return;
         lastBurstTimeRef.current = now;
 
-        const newHearts = Array.from({ length: 8 }).map((_, i) => ({
+        setHeartBurstSource(source);
+
+        const count = source === 'completion' ? 12 : 8;
+        const newHearts = Array.from({ length: count }).map((_, i) => ({
             id: now + i,
             left: Math.random() * 100,
-            size: Math.random() * 20 + 20,
+            size: source === 'completion' ? Math.random() * 30 + 30 : Math.random() * 20 + 20,
             duration: Math.random() * 2 + 3,
             delay: Math.random() * 0.5,
         }));
@@ -213,7 +226,15 @@ export default function ValentineSlugPage() {
                         backgroundMusicUrl: data.backgroundMusicUrl || "",
                         swipeHintColor: data.swipeHintColor || DEFAULT_CONTENT.swipeHintColor,
                         swipeHintText: data.swipeHintText || DEFAULT_CONTENT.swipeHintText,
+                        isGameEnabled: data.showGame !== undefined ? data.showGame : true,
                     });
+
+                    // If game is disabled, auto-complete it to show final reveal directly
+                    if (data.showGame === false) {
+                        setIsPuzzleComplete(true);
+                        setShowFinalReveal(true);
+                    }
+
                     if (data.memories && data.memories.length > 0) {
                         setMemories(data.memories);
                     }
@@ -387,10 +408,12 @@ export default function ValentineSlugPage() {
                         setIsOpen(true);
                         setCountdown(null);
 
-                        // Trigger heart burst
+                        // Trigger heart burst - REMOVED for exclusive victory reward
+                        /*
                         if (typeof triggerHeartBurst === 'function') {
                             triggerHeartBurst();
                         }
+                        */
 
                         // Fade out the mask after a short delay
                         setTimeout(() => {
@@ -1237,7 +1260,7 @@ export default function ValentineSlugPage() {
             </div>
 
             {/* ❤️ Burst Hearts Animation Overlay */}
-            <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+            <div className={`fixed inset-0 pointer-events-none overflow-hidden ${heartBurstSource === 'interaction' ? 'z-50' : 'z-[150]'}`}>
                 {burstHearts.map((h) => (
                     <div
                         key={h.id}
@@ -1336,41 +1359,7 @@ export default function ValentineSlugPage() {
                 </div>
             )}
 
-            {/* 🔳 Controls (Left Side: Fullscreen) - Minimalist Floating Glass */}
-            {isOpen && (
-                <div className="fixed left-5 z-[60]" style={{ top: 'calc(1.25rem + env(safe-area-inset-top))' }}>
-                    <button
-                        onClick={toggleFullscreen}
-                        className="group w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 relative"
-                        style={{
-                            background: isFullscreen
-                                ? 'rgba(255, 255, 255, 0.2)'
-                                : 'rgba(255, 25, 60, 0.15)',
-                            backdropFilter: 'blur(12px) saturate(150%)',
-                            border: '2px solid rgba(255, 255, 255, 0.6)',
-                            boxShadow: '0 8px 32px 0 rgba(211, 47, 47, 0.15)',
-                        }}
-                    >
-                        {/* Glow Effect behind icon */}
-                        <div className="absolute inset-0 rounded-full bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
 
-                        {isFullscreen ? (
-                            <div className="relative transform rotate-180 transition-all duration-500 opacity-70 group-hover:opacity-100 group-hover:scale-110">
-                                <Maximize size="18" variant="Outline" color="white" />
-                            </div>
-                        ) : (
-                            <div className="relative transition-all duration-500 opacity-70 group-hover:opacity-100 group-hover:scale-110">
-                                <Maximize size="18" variant="Outline" color="white" />
-                            </div>
-                        )}
-
-                        {/* Subtle breathing ring when not fullscreen */}
-                        {!isFullscreen && (
-                            <div className="absolute inset-0 rounded-full border border-white/30 animate-[pulse-soft_3s_infinite]" />
-                        )}
-                    </button>
-                </div>
-            )}
 
             {/* 🏙️ Background Decoration */}
             {isOpen ? (
@@ -1839,6 +1828,154 @@ export default function ValentineSlugPage() {
                                                 </SwiperSlide>
                                             )
                                         })}
+
+                                        {/* 🧩 JIGSAW PUZZLE - Final Slide */}
+                                        {memories.length > 0 && (
+                                            <SwiperSlide key="game-slide">
+                                                {({ isActive }) => (
+                                                    <div className="slide-content relative w-full h-full z-[50] pointer-events-auto">
+                                                        {/* Premium Shine Effect */}
+                                                        <div className="card-shine animate-shine opacity-50 pointer-events-none" />
+
+                                                        {/* ⚪ Mystery Veil Overlay (Consistent with other cards) */}
+                                                        {!seenSlides.has(memories.length) && (
+                                                            <div
+                                                                className={`mystery-veil ${revealedSlides.has(memories.length) ? 'animate-veil-reveal' : ''}`}
+                                                                style={{
+                                                                    willChange: 'opacity',
+                                                                    pointerEvents: 'none',
+                                                                    zIndex: 100 // Above game cover content
+                                                                }}
+                                                            />
+                                                        )}
+
+                                                        {!isPuzzleComplete ? (
+                                                            /* 🎮 PREMIUM GAME COVER - Romantic Style - Improved for varied screen heights */
+                                                            <div className="absolute inset-0 flex flex-col items-center justify-start pt-[12%] sm:pt-[15%] p-6 text-center z-[60] pointer-events-auto bg-gradient-to-b from-rose-50/30 to-pink-100/30">
+                                                                {/* 💖 Cuter Decorative Elements: Floating Hearts & Sparkles */}
+                                                                <div className="absolute top-[5%] left-0 w-full px-10 flex justify-between items-center pointer-events-none opacity-60">
+                                                                    <div className="animate-[heart-float_4s_infinite]">
+                                                                        <Heart size={24} variant="Bold" color="#FFB6C1" />
+                                                                    </div>
+                                                                    <div className="flex flex-col items-center gap-1.5 translate-y-2">
+                                                                        <div className="px-4 py-1.5 bg-pink-100/50 backdrop-blur-md border border-white/60 rounded-full shadow-sm">
+                                                                            <Typography className="text-[#8B1D36] font-bold text-[0.6rem] tracking-[0.1em] font-mali">
+                                                                                Unlock My Love
+                                                                            </Typography>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="animate-[heart-float_5s_infinite_1s]">
+                                                                        <Heart size={20} variant="Bold" color="#FFCCDD" />
+                                                                    </div>
+                                                                </div>
+
+                                                                <div className="mb-6 relative mt-15">
+                                                                    {/* Inner Glow/Halo */}
+                                                                    <div className="absolute inset-0 animate-pulse bg-pink-300/20 blur-xl rounded-full scale-125" />
+
+                                                                    <div className="relative bg-white/40 backdrop-blur-md p-3.5 rounded-[2rem] border border-white/60 shadow-[0_15px_40px_rgba(255,100,150,0.12)]">
+                                                                        <div className="relative">
+                                                                            <Heart size={42} variant="Bold" color="#FF3366" className="drop-shadow-[0_0_8px_rgba(255,51,102,0.3)]" />
+                                                                            <div className="absolute -top-1 -right-1">
+                                                                                <Heart size={18} variant="Bold" color="#FF99AC" className="animate-bounce" />
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+
+                                                                <Typography
+                                                                    className="text-[#8B1D36] font-bold mb-1.5 drop-shadow-sm font-mali"
+                                                                    sx={{
+                                                                        fontSize: { xs: '1.6rem', sm: '2rem' },
+                                                                        letterSpacing: '-0.02em',
+                                                                        fontWeight: 900,
+                                                                        lineHeight: 1.2
+                                                                    }}
+                                                                >
+                                                                    สะสมใจแทนคำรัก
+                                                                </Typography>
+                                                                <Typography
+                                                                    className="text-pink-400 font-mali text-[0.65rem] sm:text-xs opacity-90 animate-pulse max-w-[240px]"
+                                                                >
+                                                                    สะสมหัวใจให้ครบ เพื่อรับรางวัลพิเศษ จากคนที่รักคุณ 🎁
+                                                                </Typography>
+                                                            </div>
+                                                        ) : (
+                                                            /* 🎉 Final Reveal after puzzle completion */
+                                                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 via-rose-50 to-pink-100">
+                                                                {/* Decorative elements */}
+                                                                <div className="absolute top-10 left-10 opacity-20 animate-[heart-float_3s_infinite]">
+                                                                    <Heart size={40} variant="Bold" color="#FF3366" />
+                                                                </div>
+                                                                <div className="absolute bottom-20 right-10 opacity-15 animate-[heart-float_2.5s_infinite_500ms]">
+                                                                    <Heart size={30} variant="Bold" color="#FF99AC" />
+                                                                </div>
+                                                                <div className="absolute top-1/3 right-8 opacity-20 animate-[heart-float_2.8s_infinite_300ms]">
+                                                                    <Heart size={24} variant="Bold" color="#FF6B8A" />
+                                                                </div>
+
+                                                                <div className={`text-center px-6 ${showFinalReveal ? 'animate-[scaleIn_0.8s_ease-out_forwards]' : 'opacity-0'}`}>
+                                                                    {/* Big heart */}
+                                                                    <div className="relative inline-block mb-6">
+                                                                        <div className="absolute inset-0 animate-ping opacity-30">
+                                                                            <Heart size={80} variant="Bold" color="#FF3366" />
+                                                                        </div>
+                                                                        <Heart
+                                                                            size={80}
+                                                                            variant="Bold"
+                                                                            color="#FF3366"
+                                                                            className="drop-shadow-lg animate-[heartPulse_1.5s_ease-in-out_infinite]"
+                                                                        />
+                                                                    </div>
+
+                                                                    {/* Title */}
+                                                                    <Typography
+                                                                        className="text-[#FF3366] font-bold mb-3"
+                                                                        sx={{ fontFamily: 'var(--font-dancing), cursive', fontSize: '2.2rem' }}
+                                                                    >
+                                                                        Forever Yours 💕
+                                                                    </Typography>
+
+                                                                    {/* Conditional Reward Message */}
+                                                                    {heartGameScore >= 1000 ? (
+                                                                        <div className="mt-3 p-6 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-3xl border-2 border-yellow-200 shadow-xl">
+                                                                            <div className="flex flex-col items-center gap-2">
+
+                                                                                <Typography className="text-[#8B1D36] font-bold" sx={{ fontFamily: 'var(--font-dancing), cursive', fontSize: '1.8rem' }}>
+                                                                                    Exclusive Reward! 🎁
+                                                                                </Typography>
+                                                                                <Typography className="text-gray-600 font-mali text-sm leading-relaxed">
+                                                                                    Amazing! You scored {heartGameScore} points.<br />
+                                                                                    คุณเก่งที่สุดเลย! รับรางวัลพิเศษจากคนรักของคุณได้เลยนะคะ ❤️
+                                                                                </Typography>
+                                                                            </div>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <>
+                                                                            {/* Standard Message */}
+                                                                            <Typography
+                                                                                className="text-[#8B1D36] opacity-80 mb-6 leading-relaxed"
+                                                                                sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1rem' }}
+                                                                            >
+                                                                                Thank you for being my everything.<br />
+                                                                                Every piece of my heart belongs to you.
+                                                                            </Typography>
+
+                                                                            <Typography
+                                                                                className="text-[#D41442] font-bold tracking-wider"
+                                                                                sx={{ fontFamily: 'var(--font-dancing), cursive', fontSize: '1.4rem' }}
+                                                                            >
+                                                                                ~ {displayContent.signer} ~
+                                                                            </Typography>
+                                                                        </>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </SwiperSlide>
+                                        )}
                                     </Swiper>
 
                                     {/* 🎬 FLOATING PLAY BUTTON */}
@@ -1859,6 +1996,37 @@ export default function ValentineSlugPage() {
                                                 </button>
                                             </div>
                                         )}
+
+                                    {/* 🧩 HEART CATCHER BUTTON */}
+                                    {currentSlideIndex === memories.length && !isPuzzleComplete && (
+                                        <div className="absolute bottom-[6%] left-1/2 transform -translate-x-1/2 z-[100] w-full flex justify-center pointer-events-auto px-10">
+                                            {/* Heart Catcher Button */}
+                                            <button
+                                                type="button"
+                                                className="group relative w-full max-w-[300px] py-4 bg-rose-500/20 backdrop-blur-xl border border-rose-200/40 rounded-[2rem] shadow-[0_15px_40px_rgba(212,20,66,0.15)] overflow-hidden transition-all duration-500 hover:bg-rose-500/30 hover:shadow-[0_20px_50px_rgba(212,20,66,0.25)] active:scale-95 animate-[fadeIn_1s_ease-out]"
+                                                onClick={() => setShowHeartGame(true)}
+                                                onTouchEnd={(e) => {
+                                                    e.preventDefault();
+                                                    setShowHeartGame(true);
+                                                }}
+                                            >
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-rose-100/30 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform" />
+                                                <div className="flex items-center justify-center gap-3 relative z-10">
+                                                    <div className="bg-gradient-to-br from-[#FFD700] to-[#FFA500] p-2 rounded-full shadow-lg">
+                                                        <Star size="20" variant="Bold" color="white" className="group-hover:rotate-[360deg] transition-transform duration-700" />
+                                                    </div>
+                                                    <div className="flex flex-col items-start leading-none">
+                                                        <Typography className="text-[#8B1D36] font-bold" sx={{ fontFamily: 'var(--font-dancing), cursive', fontSize: '1.6rem', letterSpacing: '0.05em' }}>
+                                                            Catch My Love
+                                                        </Typography>
+                                                        <Typography className="text-[#D41442]/70 font-bold" sx={{ fontFamily: 'var(--font-mali), sans-serif', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.2em' }}>
+                                                            กดเพื่อเล่นเกม
+                                                        </Typography>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
@@ -2012,6 +2180,33 @@ export default function ValentineSlugPage() {
                             </div>
                         </div>
                     )}
+                </div>
+            )}
+
+
+
+            {/* 💓 HEART CATCHER GAME MODAL */}
+            {showHeartGame && (
+                <div className="fixed inset-0 z-[130] flex items-center justify-center bg-black/20 backdrop-blur-lg animate-[fadeIn_0.5s_ease-out]">
+                    <HeartCatcher
+                        images={memories.filter(m => m.type === 'image').map(m => m.url)}
+                        onClose={() => setShowHeartGame(false)}
+                        onComplete={(score) => {
+                            setHeartGameScore(score);
+                            setShowHeartGame(false);
+
+                            // 🎯 Immediate Reveal Logic:
+                            // If score is enough, immediately show final reveal without going back to cover
+                            if (score >= 1000) {
+                                setIsPuzzleComplete(true);
+                                setShowFinalReveal(true);
+                                triggerHeartBurst('completion'); // Big celebration burst!
+                            } else {
+                                // If not enough, just close and let them try again or see standard end
+                                // Removed interaction burst to keep celebration exclusive to 1000+ score
+                            }
+                        }}
+                    />
                 </div>
             )}
         </Box>

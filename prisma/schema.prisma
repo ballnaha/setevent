@@ -307,6 +307,7 @@ model ValentineCard {
   // UI Customization
   swipeHintColor           String?  @default("white") // white, red
   swipeHintText            String?  @default("Swipe to see more")
+  showGame                 Boolean  @default(true)
 
   // Customer Contact Info (Optional)
   customerPhone            String?

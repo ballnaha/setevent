@@ -106,6 +106,7 @@ interface ValentineCard {
     backgroundMusicUrl: string | null;
     swipeHintColor: string | null;
     swipeHintText: string | null;
+    showGame: boolean;
     customerPhone: string | null;
     customerAddress: string | null;
     note: string | null;
@@ -479,6 +480,7 @@ export default function ValentineAdminPage() {
         disabledAt: "", // วันที่จะ disabled อัตโนมัติ (format: YYYY-MM-DDTHH:mm)
         swipeHintColor: "white" as "white" | "red", // สี hint "Swipe to see more"
         swipeHintText: "Swipe to see more", // ข้อความ hint
+        showGame: true, // เปิด/ปิด เกม
         customerPhone: "", // เบอร์โทรลูกค้า
         customerAddress: "", // ที่อยู่ลูกค้า
         note: "", // บันทึกเพิ่มเติม
@@ -595,17 +597,17 @@ export default function ValentineAdminPage() {
             // 1. Draw background (card_blank.jpg)
             ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-            // 2. Draw heart on left side (scaled to fit left half)
+            // 2. Draw heart on right side
             const heartWidth = CARD_WIDTH * 0.35;
             const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
-            const heartX = CARD_WIDTH * 0.06;
+            const heartX = CARD_WIDTH * 0.58;
             const heartY = (CARD_HEIGHT - heartHeight) / 2;
             ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
 
-            // 3. Draw title on right side above QR
+            // 3. Draw title on left side above QR
             const qrSizeOnCard = CARD_WIDTH * 0.38;
-            const qrX = CARD_WIDTH * 0.55; // moved left for more right padding
-            const qrY = CARD_HEIGHT * 0.25;
+            const qrX = CARD_WIDTH * 0.10;
+            const qrY = CARD_HEIGHT * 0.18;
 
             if (options.showTitle && targetTitle) {
                 const fontSize = Math.round(CARD_HEIGHT * 0.040);
@@ -622,7 +624,7 @@ export default function ValentineAdminPage() {
                 ctx.shadowBlur = 0;
             }
 
-            // 4. Draw QR Code on right side
+            // 4. Draw QR Code on left side
             ctx.drawImage(qrImage, qrX, qrY, qrSizeOnCard, qrSizeOnCard);
 
             // 5. Draw scan instruction below QR
@@ -646,17 +648,17 @@ export default function ValentineAdminPage() {
             // 1. Draw background
             ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-            // 2. Draw heart on top section (smaller)
+            // 2. Draw heart on bottom section
             const heartWidth = CARD_WIDTH * 0.50;
             const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
             const heartX = (CARD_WIDTH - heartWidth) / 2;
-            const heartY = CARD_HEIGHT * 0.06;
+            const heartY = CARD_HEIGHT * 0.62;
             ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
 
             // 3. Draw title above QR (larger QR)
             const qrSizeOnCard = CARD_WIDTH * 0.65;
             const qrX = (CARD_WIDTH - qrSizeOnCard) / 2;
-            const qrY = CARD_HEIGHT * 0.48;
+            const qrY = CARD_HEIGHT * 0.12;
 
             if (options.showTitle && targetTitle) {
                 const fontSize = Math.round(CARD_HEIGHT * 0.028);
@@ -751,17 +753,17 @@ export default function ValentineAdminPage() {
                 // 1. Draw background
                 ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-                // 2. Draw heart on left side
+                // 2. Draw heart on right side
                 const heartWidth = CARD_WIDTH * 0.35;
                 const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
-                const heartX = CARD_WIDTH * 0.06;
+                const heartX = CARD_WIDTH * 0.58;
                 const heartY = (CARD_HEIGHT - heartHeight) / 2;
                 ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
 
                 // 3. Draw title
                 const qrSizeOnCard = CARD_WIDTH * 0.38;
-                const qrX = CARD_WIDTH * 0.52; // moved left for more right padding
-                const qrY = CARD_HEIGHT * 0.25;
+                const qrX = CARD_WIDTH * 0.10;
+                const qrY = CARD_HEIGHT * 0.18;
 
                 if (options.showTitle && targetTitle) {
                     const fontSize = Math.round(CARD_HEIGHT * 0.040);
@@ -802,17 +804,17 @@ export default function ValentineAdminPage() {
                 // 1. Draw background
                 ctx.drawImage(bgImage, 0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-                // 2. Draw heart on top section (smaller)
+                // 2. Draw heart on bottom section
                 const heartWidth = CARD_WIDTH * 0.50;
                 const heartHeight = heartWidth * (heartImage.naturalHeight / heartImage.naturalWidth);
                 const heartX = (CARD_WIDTH - heartWidth) / 2;
-                const heartY = CARD_HEIGHT * 0.06;
+                const heartY = CARD_HEIGHT * 0.62;
                 ctx.drawImage(heartImage, heartX, heartY, heartWidth, heartHeight);
 
                 // 3. Draw title above QR (larger QR)
                 const qrSizeOnCard = CARD_WIDTH * 0.65;
                 const qrX = (CARD_WIDTH - qrSizeOnCard) / 2;
-                const qrY = CARD_HEIGHT * 0.48;
+                const qrY = CARD_HEIGHT * 0.12;
 
                 if (options.showTitle && targetTitle) {
                     const fontSize = Math.round(CARD_HEIGHT * 0.028);
@@ -1000,6 +1002,7 @@ export default function ValentineAdminPage() {
                     disabledAt: formatDisabledAt,
                     swipeHintColor: data.swipeHintColor || "white",
                     swipeHintText: data.swipeHintText || "Swipe to see more",
+                    showGame: data.showGame !== undefined ? data.showGame : true,
                     customerPhone: data.customerPhone || "",
                     customerAddress: data.customerAddress || "",
                     note: data.note || ""
@@ -1041,6 +1044,7 @@ export default function ValentineAdminPage() {
             disabledAt: "",
             swipeHintColor: "white",
             swipeHintText: "Swipe to see more",
+            showGame: true,
             customerPhone: "",
             customerAddress: "",
             note: ""
@@ -1677,6 +1681,12 @@ export default function ValentineAdminPage() {
                                                     control={<Switch checked={formData.status === 'active'} onChange={(e) => setFormData({ ...formData, status: e.target.checked ? 'active' : 'inactive' })} color="success" />}
                                                     label="การ์ดเปิดใช้งานอยู่ (Active)"
                                                 />
+                                                <FormControlLabel
+                                                    control={<Switch checked={formData.showGame} onChange={(e) => setFormData({ ...formData, showGame: e.target.checked })} color="secondary" />}
+                                                    label="เปิดการใช้งานเกม (Heart Catcher)"
+                                                />
+                                            </Box>
+                                            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
                                                 <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="th">
                                                     <DateTimePicker
                                                         label="วันที่ปิดการ์ดอัตโนมัติ"
