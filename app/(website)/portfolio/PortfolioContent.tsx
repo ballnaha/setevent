@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack, Button } from "@mui/material";
-import { CloseCircle, Gallery, Heart, Eye, ArrowLeft2, ArrowRight2 } from "iconsax-react";
+import { CloseCircle, Gallery, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
@@ -34,18 +34,12 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
     const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [activeLightboxIndex, setActiveLightboxIndex] = useState(0);
-    const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
     const swiperRef = useRef<SwiperType | null>(null);
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
 
     useEffect(() => {
         if (initialData.length === 0) {
             fetchPortfolios();
-        }
-        // Load liked items from local storage
-        const savedLikes = localStorage.getItem('likedPortfolios');
-        if (savedLikes) {
-            setLikedItems(new Set(JSON.parse(savedLikes)));
         }
     }, [initialData]);
 
@@ -74,52 +68,10 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
         ? portfolioItems
         : portfolioItems.filter((d: PortfolioItem) => d.category === selectedCategory);
 
-    const handleView = async (id: string) => {
-        try {
-            await fetch(`/api/portfolios/${id}/view`, { method: 'POST' });
-            // Update local state for view count
-            setPortfolioItems(prev => prev.map(p =>
-                p.id === id ? { ...p, views: p.views + 1 } : p
-            ));
-        } catch (error) {
-            console.error("Failed to count view", error);
-        }
-    };
-
-    const handleLike = async (e: React.MouseEvent, id: string) => {
-        e.stopPropagation(); // Prevent opening lightbox
-
-        const isLiked = likedItems.has(id);
-        const action = isLiked ? 'unlike' : 'like';
-        const incrementValue = isLiked ? -1 : 1;
-
-        // Optimistic update status
-        const newLikedItems = new Set(likedItems);
-        if (isLiked) {
-            newLikedItems.delete(id);
-        } else {
-            newLikedItems.add(id);
-        }
-        setLikedItems(newLikedItems);
-        localStorage.setItem('likedPortfolios', JSON.stringify(Array.from(newLikedItems)));
-
-        // Optimistic update count
-        setPortfolioItems(prev => prev.map(p =>
-            p.id === id ? { ...p, likes: Math.max(0, p.likes + incrementValue) } : p
-        ));
-
-        try {
-            await fetch(`/api/portfolios/${id}/like?action=${action}`, { method: 'POST' });
-        } catch (error) {
-            console.error("Failed to toggle like", error);
-        }
-    };
-
     const openLightbox = (item: PortfolioItem, index: number) => {
         setLightboxIndex(index);
         setActiveLightboxIndex(index);
         setSelectedItem(item);
-        handleView(item.id);
     };
 
     const closeLightbox = () => {
@@ -369,34 +321,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                         {item.title}
                                     </Typography>
 
-                                    <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                                        <Box
-                                            sx={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 0.5,
-                                                cursor: 'pointer',
-                                                transition: 'transform 0.2s',
-                                                '&:hover': { transform: 'scale(1.1)' }
-                                            }}
-                                            onClick={(e) => handleLike(e, item.id)}
-                                        >
-                                            <Heart
-                                                size="16"
-                                                color={likedItems.has(item.id) ? "#ef4444" : "white"}
-                                                variant={likedItems.has(item.id) ? "Bold" : "Linear"}
-                                            />
-                                            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
-                                                {item.likes}
-                                            </Typography>
-                                        </Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                            <Eye size="16" color="rgba(255,255,255,0.9)" />
-                                            <Typography sx={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
-                                                {item.views}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
+
                                 </Box>
                             </Box>
                         ))}
