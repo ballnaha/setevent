@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { Heart, Star, Magicpen, Forbidden, Gift, Gallery, CloseCircle } from "iconsax-react";
-import { Typography, Box, IconButton } from "@mui/material";
+import { Heart, Star, Magicpen, Forbidden, Gift, Gallery, CloseCircle, Timer1, Cup } from "iconsax-react";
+import { Typography, Box, IconButton, Button } from "@mui/material";
+import { useParams } from "next/navigation";
+import Leaderboard from "./Leaderboard";
 
 interface FallingHeart {
     id: number;
     x: number;
     y: number;
     size: number;
-    type: 'normal' | 'rare' | 'super' | 'bomb' | 'rainbow';
+    type: 'normal' | 'rare' | 'super' | 'bomb' | 'rainbow' | 'clock';
     points: number;
     color: string;
 }
@@ -60,6 +62,16 @@ const MemoizedHeart = React.memo(({ heart, onCatch }: { heart: FallingHeart, onC
                             className="opacity-90 drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]"
                         />
                         <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                    </div>
+                ) : heart.type === 'clock' ? (
+                    <div className="relative">
+                        <div className="absolute inset-0 bg-blue-400/20 blur-lg rounded-full animate-pulse" />
+                        <Timer1
+                            size={heart.size}
+                            variant="Bold"
+                            color={heart.color}
+                            className="opacity-90 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)] animate-bounce"
+                        />
                     </div>
                 ) : (
                     <div
@@ -141,12 +153,18 @@ MemoizedParticle.displayName = 'MemoizedParticle';
 
 // --- MAIN COMPONENT ---
 export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, images }: HeartCatcherProps) {
+    const params = useParams();
+    const slug = params.slug as string;
     const [score, setScore] = useState(0);
+    const [spawnInterval, setSpawnInterval] = useState(250);
+    const [speedMultiplier, setSpeedMultiplier] = useState(1);
+    const [gameDuration, setGameDuration] = useState(0); // Total seconds played this round
+    const [showLeaderboard, setShowLeaderboard] = useState(false);
     const [timeLeft, setTimeLeft] = useState(30);
     const [hearts, setHearts] = useState<FallingHeart[]>([]);
     const [isGameOver, setIsGameOver] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
-    const [floatingScores, setFloatingScores] = useState<{ id: number, x: number, y: number, points: number }[]>([]);
+    const [floatingScores, setFloatingScores] = useState<{ id: number, x: number, y: number, points: number | string }[]>([]);
     const [particles, setParticles] = useState<{ id: number, x: number, y: number, color: string, angle: number, speed: number }[]>([]);
 
     const spawnTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -156,19 +174,26 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
     // Spawn a new heart
     const spawnHeart = useCallback(() => {
         const rand = Math.random();
-        let type: 'normal' | 'rare' | 'super' | 'bomb' | 'rainbow' = 'normal';
-        let points = 5; // Low points but high frequency
+        let type: 'normal' | 'rare' | 'super' | 'bomb' | 'rainbow' | 'clock' = 'normal';
+        let points = 5;
         let color = "#FF3366";
         let size = 45 + Math.random() * 20;
 
-        if (rainbowSpawnedRef.current < 2 && rand > 0.96) {
-            // Rainbow Heart - Max 2 per game
+        // Dynamic Luck: Increase clock rate when time is low (Clutch Luck)
+        const clockThreshold = timeLeft < 10 ? 0.97 : 0.99;
+
+        if (rainbowSpawnedRef.current < 2 && rand > 0.99) {
             type = 'rainbow';
             points = 250;
             color = "linear-gradient(45deg, #FF3366, #FFD700, #33FFF6, #A033FF)";
             size = 55 + Math.random() * 10;
             rainbowSpawnedRef.current += 1;
-        } else if (rand > 0.98) { // Super Heart (Rare)
+        } else if (rand > clockThreshold) {
+            type = 'clock';
+            points = 0;
+            color = "#3B82F6";
+            size = 40 + Math.random() * 10;
+        } else if (rand > 0.95) {
             type = 'super';
             points = 25;
             color = "#FFD700";
@@ -202,7 +227,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
         setTimeout(() => {
             setHearts(prev => prev.filter(h => h.id !== id));
         }, 1200);
-    }, []);
+    }, [timeLeft]); // Added timeLeft to dependencies for clockThreshold
 
     const createParticles = (x: number, y: number, color: string) => {
         const timestamp = Date.now();
@@ -231,11 +256,16 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
         setGameStarted(true);
         setScore(0);
         setTimeLeft(30);
+        setGameDuration(0); // Reset game duration
         setHearts([]);
         setIsGameOver(false);
         rainbowSpawnedRef.current = 0;
 
-        // High Frequency Spawn Interval
+        // Clear any existing timers before starting new ones
+        if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
+        if (gameTimerRef.current) clearInterval(gameTimerRef.current);
+
+        // Heart Spawning Interval
         spawnTimerRef.current = setInterval(() => {
             setHearts(prev => {
                 const currentMax = 8; // Many hearts on screen for the Fun Factor
@@ -244,16 +274,19 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                 }
                 return prev;
             });
-        }, 220); // Very fast spawning
+        }, spawnInterval); // Use dynamic spawnInterval
 
+        // Game Timer and Duration Tracking
         gameTimerRef.current = setInterval(() => {
             setTimeLeft(prev => {
                 if (prev <= 1) {
-                    stopGame();
+                    stopGame(); // Use stopGame to clear all timers
                     return 0;
                 }
                 return prev - 1;
             });
+            // Track total duration played
+            setGameDuration(d => d + 1);
         }, 1000);
     };
 
@@ -270,18 +303,29 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                 });
             }, 150); // Frenzy speed! (150ms)
         }
-    }, [timeLeft, gameStarted, isGameOver, spawnHeart]);
+    }, [timeLeft, gameStarted, isGameOver, spawnHeart, spawnInterval]); // Added spawnInterval to dependencies
 
     const catchHeart = (id: number, x: number, y: number, points: number, color: string) => {
-        setScore(prev => prev + points);
+        const heart = hearts.find(h => h.id === id);
+        let bonusText: number | string = "";
+
+        if (heart?.type === 'clock') {
+            const extraTime = 3 + Math.floor(Math.random() * 4); // Random +3 to +6 seconds
+            setTimeLeft(prev => Math.min(prev + extraTime, 60));
+            bonusText = `+${extraTime}s`;
+        } else {
+            setScore(prev => prev + points);
+            bonusText = points > 0 ? `+${points}` : `${points}`;
+        }
+
         setHearts(prev => prev.filter(heart => heart.id !== id));
 
         // Effects
         createParticles(x, y, color);
 
-        // Show floating score
+        // Show floating score or time
         const scoreId = Date.now() + Math.random();
-        setFloatingScores(prev => [...prev, { id: scoreId, x, y, points }]);
+        setFloatingScores(prev => [...prev, { id: scoreId, x, y, points: bonusText as any }]);
         setTimeout(() => {
             setFloatingScores(prev => prev.filter(s => s.id !== scoreId));
         }, 800);
@@ -358,10 +402,19 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                         </Typography>
                         <button
                             onClick={startGame}
-                            className="px-12 py-4 bg-gradient-to-r from-[#FF3366] to-[#D41442] text-white font-bold rounded-full shadow-[0_15px_30px_rgba(212,20,66,0.3)] hover:shadow-[0_20px_45px_rgba(212,20,66,0.5)] transition-all active:scale-95 text-xl"
+                            className="px-12 py-4 bg-gradient-to-r from-[#FF3366] to-[#D41442] text-white font-bold rounded-full shadow-[0_15px_30px_rgba(212,20,66,0.3)] hover:shadow-[0_20px_45px_rgba(212,20,66,0.5)] transition-all active:scale-95 text-xl mb-4"
                             style={{ fontFamily: 'var(--font-mali), sans-serif' }}
                         >
                             เริ่มเล่นเลย!
+                        </button>
+
+                        <button
+                            onClick={() => setShowLeaderboard(true)}
+                            className="px-8 py-2 border-2 border-[#D41442] text-[#D41442] font-extrabold rounded-full hover:bg-rose-50 transition-all flex items-center gap-2"
+                            style={{ fontFamily: 'var(--font-mali), sans-serif' }}
+                        >
+                            <Cup size="20" variant="Bold" color="#D41442" />
+                            ตารางอันดับ 🏆
                         </button>
                     </div>
                 ) : isGameOver ? (
@@ -404,17 +457,28 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                                     className="w-full py-3.5 bg-gradient-to-r from-[#D41442] to-[#FF3366] text-white font-bold rounded-xl shadow-lg active:scale-95 transition-all text-base"
                                     style={{ fontFamily: 'var(--font-mali), sans-serif' }}
                                 >
-                                    เก็บแต้มแห่งรัก ❤️
+                                    กลับหน้าแรก ✨
                                 </button>
+
+                                <button
+                                    onClick={() => setShowLeaderboard(true)}
+                                    className="w-full py-3 border-2 border-pink-200 text-[#FF3366] font-bold rounded-xl hover:bg-pink-50 transition-all flex items-center justify-center gap-2 text-sm"
+                                    style={{ fontFamily: 'var(--font-mali), sans-serif' }}
+                                >
+                                    <Cup size="18" variant="Bold" color="#FF3366" />
+                                    ดูตารางอันดับ 🏆
+                                </button>
+
                                 <button
                                     onClick={startGame}
-                                    className="w-full py-3 bg-white text-[#FF3366] border border-pink-100 font-bold rounded-xl shadow-sm active:scale-95 transition-all text-sm"
+                                    className="w-full py-3 bg-gray-50 text-gray-400 font-bold rounded-xl active:scale-95 transition-all text-sm"
                                     style={{ fontFamily: 'var(--font-mali), sans-serif' }}
                                 >
                                     เล่นอีกรอบ 🔄
                                 </button>
                             </div>
                         </div>
+
                     </div>
                 ) : (
                     <>
@@ -463,15 +527,22 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                                 }}
                             >
                                 <Typography
-                                    className={`font-black text-2xl drop-shadow-md ${score.points >= 250 ? 'animate-[rainbow-text_1s_linear_infinite]' : (score.points > 0 ? 'text-[#FF3366]' : 'text-gray-600')}`}
-                                    sx={score.points >= 250 ? {
+                                    className={`font-black text-2xl drop-shadow-md ${typeof score.points === 'number' && (score.points as number) >= 250
+                                        ? 'animate-[rainbow-text_1s_linear_infinite]'
+                                        : (String(score.points).includes('s')
+                                            ? 'text-blue-500'
+                                            : (typeof score.points === 'number' && (score.points as number) > 0 ? 'text-[#FF3366]' : 'text-gray-600'))
+                                        }`}
+                                    sx={typeof score.points === 'number' && (score.points as number) >= 250 ? {
                                         background: 'linear-gradient(45deg, #FF3366, #FFD700, #33FFF6, #A033FF)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
                                     } : {}}
                                 >
-                                    {score.points > 0 ? `+${score.points}` : score.points}
+                                    {String(score.points).startsWith('+') || String(score.points).startsWith('-')
+                                        ? score.points
+                                        : (typeof score.points === 'number' && score.points > 0 ? `+${score.points}` : score.points)}
                                 </Typography>
                             </div>
                         ))}
@@ -481,6 +552,16 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                             <MemoizedParticle key={p.id} p={p} />
                         ))}
                     </>
+                )}
+
+                {/* Global Leaderboard Modal Overlay */}
+                {showLeaderboard && (
+                    <Leaderboard
+                        slug={slug}
+                        currentScore={score}
+                        gameDuration={gameDuration}
+                        onClose={() => setShowLeaderboard(false)}
+                    />
                 )}
             </div>
 
@@ -524,6 +605,6 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                     100% { transform: scale(0.8); opacity: 0; filter: blur(5px); }
                 }
             `}</style>
-        </div>
+        </div >
     );
 }

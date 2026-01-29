@@ -319,6 +319,22 @@ model ValentineCard {
 
   memories        ValentineMemory[]
   orderedProducts ValentineProduct[]
+  scores          ValentineScore[]
+}
+
+model ValentineScore {
+  id        String   @id @default(cuid())
+  cardId    String
+  playerId  String   // persistent ID from localStorage
+  name      String
+  score     Int
+  createdAt DateTime @default(now())
+
+  card ValentineCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  @@unique([cardId, playerId])
+  @@index([cardId])
+  @@index([score(sort: Desc)])
 }
 
 model ValentineMemory {
