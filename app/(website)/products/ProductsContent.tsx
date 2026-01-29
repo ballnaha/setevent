@@ -25,11 +25,13 @@ interface RootCategory {
     _count: { products: number; children: number };
 }
 
-export default function ProductsContent() {
-    const [categories, setCategories] = useState<RootCategory[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function ProductsContent({ initialData = [] }: { initialData?: RootCategory[] }) {
+    const [categories, setCategories] = useState<RootCategory[]>(initialData);
+    const [loading, setLoading] = useState(initialData.length === 0);
 
     useEffect(() => {
+        if (initialData.length > 0) return;
+
         async function fetchCategories() {
             try {
                 const res = await fetch('/api/admin/categories', { cache: 'no-store' });
@@ -397,6 +399,8 @@ export default function ProductsContent() {
                                                             src={child.image}
                                                             alt={child.name}
                                                             fill
+                                                            priority={category.id === categories[0]?.id && category.children.indexOf(child) < 4}
+                                                            sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, (max-width: 1280px) 25vw, 300px"
                                                             placeholder="blur"
                                                             blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                                             style={{ objectFit: 'cover' }}

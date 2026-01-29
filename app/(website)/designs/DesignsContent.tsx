@@ -263,14 +263,22 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     }
                                 }}
                             >
-                                <Box sx={{ position: 'relative', width: '100%', borderRadius: 'inherit', bgcolor: '#e0e0e0' }}>
+                                <Box sx={{
+                                    position: 'relative',
+                                    width: '100%',
+                                    borderRadius: 'inherit',
+                                    bgcolor: 'rgba(128,128,128,0.1)',
+                                    aspectRatio: 'unset',
+                                    overflow: 'hidden'
+                                }}>
                                     <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         className="design-image"
                                         width={500}
                                         height={500}
-                                        loading={idx < 6 ? 'eager' : 'lazy'}
+                                        priority={idx < 3}
+                                        sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
                                         placeholder="blur"
                                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                         style={{

@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import ProductsContent from './ProductsContent';
+import prisma from '@/lib/prisma';
 
 // Revalidate every 60 seconds for fresh data with caching
 export const revalidate = 60;
@@ -33,6 +34,30 @@ export const metadata: Metadata = {
     },
 };
 
-export default function ProductsPage() {
-    return <ProductsContent />;
+export default async function ProductsPage() {
+    // Fetch all categories from the database on the server
+    const data = await prisma.category.findMany({
+        where: { status: 'active' },
+        include: {
+            _count: {
+                select: { products: true, children: true }
+            }
+        },
+        orderBy: { order: 'asc' }
+    });
+
+    // Filter to get only root categories and build tree
+    const rootCats = data.filter((cat: any) => !cat.parentId);
+    const initialData = rootCats.map((root: any) => ({
+        ...root,
+        children: data.filter((cat: any) => cat.parentId === root.id).map((child: any) => ({
+            ...child,
+            _count: {
+                products: child._count.products,
+                children: child._count.children
+            }
+        }))
+    }));
+
+    return <ProductsContent initialData={initialData} />;
 }

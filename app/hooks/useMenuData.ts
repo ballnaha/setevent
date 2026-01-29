@@ -37,12 +37,14 @@ const defaultSections: MenuSection[] = [
     }
 ];
 
-export function useMenuData(): MenuData {
-    const [sections, setSections] = useState<MenuSection[]>(defaultSections);
-    const [loading, setLoading] = useState(true);
+export function useMenuData(initialSections?: MenuSection[]): MenuData {
+    const [sections, setSections] = useState<MenuSection[]>(initialSections || defaultSections);
+    const [loading, setLoading] = useState(!initialSections);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (initialSections && initialSections.length > 0) return;
+
         async function fetchMenu() {
             try {
                 const res = await fetch('/api/categories/menu');

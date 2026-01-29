@@ -57,7 +57,7 @@ interface PageData {
 }
 
 // ProductCard Component - Glassmorphism Bottom Panel Style (Like Middle Card)
-function ProductCard({ product, categoryName }: { product: Product; categoryName: string }) {
+function ProductCard({ product, categoryName, isPriority = false }: { product: Product; categoryName: string; isPriority?: boolean }) {
     const [isHovered, setIsHovered] = useState(false);
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
@@ -168,6 +168,8 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
                                                 src={img}
                                                 alt={product.name}
                                                 fill
+                                                priority={idx === 0 && isPriority}
+                                                sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"
                                                 placeholder="blur"
                                                 blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                                 style={{ objectFit: 'cover' }}
@@ -624,16 +626,18 @@ function ProductCard({ product, categoryName }: { product: Product; categoryName
     );
 }
 
-export default function ProductCategoryContent() {
+export default function ProductCategoryContent({ initialData = null }: { initialData?: PageData | null }) {
     const params = useParams();
     const slugArray = params.slug as string[] | undefined;
     const slugPath = slugArray?.join('/') || '';
 
-    const [data, setData] = useState<PageData | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [data, setData] = useState<PageData | null>(initialData);
+    const [loading, setLoading] = useState(initialData === null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
+        if (initialData) return;
+
         async function fetchData() {
             if (!slugPath) return;
 
@@ -968,8 +972,8 @@ export default function ProductCategoryContent() {
                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: '1fr 1fr 1fr' },
                         gap: { xs: 3, md: 4 }
                     }}>
-                        {products.map((product) => (
-                            <ProductCard key={product.id} product={product} categoryName={category.name} />
+                        {products.map((product, idx) => (
+                            <ProductCard key={product.id} product={product} categoryName={category.name} isPriority={idx < 3} />
                         ))}
                     </Box>
                 </Container>
