@@ -154,7 +154,7 @@ export default function ProfilePage() {
                                 border: `2px solid ${roleColor}30`
                             }}
                         >
-                            {profile?.name?.charAt(0).toUpperCase() || 'U'}
+                            {profile?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </Avatar>
 
                         <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: '#1a1a1a' }}>

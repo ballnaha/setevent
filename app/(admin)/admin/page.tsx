@@ -131,7 +131,7 @@ export default function AdminDashboard() {
                                             justifyContent: 'center',
                                         }}
                                     >
-                                        <card.icon size={24} color={card.color} variant="Bold" />
+                                        {card.icon ? <card.icon size={24} color={card.color} variant="Bold" /> : <Box sx={{ width: 24, height: 24 }} />}
                                     </Box>
                                 </Box>
                             </CardContent>

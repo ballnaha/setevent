@@ -136,11 +136,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                             }}
                                         >
                                             <ListItemIcon sx={{ minWidth: 34 }}>
-                                                <Icon
-                                                    size={20}
-                                                    color={isActive ? '#FFFFFF' : '#9CA3AF'}
-                                                    variant={isActive ? 'Bold' : 'Outline'}
-                                                />
+                                                {Icon ? (
+                                                    <Icon
+                                                        size={20}
+                                                        color={isActive ? '#FFFFFF' : '#9CA3AF'}
+                                                        variant={isActive ? 'Bold' : 'Outline'}
+                                                    />
+                                                ) : <Box sx={{ width: 20, height: 20 }} />}
                                             </ListItemIcon>
                                             <ListItemText
                                                 primary={item.label}
@@ -242,7 +244,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                     borderColor: 'rgba(255,255,255,0.3)'
                                 }
                             }}>
-                                {session?.user?.name?.charAt(0).toUpperCase() || 'A'}
+                                {session?.user?.name?.charAt(0)?.toUpperCase() || 'A'}
                             </Avatar>
                         </IconButton>
 
@@ -399,7 +401,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                                         transition: 'all 0.2s',
                                         boxShadow: isActive ? '0 4px 12px rgba(10, 92, 90, 0.3)' : 'none'
                                     }}>
-                                        <Icon size={22} variant={isActive ? 'Bold' : 'Outline'} color="currentColor" />
+                                        {Icon ? <Icon size={22} variant={isActive ? 'Bold' : 'Outline'} color="currentColor" /> : <Box sx={{ width: 22, height: 22 }} />}
                                     </Box>
                                 }
                                 sx={{

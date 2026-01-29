@@ -373,7 +373,7 @@ export default function UsersPage() {
                                                 fontFamily: 'var(--font-prompt)',
                                             }}
                                         >
-                                            {user.name?.charAt(0).toUpperCase() || 'U'}
+                                            {user.name?.charAt(0)?.toUpperCase() || 'U'}
                                         </Avatar>
                                         <Chip
                                             icon={<RoleIcon size={14} />}
