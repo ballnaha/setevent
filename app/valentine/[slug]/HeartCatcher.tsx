@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Heart, Star, Magicpen, Forbidden, Gift, Gallery, CloseCircle } from "iconsax-react";
-import { Typography, Box, IconButton, Button } from "@mui/material";
-import { Close } from "@mui/icons-material";
+import { Typography, Box, IconButton } from "@mui/material";
 
 interface FallingHeart {
     id: number;
@@ -22,7 +21,126 @@ interface HeartCatcherProps {
     images?: string[];
 }
 
-export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, images = [] }: HeartCatcherProps) {
+// --- OPTIMIZED SUB-COMPONENTS ---
+
+const MemoizedHeart = React.memo(({ heart, onCatch }: { heart: FallingHeart, onCatch: (id: number, x: number, y: number, points: number, color: string) => void }) => {
+    return (
+        <div
+            className="absolute cursor-pointer select-none group animate-[heart-lifecycle_1.5s_ease-in-out_forwards]"
+            style={{
+                left: `${heart.x}%`,
+                top: `${heart.y}%`,
+                transform: `translate3d(-50%, -50%, 0)`,
+                zIndex: heart.type === 'super' ? 50 : 40,
+                willChange: 'opacity, transform'
+            }}
+            onMouseDown={(e) => {
+                e.stopPropagation();
+                onCatch(heart.id, heart.x, heart.y, heart.points, heart.color);
+            }}
+            onTouchStart={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onCatch(heart.id, heart.x, heart.y, heart.points, heart.color);
+            }}
+        >
+            <div className="transition-transform active:scale-125 duration-150" style={{ transform: 'translateZ(0)' }}>
+                {heart.type === 'rainbow' && (
+                    <div className="absolute inset-0 bg-white/20 blur-xl rounded-full animate-pulse" />
+                )}
+                {heart.type === 'super' && (
+                    <div className="absolute inset-0 bg-yellow-300/30 blur-lg rounded-full animate-pulse" />
+                )}
+                {heart.type === 'bomb' ? (
+                    <div className="relative">
+                        <Forbidden
+                            size={heart.size}
+                            variant="Bold"
+                            color={heart.color}
+                            className="opacity-90 drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]"
+                        />
+                        <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
+                    </div>
+                ) : (
+                    <div
+                        style={{
+                            position: 'relative',
+                            width: heart.size,
+                            height: heart.size,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                        }}
+                    >
+                        {heart.type === 'rainbow' ? (
+                            <div
+                                className="animate-[rainbow-rotate_3s_linear_infinite]"
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    background: 'linear-gradient(45deg, #FF3366, #FFD700, #33FFF6, #A033FF)',
+                                    WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
+                                    maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
+                                    WebkitMaskSize: 'contain',
+                                    maskSize: 'contain',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    maskRepeat: 'no-repeat',
+                                    WebkitMaskPosition: 'center',
+                                    maskPosition: 'center',
+                                    filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))'
+                                }}
+                            />
+                        ) : (
+                            <Heart
+                                size={heart.size}
+                                variant="Bold"
+                                color={heart.color}
+                                className="opacity-90"
+                            />
+                        )}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+MemoizedHeart.displayName = 'MemoizedHeart';
+
+const MemoizedParticle = React.memo(({ p }: { p: any }) => {
+    return (
+        <div
+            className="absolute pointer-events-none z-[90] animate-[particle-fade_1s_forwards]"
+            style={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                '--angle': `${p.angle}rad`,
+                '--speed': `${p.speed}`,
+                transform: 'translateZ(0)'
+            } as any}
+        >
+            {p.color.includes('gradient') ? (
+                <div
+                    className="animate-[rainbow-rotate_2s_linear_infinite]"
+                    style={{
+                        width: 14,
+                        height: 14,
+                        background: p.color,
+                        WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
+                        maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
+                        WebkitMaskSize: 'contain',
+                        maskSize: 'contain'
+                    }}
+                />
+            ) : (
+                <Heart size={14} variant="Bold" color={p.color} className="opacity-80 drop-shadow-sm" />
+            )}
+        </div>
+    );
+});
+MemoizedParticle.displayName = 'MemoizedParticle';
+
+// --- MAIN COMPONENT ---
+export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, images }: HeartCatcherProps) {
     const [score, setScore] = useState(0);
     const [timeLeft, setTimeLeft] = useState(30);
     const [hearts, setHearts] = useState<FallingHeart[]>([]);
@@ -236,7 +354,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                         </Typography>
                         <Typography className="text-gray-600 mb-8 max-w-[280px] font-mali text-sm pt-5 pb-10">
                             แตะที่หัวใจเพื่อเก็บแต้มรักกันเถอะ<br />
-                            <span className="text-rose-500 font-bold">เป้าหมาย: 1,000 แต้ม</span> เพื่อรับรางวัลพิเศษ จากคนที่รักคุณ! 🎁
+                            <span className="text-rose-500 font-bold">เป้าหมาย: {targetScore.toLocaleString()} แต้ม</span> เพื่อรับรางวัลพิเศษ จากคนที่รักคุณ! 🎁
                         </Typography>
                         <button
                             onClick={startGame}
@@ -263,7 +381,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                             </div>
 
                             <div className="w-full mb-6">
-                                {score >= 1000 ? (
+                                {score >= targetScore ? (
                                     <div className="p-4 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-2xl border-2 border-yellow-200/50 shadow-sm animate-[pulse_3s_infinite] flex flex-col items-center gap-1.5">
                                         <Gift size={32} variant="Bold" color="#FFD700" className="drop-shadow-sm" />
                                         <Typography className="text-[#8B1D36] font-bold text-xs uppercase font-mali tracking-wider">
@@ -275,7 +393,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                                     </div>
                                 ) : (
                                     <div className="px-4 py-3 bg-rose-50 rounded-2xl border border-rose-100 italic font-mali text-rose-300 text-[0.65rem] text-center">
-                                        ขาดอีก {1000 - score} แต้ม เพื่อรับรางวัลพิเศษนะ!
+                                        ขาดอีก {targetScore - score} แต้ม เพื่อรับรางวัลพิเศษนะ!
                                     </div>
                                 )}
                             </div>
@@ -300,86 +418,38 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                     </div>
                 ) : (
                     <>
-                        {hearts.map(heart => (
-                            <div
-                                key={heart.id}
-                                className="absolute cursor-pointer select-none group animate-[heart-lifecycle_1.5s_ease-in-out_forwards]"
-                                style={{
-                                    left: `${heart.x}%`,
-                                    top: `${heart.y}%`,
-                                    transform: `translate3d(-50%, -50%, 0)`,
-                                    zIndex: heart.type === 'super' ? 50 : 40,
-                                    willChange: 'opacity, transform'
-                                }}
-                                onMouseDown={(e) => {
-                                    e.stopPropagation();
-                                    catchHeart(heart.id, heart.x, heart.y, heart.points, heart.color);
-                                }}
-                                onTouchStart={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    catchHeart(heart.id, heart.x, heart.y, heart.points, heart.color);
+                        {/* Faint Background Countdown */}
+                        {gameStarted && !isGameOver && timeLeft <= 5 && timeLeft > 0 && (
+                            <Box
+                                key={timeLeft}
+                                className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden"
+                                sx={{
+                                    zIndex: 1,
+                                    '& > *': { transform: 'translateZ(0)' }
                                 }}
                             >
-                                <div className="transition-transform active:scale-125 duration-150">
-                                    {heart.type === 'rainbow' && (
-                                        <div className="absolute inset-0 bg-white/20 blur-xl rounded-full animate-pulse" />
-                                    )}
-                                    {heart.type === 'super' && (
-                                        <div className="absolute inset-0 bg-yellow-300/30 blur-lg rounded-full animate-pulse" />
-                                    )}
-                                    {heart.type === 'bomb' ? (
-                                        <div className="relative">
-                                            <Forbidden
-                                                size={heart.size}
-                                                variant="Bold"
-                                                color={heart.color}
-                                                className="opacity-90 drop-shadow-[0_0_10px_rgba(0,0,0,0.3)]"
-                                            />
-                                            <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping" />
-                                        </div>
-                                    ) : (
-                                        <div
-                                            style={{
-                                                position: 'relative',
-                                                width: heart.size,
-                                                height: heart.size,
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}
-                                        >
-                                            {heart.type === 'rainbow' ? (
-                                                <div
-                                                    className="animate-[rainbow-rotate_3s_linear_infinite]"
-                                                    style={{
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        background: 'linear-gradient(45deg, #FF3366, #FFD700, #33FFF6, #A033FF)',
-                                                        WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
-                                                        maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
-                                                        WebkitMaskSize: 'contain',
-                                                        maskSize: 'contain',
-                                                        WebkitMaskRepeat: 'no-repeat',
-                                                        maskRepeat: 'no-repeat',
-                                                        WebkitMaskPosition: 'center',
-                                                        maskPosition: 'center',
-                                                        filter: 'drop-shadow(0 0 8px rgba(255, 255, 255, 0.8))'
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Heart
-                                                    size={heart.size}
-                                                    variant="Bold"
-                                                    color={heart.color}
-                                                    className="opacity-90"
-                                                />
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                                <Typography
+                                    sx={{
+                                        fontSize: { xs: '18rem', sm: '28rem' },
+                                        fontWeight: 900,
+                                        color: 'rgba(255, 51, 102, 0.3)',
+                                        fontFamily: 'var(--font-mali), sans-serif',
+                                        lineHeight: 1,
+                                        animation: 'countdown-pop 1s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards',
+                                        textShadow: '0 0 30px rgba(255, 255, 255, 0.4)',
+                                        willChange: 'transform, opacity, filter'
+                                    }}
+                                >
+                                    {timeLeft}
+                                </Typography>
+                            </Box>
+                        )}
+
+                        {hearts.map(heart => (
+                            <MemoizedHeart key={heart.id} heart={heart} onCatch={catchHeart} />
                         ))}
+
+                        {/* Floating Scores Feedback */}
 
                         {/* Floating Scores Feedback */}
                         {floatingScores.map(score => (
@@ -408,33 +478,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
 
                         {/* Particle Burst Effects */}
                         {particles.map(p => (
-                            <div
-                                key={p.id}
-                                className="absolute pointer-events-none z-[90] animate-[particle-fade_1s_forwards]"
-                                style={{
-                                    left: `${p.x}%`,
-                                    top: `${p.y}%`,
-                                    '--angle': `${p.angle}rad`,
-                                    '--speed': `${p.speed}`
-                                } as any}
-                            >
-                                {p.color.includes('gradient') ? (
-                                    <div
-                                        className="animate-[rainbow-rotate_2s_linear_infinite]"
-                                        style={{
-                                            width: 14,
-                                            height: 14,
-                                            background: p.color,
-                                            WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
-                                            maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'%3E%3Cpath d='M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'/%3E%3C/svg%3E")`,
-                                            WebkitMaskSize: 'contain',
-                                            maskSize: 'contain'
-                                        }}
-                                    />
-                                ) : (
-                                    <Heart size={14} variant="Bold" color={p.color} className="opacity-80 drop-shadow-sm" />
-                                )}
-                            </div>
+                            <MemoizedParticle key={p.id} p={p} />
                         ))}
                     </>
                 )}
@@ -472,6 +516,12 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
                 @keyframes rainbow-text {
                     0% { filter: hue-rotate(0deg); }
                     100% { filter: hue-rotate(360deg); }
+                }
+                @keyframes countdown-pop {
+                    0% { transform: scale(2); opacity: 0; filter: blur(10px); }
+                    15% { transform: scale(1); opacity: 0.3; filter: blur(0px); }
+                    80% { transform: scale(1); opacity: 0.3; filter: blur(0px); }
+                    100% { transform: scale(0.8); opacity: 0; filter: blur(5px); }
                 }
             `}</style>
         </div>
