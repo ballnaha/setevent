@@ -266,12 +266,41 @@ export default function Leaderboard({ slug, currentScore, gameDuration, onClose 
                                     // 3. Allow submission (First time or Higher score)
                                     return (
                                         <>
+                                            {isHigher && currentScore > 0 && (
+                                                <Box sx={{
+                                                    display: 'inline-flex',
+                                                    alignItems: 'center',
+                                                    gap: 0.5,
+                                                    px: 1.5,
+                                                    py: 0.4,
+                                                    bgcolor: '#FF3366',
+                                                    color: 'white',
+                                                    borderRadius: '50px',
+                                                    mb: 1.5,
+                                                    boxShadow: '0 4px 12px rgba(255, 51, 102, 0.3)',
+                                                    animation: 'pulse 2s infinite'
+                                                }}>
+                                                    <Crown size="14" variant="Bold" color="#FFD700" />
+                                                    <Typography sx={{ fontSize: '0.65rem', fontWeight: 900, fontFamily: 'var(--font-mali)', letterSpacing: '0.05em' }}>
+                                                        NEW HIGH SCORE!
+                                                    </Typography>
+                                                </Box>
+                                            )}
+
                                             <Typography sx={{ mb: 1, fontWeight: 800, color: '#D41442', fontFamily: 'var(--font-mali)', fontSize: '0.9rem' }}>
-                                                {!savedName && userInTop ? "คุณต้องการเปลี่ยนชื่อเป็น? ✍️" : savedName && isHigher ? "ว้าว! สถิติใหม่ของคุณ 🌟" : "ส่งคะแนนรักของคุณ! ❤️"}
+                                                {!savedName && userInTop ? "คุณต้องการเปลี่ยนชื่อเป็น? ✍️" : isHigher ? "ว้าว! สถิติใหม่ของคุณ 🌟" : "ส่งคะแนนรักของคุณ! ❤️"}
                                             </Typography>
 
                                             {currentScore > 0 && (
-                                                <Typography sx={{ mb: 2, fontWeight: 900, color: '#FF3366', fontFamily: 'var(--font-mali)', fontSize: '1.6rem', lineHeight: 1 }}>
+                                                <Typography sx={{
+                                                    mb: 2,
+                                                    fontWeight: 900,
+                                                    color: isHigher ? '#FF3366' : '#8B1D36',
+                                                    fontFamily: 'var(--font-mali)',
+                                                    fontSize: isHigher ? '2.2rem' : '1.6rem',
+                                                    lineHeight: 1,
+                                                    transition: 'all 0.3s ease'
+                                                }}>
                                                     {currentScore.toLocaleString()} <Box component="span" sx={{ fontSize: '0.8rem', fontWeight: 700 }}>แต้ม</Box>
                                                 </Typography>
                                             )}

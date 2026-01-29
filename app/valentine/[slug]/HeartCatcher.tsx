@@ -170,8 +170,14 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
     const spawnTimerRef = useRef<NodeJS.Timeout | null>(null);
     const gameTimerRef = useRef<NodeJS.Timeout | null>(null);
     const rainbowSpawnedRef = useRef<number>(0);
+    const spawnsSinceLastClockRef = useRef<number>(0);
+    const timeLeftRef = useRef(timeLeft);
+    const scoreRef = useRef(score);
 
-    // Spawn a new heart
+    // Sync refs with state for use in intervals/callbacks
+    useEffect(() => { timeLeftRef.current = timeLeft; }, [timeLeft]);
+    useEffect(() => { scoreRef.current = score; }, [score]);
+
     const spawnHeart = useCallback(() => {
         const rand = Math.random();
         let type: 'normal' | 'rare' | 'super' | 'bomb' | 'rainbow' | 'clock' = 'normal';
@@ -179,8 +185,16 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
         let color = "#FF3366";
         let size = 45 + Math.random() * 20;
 
+        const currentTimeLeft = timeLeftRef.current;
+        const currentScore = scoreRef.current;
+
         // Dynamic Luck: Increase clock rate when time is low (Clutch Luck)
-        const clockThreshold = timeLeft < 10 ? 0.97 : 0.99;
+        const clockThreshold = currentTimeLeft < 10 ? 0.985 : 0.995;
+
+        // Pity System
+        const scoreFactor = Math.floor(currentScore / 500) * 10;
+        const pityThreshold = (currentTimeLeft < 10 ? 30 : 60) + scoreFactor;
+        const needsPityClock = spawnsSinceLastClockRef.current >= pityThreshold;
 
         if (rainbowSpawnedRef.current < 2 && rand > 0.99) {
             type = 'rainbow';
@@ -188,29 +202,34 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
             color = "linear-gradient(45deg, #FF3366, #FFD700, #33FFF6, #A033FF)";
             size = 55 + Math.random() * 10;
             rainbowSpawnedRef.current += 1;
-        } else if (rand > clockThreshold) {
+        } else if (rand > clockThreshold || needsPityClock) {
             type = 'clock';
             points = 0;
             color = "#3B82F6";
             size = 40 + Math.random() * 10;
-        } else if (rand > 0.95) {
-            type = 'super';
-            points = 25;
-            color = "#FFD700";
-            size = 40 + Math.random() * 10;
-        } else if (rand > 0.82) { // Bomb (The real difficulty)
-            type = 'bomb';
-            points = -100;
-            color = "#1A1A1A";
-            size = 50 + Math.random() * 10;
-        } else if (rand > 0.65) { // Rare Heart
-            type = 'rare';
-            points = 12;
-            color = "#D41442";
-            size = 40 + Math.random() * 15;
+            spawnsSinceLastClockRef.current = 0;
+        } else {
+            spawnsSinceLastClockRef.current += 1;
+
+            if (rand > 0.95) {
+                type = 'super';
+                points = 25;
+                color = "#FFD700";
+                size = 40 + Math.random() * 10;
+            } else if (rand > 0.82) {
+                type = 'bomb';
+                points = -100;
+                color = "#1A1A1A";
+                size = 50 + Math.random() * 10;
+            } else if (rand > 0.65) {
+                type = 'rare';
+                points = 12;
+                color = "#D41442";
+                size = 40 + Math.random() * 15;
+            }
         }
 
-        const id = Date.now() + Math.random() + Math.random();
+        const id = Date.now() + Math.random();
         const newHeart: FallingHeart = {
             id,
             x: 10 + Math.random() * 80,
@@ -221,13 +240,17 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
             color
         };
 
-        setHearts(prev => [...prev, newHeart]);
+        setHearts(prev => {
+            const maxHearts = currentTimeLeft < 10 ? 12 : 8;
+            if (prev.length >= maxHearts) return prev;
+            return [...prev, newHeart];
+        });
 
-        // Keep them on screen long enough to have many at once, but still fast
+        // Auto-remove heart after animation
         setTimeout(() => {
             setHearts(prev => prev.filter(h => h.id !== id));
-        }, 1200);
-    }, [timeLeft]); // Added timeLeft to dependencies for clockThreshold
+        }, 1500);
+    }, []); // No dependencies - use refs instead
 
     const createParticles = (x: number, y: number, color: string) => {
         const timestamp = Date.now();
@@ -260,21 +283,14 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
         setHearts([]);
         setIsGameOver(false);
         rainbowSpawnedRef.current = 0;
+        spawnsSinceLastClockRef.current = 0;
 
         // Clear any existing timers before starting new ones
         if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
         if (gameTimerRef.current) clearInterval(gameTimerRef.current);
 
         // Heart Spawning Interval
-        spawnTimerRef.current = setInterval(() => {
-            setHearts(prev => {
-                const currentMax = 8; // Many hearts on screen for the Fun Factor
-                if (prev.length < currentMax) {
-                    spawnHeart();
-                }
-                return prev;
-            });
-        }, spawnInterval); // Use dynamic spawnInterval
+        spawnTimerRef.current = setInterval(spawnHeart, spawnInterval);
 
         // Game Timer and Duration Tracking
         gameTimerRef.current = setInterval(() => {
@@ -292,44 +308,39 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
 
     useEffect(() => {
         if (gameStarted && !isGameOver && timeLeft === 10) {
+            // Restart interval with frenzy speed
             if (spawnTimerRef.current) clearInterval(spawnTimerRef.current);
-            spawnTimerRef.current = setInterval(() => {
-                setHearts(prev => {
-                    const frenziedMax = 12; // Screen filled with love!
-                    if (prev.length < frenziedMax) {
-                        spawnHeart();
-                    }
-                    return prev;
-                });
-            }, 150); // Frenzy speed! (150ms)
+            spawnTimerRef.current = setInterval(spawnHeart, 150);
         }
-    }, [timeLeft, gameStarted, isGameOver, spawnHeart, spawnInterval]); // Added spawnInterval to dependencies
+    }, [timeLeft === 10, gameStarted, isGameOver, spawnHeart]);
 
-    const catchHeart = (id: number, x: number, y: number, points: number, color: string) => {
-        const heart = hearts.find(h => h.id === id);
-        let bonusText: number | string = "";
+    const catchHeart = useCallback((id: number, x: number, y: number, points: number, color: string) => {
+        setHearts(prev => {
+            const heart = prev.find(h => h.id === id);
+            if (!heart) return prev;
 
-        if (heart?.type === 'clock') {
-            const extraTime = 3 + Math.floor(Math.random() * 4); // Random +3 to +6 seconds
-            setTimeLeft(prev => Math.min(prev + extraTime, 60));
-            bonusText = `+${extraTime}s`;
-        } else {
-            setScore(prev => prev + points);
-            bonusText = points > 0 ? `+${points}` : `${points}`;
-        }
+            let bonusText: number | string = "";
 
-        setHearts(prev => prev.filter(heart => heart.id !== id));
+            if (heart.type === 'clock') {
+                const extraTime = 3 + Math.floor(Math.random() * 4);
+                setTimeLeft(prevTime => Math.min(prevTime + extraTime, 60));
+                bonusText = `+${extraTime}s`;
+            } else {
+                setScore(prevScore => prevScore + points);
+                bonusText = points > 0 ? `+${points}` : `${points}`;
+            }
 
-        // Effects
-        createParticles(x, y, color);
+            // Sync Particles and Scores
+            createParticles(x, y, color);
+            const scoreId = Date.now() + Math.random();
+            setFloatingScores(fs => [...fs, { id: scoreId, x, y, points: bonusText as any }]);
+            setTimeout(() => {
+                setFloatingScores(fs => fs.filter(s => s.id !== scoreId));
+            }, 800);
 
-        // Show floating score or time
-        const scoreId = Date.now() + Math.random();
-        setFloatingScores(prev => [...prev, { id: scoreId, x, y, points: bonusText as any }]);
-        setTimeout(() => {
-            setFloatingScores(prev => prev.filter(s => s.id !== scoreId));
-        }, 800);
-    };
+            return prev.filter(h => h.id !== id);
+        });
+    }, []);
 
     // Cleanup
     useEffect(() => {
