@@ -28,15 +28,15 @@ export async function GET(
         });
 
         let userRank = null;
+        let userBestScore = 0; // Track the actual score value
         if (pId) {
-            // Find user's best score globally
             const userScore = await prisma.valentineScore.findFirst({
                 where: { playerId: pId },
                 orderBy: { score: 'desc' }
             });
 
             if (userScore) {
-                // Calculation of rank globally
+                userBestScore = userScore.score;
                 const countHigher = await prisma.valentineScore.count({
                     where: {
                         score: { gt: userScore.score }
@@ -49,7 +49,8 @@ export async function GET(
         return NextResponse.json({
             scores: topScores,
             totalPlayers,
-            userRank
+            userRank,
+            userBestScore // Send it to client
         });
     } catch (error) {
         console.error('Error fetching global leaderboard:', error);
