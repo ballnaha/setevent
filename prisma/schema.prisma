@@ -334,6 +334,7 @@ model ValentineScore {
 
   @@unique([cardId, playerId])
   @@index([cardId])
+  @@index([playerId])
   @@index([score(sort: Desc)])
 }
 
