@@ -358,6 +358,12 @@ export default function Leaderboard({ slug, currentScore, gameDuration, onClose 
                                     <Typography sx={{ fontSize: '0.65rem', color: '#666', fontFamily: 'var(--font-mali)' }}>อันดับที่ {userRank} จาก {totalPlayers} คน</Typography>
                                 </Box>
                             </Box>
+                            <Box sx={{ textAlign: 'right' }}>
+                                <Typography sx={{ fontWeight: 900, color: '#FF3366', fontSize: '1.1rem', fontFamily: 'var(--font-mali)' }}>
+                                    {userBestScore.toLocaleString()}
+                                </Typography>
+                                <Typography sx={{ fontSize: '0.65rem', color: '#9CA3AF', fontFamily: 'var(--font-mali)', fontWeight: 700 }}>แต้ม</Typography>
+                            </Box>
                         </Box>
                     )}
                 </Box>
