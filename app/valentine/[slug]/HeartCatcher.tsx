@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import Leaderboard from "./Leaderboard";
 
 interface FallingHeart {
-    id: number;
+    id: string;
     x: number;
     y: number;
     size: number;
@@ -25,7 +25,7 @@ interface HeartCatcherProps {
 
 // --- OPTIMIZED SUB-COMPONENTS ---
 
-const MemoizedHeart = React.memo(({ heart, onCatch }: { heart: FallingHeart, onCatch: (id: number, x: number, y: number, points: number, color: string) => void }) => {
+const MemoizedHeart = React.memo(({ heart, onCatch }: { heart: FallingHeart, onCatch: (id: string, x: number, y: number, points: number, color: string) => void }) => {
     return (
         <div
             className="absolute cursor-pointer select-none group animate-[heart-lifecycle_1.5s_ease-in-out_forwards]"
@@ -164,8 +164,8 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
     const [hearts, setHearts] = useState<FallingHeart[]>([]);
     const [isGameOver, setIsGameOver] = useState(false);
     const [gameStarted, setGameStarted] = useState(false);
-    const [floatingScores, setFloatingScores] = useState<{ id: number, x: number, y: number, points: number | string }[]>([]);
-    const [particles, setParticles] = useState<{ id: number, x: number, y: number, color: string, angle: number, speed: number }[]>([]);
+    const [floatingScores, setFloatingScores] = useState<{ id: string, x: number, y: number, points: number | string }[]>([]);
+    const [particles, setParticles] = useState<{ id: string, x: number, y: number, color: string, angle: number, speed: number }[]>([]);
 
     const spawnTimerRef = useRef<NodeJS.Timeout | null>(null);
     const gameTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -229,7 +229,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
             }
         }
 
-        const id = Date.now() + Math.random();
+        const id = `heart-${performance.now()}-${Math.random().toString(36).substr(2, 9)}`;
         const newHeart: FallingHeart = {
             id,
             x: 10 + Math.random() * 80,
@@ -256,7 +256,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
         const timestamp = Date.now();
         const randSeed = Math.random();
         const newParticles = Array.from({ length: 8 }).map((_, i) => ({
-            id: timestamp + i + randSeed, // Much more unique
+            id: `p-${timestamp}-${i}-${Math.random().toString(36).substr(2, 5)}`,
             x,
             y,
             color,
@@ -314,7 +314,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
         }
     }, [timeLeft === 10, gameStarted, isGameOver, spawnHeart]);
 
-    const catchHeart = useCallback((id: number, x: number, y: number, points: number, color: string) => {
+    const catchHeart = useCallback((id: string, x: number, y: number, points: number, color: string) => {
         setHearts(prev => {
             const heart = prev.find(h => h.id === id);
             if (!heart) return prev;
@@ -332,7 +332,7 @@ export default function HeartCatcher({ onComplete, onClose, targetScore = 1000, 
 
             // Sync Particles and Scores
             createParticles(x, y, color);
-            const scoreId = Date.now() + Math.random();
+            const scoreId = `score-${performance.now()}-${Math.random().toString(36).substr(2, 9)}`;
             setFloatingScores(fs => [...fs, { id: scoreId, x, y, points: bonusText as any }]);
             setTimeout(() => {
                 setFloatingScores(fs => fs.filter(s => s.id !== scoreId));
