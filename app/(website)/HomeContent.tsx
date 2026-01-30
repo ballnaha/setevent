@@ -5,10 +5,10 @@ import dynamic from "next/dynamic";
 import { Box, Skeleton } from "@mui/material";
 
 // Lazy load components that are below the fold for faster initial render
-const ServicesSection = dynamic(() => import("../components/ServicesSection"), {
-    loading: () => <Box sx={{ minHeight: 400 }}><Skeleton variant="rectangular" height={400} /></Box>,
-});
+import AboutSection from "../components/AboutSection";
+import ServicesSection from "../components/ServicesSection";
 
+// Lazy load components that are below the fold for faster initial render
 const FeaturedEvents = dynamic(() => import("../components/FeaturedEvents"), {
     loading: () => <Box sx={{ minHeight: 500 }}><Skeleton variant="rectangular" height={500} /></Box>,
 });
@@ -25,10 +25,6 @@ const CTASection = dynamic(() => import("../components/CTASection"), {
     loading: () => <Box sx={{ minHeight: 300 }}><Skeleton variant="rectangular" height={300} /></Box>,
 });
 
-const AboutSection = dynamic(() => import("../components/AboutSection"), {
-    loading: () => <Box sx={{ minHeight: 400 }}><Skeleton variant="rectangular" height={400} /></Box>,
-});
-
 export default function HomeContent() {
     return (
         <Box>
@@ -41,3 +37,4 @@ export default function HomeContent() {
         </Box>
     );
 }
+
