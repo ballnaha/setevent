@@ -120,23 +120,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
 
     // ========================================
-    // 🖼️ PORTFOLIO CATEGORY ROUTES
-    // ========================================
-    const portfolioCategoryRoutes: MetadataRoute.Sitemap = [
-        '/portfolio/marketing-event',
-        '/portfolio/seminar-conference',
-        '/portfolio/exhibition',
-        '/portfolio/concert',
-        '/portfolio/wedding',
-        '/portfolio/fixed-installation',
-    ].map((route) => ({
-        url: `${baseUrl}${route}`,
-        lastModified: new Date('2025-01-01'),
-        changeFrequency: 'monthly' as const,
-        priority: 0.6,
-    }));
-
-    // ========================================
     // 📝 DYNAMIC BLOG POSTS (From Database)
     // ========================================
     let blogRoutes: MetadataRoute.Sitemap = [];
@@ -161,38 +144,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
 
     // ========================================
-    // 🎨 DYNAMIC DESIGNS (From Database) - Optional
-    // ========================================
-    let designRoutes: MetadataRoute.Sitemap = [];
-    try {
-        const designs = await prisma.design.findMany({
-            where: { status: 'active' },
-            select: {
-                id: true,
-                updatedAt: true,
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 100, // Limit for performance
-        });
-
-        designRoutes = designs.map((design) => ({
-            url: `${baseUrl}/designs/${design.id}`,
-            lastModified: design.updatedAt,
-            changeFrequency: 'monthly' as const,
-            priority: 0.5,
-        }));
-    } catch (error) {
-        console.error('Sitemap: Failed to fetch designs', error);
-    }
-
-    // ========================================
     // 🔗 COMBINE ALL ROUTES
     // ========================================
     return [
         ...staticRoutes,
         ...productRoutes,
-        ...portfolioCategoryRoutes,
         ...blogRoutes,
-        ...designRoutes,
     ];
 }
