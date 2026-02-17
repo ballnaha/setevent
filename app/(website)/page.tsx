@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import HomeContent from './HomeContent';
 import BannerSlider from '../components/BannerSlider';
 
+export const revalidate = 3600; // Revalidate every hour
+
 export const metadata: Metadata = {
   title: 'SET EVENT Thailand | บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร',
   description: 'SET EVENT Thailand - บริการให้เช่าจอ LED, เวที, แสง, เสียง และอุปกรณ์งานอีเวนต์ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา และอีเวนต์ทุกประเภท พร้อมทีมงานมืออาชีพ',

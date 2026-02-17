@@ -21,7 +21,7 @@ export default function BannerSlider() {
                         priority
                         fetchPriority="high"
                         sizes="100vw"
-                        quality={85}
+                        quality={75}
                         placeholder="blur"
                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                         style={{
@@ -41,7 +41,7 @@ export default function BannerSlider() {
                         priority
                         fetchPriority="high"
                         sizes="100vw"
-                        quality={75}
+                        quality={70}
                         placeholder="blur"
                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                         style={{

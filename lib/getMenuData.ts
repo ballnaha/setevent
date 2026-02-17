@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { unstable_cache } from 'next/cache';
 
 export interface MenuItem {
     label: string;
@@ -12,54 +13,58 @@ export interface MenuSection {
     items: MenuItem[];
 }
 
-export async function getMenuData(): Promise<MenuSection[]> {
-    try {
-        // Fetch all active categories with their children
-        const categories = await prisma.category.findMany({
-            where: { status: 'active' },
-            include: {
-                children: {
-                    where: { status: 'active' },
-                    include: {
-                        children: {
-                            where: { status: 'active' },
-                            orderBy: { order: 'asc' }
-                        }
-                    },
-                    orderBy: { order: 'asc' }
-                }
-            },
-            orderBy: { order: 'asc' }
-        });
-
-        // Get only root categories (parentId is null)
-        const rootCategories = categories.filter(cat => cat.parentId === null);
-
-        // Transform to menu sections format
-        const sections: MenuSection[] = rootCategories.map(rootCat => {
-            return {
-                title: rootCat.name,
-                items: rootCat.children?.map((child: any) => {
-                    const menuItem: MenuItem = {
-                        label: child.name,
-                        href: `/products/${rootCat.slug}/${child.slug}`
-                    };
-
-                    if (child.children && child.children.length > 0) {
-                        menuItem.children = child.children.map((grandChild: any) => ({
-                            label: grandChild.name,
-                            href: `/products/${rootCat.slug}/${child.slug}/${grandChild.slug}`
-                        }));
+export const getMenuData = unstable_cache(
+    async (): Promise<MenuSection[]> => {
+        try {
+            // Fetch all active categories with their children
+            const categories = await prisma.category.findMany({
+                where: { status: 'active' },
+                include: {
+                    children: {
+                        where: { status: 'active' },
+                        include: {
+                            children: {
+                                where: { status: 'active' },
+                                orderBy: { order: 'asc' }
+                            }
+                        },
+                        orderBy: { order: 'asc' }
                     }
+                },
+                orderBy: { order: 'asc' }
+            });
 
-                    return menuItem;
-                }) || []
-            };
-        });
+            // Get only root categories (parentId is null)
+            const rootCategories = categories.filter(cat => cat.parentId === null);
 
-        return sections;
-    } catch (error) {
-        console.error("Error fetching menu categories:", error);
-        return [];
-    }
-}
+            // Transform to menu sections format
+            const sections: MenuSection[] = rootCategories.map(rootCat => {
+                return {
+                    title: rootCat.name,
+                    items: rootCat.children?.map((child: any) => {
+                        const menuItem: MenuItem = {
+                            label: child.name,
+                            href: `/products/${rootCat.slug}/${child.slug}`
+                        };
+
+                        if (child.children && child.children.length > 0) {
+                            menuItem.children = child.children.map((grandChild: any) => ({
+                                label: grandChild.name,
+                                href: `/products/${rootCat.slug}/${child.slug}/${grandChild.slug}`
+                            }));
+                        }
+
+                        return menuItem;
+                    }) || []
+                };
+            });
+
+            return sections;
+        } catch (error) {
+            console.error("Error fetching menu categories:", error);
+            return [];
+        }
+    },
+    ['menu-data'],
+    { revalidate: 3600, tags: ['menu', 'categories'] }
+);
