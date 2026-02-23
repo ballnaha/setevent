@@ -254,9 +254,9 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
 
                 {/* Masonry Gallery */}
                 {loading ? (
-                    <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, gap: 2 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Skeleton key={i} variant="rounded" height={300} sx={{ mb: 2, borderRadius: 3, width: '100%', bgcolor: 'rgba(224,224,224,0.4)', animation: 'pulse 1.5s ease-in-out infinite' }} />
+                            <Skeleton key={i} variant="rounded" height={300} sx={{ borderRadius: 3, width: '100%', bgcolor: 'rgba(224,224,224,0.4)', animation: 'pulse 1.5s ease-in-out infinite' }} />
                         ))}
                     </Box>
                 ) : filteredItems.length === 0 ? (
@@ -289,12 +289,9 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                     </Box>
                 ) : (
                     <Box sx={{
-                        columnCount: { xs: 1, sm: 2, md: 3 },
-                        columnGap: 2,
-                        '& > div': {
-                            breakInside: 'avoid',
-                            mb: 2
-                        }
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+                        gap: 2
                     }}>
                         {filteredItems.map((item, idx) => (
                             <Link

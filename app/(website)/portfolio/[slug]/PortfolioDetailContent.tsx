@@ -221,11 +221,11 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
         ) : (
           <Box
             sx={{
-              columnCount: { xs: 2, sm: 3, md: 4, lg: 5 },
-              columnGap: '5px',
+              columnCount: { xs: 1, sm: 2, md: 3 },
+              columnGap: 2,
               '& > div': {
                 breakInside: 'avoid',
-                mb: '5px',
+                mb: 2,
               },
             }}
           >
