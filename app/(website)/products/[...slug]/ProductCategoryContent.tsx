@@ -88,10 +88,10 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                     height: { xs: 340, md: 380 },
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     cursor: 'pointer',
-                    boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+                    boxShadow: '0 8px 32px var(--border-color)',
                     '&:hover': {
                         transform: 'translateY(-12px) scale(1.02)',
-                        boxShadow: '0 32px 64px rgba(0,0,0,0.25)',
+                        boxShadow: '0 32px 64px var(--border-color)',
                     }
                 }}
             >
@@ -672,7 +672,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
     if (loading) {
         return (
             <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
-                {/* Hero Skeleton - Light Theme */}
+                {/* Hero Skeleton - Adaptive Theme */}
                 <Box sx={{
                     pt: { xs: 15, md: 22 },
                     pb: { xs: 8, md: 10 },
@@ -682,14 +682,14 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     justifyContent: 'center',
                     gap: 3
                 }}>
-                    <Skeleton variant="rounded" width={140} height={32} sx={{ borderRadius: 10, bgcolor: 'rgba(0,0,0,0.05)' }} />
-                    <Skeleton variant="text" width={300} height={60} sx={{ bgcolor: 'rgba(0,0,0,0.08)' }} />
-                    <Skeleton variant="text" width={500} height={24} sx={{ maxWidth: '90%', bgcolor: 'rgba(0,0,0,0.05)' }} />
+                    <Skeleton variant="rounded" width={140} height={32} sx={{ borderRadius: 10, bgcolor: 'rgba(128,128,128,0.1)' }} />
+                    <Skeleton variant="text" width={300} height={60} sx={{ bgcolor: 'rgba(128,128,128,0.15)' }} />
+                    <Skeleton variant="text" width={500} height={24} sx={{ maxWidth: '90%', bgcolor: 'rgba(128,128,128,0.1)' }} />
                 </Box>
                 <Container maxWidth="lg" sx={{ mt: 4 }}>
                     <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
                         {[1, 2, 3, 4, 5, 6].map(i => (
-                            <Skeleton key={i} variant="rounded" height={300} sx={{ bgcolor: 'rgba(0,0,0,0.1)', borderRadius: 2 }} />
+                            <Skeleton key={i} variant="rounded" height={300} sx={{ bgcolor: 'rgba(128,128,128,0.1)', borderRadius: 2 }} />
                         ))}
                     </Box>
                 </Container>
@@ -704,7 +704,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 2 }}>
                         ไม่พบหน้าที่ต้องการ
                     </Typography>
-                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'rgba(0,0,0,0.6)', mb: 4 }}>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, mb: 4 }}>
                         {error || 'ไม่พบหมวดหมู่สินค้านี้'}
                     </Typography>
                     <Button
@@ -731,6 +731,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
+                bgcolor: "var(--background)",
             }}>
                 {/* Background Decor */}
                 <Box sx={{
@@ -739,7 +740,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-emerald) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -749,7 +750,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     left: '-10%',
                     width: '500px',
                     height: '500px',
-                    background: 'radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, rgba(0,0,0,0) 70%)',
+                    background: 'radial-gradient(circle, var(--decor-ruby) 0%, rgba(0,0,0,0) 70%)',
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -759,9 +760,9 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                         <Chip
                             label="Products Category"
                             sx={{
-                                bgcolor: 'rgba(16, 185, 129, 0.1)',
-                                color: '#10B981',
-                                border: '1px solid rgba(16, 185, 129, 0.2)',
+                                bgcolor: 'rgba(10, 92, 90, 0.1)',
+                                color: 'var(--primary)',
+                                border: '1px solid rgba(10, 92, 90, 0.2)',
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 600
                             }}
@@ -779,7 +780,22 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                                 textShadow: 'var(--text-glow)'
                             }}
                         >
-                            {category.name}
+                            {category.name.split(' ').map((word, i) => (
+                                <React.Fragment key={i}>
+                                    {i > 0 && <br />}
+                                    {i === category.name.split(' ').length - 1 ? (
+                                        <span style={{
+                                            background: 'linear-gradient(90deg, #10B981 0%, #3B82F6 100%)',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent'
+                                        }}>
+                                            {word}
+                                        </span>
+                                    ) : (
+                                        word
+                                    )}
+                                </React.Fragment>
+                            ))}
                         </Typography>
                         {category.description && (
                             <Typography
@@ -829,10 +845,10 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                                         transition: 'all 0.3s ease',
                                         border: '1px solid',
                                         borderColor: 'rgba(128,128,128,0.2)',
-                                        boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+                                        boxShadow: '0 4px 20px var(--border-color)',
                                         '&:hover': {
                                             transform: 'translateY(-4px)',
-                                            boxShadow: '0 12px 40px rgba(0,0,0,0.12)',
+                                            boxShadow: '0 12px 40px var(--border-color)',
                                             borderColor: 'var(--primary)',
                                             '& .card-icon': {
                                                 bgcolor: 'var(--primary)',
@@ -917,7 +933,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                                             width: 40,
                                             height: 40,
                                             borderRadius: '50%',
-                                            bgcolor: 'rgba(0,0,0,0.04)',
+                                            bgcolor: 'rgba(128,128,128,0.1)',
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
@@ -960,7 +976,8 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                         </Typography>
                         <Typography sx={{
                             fontFamily: "var(--font-prompt)",
-                            color: "rgba(0,0,0,0.5)",
+                            color: "var(--foreground)",
+                            opacity: 0.5,
                             fontSize: '1rem'
                         }}>
                             พบ {products.length} รายการ
@@ -989,11 +1006,14 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     minHeight: '40vh',
                     py: 8
                 }}>
-                    <Gallery size="64" color="rgba(0,0,0,0.2)" variant="Bold" />
+                    <Box sx={{ opacity: 0.2 }}>
+                        <Gallery size="64" color="var(--foreground)" variant="Bold" />
+                    </Box>
                     <Typography sx={{
                         fontFamily: 'var(--font-prompt)',
                         fontSize: '1.2rem',
-                        color: 'rgba(0,0,0,0.5)',
+                        color: 'var(--foreground)',
+                        opacity: 0.5,
                         mt: 2
                     }}>
                         ยังไม่มีสินค้าในหมวดหมู่นี้

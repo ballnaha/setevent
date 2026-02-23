@@ -35,7 +35,12 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await req.json();
-        const { title, category, image, description, status, order } = body;
+        const { title, category, image, description, status, order, slug } = body;
+
+        // Use title as slug if slug is empty
+        const finalSlug: string = (slug && typeof slug === 'string' && slug.trim().length > 0)
+            ? slug.trim()
+            : (title && typeof title === 'string' ? title.trim() : '');
 
         // Fetch existing portfolio to handle image cleanup
         const oldPortfolio = await prisma.portfolio.findUnique({
@@ -64,6 +69,7 @@ export async function PUT(
             where: { id },
             data: {
                 title,
+                slug: finalSlug,
                 category,
                 image,
                 description,
@@ -92,7 +98,10 @@ export async function DELETE(
 
         // Get portfolio to find image path
         const portfolio = await prisma.portfolio.findUnique({
-            where: { id }
+            where: { id },
+            include: {
+                images: true
+            }
         });
 
         if (portfolio?.image) {
@@ -113,6 +122,31 @@ export async function DELETE(
                     console.error("File deletion logic error:", err);
                 }
             }
+        }
+
+        // Delete all album images (files + DB rows)
+        if (portfolio?.images && portfolio.images.length > 0) {
+            try {
+                const fs = require('fs/promises');
+                const path = require('path');
+
+                for (const img of portfolio.images) {
+                    if (img.url && typeof img.url === 'string' && img.url.startsWith('/uploads')) {
+                        const relativePath = img.url.substring(1);
+                        const filepath = path.join(process.cwd(), 'public', relativePath);
+
+                        await fs.unlink(filepath).catch((err: any) => {
+                            if (err.code !== 'ENOENT') console.error("Error deleting file:", err);
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error("Album images file deletion logic error:", err);
+            }
+
+            await prisma.portfolioImage.deleteMany({
+                where: { portfolioId: id }
+            });
         }
 
         await prisma.portfolio.delete({

@@ -120,11 +120,36 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
     const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
-    const isHome = forceTransparent || pathname === "/" || pathname === "/about" || pathname === "/contact" || pathname === "/promotions" || pathname === "/designs" || pathname === "/portfolio" || pathname.startsWith("/products") || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/privacy-policy" || pathname === "/terms-of-service";
+    const decodedPathname = decodeURIComponent(pathname);
+
+    const isHome = forceTransparent || 
+        pathname === "/" || 
+        pathname === "/about" || 
+        pathname === "/contact" || 
+        pathname === "/promotions" || 
+        pathname === "/designs" || 
+        pathname.startsWith("/portfolio") || 
+        decodedPathname.startsWith("/portfolio") || 
+        pathname.startsWith("/products") || 
+        pathname.startsWith("/blog") || 
+        pathname.startsWith("/faq") || 
+        pathname === "/privacy-policy" || 
+        pathname === "/terms-of-service";
 
     // Fix: Default to true if forceDarkText is true OR it's a known light-background page, 
     // but ONLY switch to false if we are SURE it's dark mode (after mounting)
-    const isDarkText = (forceDarkText || pathname === "/about" || pathname.startsWith("/blog") || pathname.startsWith("/faq") || pathname === "/designs" || pathname === "/portfolio" || pathname === "/promotions" || pathname.startsWith("/products") || pathname === "/contact" || pathname === "/privacy-policy" || pathname === "/terms-of-service")
+    const isDarkText = (forceDarkText || 
+        pathname === "/about" || 
+        pathname.startsWith("/blog") || 
+        pathname.startsWith("/faq") || 
+        pathname === "/designs" || 
+        pathname.startsWith("/portfolio") || 
+        decodedPathname.startsWith("/portfolio") || 
+        pathname === "/promotions" || 
+        pathname.startsWith("/products") || 
+        pathname === "/contact" || 
+        pathname === "/privacy-policy" || 
+        pathname === "/terms-of-service")
         ? (!mounted || resolvedTheme !== 'dark')
         : (mounted && resolvedTheme === 'dark');
 
@@ -406,9 +431,9 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                 color="transparent"
                 elevation={0}
                 sx={{
-                    bgcolor: isHome ? "transparent" : "#1a1a1a",
-                    boxShadow: isHome ? "none" : "0 4px 20px -10px rgba(0,0,0,0.3)",
-                    borderBottom: isHome ? "none" : "1px solid rgba(255,255,255,0.05)",
+                    bgcolor: isHome ? "transparent" : (mounted && resolvedTheme === 'dark' ? "#1a1a1a" : "#ffffff"),
+                    boxShadow: isHome ? "none" : (mounted && resolvedTheme === 'dark' ? "0 4px 20px -10px rgba(0,0,0,0.3)" : "0 4px 20px -10px rgba(0,0,0,0.1)"),
+                    borderBottom: isHome ? "none" : (mounted && resolvedTheme === 'dark' ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)"),
                     transition: "all 0.3s ease",
                     paddingTop: isHome ? 2 : 0,
                 }}

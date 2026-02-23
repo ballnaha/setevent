@@ -33,11 +33,13 @@ import {
     FormControlLabel
 } from "@mui/material";
 import { Add, Edit, Trash, Gallery, CloseCircle, Eye, Heart } from "iconsax-react";
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
 
 // Portfolio interface aligned with Schema
 interface Portfolio {
     id: string;
     title: string;
+    slug: string;
     category: string;
     image: string | null;
     description: string | null;
@@ -45,6 +47,14 @@ interface Portfolio {
     views: number;
     status: string;
     createdAt: string;
+}
+
+interface PortfolioImage {
+    id: string;
+    portfolioId: string;
+    url: string;
+    caption: string | null;
+    order: number;
 }
 
 // Default categories removed to allow full dynamic management through data.
@@ -62,6 +72,13 @@ export default function PortfolioAdminPage() {
     const [showCustomInput, setShowCustomInput] = useState(false);
     const [useWatermark, setUseWatermark] = useState(false);
 
+    // Album images state
+    const [imagesDialogOpen, setImagesDialogOpen] = useState(false);
+    const [imagesLoading, setImagesLoading] = useState(false);
+    const [imagesSaving, setImagesSaving] = useState(false);
+    const [currentPortfolioId, setCurrentPortfolioId] = useState<string | null>(null);
+    const [albumImages, setAlbumImages] = useState<PortfolioImage[]>([]);
+
     // Delete Confirmation State
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -76,6 +93,7 @@ export default function PortfolioAdminPage() {
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         title: "",
+        slug: "",
         category: "",
         image: "",
         description: "",
@@ -115,11 +133,125 @@ export default function PortfolioAdminPage() {
         }
     };
 
+    const openImagesDialog = async (portfolioId: string) => {
+        setCurrentPortfolioId(portfolioId);
+        setImagesDialogOpen(true);
+        setImagesLoading(true);
+        try {
+            const res = await fetch(`/api/admin/portfolios/${portfolioId}/images`);
+            if (res.ok) {
+                const data = await res.json();
+                setAlbumImages(data);
+            } else {
+                setAlbumImages([]);
+            }
+        } catch (e) {
+            console.error("Failed to load album images", e);
+            setAlbumImages([]);
+        } finally {
+            setImagesLoading(false);
+        }
+    };
+
+    const handleAlbumFilesSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!currentPortfolioId) return;
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        setImagesSaving(true);
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const uploadFormData = new FormData();
+                uploadFormData.append("file", file);
+                uploadFormData.append("folder", "portfolio");
+                uploadFormData.append("watermark", useWatermark.toString());
+
+                const uploadRes = await fetch("/api/upload", {
+                    method: "POST",
+                    body: uploadFormData
+                });
+                const uploadData = await uploadRes.json();
+                if (uploadData.url) {
+                    const createRes = await fetch(`/api/admin/portfolios/${currentPortfolioId}/images`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ url: uploadData.url })
+                    });
+                    if (createRes.ok) {
+                        const created = await createRes.json();
+                        setAlbumImages(prev => [...prev, created].sort((a, b) => a.order - b.order));
+                    }
+                }
+            }
+            // refresh main list to reflect possible cover image change
+            fetchPortfolios();
+        } catch (error) {
+            console.error("Failed to upload album images", error);
+        } finally {
+            setImagesSaving(false);
+            if (e.target) {
+                e.target.value = "";
+            }
+        }
+    };
+
+    const handleAlbumImageDelete = async (imageId: string) => {
+        if (!currentPortfolioId) return;
+        setImagesSaving(true);
+        try {
+            const res = await fetch(`/api/admin/portfolios/${currentPortfolioId}/images`, {
+                method: "DELETE",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ imageId })
+            });
+            if (res.ok) {
+                setAlbumImages(prev => prev.filter(img => img.id !== imageId));
+                // backend already reorders and updates cover, refresh list
+                fetchPortfolios();
+            }
+        } catch (e) {
+            console.error("Failed to delete album image", e);
+        } finally {
+            setImagesSaving(false);
+        }
+    };
+
+    const handleAlbumDragEnd = async (result: DropResult) => {
+        if (!result.destination || !currentPortfolioId) return;
+        const sourceIndex = result.source.index;
+        const destIndex = result.destination.index;
+        if (sourceIndex === destIndex) return;
+
+        const updated = Array.from(albumImages);
+        const [moved] = updated.splice(sourceIndex, 1);
+        updated.splice(destIndex, 0, moved);
+
+        const withNewOrder = updated.map((img, index) => ({ ...img, order: index }));
+        setAlbumImages(withNewOrder);
+
+        try {
+            setImagesSaving(true);
+            await fetch(`/api/admin/portfolios/${currentPortfolioId}/images`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(withNewOrder.map(img => ({ id: img.id, order: img.order })))
+            });
+            // cover image may change after reorder
+            fetchPortfolios();
+        } catch (e) {
+            console.error("Failed to reorder album images", e);
+        } finally {
+            setImagesSaving(false);
+        }
+    };
+
     const handleOpen = (portfolio?: Portfolio) => {
         if (portfolio) {
             setEditId(portfolio.id);
             setFormData({
                 title: portfolio.title,
+                slug: portfolio.slug,
                 category: portfolio.category,
                 image: portfolio.image || "",
                 description: portfolio.description || "",
@@ -132,6 +264,7 @@ export default function PortfolioAdminPage() {
             setEditId(null);
             setFormData({
                 title: "",
+                slug: "",
                 category: allCategories.length > 0 ? allCategories[0] : FALLBACK_CATEGORY,
                 image: "",
                 description: "",
@@ -199,8 +332,14 @@ export default function PortfolioAdminPage() {
                 }
             }
 
+            // Ensure slug has a value; if empty, fall back to title.
+            const finalSlug = (formData.slug && formData.slug.trim().length > 0)
+                ? formData.slug.trim()
+                : formData.title.trim();
+
             const payload = {
                 ...formData,
+                slug: finalSlug,
                 image: imageUrl
             };
 
@@ -351,6 +490,7 @@ export default function PortfolioAdminPage() {
                             <TableRow>
                                 <TableCell>Image</TableCell>
                                 <TableCell>Title</TableCell>
+                                <TableCell>Slug (URL)</TableCell>
                                 <TableCell>Category</TableCell>
                                 <TableCell align="center">Likes</TableCell>
                                 <TableCell align="center">Views</TableCell>
@@ -389,6 +529,9 @@ export default function PortfolioAdminPage() {
                                         <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 500 }}>
                                             {portfolio.title}
                                         </TableCell>
+                                        <TableCell sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'text.secondary' }}>
+                                            {portfolio.slug || '-'}
+                                        </TableCell>
                                         <TableCell>
                                             <Chip
                                                 label={portfolio.category}
@@ -425,6 +568,9 @@ export default function PortfolioAdminPage() {
                                             />
                                         </TableCell>
                                         <TableCell align="right">
+                                            <IconButton onClick={() => openImagesDialog(portfolio.id)} sx={{ mr: 1 }}>
+                                                <Gallery size="18" color="#0ea5e9" />
+                                            </IconButton>
                                             <IconButton onClick={() => handleOpen(portfolio)}>
                                                 <Edit size="18" color="#3b82f6" />
                                             </IconButton>
@@ -546,6 +692,16 @@ export default function PortfolioAdminPage() {
                                         sx: { fontFamily: 'var(--font-prompt)' }
                                     }}
                                 />
+                                <TextField
+                                    label="Slug (URL)"
+                                    fullWidth
+                                    value={formData.slug}
+                                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                                    helperText="ใช้สำหรับ URL (ถ้าไม่กรอกจะใช้ Title แทน) รองรับภาษาไทย"
+                                    InputProps={{
+                                        sx: { fontFamily: 'var(--font-prompt)' }
+                                    }}
+                                />
                                 <FormControl fullWidth required>
                                     <InputLabel>Category</InputLabel>
                                     <Select
@@ -656,6 +812,103 @@ export default function PortfolioAdminPage() {
                     <Button onClick={handleDeleteImageConfirm} variant="contained" color="error" disabled={deletingImage}
                         startIcon={deletingImage ? <CircularProgress size={16} color="inherit" /> : <Trash size="16" color="white" />}>
                         {deletingImage ? "กำลังลบ..." : "ลบ"}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Album Images Dialog */}
+            <Dialog open={imagesDialogOpen} onClose={() => setImagesDialogOpen(false)} maxWidth="md" fullWidth>
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>
+                    จัดการรูปในอัลบั้ม
+                </DialogTitle>
+                <DialogContent dividers>
+                    <Box sx={{ mb: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2 }}>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>
+                            อัปโหลดรูปหลายรูปได้ในครั้งเดียว
+                        </Typography>
+                        <Button
+                            variant="contained"
+                            component="label"
+                            disabled={imagesSaving}
+                            sx={{ fontFamily: 'var(--font-prompt)' }}
+                        >
+                            เพิ่มรูป
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                hidden
+                                onChange={handleAlbumFilesSelect}
+                            />
+                        </Button>
+                    </Box>
+                    {imagesLoading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : albumImages.length === 0 ? (
+                        <Box sx={{ textAlign: 'center', py: 4, color: 'text.secondary' }}>
+                            <Gallery size="40" variant="Bulk" />
+                            <Typography sx={{ mt: 1, fontFamily: 'var(--font-prompt)' }}>
+                                ยังไม่มีรูปในอัลบั้มนี้
+                            </Typography>
+                        </Box>
+                    ) : (
+                        <DragDropContext onDragEnd={handleAlbumDragEnd}>
+                            <Droppable droppableId="album-images">
+                                {(provided) => (
+                                    <Box
+                                        ref={provided.innerRef}
+                                        {...provided.droppableProps}
+                                        sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}
+                                    >
+                                        {albumImages.map((img, index) => (
+                                            <Draggable key={img.id} draggableId={img.id} index={index}>
+                                                {(dragProvided, snapshot) => (
+                                                    <Paper
+                                                        ref={dragProvided.innerRef}
+                                                        {...dragProvided.draggableProps}
+                                                        {...dragProvided.dragHandleProps}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            p: 1,
+                                                            gap: 2,
+                                                            opacity: snapshot.isDragging ? 0.8 : 1
+                                                        }}
+                                                    >
+                                                        <Avatar
+                                                            src={img.url}
+                                                            variant="rounded"
+                                                            sx={{ width: 80, height: 60 }}
+                                                        />
+                                                        <Box sx={{ flex: 1 }}>
+                                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
+                                                                รูปที่ {index + 1}
+                                                            </Typography>
+                                                            {img.caption && (
+                                                                <Typography sx={{ fontSize: '0.8rem', color: 'text.secondary', fontFamily: 'var(--font-prompt)' }}>
+                                                                    {img.caption}
+                                                                </Typography>
+                                                            )}
+                                                        </Box>
+                                                        <IconButton onClick={() => handleAlbumImageDelete(img.id)} disabled={imagesSaving}>
+                                                            <Trash size="18" color="#ef4444" />
+                                                        </IconButton>
+                                                    </Paper>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </Box>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+                    )}
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setImagesDialogOpen(false)} disabled={imagesSaving}>
+                        ปิด
                     </Button>
                 </DialogActions>
             </Dialog>

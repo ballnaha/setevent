@@ -43,10 +43,9 @@ export default async function PortfolioPage() {
         select: {
             id: true,
             title: true,
+            slug: true,
             category: true,
             image: true,
-            likes: true,
-            views: true,
         }
     });
 

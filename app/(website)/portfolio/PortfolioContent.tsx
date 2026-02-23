@@ -4,14 +4,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack, Button } from "@mui/material";
 import { CloseCircle, Gallery, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
+import { Navigation, Pagination, Autoplay, EffectCoverflow, Thumbs, FreeMode } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
 
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "swiper/css/effect-coverflow";
+import "swiper/css/thumbs";
+import "swiper/css/free-mode";
 import { useTheme as useNextTheme } from 'next-themes';
 
 // Portfolio interface
@@ -20,8 +23,14 @@ interface PortfolioItem {
     title: string;
     category: string;
     image: string;
-    likes: number;
-    views: number;
+    slug: string;
+}
+
+interface PortfolioImageItem {
+    id: string;
+    url: string;
+    caption: string | null;
+    order: number;
 }
 
 // Categories are now dynamically derived from the database data.
@@ -34,8 +43,11 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
     const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [activeLightboxIndex, setActiveLightboxIndex] = useState(0);
+    const [albumImages, setAlbumImages] = useState<PortfolioImageItem[]>([]);
+    const [albumLoading, setAlbumLoading] = useState(false);
     const swiperRef = useRef<SwiperType | null>(null);
     const lightboxSwiperRef = useRef<SwiperType | null>(null);
+    const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
 
     useEffect(() => {
         if (initialData.length === 0) {
@@ -68,14 +80,58 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
         ? portfolioItems
         : portfolioItems.filter((d: PortfolioItem) => d.category === selectedCategory);
 
-    const openLightbox = (item: PortfolioItem, index: number) => {
+    const openLightbox = async (item: PortfolioItem, index: number) => {
         setLightboxIndex(index);
-        setActiveLightboxIndex(index);
+        setActiveLightboxIndex(0);
         setSelectedItem(item);
+        setAlbumLoading(true);
+        try {
+            const res = await fetch(`/api/portfolios/${item.id}/images`, { cache: 'no-store' });
+            if (res.ok) {
+                const data: PortfolioImageItem[] = await res.json();
+                // If there are album images, use them; otherwise fallback to single cover
+                if (data.length > 0) {
+                    setAlbumImages(data);
+                } else {
+                    setAlbumImages([
+                        {
+                            id: item.id,
+                            url: item.image || '/images/placeholder.jpg',
+                            caption: item.title,
+                            order: 0
+                        }
+                    ]);
+                }
+            } else {
+                setAlbumImages([
+                    {
+                        id: item.id,
+                        url: item.image || '/images/placeholder.jpg',
+                        caption: item.title,
+                        order: 0
+                    }
+                ]);
+            }
+        } catch (error) {
+            console.error('Error fetching portfolio album images:', error);
+            setAlbumImages([
+                {
+                    id: item.id,
+                    url: item.image || '/images/placeholder.jpg',
+                    caption: item.title,
+                    order: 0
+                }
+            ]);
+        } finally {
+            setAlbumLoading(false);
+        }
     };
 
     const closeLightbox = () => {
         setSelectedItem(null);
+        setAlbumImages([]);
+        setAlbumLoading(false);
+        setThumbsSwiper(null);
     };
 
     return (
@@ -241,97 +297,99 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                         }
                     }}>
                         {filteredItems.map((item, idx) => (
-                            <Box
+                            <Link
                                 key={item.id}
-                                onClick={() => openLightbox(item, idx)}
-                                sx={{
-                                    position: 'relative',
-                                    borderRadius: 3,
-                                    overflow: 'hidden',
-                                    cursor: 'pointer',
-                                    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-                                    transition: 'all 0.4s ease',
-                                    '&:hover': {
-                                        transform: 'translateY(-5px)',
-                                        boxShadow: '0 12px 30px rgba(0,0,0,0.2)',
-                                    },
-                                    '&:hover img': {
-                                        transform: 'scale(1.1)',
-                                    },
-                                    '&:hover .overlay': {
-                                        opacity: 1
-                                    }
-                                }}
+                                href={`/portfolio/${encodeURIComponent(item.slug)}`}
+                                style={{ textDecoration: 'none' }}
                             >
-                                <Box sx={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    borderRadius: 'inherit',
-                                    bgcolor: 'rgba(128,128,128,0.1)',
-                                    aspectRatio: 'unset', // Let the image determine height
-                                    overflow: 'hidden'
-                                }}>
-                                    <Image
-                                        src={item.image || '/images/placeholder.jpg'}
-                                        alt={item.title}
-                                        width={500}
-                                        height={500}
-                                        priority={idx < 3}
-                                        sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
-                                        placeholder="blur"
-                                        blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
-                                        style={{
-                                            width: '100%',
-                                            height: 'auto',
-                                            display: 'block',
-                                            transition: 'transform 0.6s ease'
-                                        }}
-                                    />
+                                <Box
+                                    sx={{
+                                        position: 'relative',
+                                        borderRadius: 3,
+                                        overflow: 'hidden',
+                                        cursor: 'pointer',
+                                        boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+                                        transition: 'all 0.4s ease',
+                                        '&:hover': {
+                                            transform: 'translateY(-5px)',
+                                            boxShadow: '0 12px 30px rgba(0,0,0,0.2)',
+                                        },
+                                        '&:hover img': {
+                                            transform: 'scale(1.1)',
+                                        },
+                                        '&:hover .overlay': {
+                                            opacity: 1
+                                        }
+                                    }}
+                                >
+                                    <Box sx={{
+                                        position: 'relative',
+                                        width: '100%',
+                                        borderRadius: 'inherit',
+                                        bgcolor: 'rgba(128,128,128,0.1)',
+                                        aspectRatio: 'unset', // Let the image determine height
+                                        overflow: 'hidden'
+                                    }}>
+                                        <Image
+                                            src={item.image || '/images/placeholder.jpg'}
+                                            alt={item.title}
+                                            width={500}
+                                            height={500}
+                                            priority={idx < 3}
+                                            sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
+                                            placeholder="blur"
+                                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
+                                            style={{
+                                                width: '100%',
+                                                height: 'auto',
+                                                display: 'block',
+                                                transition: 'transform 0.6s ease'
+                                            }}
+                                        />
+                                    </Box>
+
+                                    {/* Gradient Overlay - Always Visible */}
+                                    <Box className="overlay" sx={{
+                                        position: 'absolute',
+                                        inset: 0,
+                                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
+                                        opacity: 1,
+                                        transition: 'opacity 0.3s ease',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'flex-end',
+                                        p: 2
+                                    }}>
+                                        <Chip
+                                            label={item.category}
+                                            size="small"
+                                            sx={{
+                                                alignSelf: 'flex-start',
+                                                mb: 1,
+                                                bgcolor: 'var(--primary)',
+                                                color: 'white',
+                                                fontFamily: 'var(--font-prompt)',
+                                                fontWeight: 600,
+                                                fontSize: { xs: '0.7rem', md: '0.75rem' },
+                                                height: { xs: 24, md: 28 }
+                                            }}
+                                        />
+                                        <Typography
+                                            sx={{
+                                                fontFamily: 'var(--font-prompt)',
+                                                fontWeight: 600,
+                                                fontSize: { xs: '1rem', md: '1.25rem' },
+                                                color: 'white',
+                                                lineHeight: 1.3,
+                                                mb: 1,
+                                                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                            }}
+                                        >
+                                            {item.title}
+                                        </Typography>
+                                    </Box>
                                 </Box>
-
-                                {/* Gradient Overlay - Always Visible */}
-                                <Box className="overlay" sx={{
-                                    position: 'absolute',
-                                    inset: 0,
-                                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, transparent 100%)',
-                                    opacity: 1,
-                                    transition: 'opacity 0.3s ease',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'flex-end',
-                                    p: 2
-                                }}>
-                                    <Chip
-                                        label={item.category}
-                                        size="small"
-                                        sx={{
-                                            alignSelf: 'flex-start',
-                                            mb: 1,
-                                            bgcolor: 'var(--primary)',
-                                            color: 'white',
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontWeight: 600,
-                                            fontSize: { xs: '0.7rem', md: '0.75rem' },
-                                            height: { xs: 24, md: 28 }
-                                        }}
-                                    />
-                                    <Typography
-                                        sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontWeight: 600,
-                                            fontSize: { xs: '1rem', md: '1.25rem' },
-                                            color: 'white',
-                                            lineHeight: 1.3,
-                                            mb: 1,
-                                            textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                                        }}
-                                    >
-                                        {item.title}
-                                    </Typography>
-
-
-                                </Box>
-                            </Box>
+                            </Link>
                         ))}
                     </Box>
                 )}
@@ -354,6 +412,9 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                     height: { xs: '100vh', md: '90vh' },
                     bgcolor: 'transparent',
                     outline: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    '& .lightbox-main-swiper .swiper-slide:not(.swiper-slide-active)': { visibility: 'hidden' }
                 }}>
                     {/* Close Button */}
                     <IconButton
@@ -373,17 +434,20 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
 
                     {/* Lightbox Swiper */}
                     <Swiper
+                        className="lightbox-main-swiper"
                         onSwiper={(swiper) => { lightboxSwiperRef.current = swiper; }}
                         onSlideChange={(swiper) => setActiveLightboxIndex(swiper.realIndex)}
-                        modules={[Navigation, Pagination]}
+                        modules={[Navigation, Pagination, Thumbs]}
                         initialSlide={lightboxIndex}
                         navigation
-                        pagination={{ clickable: true }}
-                        loop={filteredItems.length > 1}
-                        style={{ height: '100%', borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
+                        pagination={{ type: 'fraction' }}
+                        thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                        slidesPerView={1}
+                        spaceBetween={0}
+                        style={{ flex: 1, minHeight: 0, borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
                     >
-                        {filteredItems.map((item, idx) => (
-                            <SwiperSlide key={item.id}>
+                        {albumImages.map((img, idx) => (
+                            <SwiperSlide key={img.id}>
                                 <Box sx={{
                                     position: 'relative',
                                     width: '100%',
@@ -420,8 +484,8 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                     </Box>
 
                                     <Image
-                                        src={item.image || '/images/placeholder.jpg'}
-                                        alt={item.title}
+                                        src={img.url || '/images/placeholder.jpg'}
+                                        alt={img.caption || selectedItem?.title || ''}
                                         fill
                                         priority={Math.abs(idx - activeLightboxIndex) <= 1}
                                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
@@ -431,8 +495,8 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                             zIndex: 2,
                                             transition: 'opacity 0.3s ease-in-out'
                                         }}
-                                        onLoadingComplete={(img) => {
-                                            const parent = img.parentElement;
+                                        onLoadingComplete={(imageEl) => {
+                                            const parent = imageEl.parentElement;
                                             if (parent) {
                                                 const spinner = parent.querySelector('.MuiBox-root');
                                                 if (spinner) (spinner as HTMLElement).style.display = 'none';
@@ -458,10 +522,10 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                                                 color: 'white',
                                             }}
                                         >
-                                            {item.title}
+                                            {selectedItem?.title}
                                         </Typography>
                                         <Chip
-                                            label={item.category}
+                                            label={selectedItem?.category || ''}
                                             size="small"
                                             sx={{
                                                 mt: 2,
@@ -475,6 +539,48 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                             </SwiperSlide>
                         ))}
                     </Swiper>
+
+                    {/* Thumbnail Strip */}
+                    {albumImages.length > 1 && (
+                        <Box sx={{ mt: 1.5, height: { xs: 56, md: 72 }, px: { xs: 1, md: 2 } }}>
+                            <Swiper
+                                onSwiper={setThumbsSwiper}
+                                modules={[FreeMode, Thumbs]}
+                                spaceBetween={8}
+                                slidesPerView={'auto'}
+                                freeMode={true}
+                                watchSlidesProgress={true}
+                                centerInsufficientSlides={true}
+                                style={{ height: '100%' }}
+                            >
+                                {albumImages.map((img, idx) => (
+                                    <SwiperSlide key={`thumb-${img.id}`} style={{ width: 'auto' }}>
+                                        <Box
+                                            sx={{
+                                                width: { xs: 64, md: 96 },
+                                                height: '100%',
+                                                borderRadius: 1.5,
+                                                overflow: 'hidden',
+                                                cursor: 'pointer',
+                                                border: idx === activeLightboxIndex ? '2px solid var(--primary)' : '2px solid transparent',
+                                                opacity: idx === activeLightboxIndex ? 1 : 0.4,
+                                                transition: 'all 0.2s',
+                                                '&:hover': { opacity: 1 }
+                                            }}
+                                        >
+                                            <Image
+                                                src={img.url || '/images/placeholder.jpg'}
+                                                alt={`Thumbnail ${idx + 1}`}
+                                                width={96}
+                                                height={72}
+                                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                            />
+                                        </Box>
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
+                        </Box>
+                    )}
                 </Box>
             </Modal>
         </Box>

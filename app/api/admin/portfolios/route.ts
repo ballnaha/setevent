@@ -25,15 +25,20 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { title, category, image, description, status } = body;
+        const { title, category, image, description, status, slug } = body;
 
         if (!title || !category) {
             return NextResponse.json({ error: "Title and category are required" }, { status: 400 });
         }
 
+        const baseSlug: string = (slug && typeof slug === 'string' && slug.trim().length > 0)
+            ? slug.trim()
+            : title.trim();
+
         const portfolio = await prisma.portfolio.create({
             data: {
                 title,
+                slug: baseSlug,
                 category,
                 image: image || null,
                 description: description || null,

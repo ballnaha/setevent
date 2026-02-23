@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
             select: {
                 id: true,
                 title: true,
+                slug: true,
                 category: true,
                 image: true,
                 likes: true,
