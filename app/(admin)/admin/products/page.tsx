@@ -255,6 +255,23 @@ function ProductsContent() {
         }
     };
 
+    const generateSlug = (val: string) => {
+        return val
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .replace(/[^\w\u0E00-\u0E7F-]+/g, '')
+            .replace(/-+/g, '-')
+            .trim();
+    };
+
+    const handleNameChange = (name: string) => {
+        setFormData(prev => ({
+            ...prev,
+            name,
+            slug: editingProduct ? prev.slug : generateSlug(name)
+        }));
+    };
+
     const deleteFile = async (url: string) => {
         try {
             await fetch('/api/upload', {
@@ -534,7 +551,7 @@ function ProductsContent() {
                             label="ชื่อสินค้า (Product Name)"
                             fullWidth
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => handleNameChange(e.target.value)}
                             InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                         />
 
@@ -544,8 +561,8 @@ function ProductsContent() {
                                     label="Slug (URL)"
                                     fullWidth
                                     value={formData.slug}
-                                    onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                                    helperText="เช่น led-p3-indoor (ภาษาอังกฤษ ตัวเล็ก)"
+                                    onChange={(e) => setFormData({ ...formData, slug: generateSlug(e.target.value) })}
+                                    helperText="รองรับภาษาไทยและเว้นวรรค (เว้นวรรคจะถูกเปลี่ยนเป็น -)"
                                     InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                                 />
                             </Box>

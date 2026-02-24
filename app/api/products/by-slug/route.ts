@@ -23,7 +23,8 @@ export async function GET(req: Request) {
         let currentCategory: any = null;
         let parentId: string | null = null;
 
-        for (const slug of slugs) {
+        for (const rawSlug of slugs) {
+            const slug = decodeURIComponent(rawSlug).toLowerCase();
             const foundCategory: any = await prisma.category.findFirst({
                 where: {
                     slug: slug,

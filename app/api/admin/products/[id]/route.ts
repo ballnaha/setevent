@@ -14,19 +14,20 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
         const body = await req.json();
         const { name, slug, description, price, priceUnit, categoryId, images, features, status } = body;
 
+        const updateData: any = {};
+        if (name !== undefined) updateData.name = name;
+        if (slug !== undefined) updateData.slug = slug.toLowerCase();
+        if (description !== undefined) updateData.description = description;
+        if (price !== undefined) updateData.price = price ? parseFloat(price) : null;
+        if (priceUnit !== undefined) updateData.priceUnit = priceUnit;
+        if (categoryId !== undefined) updateData.categoryId = categoryId;
+        if (images !== undefined) updateData.images = images ? JSON.stringify(images) : null;
+        if (features !== undefined) updateData.features = features ? JSON.stringify(features) : null;
+        if (status !== undefined) updateData.status = status;
+
         const product = await prisma.product.update({
             where: { id },
-            data: {
-                name,
-                slug,
-                description,
-                price: price ? parseFloat(price) : null,
-                priceUnit: priceUnit || null,
-                categoryId,
-                images: images ? JSON.stringify(images) : null,
-                features: features ? JSON.stringify(features) : null,
-                status
-            } as any // priceUnit added to schema, run prisma generate
+            data: updateData
         });
 
         // Revalidate the public products pages

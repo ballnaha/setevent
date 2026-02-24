@@ -85,28 +85,29 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                     position: 'relative',
                     borderRadius: 6,
                     overflow: 'hidden',
-                    height: { xs: 340, md: 380 },
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: { xs: 400, md: 440 },
                     transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                     cursor: 'pointer',
-                    boxShadow: '0 8px 32px var(--border-color)',
+                    bgcolor: 'var(--card-bg)',
+                    border: 'none',
+                    boxShadow: 'none',
                     '&:hover': {
-                        transform: 'translateY(-12px) scale(1.02)',
-                        boxShadow: '0 32px 64px var(--border-color)',
+                        transform: 'translateY(-4px)',
                     }
                 }}
             >
                 {/* Full Background Image with Swiper */}
                 <Box
                     sx={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
+                        flex: 1,
+                        position: 'relative',
+                        width: '100%',
+                        overflow: 'hidden',
                         '& .swiper': { width: '100%', height: '100%' },
                         '& .swiper-pagination': {
-                            bottom: 'auto',
-                            top: 16,
+                            bottom: 12,
                             left: '50%',
                             transform: 'translateX(-50%)',
                             width: 'auto',
@@ -172,7 +173,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                                 sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"
                                                 placeholder="blur"
                                                 blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
-                                                style={{ objectFit: 'cover' }}
+                                                style={{ objectFit: 'contain', backgroundColor: 'var(--card-bg)' }}
                                             />
                                         </Box>
                                     </SwiperSlide>
@@ -245,21 +246,14 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
 
                 {/* Soft Dark Glassmorphism Bottom Panel */}
                 <Box sx={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 50%, rgba(0,0,0,0) 100%)',
-                    backdropFilter: 'blur(6px)',
-                    pt: 8,
+                    bgcolor: 'var(--card-bg)',
+                    pt: 2.5,
                     pb: 2.5,
-                    px: 2.5,
+                    px: 3,
                     zIndex: 10,
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    maskImage: 'linear-gradient(to bottom, transparent, black 40%)',
-                    WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 40%)'
+                    borderTop: '1px solid var(--border-color)',
                 }}>
                     {/* Name & Title Row */}
                     <Box sx={{
@@ -273,14 +267,13 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         <Typography sx={{
                             fontFamily: 'var(--font-prompt)',
                             fontWeight: 600,
-                            fontSize: { xs: '1rem', md: '1.2rem' },
-                            color: 'white',
+                            fontSize: { xs: '0.95rem', md: '1.1rem' },
+                            color: 'var(--foreground)',
                             lineHeight: 1.3,
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
-                            textShadow: '0 2px 4px rgba(0,0,0,0.2)',
                             flex: 1
                         }}>
                             {product.name}
@@ -297,18 +290,18 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                     <Typography sx={{
                                         fontFamily: 'var(--font-prompt)',
                                         fontWeight: 700,
-                                        fontSize: '1.25rem',
-                                        color: 'white',
+                                        fontSize: '1.1rem',
+                                        color: 'var(--primary)',
                                         lineHeight: 1,
-                                        textShadow: '0 2px 8px rgba(0,0,0,0.3)'
                                     }}>
                                         ฿{product.price.toLocaleString()}
                                     </Typography>
                                     {product.priceUnit && (
                                         <Typography sx={{
                                             fontFamily: 'var(--font-prompt)',
-                                            fontSize: '0.75rem',
-                                            color: 'rgba(255,255,255,0.9)',
+                                            fontSize: '0.7rem',
+                                            color: 'var(--foreground)',
+                                            opacity: 0.6,
                                             mt: 0.2
                                         }}>
                                             {product.priceUnit}
@@ -319,24 +312,23 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                 <Box sx={{
                                     display: 'inline-flex',
                                     alignItems: 'center',
-                                    bgcolor: 'rgba(255,255,255,0.15)',
-                                    backdropFilter: 'blur(4px)',
+                                    bgcolor: 'var(--border-color)',
                                     borderRadius: 3,
                                     px: 1.2,
                                     py: 0.5,
                                     gap: 0.5,
-                                    border: '1px solid rgba(255,255,255,0.2)'
+                                    border: '1px solid var(--border-color)'
                                 }}>
                                     <Typography sx={{
                                         fontFamily: 'var(--font-prompt)',
                                         fontWeight: 500,
                                         fontSize: '0.75rem',
-                                        color: 'white',
+                                        color: 'var(--foreground)',
                                         lineHeight: 1
                                     }}>
                                         ดูรายละเอียด
                                     </Typography>
-                                    <ArrowRight2 size="14" color="white" />
+                                    <ArrowRight2 size="14" color="var(--foreground)" />
                                 </Box>
                             )}
                         </Box>
@@ -350,7 +342,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         gap: 2,
                         mt: 'auto',
                         pt: 2,
-                        borderTop: '1px solid rgba(255,255,255,0.15)'
+                        borderTop: '1px solid var(--border-color)'
                     }}>
                         {/* Left Column: Features & Description */}
                         <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -363,11 +355,12 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                             alignItems: 'center',
                                             gap: 0.6
                                         }}>
-                                            <Gallery size="14" color="rgba(255,255,255,0.8)" />
+                                            <Gallery size="14" color="var(--primary)" />
                                             <Typography sx={{
                                                 fontFamily: 'var(--font-prompt)',
                                                 fontSize: '0.75rem',
-                                                color: 'rgba(255,255,255,0.9)',
+                                                color: 'var(--foreground)',
+                                                opacity: 0.8,
                                                 whiteSpace: 'nowrap'
                                             }}>
                                                 {feature}
@@ -382,7 +375,8 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                 <Typography sx={{
                                     fontFamily: 'var(--font-prompt)',
                                     fontSize: '0.8rem',
-                                    color: 'rgba(255,255,255,0.75)',
+                                    color: 'var(--foreground)',
+                                    opacity: 0.6,
                                     display: '-webkit-box',
                                     WebkitLineClamp: 1,
                                     WebkitBoxOrient: 'vertical',
@@ -398,12 +392,13 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                             <Typography sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 fontSize: '0.65rem',
-                                color: 'rgba(255,255,255,0.5)',
+                                color: 'var(--foreground)',
+                                opacity: 0.4,
                                 display: 'flex',
                                 alignItems: 'center',
                                 gap: 0.5
                             }}>
-                                Collection <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'white', opacity: 0.5 }}></span> {categoryName}
+                                Collection <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--primary)', opacity: 0.5 }}></span> {categoryName}
                             </Typography>
                         </Box>
 
@@ -424,20 +419,20 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                     }
                                 }}
                                 sx={{
-                                    bgcolor: 'transparent',
-                                    border: '1px solid rgba(255,255,255,0.4)',
-                                    color: 'white',
+                                    bgcolor: 'var(--border-color)',
+                                    border: '1px solid var(--border-color)',
+                                    color: 'var(--foreground)',
                                     width: 36,
                                     height: 36,
                                     transition: 'all 0.2s',
                                     '&:hover': {
-                                        bgcolor: 'rgba(255,255,255,0.1)',
-                                        borderColor: 'white',
+                                        bgcolor: 'var(--background)',
+                                        borderColor: 'var(--primary)',
                                         transform: 'scale(1.05)'
                                     }
                                 }}
                             >
-                                <ExportSquare size="16" color="white" />
+                                <ExportSquare size="16" color="currentColor" />
                             </IconButton>
                         </Stack>
                     </Box>
@@ -452,9 +447,10 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    p: { xs: 2, md: 4 },
+                    p: { xs: 0, md: 4 },
                     '& .MuiBackdrop-root': {
-                        bgcolor: 'rgba(0,0,0,0.95)'
+                        bgcolor: 'var(--background)',
+                        opacity: '1 !important'
                     }
                 }}
             >
@@ -463,10 +459,11 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                     width: '100%',
                     height: '100%',
                     maxWidth: 1200,
-                    maxHeight: '90vh',
+                    maxHeight: '100vh',
                     display: 'flex',
                     flexDirection: 'column',
                     outline: 'none',
+                    bgcolor: 'var(--background)',
                     '& .swiper': { width: '100%', height: '100%' }
                 }}>
                     {/* Close Button */}
@@ -475,20 +472,20 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         aria-label="ปิดภาพขยาย"
                         sx={{
                             position: 'absolute',
-                            top: { xs: 8, md: 16 },
-                            right: { xs: 8, md: 16 },
+                            top: { xs: 16, md: 24 },
+                            right: { xs: 16, md: 24 },
                             zIndex: 100,
-                            color: 'white',
-                            bgcolor: 'rgba(0,0,0,0.5)',
+                            color: 'var(--foreground)',
+                            bgcolor: 'var(--border-color)',
                             backdropFilter: 'blur(4px)',
-                            '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+                            '&:hover': { bgcolor: 'var(--background)', border: '1px solid var(--primary)' }
                         }}
                     >
-                        <CloseCircle size="28" color="white" />
+                        <CloseCircle size="28" color='var(--primary)' variant='Outline' />
                     </IconButton>
 
                     {/* Main Swiper */}
-                    <Box sx={{ flex: 1, position: 'relative', minHeight: 0, borderRadius: { xs: 2, md: 3 }, overflow: 'hidden' }}>
+                    <Box sx={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
                         <Swiper
                             modules={[Navigation, EffectFade, Thumbs]}
                             navigation={{
@@ -504,7 +501,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         >
                             {product.images.map((img, idx) => (
                                 <SwiperSlide key={idx}>
-                                    <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+                                    <Box sx={{ position: 'relative', width: '100%', height: '100%', p: { xs: 2, md: 10 } }}>
                                         <Image
                                             src={img}
                                             alt={product.name}
@@ -529,18 +526,18 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                         top: '50%',
                                         transform: 'translateY(-50%)',
                                         zIndex: 100,
-                                        color: 'white',
-                                        bgcolor: 'rgba(255,255,255,0.1)',
+                                        color: 'var(--foreground)',
+                                        bgcolor: 'var(--border-color)',
                                         backdropFilter: 'blur(10px)',
                                         width: { xs: 40, md: 56 },
                                         height: { xs: 40, md: 56 },
                                         borderRadius: '50%',
                                         transition: 'all 0.3s ease',
-                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                                        '&:hover': { bgcolor: 'var(--background)', borderColor: 'var(--primary)', border: '1px solid var(--primary)' },
                                         '&.swiper-button-disabled': { opacity: 0, pointerEvents: 'none' }
                                     }}
                                 >
-                                    <ArrowLeft2 size="28" color="white" />
+                                    <ArrowLeft2 size="28" />
                                 </IconButton>
                                 <IconButton
                                     className="lightbox-next"
@@ -551,28 +548,28 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                         top: '50%',
                                         transform: 'translateY(-50%)',
                                         zIndex: 100,
-                                        color: 'white',
-                                        bgcolor: 'rgba(255,255,255,0.1)',
+                                        color: 'var(--foreground)',
+                                        bgcolor: 'var(--border-color)',
                                         backdropFilter: 'blur(10px)',
                                         width: { xs: 40, md: 56 },
                                         height: { xs: 40, md: 56 },
                                         borderRadius: '50%',
                                         transition: 'all 0.3s ease',
-                                        '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                                        '&:hover': { bgcolor: 'var(--background)', borderColor: 'var(--primary)', border: '1px solid var(--primary)' },
                                         '&.swiper-button-disabled': { opacity: 0, pointerEvents: 'none' }
                                     }}
                                 >
-                                    <ArrowRight2 size="28" color="white" />
+                                    <ArrowRight2 size="28" />
                                 </IconButton>
                             </>
                         )}
                     </Box>
 
                     {/* Footer: Counter & Thumbnails */}
-                    <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ pb: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
                         {/* Image Counter */}
-                        <Box sx={{ bgcolor: 'rgba(255,255,255,0.1)', borderRadius: 2, px: 2, py: 0.5 }}>
-                            <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'white', fontSize: '0.9rem' }}>
+                        <Box sx={{ bgcolor: 'var(--border-color)', borderRadius: 2, px: 2, py: 0.5 }}>
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 600 }}>
                                 {lightboxIndex + 1} / {imageCount}
                             </Typography>
                         </Box>
@@ -600,7 +597,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                                     borderRadius: 1,
                                                     overflow: 'hidden',
                                                     cursor: 'pointer',
-                                                    border: idx === lightboxIndex ? '2px solid white' : '2px solid transparent',
+                                                    border: idx === lightboxIndex ? '2px solid var(--primary)' : '2px solid transparent',
                                                     opacity: idx === lightboxIndex ? 1 : 0.5,
                                                     transition: 'all 0.2s',
                                                     '&:hover': { opacity: 1 }
@@ -953,32 +950,42 @@ export default function ProductCategoryContent({ initialData = null }: { initial
             {/* Products Grid */}
             {hasProducts && (
                 <Container maxWidth="lg" sx={{ mt: hasSubcategories ? 0 : 6 }}>
-                    {/* Section Header */}
-                    <Box sx={{ textAlign: 'center', mb: 6 }}>
-                        <Typography sx={{
-                            color: "var(--primary)",
-                            fontFamily: "var(--font-prompt)",
-                            fontWeight: 600,
-                            fontSize: '0.9rem',
-                            mb: 1,
-                            textTransform: 'uppercase',
-                            letterSpacing: 2
-                        }}>
-                            Our Products
-                        </Typography>
-                        <Typography variant="h4" sx={{
-                            fontFamily: "var(--font-prompt)",
-                            fontWeight: 700,
-                            color: "var(--foreground)",
-                            mb: 1
-                        }}>
-                            รายการสินค้า
-                        </Typography>
+                    {/* Section Header - Compact Layout */}
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        alignItems: { xs: 'flex-start', sm: 'flex-end' },
+                        justifyContent: 'space-between',
+                        mb: 4,
+                        pb: 2,
+                        borderBottom: '1px solid var(--border-color)'
+                    }}>
+                        <Box>
+                            <Typography sx={{
+                                color: "var(--primary)",
+                                fontFamily: "var(--font-prompt)",
+                                fontWeight: 600,
+                                fontSize: '0.75rem',
+                                mb: 0.5,
+                                textTransform: 'uppercase',
+                                letterSpacing: 1.5
+                            }}>
+                                Our Products
+                            </Typography>
+                            <Typography variant="h5" sx={{
+                                fontFamily: "var(--font-prompt)",
+                                fontWeight: 700,
+                                color: "var(--foreground)",
+                            }}>
+                                รายการสินค้า
+                            </Typography>
+                        </Box>
                         <Typography sx={{
                             fontFamily: "var(--font-prompt)",
                             color: "var(--foreground)",
                             opacity: 0.5,
-                            fontSize: '1rem'
+                            fontSize: '0.9rem',
+                            mt: { xs: 1, sm: 0 }
                         }}>
                             พบ {products.length} รายการ
                         </Typography>

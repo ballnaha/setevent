@@ -138,6 +138,23 @@ export default function CategoriesPage() {
         setFormData(prev => ({ ...prev, image: '' }));
     };
 
+    const generateSlug = (val: string) => {
+        return val
+            .toLowerCase()
+            .replace(/\s+/g, '-') // แทนที่เว้นวรรคด้วย -
+            .replace(/[^\w\u0E00-\u0E7F-]+/g, '') // อนุญาตเฉพาะตัวอักษร, ตัวเลข, ภาษาไทย และ -
+            .replace(/-+/g, '-') // ลด - ที่ซ้ำซ้อน
+            .trim();
+    };
+
+    const handleNameChange = (name: string) => {
+        setFormData(prev => ({
+            ...prev,
+            name,
+            slug: editingCategory ? prev.slug : generateSlug(name) // Auto-slug only for new categories
+        }));
+    };
+
     const deleteFile = async (url: string) => {
         try {
             await fetch('/api/upload', {
@@ -392,15 +409,15 @@ export default function CategoriesPage() {
                             label="ชื่อหมวดหมู่ (Name)"
                             fullWidth
                             value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            onChange={(e) => handleNameChange(e.target.value)}
                             InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                         />
                         <TextField
-                            label="Slug (เช่น rental, lighting)"
+                            label="Slug (URL)"
                             fullWidth
                             value={formData.slug}
-                            onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                            helperText="ใช้ภาษาอังกฤษตัวเล็กเท่านั้น ห้ามเว้นวรรค"
+                            onChange={(e) => setFormData({ ...formData, slug: generateSlug(e.target.value) })}
+                            helperText="รองรับภาษาไทยและเว้นวรรค (เว้นวรรคจะถูกเปลี่ยนเป็น -)"
                             InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                         />
                         <FormControl fullWidth>
@@ -445,6 +462,28 @@ export default function CategoriesPage() {
                     <Button onClick={handleCloseDialog} sx={{ fontFamily: 'var(--font-prompt)' }}>ยกเลิก</Button>
                     <Button onClick={handleSave} variant="contained" disabled={saving} sx={{ fontFamily: 'var(--font-prompt)', bgcolor: '#1a1a1a' }}>
                         {saving ? 'บันทึก...' : 'บันทึก'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
+                <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', textAlign: 'center', fontWeight: 600 }}>ยืนยันการลบ</DialogTitle>
+                <DialogContent sx={{ textAlign: 'center' }}>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)' }}>คุณแน่ใจหรือไม่ที่จะลบหมวดหมู่</Typography>
+                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mt: 1, color: 'error.main' }}>
+                        "{deletingCategory?.name}"
+                    </Typography>
+                    <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: '#666', mt: 2, display: 'block' }}>
+                        * การลบหมวดหมู่นี้จะทำให้สินค้าที่อยู่ในหมวดหมู่นี้ถูกลบไปด้วย
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
+                    <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" sx={{ borderRadius: 2, fontFamily: 'var(--font-prompt)' }}>
+                        ยกเลิก
+                    </Button>
+                    <Button onClick={handleDelete} variant="contained" color="error" sx={{ borderRadius: 2, fontFamily: 'var(--font-prompt)' }}>
+                        ยืนยันการลบ
                     </Button>
                 </DialogActions>
             </Dialog>

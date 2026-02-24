@@ -20,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
             where: { id },
             data: {
                 name,
-                slug,
+                slug: slug?.toLowerCase(),
                 description,
                 image,
                 parentId: parentId || null,

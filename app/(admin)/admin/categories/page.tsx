@@ -58,11 +58,11 @@ export default function CategoriesPage() {
     }, []);
 
     // Generate slug from name
-    const generateSlug = (name: string) => {
-        return name
+    const generateSlug = (val: string) => {
+        return val
             .toLowerCase()
-            .replace(/[^a-z0-9ก-๙\s-]/g, '')
             .replace(/\s+/g, '-')
+            .replace(/[^\w\u0E00-\u0E7F-]+/g, '')
             .replace(/-+/g, '-')
             .trim();
     };
@@ -329,7 +329,7 @@ export default function CategoriesPage() {
                             fullWidth
                             InputProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                             InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
-                            helperText="ใช้สำหรับ URL เช่น /products/rental"
+                            helperText="รองรับภาษาไทยและเว้นวรรค (เว้นวรรคจะถูกเปลี่ยนเป็น -)"
                         />
                         <TextField
                             label="คำอธิบาย"

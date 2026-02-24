@@ -25,7 +25,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     // Traverse the category tree to find the current category
     for (let i = 0; i < slugs.length; i++) {
-        const slug = slugs[i];
+        const slug = decodeURIComponent(slugs[i]).toLowerCase();
         const categoryData: { id: string; name: string; description: string | null } | null = await prisma.category.findFirst({
             where: {
                 slug: slug,
@@ -70,7 +70,8 @@ export default async function ProductCategoryPage(props: { params: Promise<{ slu
     let currentCategory: any = null;
     let parentId: string | null = null;
 
-    for (const slug of slugs) {
+    for (const rawSlug of slugs) {
+        const slug = decodeURIComponent(rawSlug).toLowerCase();
         const foundCategory: any = await prisma.category.findFirst({
             where: {
                 slug: slug,

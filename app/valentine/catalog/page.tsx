@@ -264,7 +264,8 @@ export default function ValentineCatalogPage() {
                                             sx={{
                                                 width: '100%',
                                                 height: '100%',
-                                                objectFit: 'cover',
+                                                objectFit: 'contain',
+                                                backgroundColor: 'rgba(0,0,0,0.02)',
                                                 transition: 'transform 1.2s cubic-bezier(0.2, 0, 0.2, 1)',
                                             }}
                                         />
