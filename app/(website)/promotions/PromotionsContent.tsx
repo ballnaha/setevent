@@ -275,6 +275,18 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
     const [loading, setLoading] = useState(initialPromotions.length === 0);
     const promotions = initialPromotions;
 
+    React.useEffect(() => {
+        // Since we are using SSR, if we have initial data, we stop loading
+        if (initialPromotions.length > 0) {
+            setLoading(false);
+        } else {
+            // If truly empty, we still want to stop the skeleton after mount
+            // unless we want to fetch more? Promotions currently don't have a fetch more.
+            // So we just stop.
+            setLoading(false);
+        }
+    }, [initialPromotions]);
+
     if (loading) {
         return (
             <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10, overflow: 'hidden' }}>

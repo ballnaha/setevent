@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Box, Chip, Container, Typography, Button, Stack, IconButton, Modal } from '@mui/material';
+import { Box, Chip, Container, Typography, Button, Stack, IconButton, Modal, Skeleton } from '@mui/material';
 import Link from 'next/link';
 import { ArrowLeft, Gallery, CloseCircle, ArrowLeft2, ArrowRight2, MessageQuestion, CallCalling } from 'iconsax-react';
 import Image from 'next/image';
@@ -40,20 +40,56 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const cover = portfolio.image || portfolio.images[0]?.url || '/images/placeholder.jpg';
-  const albumImages = portfolio.images;
-  // Include cover as first image if it's not already in the album
-  const coverAlreadyInAlbum = albumImages.some(img => img.url === cover);
-  const allImages = coverAlreadyInAlbum
-    ? albumImages
-    : [{ id: 'cover', url: cover, caption: portfolio.title, order: -1 }, ...albumImages];
+  // Setup images
+  const albumImages = portfolio.images || [];
+  const coverUrl = portfolio.image;
+
+  // Logical approach: 
+  // 1. If we have album images, we use them.
+  // 2. If we also have a cover that is NOT in the album, we prepend it.
+  // 3. If we have NO album images and NO cover, then allImages is empty.
+
+  const coverAlreadyInAlbum = coverUrl ? albumImages.some(img => img.url === coverUrl) : true;
+  const allImages = [...albumImages];
+
+  if (coverUrl && !coverAlreadyInAlbum) {
+    allImages.unshift({ id: 'cover', url: coverUrl, caption: portfolio.title, order: -1 });
+  }
+
+  // If truly nothing, we don't even add the placeholder here, 
+  // we let the UI handle the imageCount === 0 case.
   const imageCount = allImages.length;
+
+  React.useEffect(() => {
+    // Basic mount to handle client-side hydration
+    setLoading(false);
+  }, []);
 
   const openLightbox = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
   };
+
+  if (loading) {
+    return (
+      <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10, overflow: 'hidden' }}>
+        <Box sx={{ pt: { xs: 15, md: 22 }, pb: { xs: 8, md: 10 }, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+          <Skeleton variant="rounded" width={140} height={32} sx={{ borderRadius: 10, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
+          <Skeleton variant="text" height={60} sx={{ width: { xs: '90%', md: 400 }, bgcolor: 'var(--border-color)', opacity: 0.8 }} />
+          <Skeleton variant="text" height={24} sx={{ width: { xs: '80%', md: 600 }, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
+        </Box>
+        <Container maxWidth="lg" sx={{ mt: 4 }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
+            {[1, 2, 3].map(i => (
+              <Skeleton key={i} variant="rounded" height={300} sx={{ borderRadius: 6, bgcolor: 'var(--border-color)', opacity: 0.4 }} />
+            ))}
+          </Box>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', pb: 10, overflow: 'hidden' }}>
