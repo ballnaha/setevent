@@ -62,6 +62,11 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
     const [lightboxOpen, setLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+    const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
+
+    const handleImageLoad = (index: number) => {
+        setLoadedImages(prev => ({ ...prev, [index]: true }));
+    };
 
     const prevRef = React.useRef<HTMLButtonElement>(null);
     const nextRef = React.useRef<HTMLButtonElement>(null);
@@ -171,10 +176,29 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                                 fill
                                                 priority={idx === 0 && isPriority}
                                                 sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"
-                                                placeholder="blur"
-                                                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
-                                                style={{ objectFit: 'contain', backgroundColor: 'var(--card-bg)' }}
+                                                onLoad={() => handleImageLoad(idx)}
+                                                style={{
+                                                    objectFit: 'contain',
+                                                    backgroundColor: 'transparent',
+                                                    opacity: loadedImages[idx] ? 1 : 0,
+                                                    transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                                                }}
                                             />
+                                            {!loadedImages[idx] && (
+                                                <Skeleton
+                                                    variant="rectangular"
+                                                    width="100%"
+                                                    height="100%"
+                                                    animation="wave"
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        bgcolor: 'rgba(128,128,128,0.06)',
+                                                        zIndex: 1
+                                                    }}
+                                                />
+                                            )}
                                         </Box>
                                     </SwiperSlide>
                                 ))}
@@ -235,11 +259,21 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            background: 'linear-gradient(135deg, #2d5a4a 0%, #1a3a2e 100%)'
+                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
                         }}>
-                            <Box sx={{ transform: 'translateY(-32px)' }}>
-                                <Gallery size="64" color="rgba(255,255,255,0.3)" variant="Bold" />
-                            </Box>
+                            <Stack spacing={1.5} alignItems="center" sx={{ opacity: 0.2, transform: 'translateY(-20px)' }}>
+                                <Gallery size="56" color="var(--primary)" variant="Outline" />
+                                <Typography sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.7rem',
+                                    fontWeight: 600,
+                                    color: 'var(--primary)',
+                                    letterSpacing: 1.5,
+                                    textTransform: 'uppercase'
+                                }}>
+                                    No Image Available
+                                </Typography>
+                            </Stack>
                         </Box>
                     )}
                 </Box>
@@ -506,9 +540,29 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                             src={img}
                                             alt={product.name}
                                             fill
-                                            style={{ objectFit: 'contain' }}
+                                            onLoad={() => handleImageLoad(idx)}
+                                            style={{
+                                                objectFit: 'contain',
+                                                opacity: loadedImages[idx] ? 1 : 0,
+                                                transition: 'opacity 0.4s ease-in-out'
+                                            }}
                                             priority={idx === lightboxIndex || Math.abs(idx - lightboxIndex) <= 1}
                                         />
+                                        {!loadedImages[idx] && (
+                                            <Skeleton
+                                                variant="rectangular"
+                                                width="100%"
+                                                height="100%"
+                                                animation="wave"
+                                                sx={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    bgcolor: 'rgba(128,128,128,0.1)',
+                                                    zIndex: 1
+                                                }}
+                                            />
+                                        )}
                                     </Box>
                                 </SwiperSlide>
                             ))}
@@ -669,7 +723,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
     if (loading) {
         return (
             <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
-                {/* Hero Skeleton - Adaptive Theme */}
+                {/* Hero Skeleton - More Minimal & Beautiful */}
                 <Box sx={{
                     pt: { xs: 15, md: 22 },
                     pb: { xs: 8, md: 10 },
@@ -679,14 +733,29 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     justifyContent: 'center',
                     gap: 3
                 }}>
-                    <Skeleton variant="rounded" width={140} height={32} sx={{ borderRadius: 10, bgcolor: 'rgba(128,128,128,0.1)' }} />
-                    <Skeleton variant="text" width={300} height={60} sx={{ bgcolor: 'rgba(128,128,128,0.15)' }} />
-                    <Skeleton variant="text" width={500} height={24} sx={{ maxWidth: '90%', bgcolor: 'rgba(128,128,128,0.1)' }} />
+                    <Skeleton variant="rounded" width={140} height={32} sx={{ borderRadius: 10, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
+                    <Skeleton variant="text" height={60} sx={{ width: { xs: '90%', md: 400 }, bgcolor: 'var(--border-color)', opacity: 0.8 }} />
+                    <Skeleton variant="text" height={24} sx={{ width: { xs: '80%', md: 600 }, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
                 </Box>
                 <Container maxWidth="lg" sx={{ mt: 4 }}>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, gap: 4 }}>
                         {[1, 2, 3, 4, 5, 6].map(i => (
-                            <Skeleton key={i} variant="rounded" height={300} sx={{ bgcolor: 'rgba(128,128,128,0.1)', borderRadius: 2 }} />
+                            <Box key={i} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                <Skeleton
+                                    variant="rounded"
+                                    height={320}
+                                    animation="wave"
+                                    sx={{
+                                        bgcolor: 'var(--border-color)',
+                                        opacity: 0.4,
+                                        borderRadius: 6
+                                    }}
+                                />
+                                <Box sx={{ px: 1 }}>
+                                    <Skeleton variant="text" width="85%" height={32} sx={{ bgcolor: 'var(--border-color)', opacity: 0.7 }} />
+                                    <Skeleton variant="text" width="60%" height={24} sx={{ bgcolor: 'var(--border-color)', opacity: 0.4 }} />
+                                </Box>
+                            </Box>
                         ))}
                     </Box>
                 </Container>

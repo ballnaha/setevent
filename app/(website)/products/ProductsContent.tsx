@@ -28,6 +28,11 @@ interface RootCategory {
 export default function ProductsContent({ initialData = [] }: { initialData?: RootCategory[] }) {
     const [categories, setCategories] = useState<RootCategory[]>(initialData);
     const [loading, setLoading] = useState(initialData.length === 0);
+    const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+
+    const handleImageLoad = (id: string) => {
+        setLoadedImages(prev => ({ ...prev, [id]: true }));
+    };
 
     useEffect(() => {
         if (initialData.length > 0) return;
@@ -164,10 +169,8 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
 
                     {loading ? (
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                            {/* Skeleton for 2 category sections */}
                             {[1, 2].map(categoryIndex => (
                                 <Box key={categoryIndex}>
-                                    {/* Category Header Skeleton */}
                                     <Box sx={{
                                         display: 'flex',
                                         alignItems: 'center',
@@ -179,79 +182,34 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
                                                 variant="rounded"
                                                 width={48}
                                                 height={48}
-                                                sx={{ borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.1)' }}
+                                                sx={{ borderRadius: 2, bgcolor: 'var(--border-color)', opacity: 0.5 }}
                                             />
                                             <Box>
-                                                <Skeleton
-                                                    variant="text"
-                                                    width={180}
-                                                    height={32}
-                                                    sx={{ bgcolor: 'rgba(0,0,0,0.08)' }}
-                                                />
-                                                <Skeleton
-                                                    variant="text"
-                                                    width={120}
-                                                    height={20}
-                                                    sx={{ bgcolor: 'rgba(0,0,0,0.05)' }}
-                                                />
+                                                <Skeleton variant="text" width={180} height={32} sx={{ bgcolor: 'var(--border-color)', opacity: 0.8 }} />
+                                                <Skeleton variant="text" width={120} height={20} sx={{ bgcolor: 'var(--border-color)', opacity: 0.5 }} />
                                             </Box>
                                         </Box>
-                                        <Skeleton
-                                            variant="rounded"
-                                            width={100}
-                                            height={28}
-                                            sx={{ borderRadius: 4, bgcolor: 'rgba(16, 185, 129, 0.08)' }}
-                                        />
+                                        <Skeleton variant="rounded" width={100} height={28} sx={{ borderRadius: 4, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
                                     </Box>
 
-                                    {/* Subcategories Grid Skeleton */}
                                     <Box sx={{
                                         display: 'grid',
                                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr', lg: '1fr 1fr 1fr 1fr' },
                                         gap: 3
                                     }}>
                                         {[1, 2, 3, 4].map(cardIndex => (
-                                            <Paper
-                                                key={cardIndex}
-                                                sx={{
-                                                    borderRadius: 3,
-                                                    overflow: 'hidden',
-                                                    border: '1px solid rgba(0,0,0,0.06)'
-                                                }}
-                                            >
-                                                {/* Image Skeleton */}
+                                            <Box key={cardIndex} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                                 <Skeleton
-                                                    variant="rectangular"
+                                                    variant="rounded"
                                                     height={160}
-                                                    sx={{
-                                                        bgcolor: 'rgba(0,0,0,0.06)',
-                                                        animation: 'pulse 1.5s ease-in-out infinite'
-                                                    }}
+                                                    animation="wave"
+                                                    sx={{ bgcolor: 'var(--border-color)', opacity: 0.4, borderRadius: 3 }}
                                                 />
-                                                {/* Info Skeleton */}
-                                                <Box sx={{ p: 2.5 }}>
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                        <Skeleton
-                                                            variant="text"
-                                                            width="70%"
-                                                            height={24}
-                                                            sx={{ bgcolor: 'rgba(0,0,0,0.08)' }}
-                                                        />
-                                                        <Skeleton
-                                                            variant="circular"
-                                                            width={18}
-                                                            height={18}
-                                                            sx={{ bgcolor: 'rgba(16, 185, 129, 0.15)' }}
-                                                        />
-                                                    </Box>
-                                                    <Skeleton
-                                                        variant="text"
-                                                        width="40%"
-                                                        height={18}
-                                                        sx={{ mt: 0.5, bgcolor: 'rgba(0,0,0,0.05)' }}
-                                                    />
+                                                <Box sx={{ px: 1 }}>
+                                                    <Skeleton variant="text" width="80%" height={24} sx={{ bgcolor: 'var(--border-color)', opacity: 0.7 }} />
+                                                    <Skeleton variant="text" width="40%" height={20} sx={{ bgcolor: 'var(--border-color)', opacity: 0.4 }} />
                                                 </Box>
-                                            </Paper>
+                                            </Box>
                                         ))}
                                     </Box>
                                 </Box>
@@ -395,16 +353,36 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
                                                     overflow: 'hidden'
                                                 }}>
                                                     {child.image ? (
-                                                        <Image
-                                                            src={child.image}
-                                                            alt={child.name}
-                                                            fill
-                                                            priority={category.id === categories[0]?.id && category.children.indexOf(child) < 4}
-                                                            sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, (max-width: 1280px) 25vw, 300px"
-                                                            placeholder="blur"
-                                                            blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
-                                                            style={{ objectFit: 'cover' }}
-                                                        />
+                                                        <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+                                                            <Image
+                                                                src={child.image}
+                                                                alt={child.name}
+                                                                fill
+                                                                priority={category.id === categories[0]?.id && category.children.indexOf(child) < 4}
+                                                                sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, (max-width: 1280px) 25vw, 300px"
+                                                                onLoad={() => handleImageLoad(child.id)}
+                                                                style={{
+                                                                    objectFit: 'cover',
+                                                                    opacity: loadedImages[child.id] ? 1 : 0,
+                                                                    transition: 'opacity 0.6s ease-in-out'
+                                                                }}
+                                                            />
+                                                            {!loadedImages[child.id] && (
+                                                                <Skeleton
+                                                                    variant="rectangular"
+                                                                    width="100%"
+                                                                    height="100%"
+                                                                    animation="wave"
+                                                                    sx={{
+                                                                        position: 'absolute',
+                                                                        top: 0,
+                                                                        left: 0,
+                                                                        bgcolor: 'rgba(128,128,128,0.06)',
+                                                                        zIndex: 1
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </Box>
                                                     ) : (
                                                         <Box sx={{
                                                             width: '100%',

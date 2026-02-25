@@ -106,11 +106,11 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
               Portfolio
             </Button>
             <Typography sx={{ color: 'var(--foreground)', opacity: 0.3 }}>/</Typography>
-            <Typography sx={{ 
-              color: 'var(--primary)', 
-              fontFamily: 'var(--font-prompt)', 
+            <Typography sx={{
+              color: 'var(--primary)',
+              fontFamily: 'var(--font-prompt)',
               fontSize: '0.9rem',
-              fontWeight: 500 
+              fontWeight: 500
             }}>
               Detail
             </Typography>
@@ -180,21 +180,6 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                 {portfolio.description}
               </Typography>
             )}
-
-            {/* Date Tag */}
-            <Typography sx={{ 
-              fontFamily: 'var(--font-prompt)', 
-              fontSize: '0.85rem', 
-              color: 'var(--foreground)', 
-              opacity: 0.4,
-              mt: 2
-            }}>
-              เผยแพร่เมื่อ {new Date(portfolio.createdAt).toLocaleDateString('th-TH', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </Typography>
           </Stack>
         </Container>
       </Box>
@@ -204,10 +189,10 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
       <Container maxWidth="lg">
 
         {imageCount === 0 ? (
-          <Box sx={{ 
-            textAlign: 'center', 
-            py: 10, 
-            bgcolor: 'rgba(128,128,128,0.05)', 
+          <Box sx={{
+            textAlign: 'center',
+            py: 10,
+            bgcolor: 'rgba(128,128,128,0.05)',
             borderRadius: 4,
             border: '1px dashed var(--border-color)'
           }}>
@@ -256,16 +241,16 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                   width={800}
                   height={600}
                   sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  style={{ 
-                    width: '100%', 
-                    height: 'auto', 
+                  style={{
+                    width: '100%',
+                    height: 'auto',
                     display: 'block',
                     transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 />
-                
+
                 {/* Hover Overlay */}
-                <Box 
+                <Box
                   className="img-overlay"
                   sx={{
                     position: 'absolute',
@@ -279,10 +264,10 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                     zIndex: 2
                   }}
                 >
-                  <Box sx={{ 
-                    width: 50, height: 50, 
-                    borderRadius: '50%', 
-                    bgcolor: 'rgba(255,255,255,0.2)', 
+                  <Box sx={{
+                    width: 50, height: 50,
+                    borderRadius: '50%',
+                    bgcolor: 'rgba(255,255,255,0.2)',
                     backdropFilter: 'blur(8px)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     border: '1px solid rgba(255,255,255,0.4)',
@@ -293,10 +278,10 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                 </Box>
 
                 {img.caption && (
-                  <Box sx={{ 
+                  <Box sx={{
                     position: 'absolute',
                     bottom: 0, left: 0, right: 0,
-                    p: 2, 
+                    p: 2,
                     background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
                     zIndex: 3
                   }}>
@@ -321,66 +306,66 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
 
       {/* Call to Action Section (Same as Products page for consistency) */}
       <Box sx={{
-          position: 'relative',
-          py: { xs: 8, md: 10 },
-          bgcolor: '#0a5c5a',
-          background: 'linear-gradient(135deg, #0a5c5a 0%, #06403e 100%)',
-          overflow: 'hidden',
-          color: 'white',
-          mt: 12,
-          borderRadius: { xs: 0, md: '60px 60px 0 0' }
+        position: 'relative',
+        py: { xs: 8, md: 10 },
+        bgcolor: '#0a5c5a',
+        background: 'linear-gradient(135deg, #0a5c5a 0%, #06403e 100%)',
+        overflow: 'hidden',
+        color: 'white',
+        mt: 12,
+        borderRadius: { xs: 0, md: '60px 60px 0 0' }
       }}>
-          <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px)' }} />
+        <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0.1, backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 11px)' }} />
 
-          <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
-              <Typography variant="h3" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 2, fontSize: { xs: '2rem', md: '3rem' } }}>
-                  สนใจจัดงานแบบนี้?
-              </Typography>
-              <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: { xs: '1rem', md: '1.25rem' }, opacity: 0.8, mb: 5, maxWidth: 600, mx: 'auto', fontWeight: 300 }}>
-                  ให้ SET EVENT ดูแลงานของคุณ ทีมงานมืออาชีพพร้อมเปลี่ยนไอเดียให้เป็นงานที่น่าจดจำ
-              </Typography>
+        <Container maxWidth="md" sx={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+          <Typography variant="h3" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 2, fontSize: { xs: '2rem', md: '3rem' } }}>
+            สนใจจัดงานแบบนี้?
+          </Typography>
+          <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: { xs: '1rem', md: '1.25rem' }, opacity: 0.8, mb: 5, maxWidth: 600, mx: 'auto', fontWeight: 300 }}>
+            ให้ SET EVENT ดูแลงานของคุณ ทีมงานมืออาชีพพร้อมเปลี่ยนไอเดียให้เป็นงานที่น่าจดจำ
+          </Typography>
 
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" alignItems="center">
-                  <Button
-                      href="https://line.me/ti/p/~@setevent"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      variant="contained"
-                      startIcon={<MessageQuestion size="24" variant="Bold" color="white" />}
-                      sx={{
-                          bgcolor: '#06C755',
-                          color: 'white',
-                          fontFamily: 'var(--font-prompt)',
-                          fontWeight: 600,
-                          px: 4, py: 1.8,
-                          borderRadius: 3,
-                          fontSize: '1rem',
-                          boxShadow: '0 8px 24px rgba(6, 199, 85, 0.3)',
-                          '&:hover': { bgcolor: '#05b04a', transform: 'translateY(-2px)' }
-                      }}
-                  >
-                      แอด LINE @setevent
-                  </Button>
-                  <Button
-                      component={Link}
-                      href="/contact"
-                      variant="outlined"
-                      startIcon={<CallCalling size="24" variant="Bold" color="white" />}
-                      sx={{
-                          borderColor: 'rgba(255,255,255,0.3)',
-                          color: 'white',
-                          fontFamily: 'var(--font-prompt)',
-                          fontWeight: 600,
-                          px: 4, py: 1.8,
-                          borderRadius: 3,
-                          fontSize: '1rem',
-                          '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', borderColor: 'white' }
-                      }}
-                  >
-                      ติดต่อสอบถามข้อมูล
-                  </Button>
-              </Stack>
-          </Container>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center" alignItems="center">
+            <Button
+              href="https://line.me/ti/p/~@setevent"
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="contained"
+              startIcon={<MessageQuestion size="24" variant="Bold" color="white" />}
+              sx={{
+                bgcolor: '#06C755',
+                color: 'white',
+                fontFamily: 'var(--font-prompt)',
+                fontWeight: 600,
+                px: 4, py: 1.8,
+                borderRadius: 3,
+                fontSize: '1rem',
+                boxShadow: '0 8px 24px rgba(6, 199, 85, 0.3)',
+                '&:hover': { bgcolor: '#05b04a', transform: 'translateY(-2px)' }
+              }}
+            >
+              แอด LINE @setevent
+            </Button>
+            <Button
+              component={Link}
+              href="/contact"
+              variant="outlined"
+              startIcon={<CallCalling size="24" variant="Bold" color="white" />}
+              sx={{
+                borderColor: 'rgba(255,255,255,0.3)',
+                color: 'white',
+                fontFamily: 'var(--font-prompt)',
+                fontWeight: 600,
+                px: 4, py: 1.8,
+                borderRadius: 3,
+                fontSize: '1rem',
+                '&:hover': { bgcolor: 'rgba(255,255,255,0.1)', borderColor: 'white' }
+              }}
+            >
+              ติดต่อสอบถามข้อมูล
+            </Button>
+          </Stack>
+        </Container>
       </Box>
 
       {/* Lightbox Modal */}
@@ -448,16 +433,16 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                 watchSlidesProgress={true}
               >
                 {allImages.map((img, idx) => (
-                  <SwiperSlide 
-                    key={img.id || `img-${idx}`} 
+                  <SwiperSlide
+                    key={img.id || `img-${idx}`}
                     style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}
                   >
-                    <Box sx={{ 
-                      position: 'relative', 
-                      width: '100%', 
-                      height: '100%', 
-                      display: 'flex', 
-                      alignItems: 'center', 
+                    <Box sx={{
+                      position: 'relative',
+                      width: '100%',
+                      height: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
                       justifyContent: 'center',
                       bgcolor: 'black'
                     }}>
@@ -469,12 +454,12 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                         priority={idx === lightboxIndex}
                         sizes="100vw"
                       />
-                      
+
                       {img.caption && (
-                        <Box sx={{ 
-                          position: 'absolute', 
-                          bottom: 0, left: 0, right: 0, 
-                          p: 4, 
+                        <Box sx={{
+                          position: 'absolute',
+                          bottom: 0, left: 0, right: 0,
+                          p: 4,
                           background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%)',
                           textAlign: 'center',
                           zIndex: 10
@@ -536,7 +521,7 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
           {/* Footer UI */}
           <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
             <Box className="lightbox-pagination" sx={{ color: 'white', fontFamily: 'var(--font-prompt)', fontSize: '1rem' }} />
-            
+
             {imageCount > 1 && (
               <Box sx={{ width: '100%', height: { xs: 60, md: 80 } }}>
                 <Swiper

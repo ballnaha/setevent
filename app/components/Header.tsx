@@ -122,33 +122,33 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
     const pathname = usePathname();
     const decodedPathname = decodeURIComponent(pathname);
 
-    const isHome = forceTransparent || 
-        pathname === "/" || 
-        pathname === "/about" || 
-        pathname === "/contact" || 
-        pathname === "/promotions" || 
-        pathname === "/designs" || 
-        pathname.startsWith("/portfolio") || 
-        decodedPathname.startsWith("/portfolio") || 
-        pathname.startsWith("/products") || 
-        pathname.startsWith("/blog") || 
-        pathname.startsWith("/faq") || 
-        pathname === "/privacy-policy" || 
+    const isHome = forceTransparent ||
+        pathname === "/" ||
+        pathname === "/about" ||
+        pathname === "/contact" ||
+        pathname === "/promotions" ||
+        pathname === "/designs" ||
+        pathname.startsWith("/portfolio") ||
+        decodedPathname.startsWith("/portfolio") ||
+        pathname.startsWith("/products") ||
+        pathname.startsWith("/blog") ||
+        pathname.startsWith("/faq") ||
+        pathname === "/privacy-policy" ||
         pathname === "/terms-of-service";
 
     // Fix: Default to true if forceDarkText is true OR it's a known light-background page, 
     // but ONLY switch to false if we are SURE it's dark mode (after mounting)
-    const isDarkText = (forceDarkText || 
-        pathname === "/about" || 
-        pathname.startsWith("/blog") || 
-        pathname.startsWith("/faq") || 
-        pathname === "/designs" || 
-        pathname.startsWith("/portfolio") || 
-        decodedPathname.startsWith("/portfolio") || 
-        pathname === "/promotions" || 
-        pathname.startsWith("/products") || 
-        pathname === "/contact" || 
-        pathname === "/privacy-policy" || 
+    const isDarkText = (forceDarkText ||
+        pathname === "/about" ||
+        pathname.startsWith("/blog") ||
+        pathname.startsWith("/faq") ||
+        pathname === "/designs" ||
+        pathname.startsWith("/portfolio") ||
+        decodedPathname.startsWith("/portfolio") ||
+        pathname === "/promotions" ||
+        pathname.startsWith("/products") ||
+        pathname === "/contact" ||
+        pathname === "/privacy-policy" ||
         pathname === "/terms-of-service")
         ? (!mounted || resolvedTheme !== 'dark')
         : (mounted && resolvedTheme === 'dark');
@@ -222,60 +222,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
 
     // ---- Renderers ----
 
-    // Recursive helper for Mobile List
-    const renderMobileTree = (items: SubItem[] | undefined, level: number = 0, parentId: string) => {
-        if (!items) return null;
 
-        return items.map((child, index) => {
-            const childId = `${parentId}-${child.label}`;
-            const hasChildren = child.children && child.children.length > 0;
-            const isExpanded = expandedItems.includes(childId);
-
-            return (
-                <React.Fragment key={childId}>
-                    <ListItem disablePadding>
-                        <ListItemButton
-                            component={hasChildren ? "div" : Link}
-                            href={hasChildren ? "#" : child.href}
-                            onClick={hasChildren ? (e: React.MouseEvent) => handleMobileExpand(childId, e) : handleDrawerToggle}
-                            sx={{
-                                pl: 4 + (level * 2),
-                                py: 1.5,
-                                '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' }
-                            }}
-                        >
-                            <ListItemText
-                                primary={child.label}
-                                primaryTypographyProps={{
-                                    fontFamily: 'var(--font-prompt)',
-                                    fontSize: '0.9rem',
-                                    fontWeight: isActive(child.href) ? 600 : 400,
-                                    color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
-                                }}
-                            />
-                            {hasChildren && (
-                                <ArrowDown2
-                                    size="16"
-                                    color="rgba(255,255,255,0.5)"
-                                    style={{
-                                        transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                                        transition: 'transform 0.3s'
-                                    }}
-                                />
-                            )}
-                        </ListItemButton>
-                    </ListItem>
-                    {hasChildren && (
-                        <Collapse in={isExpanded} timeout="auto" unmountOnExit>
-                            <List component="div" disablePadding>
-                                {renderMobileTree(child.children, level + 1, childId)}
-                            </List>
-                        </Collapse>
-                    )}
-                </React.Fragment>
-            );
-        });
-    };
 
     // Recursive helper for Desktop Mega Menu Item
     // We basically list them, if deeper, we can indent or show simple list
@@ -306,7 +253,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                             <Box
                                 component={hasChildren ? "div" : Link}
                                 href={hasChildren ? undefined : child.href}
-                                onClick={hasChildren ? (e: React.MouseEvent) => handleDesktopExpand(childId, e) : undefined}
+                                onClick={hasChildren ? (e: React.MouseEvent) => handleDesktopExpand(childId, e) : () => { setAnchorEl(null); setActiveMenu(null); }}
                                 sx={{
                                     textDecoration: 'none',
                                     cursor: 'pointer',
