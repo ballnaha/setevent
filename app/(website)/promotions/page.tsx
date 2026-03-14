@@ -37,6 +37,7 @@ interface Promotion {
     price?: string;
     period?: string;
     features: { label: string; value: string }[];
+    category?: string;
     createdAt: string;
 }
 
@@ -59,6 +60,7 @@ async function getPromotions(): Promise<Promotion[]> {
                 price: true,
                 period: true,
                 features: true,
+                category: true,
                 createdAt: true,
             }
         });
@@ -71,6 +73,7 @@ async function getPromotions(): Promise<Promotion[]> {
             price: p.price || undefined,
             period: p.period || undefined,
             features: p.features ? JSON.parse(p.features) : [],
+            category: p.category || undefined,
             createdAt: formatDate(p.createdAt)
         }));
     } catch (error) {

@@ -19,7 +19,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        const { title, description, image, price, period, features, status } = body;
+        const { title, description, image, price, period, features, category, status } = body;
 
         const promotion = await prisma.promotion.create({
             data: {
@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
                 price,
                 period,
                 features: features ? JSON.stringify(features) : null,
+                category,
                 status: status || 'active'
             }
         });

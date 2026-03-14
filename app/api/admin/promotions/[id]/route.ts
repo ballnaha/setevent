@@ -8,7 +8,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     try {
         const { id } = await params;
         const body = await req.json();
-        const { title, description, image, price, period, features, status } = body;
+        const { title, description, image, price, period, features, category, status } = body;
 
         const promotion = await prisma.promotion.update({
             where: { id },
@@ -19,6 +19,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
                 price,
                 period,
                 features: features ? JSON.stringify(features) : null,
+                category,
                 status
             }
         });

@@ -16,7 +16,17 @@ export async function GET() {
             },
             orderBy: { order: 'asc' }
         });
-        return NextResponse.json(categories);
+
+        // Map product count to products for frontend consistency
+        const mappedCategories = categories.map(cat => ({
+            ...cat,
+            _count: {
+                ...cat._count,
+                products: cat._count.products
+            }
+        }));
+
+        return NextResponse.json(mappedCategories);
     } catch (error) {
         console.error("Error fetching categories:", error);
         return NextResponse.json({ error: "Failed to fetch categories" }, { status: 500 });

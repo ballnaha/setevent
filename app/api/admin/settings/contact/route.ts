@@ -19,7 +19,7 @@ const DEFAULT_CONTACT = {
 // GET - Get contact settings
 export async function GET() {
     try {
-        const settings = await prisma.siteSettings.findUnique({
+        const settings = await prisma.sitesettings.findUnique({
             where: { key: "contact" }
         });
 
@@ -40,7 +40,7 @@ export async function PUT(req: NextRequest) {
     try {
         const body = await req.json();
 
-        const settings = await prisma.siteSettings.upsert({
+        const settings = await prisma.sitesettings.upsert({
             where: { key: "contact" },
             update: {
                 value: JSON.stringify(body)

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Box, Container, Typography, Paper, Button, Stack, Skeleton, Chip, Modal, IconButton, Tooltip } from "@mui/material";
-import { ArrowRight2, Gallery, CloseCircle, ArrowLeft2, ArrowRight, ExportSquare, Crown, ShieldTick, TruckFast, MagicStar, MedalStar, NoteText, MessageQuestion, CallCalling, Monitor } from "iconsax-react";
+import { ArrowRight2, Gallery, CloseCircle, ArrowLeft2, ArrowRight, Crown, ShieldTick, TruckFast, MagicStar, MedalStar, NoteText, MessageQuestion, CallCalling, Monitor } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
@@ -436,39 +436,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                             </Typography>
                         </Box>
 
-                        {/* Right Column: Share Button */}
-                        <Stack direction="row" spacing={1}>
-                            <IconButton
-                                aria-label="แชร์สินค้านี้"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (navigator.share) {
-                                        navigator.share({
-                                            title: product.name,
-                                            text: product.description || product.name,
-                                            url: window.location.href
-                                        });
-                                    } else {
-                                        navigator.clipboard.writeText(window.location.href);
-                                    }
-                                }}
-                                sx={{
-                                    bgcolor: 'var(--border-color)',
-                                    border: '1px solid var(--border-color)',
-                                    color: 'var(--foreground)',
-                                    width: 36,
-                                    height: 36,
-                                    transition: 'all 0.2s',
-                                    '&:hover': {
-                                        bgcolor: 'var(--background)',
-                                        borderColor: 'var(--primary)',
-                                        transform: 'scale(1.05)'
-                                    }
-                                }}
-                            >
-                                <ExportSquare size="16" color="currentColor" />
-                            </IconButton>
-                        </Stack>
+
                     </Box>
                 </Box>
             </Paper>

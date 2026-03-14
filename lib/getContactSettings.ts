@@ -29,7 +29,7 @@ const DEFAULT_CONTACT: ContactSettings = {
 export const getContactSettings = unstable_cache(
     async (): Promise<ContactSettings> => {
         try {
-            const settings = await prisma.siteSettings.findUnique({
+            const settings = await prisma.sitesettings.findUnique({
                 where: { key: "contact" }
             });
 

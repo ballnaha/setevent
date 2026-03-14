@@ -383,30 +383,35 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    '& .MuiBackdrop-root': {
+                        bgcolor: 'rgba(0,0,0,0.98)'
+                    }
                 }}
             >
                 <Box sx={{
                     position: 'relative',
-                    width: { xs: '100vw', md: '95vw' },
-                    maxWidth: 1200,
-                    height: { xs: '100vh', md: '90vh' },
-                    bgcolor: 'transparent',
+                    width: '100vw',
+                    height: '100vh',
+                    bgcolor: 'black',
                     outline: 'none',
+                    display: 'flex',
+                    flexDirection: 'column'
                 }}>
                     {/* Close Button */}
                     <IconButton
                         onClick={closeLightbox}
                         sx={{
                             position: 'absolute',
-                            top: { xs: 48, md: 24 },
-                            right: { xs: 24, md: 24 },
+                            top: { xs: 16, md: 32 },
+                            right: { xs: 16, md: 32 },
                             zIndex: 100,
-                            bgcolor: 'rgba(0,0,0,0.5)',
+                            bgcolor: 'rgba(255,255,255,0.1)',
+                            backdropFilter: 'blur(10px)',
                             color: 'white',
-                            '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
+                            '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
                         }}
                     >
-                        <CloseCircle size="28" color="white" />
+                        <CloseCircle size="32" color="white" />
                     </IconButton>
 
                     {/* Lightbox Swiper */}
@@ -416,10 +421,17 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                         modules={[Navigation, Pagination, Zoom]}
                         initialSlide={lightboxIndex}
                         navigation
-                        pagination={{ clickable: true }}
+                        pagination={{ 
+                            type: 'fraction',
+                            clickable: true 
+                        }}
                         zoom={{ maxRatio: 3 }}
                         loop={filteredItems.length > 1}
-                        style={{ height: '100%', borderRadius: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 16 }}
+                        style={{ 
+                            flex: 1,
+                            width: '100%',
+                            height: '100%',
+                        }}
                     >
                         {filteredItems.map((item, idx) => (
                             <SwiperSlide key={item.id}>
@@ -428,16 +440,19 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     width: '100%',
                                     height: '100%',
                                     bgcolor: '#000',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
                                     overflow: 'hidden'
                                 }}>
 
-                                    <div className="swiper-zoom-container" style={{ width: '100%', height: '100%' }}>
+                                    <div className="swiper-zoom-container" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                         <Image
                                             src={item.image || '/images/placeholder.jpg'}
                                             alt={item.title}
                                             fill
                                             priority={Math.abs(idx - activeLightboxIndex) <= 1}
-                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                                            sizes="100vw"
                                             style={{
                                                 objectFit: 'contain',
                                                 zIndex: 2
@@ -463,9 +478,21 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                                 position: 'absolute'
                                             }}
                                         />
-                                        <Typography sx={{ color: 'white', opacity: 0.3, fontFamily: 'var(--font-prompt)', zIndex: 1 }}>
-                                            Loading...
-                                        </Typography>
+                                        <Box className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" sx={{
+                                            borderTopColor: '#8B5CF6',
+                                            borderBottomColor: 'transparent',
+                                            borderWidth: 4,
+                                            borderStyle: 'solid',
+                                            borderRadius: '50%',
+                                            width: 48,
+                                            height: 48,
+                                            zIndex: 1,
+                                            animation: 'spin 1s linear infinite',
+                                            '@keyframes spin': {
+                                                '0%': { transform: 'rotate(0deg)' },
+                                                '100%': { transform: 'rotate(360deg)' }
+                                            }
+                                        }} />
                                     </Box>
 
                                     {/* Title Overlay - Outside zoom container */}
@@ -474,31 +501,32 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         bottom: 0,
                                         left: 0,
                                         right: 0,
-                                        p: { xs: 4, md: 4 },
-                                        pb: { xs: 8, md: 4 },
+                                        p: { xs: 4, md: 6 },
+                                        pb: { xs: 8, md: 6 },
                                         zIndex: 10,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
-                                        pointerEvents: 'none' // Allow touches to pass through mostly, but maybe we want text selection? Usually for lightbox overlays pointer-events: none is safer for zoom gestures unless it contains buttons.
+                                        background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+                                        pointerEvents: 'none'
                                     }}>
-                                        <Box sx={{ pointerEvents: 'auto' }}>
+                                        <Box sx={{ pointerEvents: 'auto', maxWidth: 800 }}>
                                             <Typography
                                                 sx={{
                                                     fontFamily: 'var(--font-prompt)',
-                                                    fontWeight: 600,
-                                                    fontSize: '1.5rem',
+                                                    fontWeight: 700,
+                                                    fontSize: { xs: '1.5rem', md: '2.5rem' },
                                                     color: 'white',
+                                                    mb: 1
                                                 }}
                                             >
                                                 {item.title}
                                             </Typography>
                                             <Chip
                                                 label={item.category}
-                                                size="small"
                                                 sx={{
-                                                    mt: 2,
                                                     bgcolor: '#8B5CF6',
                                                     color: 'white',
                                                     fontFamily: 'var(--font-prompt)',
+                                                    fontWeight: 600,
+                                                    px: 1
                                                 }}
                                             />
                                         </Box>
@@ -509,6 +537,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     </Swiper>
                 </Box>
             </Modal>
+
         </Box>
     );
 }

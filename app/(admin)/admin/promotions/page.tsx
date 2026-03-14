@@ -21,7 +21,8 @@ import {
     TextField,
     Stack,
     CircularProgress,
-    Avatar
+    Avatar,
+    Autocomplete
 } from "@mui/material";
 import { Add, Edit, Trash, Gallery, CloseCircle } from "iconsax-react";
 import {
@@ -52,6 +53,7 @@ interface Promotion {
     price: string;
     period: string;
     features: string;
+    category?: string;
     status: string;
     order: number;
     createdAt: string;
@@ -156,9 +158,11 @@ export default function PromotionsAdminPage() {
         image: "",
         price: "",
         period: "",
+        category: "",
         status: "active"
     });
     const [features, setFeatures] = useState<Feature[]>([{ label: "", value: "" }]);
+    const uniqueCategories = Array.from(new Set(promotions.map(p => p.category).filter(Boolean))) as string[];
 
     const sensors = useSensors(
         useSensor(PointerSensor),
@@ -213,6 +217,7 @@ export default function PromotionsAdminPage() {
                 image: promo.image,
                 price: promo.price || "",
                 period: promo.period || "",
+                category: promo.category || "",
                 status: promo.status
             });
             try {
@@ -222,7 +227,7 @@ export default function PromotionsAdminPage() {
             }
         } else {
             setEditId(null);
-            setFormData({ title: "", description: "", image: "", price: "", period: "", status: "active" });
+            setFormData({ title: "", description: "", image: "", price: "", period: "", category: "", status: "active" });
             setFeatures([{ label: "", value: "" }]);
         }
         setSelectedFile(null);
@@ -471,6 +476,17 @@ export default function PromotionsAdminPage() {
                                 <TextField label="Title" fullWidth value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
                                 <TextField label="Price (e.g., ฿59,000)" fullWidth value={formData.price} onChange={(e) => setFormData({ ...formData, price: e.target.value })} />
                                 <TextField label="Period (e.g., Jan - Mar 2026)" fullWidth value={formData.period} onChange={(e) => setFormData({ ...formData, period: e.target.value })} />
+                                <Autocomplete
+                                    freeSolo
+                                    options={uniqueCategories}
+                                    value={formData.category}
+                                    onInputChange={(event, newValue) => {
+                                        setFormData({ ...formData, category: newValue });
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField {...params} label="Category (e.g. งานแต่ง, เช่าจอ LED)" />
+                                    )}
+                                />
                                 <TextField select label="Status" fullWidth value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} SelectProps={{ native: true }}>
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>

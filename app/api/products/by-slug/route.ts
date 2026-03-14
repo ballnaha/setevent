@@ -89,7 +89,12 @@ export async function GET(req: Request) {
                 description: currentCategory.description,
                 image: currentCategory.image
             },
-            children: currentCategory.children || [],
+            children: (currentCategory.children || []).map((child: any) => ({
+                ...child,
+                _count: {
+                    products: child._count.products
+                }
+            })),
             products: products.map(p => ({
                 id: p.id,
                 name: p.name,

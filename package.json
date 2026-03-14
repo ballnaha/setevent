@@ -21,6 +21,7 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@line/liff": "^2.27.3",
     "@mui/icons-material": "^7.3.6",
+    "@mui/lab": "^7.0.1-beta.23",
     "@mui/material": "^7.3.6",
     "@mui/material-nextjs": "^7.3.6",
     "@mui/x-date-pickers": "^8.26.0",

@@ -35,7 +35,6 @@ export const metadata: Metadata = {
 };
 
 export default async function ProductsPage() {
-    // Fetch all categories from the database on the server
     const data = await prisma.category.findMany({
         where: { status: 'active' },
         include: {

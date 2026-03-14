@@ -14,6 +14,7 @@ interface Promotion {
     price?: string;
     period?: string;
     features: { label: string; value: string }[];
+    category?: string;
     createdAt: string;
 }
 
@@ -43,237 +44,171 @@ function PromotionCard({ promotion, onClick, priority = false }: { promotion: Pr
     const extraFeaturesCount = Math.max(0, promotion.features.length - 2);
 
     return (
-        <Paper
+        <Box
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={onClick}
             sx={{
                 position: 'relative',
-                borderRadius: 4,
-                overflow: 'hidden',
-                height: { xs: 400, md: 440 },
                 transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 cursor: 'pointer',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                bgcolor: 'var(--background)',
                 '&:hover': {
-                    transform: 'translateY(-8px)',
-                    boxShadow: '0 24px 48px rgba(0,0,0,0.2)',
+                    '& .promo-image': {
+                        transform: 'scale(1.05)',
+                    },
+                    '& .promo-title': {
+                        color: 'var(--primary)',
+                    }
                 }
             }}
         >
-            {/* Background Image */}
+            {/* Image Container */}
             <Box sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                transition: 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
-                transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                position: 'relative',
+                width: '100%',
+                overflow: 'hidden',
+                lineHeight: 0,
+                borderRadius: 0,
+                bgcolor: 'rgba(128,128,128,0.05)',
             }}>
                 <Image
                     src={promotion.image}
                     alt={promotion.title}
-                    fill
+                    width={800}
+                    height={800}
                     priority={priority}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     placeholder="blur"
                     blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
-                    style={{ objectFit: 'cover' }}
+                    className="promo-image"
+                    style={{
+                        width: '100%',
+                        height: 'auto',
+                        transition: 'transform 0.8s cubic-bezier(0.2, 0, 0.2, 1)',
+                    }}
                 />
+
+                {/* Minimal Top Badge */}
+                {promotion.period && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: 12,
+                        left: 12,
+                        zIndex: 3,
+                        bgcolor: 'var(--primary)',
+                        px: 1.5,
+                        py: 0.5,
+                        borderRadius: 1,
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
+                    }}>
+                        <Typography sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                            color: 'white',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px'
+                        }}>
+                            {promotion.period}
+                        </Typography>
+                    </Box>
+                )}
             </Box>
 
-            {/* Top Badge - Period/Special */}
-            {promotion.period && (
-                <Box sx={{
-                    position: 'absolute',
-                    top: 16,
-                    left: 16,
-                    zIndex: 3,
-                    bgcolor: 'rgba(0,0,0,0.7)',
-                    backdropFilter: 'blur(8px)',
-                    px: 1.5,
-                    py: 0.75,
-                    borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 0.5
-                }}>
-                    <Ticket size="14" color="#FFD700" variant="TwoTone" />
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        color: 'white',
-                    }}>
-                        {promotion.period}
-                    </Typography>
-                </Box>
-            )}
-
-            {/* Gradient Overlay */}
-            <Box sx={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                height: '60%',
-                background: 'linear-gradient(to top, rgba(15,30,25,0.98) 0%, rgba(15,30,25,0.9) 40%, rgba(15,30,25,0) 100%)',
-                zIndex: 1
-            }} />
-
-            {/* Content Container */}
-            <Box sx={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                p: 2.5,
-                zIndex: 2,
-            }}>
-                {/* Title as Main Headline */}
-                <Typography sx={{
-                    fontFamily: 'var(--font-prompt)',
-                    fontSize: { xs: '1.5rem', md: '1.75rem' },
-                    fontWeight: 500,
-                    color: 'white',
-                    lineHeight: 1.2,
-                    mb: 1.5,
-                }}>
-                    {promotion.title}
-                </Typography>
-
-                {/* Price & Description with Features Row */}
-                <Box sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    gap: 2,
-                    mb: 2
-                }}>
-                    {/* Left: Price & Description */}
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
+            {/* Content Section - High End Style */}
+            <Box sx={{ py: 2.5, px: 0.5 }}>
+                <Stack spacing={1.5}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
+                        <Typography
+                            className="promo-title"
+                            sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontSize: '1.25rem',
+                                fontWeight: 600,
+                                color: 'var(--foreground)',
+                                lineHeight: 1.3,
+                                transition: 'color 0.3s ease',
+                                flex: 1
+                            }}
+                        >
+                            {promotion.title}
+                        </Typography>
                         {promotion.price && (
                             <Typography sx={{
                                 fontFamily: 'var(--font-prompt)',
-                                fontSize: '0.95rem',
-                                color: 'white',
-                                fontWeight: 600,
-                                mb: 0.5
+                                fontSize: '1.1rem',
+                                color: 'var(--primary)',
+                                fontWeight: 700,
+                                whiteSpace: 'nowrap'
                             }}>
-                                ฿{formatPrice(promotion.price)}
+                                {formatPrice(promotion.price)}
                             </Typography>
                         )}
-                        <Typography sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            fontSize: '0.8rem',
-                            color: 'rgba(255,255,255,0.6)',
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                        }}>
-                            {promotion.description}
-                        </Typography>
                     </Box>
 
-                    {/* Right: Features with Icons */}
-                    <Box sx={{
-                        display: 'flex',
-                        gap: 1,
-                        flexShrink: 0
-                    }}>
-                        {promotion.features.slice(0, 2).map((feature, idx) => (
-                            <Box key={idx} sx={{
-                                textAlign: 'center',
-                                bgcolor: 'rgba(255,255,255,0.08)',
-                                px: 1.5,
-                                py: 1,
-                                borderRadius: 2,
-                                minWidth: 55
-                            }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-                                    <Gallery size="14" color="rgba(255,255,255,0.7)" />
-                                    <Typography sx={{
-                                        fontFamily: 'var(--font-prompt)',
-                                        fontSize: '0.65rem',
-                                        color: 'rgba(255,255,255,0.6)',
-                                        lineHeight: 1.2
-                                    }}>
-                                        {feature.value}
-                                    </Typography>
-                                </Box>
-                                <Typography sx={{
-                                    fontFamily: 'var(--font-prompt)',
-                                    fontSize: '0.95rem',
-                                    color: 'white',
-                                    fontWeight: 600,
-                                    mt: 0.25
-                                }}>
-                                    {feature.label}
-                                </Typography>
-                            </Box>
-                        ))}
-                        {extraFeaturesCount > 0 && (
-                            <Box sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                bgcolor: 'rgba(255,255,255,0.08)',
-                                borderRadius: 2,
-                                width: 40,
-                                height: 'auto',
-                            }}>
-                                <Typography sx={{
-                                    fontFamily: 'var(--font-prompt)',
-                                    fontSize: '0.9rem',
-                                    color: 'white',
-                                    fontWeight: 600
-                                }}>
-                                    +{extraFeaturesCount}
-                                </Typography>
-                            </Box>
-                        )}
-                    </Box>
-                </Box>
-
-                {/* Footer - "By" with Date + Extra Features Count */}
-                <Box sx={{
-                    borderTop: '1px solid rgba(255,255,255,0.1)',
-                    pt: 1.5,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                }}>
                     <Typography sx={{
                         fontFamily: 'var(--font-prompt)',
-                        fontSize: '0.75rem',
-                        color: 'rgba(255,255,255,0.5)',
+                        fontSize: '0.9rem',
+                        color: 'var(--foreground)',
+                        opacity: 0.6,
+                        lineHeight: 1.6,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
                     }}>
-                        By • <Box component="span" sx={{ color: 'var(--primary)', fontWeight: 500 }}>SET EVENT</Box>  {promotion.createdAt}
+                        {promotion.description}
                     </Typography>
 
-                    {/* Show extra features count if more than 2 */}
-                    {extraFeaturesCount > 0 && (
-                        <Typography sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            fontSize: '0.7rem',
-                            color: 'var(--primary)',
-                            fontWeight: 500,
-                        }}>
-                            +{extraFeaturesCount} เพิ่มเติม
-                        </Typography>
-                    )}
-                </Box>
+                    {/* Features Chips */}
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {promotion.features.slice(0, 3).map((feature, idx) => (
+                            <Chip
+                                key={idx}
+                                label={`${feature.label}: ${feature.value}`}
+                                size="small"
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.7rem',
+                                    bgcolor: 'rgba(128,128,128,0.08)',
+                                    color: 'var(--foreground)',
+                                    borderRadius: 1,
+                                    '& .MuiChip-label': { px: 1 }
+                                }}
+                            />
+                        ))}
+                        {extraFeaturesCount > 0 && (
+                            <Typography sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontSize: '0.7rem',
+                                color: 'var(--primary)',
+                                fontWeight: 500,
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}>
+                                +{extraFeaturesCount} features
+                            </Typography>
+                        )}
+                    </Box>
+                </Stack>
             </Box>
-        </Paper>
+        </Box>
     );
 }
 
 export default function PromotionsContent({ initialPromotions }: PromotionsContentProps) {
     const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null);
     const [loading, setLoading] = useState(initialPromotions.length === 0);
-    const promotions = initialPromotions;
+    const [activeTab, setActiveTab] = useState('ทั้งหมด');
+
+    // Get unique categories and filter out empty ones
+    const categories = ['ทั้งหมด', ...Array.from(new Set(initialPromotions.map(p => p.category).filter(Boolean)))];
+
+    // Filter promotions by category
+    const filteredPromotions = activeTab === 'ทั้งหมด'
+        ? initialPromotions
+        : initialPromotions.filter(p => p.category === activeTab);
 
     React.useEffect(() => {
         // Since we are using SSR, if we have initial data, we stop loading
@@ -308,27 +243,24 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                 {/* Grid Skeleton */}
                 <Container maxWidth="lg" sx={{ mt: 8 }}>
                     <Box sx={{
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-                        gap: 4
+                        columnCount: { xs: 1, sm: 2, md: 3 },
+                        columnGap: 2,
+                        '& > div': {
+                            breakInside: 'avoid',
+                            mb: 2
+                        }
                     }}>
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Box key={i} sx={{
-                                borderRadius: 4,
-                                overflow: 'hidden',
-                                height: { xs: 400, md: 440 },
-                                position: 'relative',
-                                bgcolor: 'var(--border-color)',
-                                opacity: 0.3
-                            }}>
-                                <Skeleton variant="rectangular" height="100%" animation="wave" />
-                                <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, p: 3, zIndex: 1 }}>
-                                    <Skeleton variant="text" width="80%" height={40} sx={{ mb: 1, bgcolor: 'rgba(255,255,255,0.2)' }} />
-                                    <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-                                        <Skeleton variant="text" width="30%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-                                        <Skeleton variant="text" width="40%" height={20} sx={{ bgcolor: 'rgba(255,255,255,0.1)' }} />
-                                    </Stack>
-                                    <Skeleton variant="text" width="100%" height={60} sx={{ bgcolor: 'rgba(255,255,255,0.05)' }} />
+                            <Box key={i} sx={{ mb: 4 }}>
+                                <Skeleton
+                                    variant="rounded"
+                                    width="100%"
+                                    height={i % 2 === 0 ? 300 : 450}
+                                    sx={{ borderRadius: 2, bgcolor: 'var(--border-color)', opacity: 0.3 }}
+                                />
+                                <Box sx={{ py: 2 }}>
+                                    <Skeleton variant="text" width="80%" height={32} sx={{ mb: 1, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
+                                    <Skeleton variant="text" width="100%" height={20} sx={{ bgcolor: 'var(--border-color)', opacity: 0.3 }} />
                                 </Box>
                             </Box>
                         ))}
@@ -419,9 +351,49 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                 </Container>
             </Box>
 
+            {/* Category Tabs */}
+            {categories.length > 1 && (
+                <Container maxWidth="lg">
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        gap: 1.5,
+                        mt: 4,
+                        mb: 2,
+                        flexWrap: 'wrap'
+                    }}>
+                        {categories.map((cat) => (
+                            <Box
+                                key={cat as string}
+                                onClick={() => setActiveTab(cat as string)}
+                                sx={{
+                                    px: 3,
+                                    py: 1,
+                                    borderRadius: 10,
+                                    cursor: 'pointer',
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.9rem',
+                                    fontWeight: 500,
+                                    transition: 'all 0.3s ease',
+                                    bgcolor: activeTab === cat ? 'var(--primary)' : 'rgba(128,128,128,0.05)',
+                                    color: activeTab === cat ? 'white' : 'var(--foreground)',
+                                    border: '1px solid',
+                                    borderColor: activeTab === cat ? 'var(--primary)' : 'rgba(128,128,128,0.1)',
+                                    '&:hover': {
+                                        bgcolor: activeTab === cat ? 'var(--primary)' : 'rgba(128,128,128,0.1)',
+                                    }
+                                }}
+                            >
+                                {cat}
+                            </Box>
+                        ))}
+                    </Box>
+                </Container>
+            )}
+
             {/* Content List */}
             <Container maxWidth="lg" sx={{ mt: 8 }}>
-                {promotions.length === 0 ? (
+                {filteredPromotions.length === 0 ? (
                     <Box sx={{
                         textAlign: 'center',
                         py: 15,
@@ -430,12 +402,12 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                         alignItems: 'center',
                         justifyContent: 'center',
                         bgcolor: 'rgba(255,255,255,0.02)',
-                        borderRadius: 4,
+                        borderRadius: 1,
                         border: '1px dashed rgba(128,128,128,0.2)'
                     }}>
                         <Ticket size="64" color="var(--primary)" variant="Bulk" style={{ opacity: 0.3, marginBottom: 20 }} />
                         <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontWeight: 600, mb: 1 }}>
-                            ยังไม่มีโปรโมชั่นในขณะนี้
+                            {activeTab === 'ทั้งหมด' ? 'ยังไม่มีโปรโมชั่นในขณะนี้' : `ยังไม่มีโปรโมชั่นในกลุ่ม ${activeTab}`}
                         </Typography>
                         <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6 }}>
                             เรากำลังจัดเตรียมข้อเสนอสุดพิเศษสำหรับคุณ อดใจรอนิดนะคะ
@@ -443,17 +415,21 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                     </Box>
                 ) : (
                     <Box sx={{
-                        display: 'grid',
-                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
-                        gap: 4
+                        columnCount: { xs: 1, sm: 2, md: 3 },
+                        columnGap: 2,
+                        '& > div': {
+                            breakInside: 'avoid',
+                            mb: 2
+                        }
                     }}>
-                        {promotions.map((promo, index) => (
-                            <PromotionCard
-                                key={promo.id}
-                                promotion={promo}
-                                onClick={() => setSelectedPromotion(promo)}
-                                priority={index < 3} // First 3 cards get priority loading for LCP
-                            />
+                        {filteredPromotions.map((promo, index) => (
+                            <Box key={promo.id}>
+                                <PromotionCard
+                                    promotion={promo}
+                                    onClick={() => setSelectedPromotion(promo)}
+                                    priority={index < 3} // First 3 cards get priority loading for LCP
+                                />
+                            </Box>
                         ))}
                     </Box>
                 )}
@@ -478,16 +454,13 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                     sx={{
                         position: 'relative',
                         width: '100%',
-                        maxWidth: { xs: '100%', md: 1000 },
-                        height: { xs: '100vh', md: 'auto' },
-                        maxHeight: { xs: '100vh', md: '90vh' },
+                        height: '100vh',
                         bgcolor: '#1a1a1a',
-                        borderRadius: { xs: 0, md: 4 },
+                        borderRadius: 0,
                         overflow: 'hidden',
                         display: 'flex',
                         flexDirection: 'column',
                         outline: 'none',
-                        boxShadow: '0 24px 48px rgba(0,0,0,0.5)'
                     }}
                 >
                     {/* Close Button */}
@@ -575,7 +548,7 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                                                 color: 'var(--primary)',
                                                 fontWeight: 600
                                             }}>
-                                                {selectedPromotion.price}
+                                                {formatPrice(selectedPromotion.price)}
                                             </Typography>
                                         )}
                                     </Box>
@@ -597,7 +570,7 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                                         gap: 2,
                                         bgcolor: 'rgba(255,255,255,0.03)',
                                         p: 3,
-                                        borderRadius: 3,
+                                        borderRadius: 1,
                                         border: '1px solid rgba(255,255,255,0.05)'
                                     }}>
                                         {selectedPromotion.features.map((feature, idx) => (
@@ -713,7 +686,7 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                                                 color: 'var(--primary)',
                                                 fontWeight: 600
                                             }}>
-                                                {selectedPromotion.price}
+                                                {formatPrice(selectedPromotion.price)}
                                             </Typography>
                                         )}
                                     </Box>
@@ -735,7 +708,7 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                                         gap: 1.5,
                                         bgcolor: 'rgba(255,255,255,0.03)',
                                         p: 2,
-                                        borderRadius: 2,
+                                        borderRadius: 1,
                                         border: '1px solid rgba(255,255,255,0.05)'
                                     }}>
                                         {selectedPromotion.features.map((feature, idx) => (

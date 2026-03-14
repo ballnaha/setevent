@@ -19,7 +19,7 @@ const DEFAULT_CONTACT = {
 // GET - Get contact settings (public)
 export async function GET() {
     try {
-        const settings = await prisma.siteSettings.findUnique({
+        const settings = await prisma.sitesettings.findUnique({
             where: { key: "contact" }
         });
 
