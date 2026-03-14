@@ -30,7 +30,7 @@ export async function GET(
             where: { id },
             include: {
                 _count: {
-                    select: { events: true },
+                    select: { event: true },
                 },
             },
         });
@@ -99,7 +99,7 @@ export async function PATCH(
             data: updateData,
             include: {
                 _count: {
-                    select: { events: true },
+                    select: { event: true },
                 },
             },
         });

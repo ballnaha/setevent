@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
         const customer = await prisma.customer.findUnique({
             where: { lineUid },
             include: {
-                events: {
+                event: {
                     // where: {
                     //    status: {
                     //        notIn: ['completed', 'cancelled']
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ events: [] });
         }
 
-        const events = customer.events.map((evt: any) => ({
+        const events = customer.event.map((evt: any) => ({
             ...evt,
             isReviewed: !!evt.review,
             reviewRating: evt.review?.rating,

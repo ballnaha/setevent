@@ -157,7 +157,7 @@ async function seedMockData() {
                 },
             ];
 
-            await prisma.eventTimeline.createMany({
+            await prisma.eventtimeline.createMany({
                 data: timelines.map(t => ({
                     eventId: event.id,
                     title: t.title,

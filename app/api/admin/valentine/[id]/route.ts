@@ -10,7 +10,7 @@ export async function GET(
     try {
         const { id } = await params;
 
-        const card = await prisma.valentineCard.findUnique({
+        const card = await prisma.valentinecard.findUnique({
             where: { id },
             include: {
                 memories: {
@@ -45,7 +45,7 @@ export async function PUT(
         } = body;
 
         // Update main card data
-        const card = await prisma.valentineCard.update({
+        const card = await prisma.valentinecard.update({
             where: { id },
             data: {
                 slug,
@@ -96,12 +96,12 @@ export async function PUT(
         if (memories && Array.isArray(memories)) {
 
             // Simple approach: delete all and recreate
-            await prisma.valentineMemory.deleteMany({
+            await prisma.valentinememory.deleteMany({
                 where: { cardId: id }
             });
 
             if (memories.length > 0) {
-                await prisma.valentineMemory.createMany({
+                await prisma.valentinememory.createMany({
                     data: memories.map((m: any, index: number) => ({
                         cardId: id,
                         type: m.type || 'image',
@@ -135,7 +135,7 @@ export async function DELETE(
     try {
         const { id } = await params;
 
-        const card = await prisma.valentineCard.findUnique({
+        const card = await prisma.valentinecard.findUnique({
             where: { id },
             include: { memories: true }
         });
@@ -172,7 +172,7 @@ export async function DELETE(
             }
         }
 
-        await prisma.valentineCard.delete({
+        await prisma.valentinecard.delete({
             where: { id }
         });
 

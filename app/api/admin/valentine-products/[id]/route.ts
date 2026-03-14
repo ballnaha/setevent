@@ -9,7 +9,7 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const product = await prisma.valentineProduct.findUnique({
+        const product = await prisma.valentineproduct.findUnique({
             where: { id },
             include: {
                 images: {
@@ -55,13 +55,13 @@ export async function PUT(
         const result = await prisma.$transaction(async (tx) => {
             // 1. Delete existing images if new images are provided
             if (images && Array.isArray(images)) {
-                await tx.valentineProductImage.deleteMany({
+                await tx.valentineproductimage.deleteMany({
                     where: { productId: id }
                 });
             }
 
             // 2. Update product
-            return await tx.valentineProduct.update({
+            return await tx.valentineproduct.update({
                 where: { id },
                 data: {
                     name,
@@ -103,7 +103,7 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        await prisma.valentineProduct.delete({
+        await prisma.valentineproduct.delete({
             where: { id },
         });
 

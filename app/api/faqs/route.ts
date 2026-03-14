@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // GET - Fetch active FAQs (public)
 export async function GET() {
     try {
-        const faqs = await prisma.fAQ.findMany({
+        const faqs = await prisma.faq.findMany({
             where: { status: 'active' },
             orderBy: { order: 'asc' },
             select: {

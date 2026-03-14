@@ -7,7 +7,7 @@ async function main() {
     const event = await prisma.event.findUnique({
         where: { inviteCode },
         include: {
-            chatLogs: true,
+            chatlog: true,
             customer: true
         }
     });
@@ -19,8 +19,8 @@ async function main() {
 
     console.log(`Event found: ${event.eventName} (${event.id})`);
     console.log(`Customer: ${event.customer.displayName} (${event.customer.lineUid})`);
-    console.log(`Chat Logs count: ${event.chatLogs.length}`);
-    console.log(JSON.stringify(event.chatLogs, null, 2));
+    console.log(`Chat Logs count: ${event.chatlog.length}`);
+    console.log(JSON.stringify(event.chatlog, null, 2));
 }
 
 main()

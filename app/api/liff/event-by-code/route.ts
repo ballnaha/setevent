@@ -35,12 +35,12 @@ export async function GET(request: NextRequest) {
                         displayName: true,
                     }
                 },
-                sales: {
+                user: {
                     select: {
                         name: true
                     }
                 },
-                timelines: {
+                eventtimeline: {
                     orderBy: { order: 'asc' },
                     select: {
                         id: true,
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
                         createdAt: true
                     }
                 },
-                chatLogs: {
+                chatlog: {
                     orderBy: { createdAt: 'desc' },
                     select: {
                         id: true,
@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
                         createdAt: true
                     }
                 },
-                bookings: {
+                booking: {
                     select: {
                         id: true,
                         serviceName: true,
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
         // Fallback names
         const customerFallback = event.customer.displayName || 'Customer';
-        const staffFallback = event.sales?.name || 'Admin';
+        const staffFallback = event.user?.name || 'Admin';
 
         // Functional helper for mapping logs
         const mapChatLogs = (logs: any[], customerName: string, staffName: string) => {
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
         };
 
         // If no timelines exist, create default ones
-        if (event.timelines.length === 0) {
+        if (event.eventtimeline.length === 0) {
             const defaultTimelines = [
                 { title: 'ยืนยันรายละเอียดงาน', description: 'ทีมงานติดต่อยืนยันรายละเอียด', order: 1 },
                 { title: 'ใบเสนอราคา', description: 'จัดทำและส่งใบเสนอราคา', order: 2 },
@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
                 { title: 'เสร็จสิ้น', description: 'งานเสร็จสมบูรณ์', order: 6 },
             ];
 
-            await prisma.eventTimeline.createMany({
+            await prisma.eventtimeline.createMany({
                 data: defaultTimelines.map(t => ({
                     eventId: event.id,
                     ...t,
@@ -132,10 +132,10 @@ export async function GET(request: NextRequest) {
             const updatedEvent = await (prisma.event as any).findUnique({
                 where: { id: event.id },
                 include: {
-                    timelines: { orderBy: { createdAt: 'desc' } },
-                    chatLogs: { orderBy: { createdAt: 'desc' } },
-                    bookings: true,
-                    sales: {
+                    eventtimeline: { orderBy: { createdAt: 'desc' } },
+                    chatlog: { orderBy: { createdAt: 'desc' } },
+                    booking: true,
+                    user: {
                         select: {
                             name: true
                         }
@@ -151,13 +151,13 @@ export async function GET(request: NextRequest) {
             if (!updatedEvent) return NextResponse.json({ error: 'Event not found after update' }, { status: 404 });
 
             const customerName = updatedEvent.customer.displayName || 'Customer';
-            const staffName = updatedEvent.sales?.name || 'Admin';
+            const staffName = updatedEvent.user?.name || 'Admin';
 
             return NextResponse.json({
                 success: true,
                 event: {
                     ...updatedEvent,
-                    chatLogs: mapChatLogs(updatedEvent.chatLogs, customerName, staffName),
+                    chatLogs: mapChatLogs(updatedEvent.chatlog, customerName, staffName),
                     customerDisplayName: updatedEvent.customer.displayName,
                 },
             });
@@ -174,9 +174,9 @@ export async function GET(request: NextRequest) {
                 description: event.description,
                 status: event.status,
                 totalPrice: event.totalPrice,
-                timelines: event.timelines,
-                chatLogs: mapChatLogs(event.chatLogs, customerFallback, staffFallback),
-                bookings: event.bookings,
+                timelines: event.eventtimeline,
+                chatLogs: mapChatLogs(event.chatlog, customerFallback, staffFallback),
+                bookings: event.booking,
                 customerDisplayName: event.customer.displayName,
             },
         });

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         let customer = await prisma.customer.findUnique({
             where: { lineUid },
             include: {
-                events: {
+                event: {
                     where: { status: { not: 'cancelled' } },
                     orderBy: { eventDate: 'desc' },
                     select: {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
                     status: 'new',
                 },
                 include: {
-                    events: true,
+                    event: true,
                 },
             });
 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
         });
 
         // ⏳ Pending
-        if (customer.events.length === 0) {
+        if (customer.event.length === 0) {
             return NextResponse.json({
                 status: 'pending',
                 displayName: customer.displayName,
@@ -79,7 +79,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             status: 'active',
             displayName: customer.displayName,
-            events: customer.events,
+            events: customer.event,
         });
     } catch (error) {
         console.error('Check status error:', error);

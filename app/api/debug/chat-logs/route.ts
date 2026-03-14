@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    const chatLogs = await prisma.chatLog.findMany({
+    const chatLogs = await prisma.chatlog.findMany({
         where: { eventId },
         orderBy: { createdAt: 'desc' },
         take: 20,

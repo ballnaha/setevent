@@ -10,7 +10,7 @@ async function main() {
         where: { inviteCode },
         include: {
             customer: true,
-            chatLogs: {
+            chatlog: {
                 orderBy: { createdAt: 'desc' }
             }
         }
@@ -30,9 +30,9 @@ async function main() {
     output.push(`Customer LINE UID: ${event.customer.lineUid}`);
     output.push('='.repeat(60));
 
-    output.push(`\nChat Logs linked to this event: ${event.chatLogs.length}`);
+    output.push(`\nChat Logs linked to this event: ${event.chatlog.length}`);
 
-    event.chatLogs.forEach((log, i) => {
+    event.chatlog.forEach((log, i) => {
         output.push(`\n--- Chat Log ${i + 1} ---`);
         output.push(`ID: ${log.id}`);
         output.push(`Direction: ${log.direction}`);
@@ -43,7 +43,7 @@ async function main() {
     });
 
     // Also check ALL chat logs for this customer
-    const allCustomerChats = await prisma.chatLog.findMany({
+    const allCustomerChats = await prisma.chatlog.findMany({
         where: { customerId: event.customer.id },
         orderBy: { createdAt: 'desc' }
     });

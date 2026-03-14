@@ -14,7 +14,7 @@ export async function PUT(req: NextRequest) {
         }
 
         const updates = orderedIds.map((id, index) =>
-            prisma.fAQ.update({
+            prisma.faq.update({
                 where: { id },
                 data: { order: index }
             })

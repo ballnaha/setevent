@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 // GET - List all products for admin
 export async function GET() {
     try {
-        const products = await prisma.valentineProduct.findMany({
+        const products = await prisma.valentineproduct.findMany({
             include: {
                 images: {
                     orderBy: { order: 'asc' }
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Name and price are required" }, { status: 400 });
         }
 
-        const product = await prisma.valentineProduct.create({
+        const product = await prisma.valentineproduct.create({
             data: {
                 name,
                 category: category || "General",

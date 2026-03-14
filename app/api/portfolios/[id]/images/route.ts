@@ -9,7 +9,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const images = await prisma.portfolioImage.findMany({
+    const images = await prisma.portfolioimage.findMany({
       where: { portfolioId: id },
       orderBy: { order: "asc" },
       select: {

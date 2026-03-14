@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export async function GET() {
     try {
-        const products = await prisma.valentineProduct.findMany({
+        const products = await prisma.valentineproduct.findMany({
             where: {
                 status: "active"
             },

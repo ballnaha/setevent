@@ -10,7 +10,7 @@ export async function GET(
 ) {
     try {
         const { id } = await params;
-        const faq = await prisma.fAQ.findUnique({
+        const faq = await prisma.faq.findUnique({
             where: { id }
         });
 
@@ -35,7 +35,7 @@ export async function PUT(
         const body = await request.json();
         const { question, answer, category, status } = body;
 
-        const faq = await prisma.fAQ.update({
+        const faq = await prisma.faq.update({
             where: { id },
             data: {
                 question,
@@ -59,7 +59,7 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        await prisma.fAQ.delete({
+        await prisma.faq.delete({
             where: { id }
         });
 

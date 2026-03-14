@@ -32,7 +32,7 @@ export async function GET() {
             where: whereClause,
             include: {
                 _count: {
-                    select: { events: true },
+                    select: { event: true },
                 },
             },
             orderBy: { createdAt: 'desc' },

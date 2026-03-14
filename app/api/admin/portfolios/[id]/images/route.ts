@@ -13,7 +13,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const images = await prisma.portfolioImage.findMany({
+    const images = await prisma.portfolioimage.findMany({
       where: { portfolioId: id },
       orderBy: { order: "asc" }
     });
@@ -39,14 +39,14 @@ export async function POST(
       return NextResponse.json({ error: "Image url is required" }, { status: 400 });
     }
 
-    const maxOrder = await prisma.portfolioImage.aggregate({
+    const maxOrder = await prisma.portfolioimage.aggregate({
       where: { portfolioId: id },
       _max: { order: true }
     });
 
     const nextOrder = (maxOrder._max.order ?? -1) + 1;
 
-    const image = await prisma.portfolioImage.create({
+    const image = await prisma.portfolioimage.create({
       data: {
         portfolioId: id,
         url,
@@ -75,7 +75,7 @@ export async function DELETE(
       return NextResponse.json({ error: "imageId is required" }, { status: 400 });
     }
 
-    const image = await prisma.portfolioImage.findUnique({ where: { id: imageId } });
+    const image = await prisma.portfolioimage.findUnique({ where: { id: imageId } });
 
     if (!image || image.portfolioId !== id) {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
@@ -94,17 +94,17 @@ export async function DELETE(
       }
     }
 
-    await prisma.portfolioImage.delete({ where: { id: imageId } });
+    await prisma.portfolioimage.delete({ where: { id: imageId } });
 
     // re-normalize orders after deletion
-    const remaining = await prisma.portfolioImage.findMany({
+    const remaining = await prisma.portfolioimage.findMany({
       where: { portfolioId: id },
       orderBy: { order: "asc" }
     });
 
     await Promise.all(
       remaining.map((img: { id: string }, index: number) =>
-        prisma.portfolioImage.update({
+        prisma.portfolioimage.update({
           where: { id: img.id },
           data: { order: index }
         })
@@ -134,7 +134,7 @@ export async function PATCH(
 
     await Promise.all(
       items.map((item: { id: string; order: number }) =>
-        prisma.portfolioImage.update({
+        prisma.portfolioimage.update({
           where: { id: item.id },
           data: { order: item.order }
         })

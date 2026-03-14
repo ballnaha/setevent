@@ -6,7 +6,7 @@ async function main() {
     console.log('🔗 Linking orphan chat logs to events...\n');
 
     // ดึง chat logs ที่ยังไม่ได้ link กับ event
-    const orphanLogs = await prisma.chatLog.findMany({
+    const orphanLogs = await prisma.chatlog.findMany({
         where: { eventId: null },
         include: { customer: true },
         orderBy: { createdAt: 'asc' }
@@ -27,7 +27,7 @@ async function main() {
         });
 
         if (relatedEvent) {
-            await prisma.chatLog.update({
+            await prisma.chatlog.update({
                 where: { id: log.id },
                 data: { eventId: relatedEvent.id }
             });

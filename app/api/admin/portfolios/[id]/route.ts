@@ -144,7 +144,7 @@ export async function DELETE(
                 console.error("Album images file deletion logic error:", err);
             }
 
-            await prisma.portfolioImage.deleteMany({
+            await prisma.portfolioimage.deleteMany({
                 where: { portfolioId: id }
             });
         }

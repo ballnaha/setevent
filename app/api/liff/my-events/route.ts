@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
         const customer = await prisma.customer.findUnique({
             where: { lineUid },
             include: {
-                events: {
+                event: {
                     where: {
                         // Show all events except cancelled
                         status: {
@@ -32,10 +32,10 @@ export async function GET(request: NextRequest) {
                         venue: true,
                         status: true,
                         _count: {
-                            select: { chatLogs: true }
+                            select: { chatlog: true }
                         },
                         // Fetch recent chat logs to find an image sent to customer
-                        chatLogs: {
+                        chatlog: {
                             where: {
                                 direction: 'outbound'
                             },
@@ -69,11 +69,11 @@ export async function GET(request: NextRequest) {
         // ...
 
         // Map events to include task count and find latest image
-        const eventsWithDetails = customer.events.map((evt: any) => {
+        const eventsWithDetails = customer.event.map((evt: any) => {
             let latestImageUrl = null;
 
             // Find first image in chat logs
-            for (const log of evt.chatLogs) {
+            for (const log of evt.chatlog) {
                 try {
                     // Check if it's a status message with images
                     if (log.message.trim().startsWith('{')) {
@@ -96,7 +96,7 @@ export async function GET(request: NextRequest) {
                 eventDate: evt.eventDate,
                 venue: evt.venue,
                 status: evt.status,
-                tasksCount: evt._count.chatLogs,
+                tasksCount: evt._count.chatlog,
                 // Use latest image found, or fallback to a default event placeholder (not customer pic)
                 customerPictureUrl: latestImageUrl,
                 isReviewed: !!evt.review

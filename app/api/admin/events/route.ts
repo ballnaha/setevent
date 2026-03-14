@@ -48,7 +48,7 @@ export async function GET() {
                         companyName: true,
                     },
                 },
-                sales: {
+                user: {
                     select: {
                         id: true,
                         name: true,

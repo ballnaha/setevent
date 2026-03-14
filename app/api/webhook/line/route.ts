@@ -139,8 +139,9 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
 
     // บันทึก Chat Log พร้อม link กับ Event (ถ้ามี)
     if (message.type === 'text') {
-        await prisma.chatLog.create({
+        await prisma.chatlog.create({
             data: {
+                id: crypto.randomUUID(),
                 customerId: customer.id,
                 eventId: eventIdToLink,
                 message: message.text,
@@ -149,8 +150,9 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
             },
         });
     } else if (message.type === 'image') {
-        await prisma.chatLog.create({
+        await prisma.chatlog.create({
             data: {
+                id: crypto.randomUUID(),
                 customerId: customer.id,
                 eventId: eventIdToLink,
                 message: `[รูปภาพ: ${message.id}]`,
@@ -159,8 +161,9 @@ async function handleMessage(lineUid: string, message: any, timestamp: number) {
             },
         });
     } else if (message.type === 'sticker') {
-        await prisma.chatLog.create({
+        await prisma.chatlog.create({
             data: {
+                id: crypto.randomUUID(),
                 customerId: customer.id,
                 eventId: eventIdToLink,
                 message: `[สติกเกอร์: ${message.packageId}/${message.stickerId}]`,

@@ -229,8 +229,9 @@ export async function POST(request: NextRequest) {
         }
 
         // บันทึก log
-        await prisma.chatLog.create({
+        await prisma.chatlog.create({
             data: {
+                id: crypto.randomUUID(),
                 customerId: customerId || 'unknown',
                 message: JSON.stringify({ type, ...data }),
                 direction: 'outbound',

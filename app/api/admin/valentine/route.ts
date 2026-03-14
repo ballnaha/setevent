@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 // GET - List all valentine cards for admin
 export async function GET() {
     try {
-        const cards = await prisma.valentineCard.findMany({
+        const cards = await prisma.valentinecard.findMany({
             include: {
                 _count: {
                     select: { memories: true }
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Slug and title are required" }, { status: 400 });
         }
 
-        const card = await prisma.valentineCard.create({
+        const card = await prisma.valentinecard.create({
             data: {
                 slug,
                 jobName: jobName || null,

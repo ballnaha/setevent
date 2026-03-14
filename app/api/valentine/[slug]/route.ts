@@ -9,7 +9,7 @@ export async function GET(
         const { slug } = await params;
         const now = new Date();
 
-        const valentine = await prisma.valentineCard.findFirst({
+        const valentine = await prisma.valentinecard.findFirst({
             where: {
                 slug: slug,
                 status: 'active',

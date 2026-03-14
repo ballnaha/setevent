@@ -57,7 +57,7 @@ interface Customer {
     status: string;
     createdAt: string;
     _count: {
-        events: number;
+        event: number;
     };
 }
 
@@ -455,7 +455,7 @@ export default function CustomersPage() {
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                     <Calendar size={16} color="gray" />
                                                     <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
-                                                        {customer._count.events} งาน
+                                                        {customer._count.event} งาน
                                                     </Typography>
                                                 </Box>
                                             </TableCell>
@@ -565,7 +565,7 @@ export default function CustomersPage() {
                                             <Box sx={{ bgcolor: '#f9f9f9', p: 1.5, borderRadius: 2 }}>
                                                 <Typography sx={{ fontSize: '0.75rem', color: '#999', mb: 0.5 }}>งานทั้งหมด</Typography>
                                                 <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: '#1a1a1a' }}>
-                                                    {customer._count.events} งาน
+                                                    {customer._count.event} งาน
                                                 </Typography>
                                             </Box>
                                         </Box>

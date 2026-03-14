@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 // GET - Fetch all FAQs (admin)
 export async function GET() {
     try {
-        const faqs = await prisma.fAQ.findMany({
+        const faqs = await prisma.faq.findMany({
             orderBy: { order: 'asc' }
         });
         return NextResponse.json(faqs);
@@ -23,11 +23,11 @@ export async function POST(req: NextRequest) {
         const { question, answer, category, status } = body;
 
         // Get max order
-        const maxOrder = await prisma.fAQ.aggregate({
+        const maxOrder = await prisma.faq.aggregate({
             _max: { order: true }
         });
 
-        const faq = await prisma.fAQ.create({
+        const faq = await prisma.faq.create({
             data: {
                 question,
                 answer,

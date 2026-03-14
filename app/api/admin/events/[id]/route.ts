@@ -47,7 +47,7 @@ export async function GET(
         }
 
         // Fetch chat logs for this event only
-        const chatLogs = await prisma.chatLog.findMany({
+        const chatLogs = await prisma.chatlog.findMany({
             where: {
                 eventId: id
             },
