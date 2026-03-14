@@ -34,5 +34,30 @@ export default async function DesignsPage() {
         image: d.image || '/images/placeholder.jpg'
     }));
 
-    return <DesignsContent initialData={initialData} />;
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'ImageGallery',
+        name: 'New Designs | SET EVENT',
+        description: 'ผลงานการออกแบบและจัดอีเวนต์ที่สวยงาม สร้างสรรค์โดยทีมงาน SET EVENT',
+        url: 'https://seteventthailand.com/designs',
+        image: initialData.map(d => ({
+            '@type': 'ImageObject',
+            name: d.title,
+            contentUrl: `https://seteventthailand.com${d.image}`,
+            itemLocation: {
+                '@type': 'Place',
+                name: d.category
+            }
+        }))
+    };
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
+            <DesignsContent initialData={initialData} />
+        </>
+    );
 }

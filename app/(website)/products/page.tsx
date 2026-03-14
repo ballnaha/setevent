@@ -58,5 +58,29 @@ export default async function ProductsPage() {
         }))
     }));
 
-    return <ProductsContent initialData={initialData} />;
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: rootCats.map((cat: any, index: number) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+                '@type': 'CollectionPage',
+                name: cat.name,
+                description: cat.description || `หมวดหมู่สิ้นค้า ${cat.name}`,
+                image: cat.image ? `https://seteventthailand.com${cat.image}` : undefined,
+                url: `https://seteventthailand.com/products/${cat.slug}`
+            }
+        }))
+    };
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
+            <ProductsContent initialData={initialData} />
+        </>
+    );
 }

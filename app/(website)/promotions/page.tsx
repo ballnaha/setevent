@@ -83,5 +83,31 @@ async function getPromotions(): Promise<Promotion[]> {
 export default async function PromotionsPage() {
     const promotions = await getPromotions();
 
-    return <PromotionsContent initialPromotions={promotions} />;
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: promotions.map((promotion, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+                '@type': 'Offer',
+                name: promotion.title,
+                description: promotion.description,
+                image: promotion.image ? `https://seteventthailand.com${promotion.image}` : undefined,
+                price: promotion.price ? promotion.price.replace(/[^0-9]/g, '') : undefined,
+                priceCurrency: 'THB',
+                url: 'https://seteventthailand.com/promotions'
+            }
+        }))
+    };
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
+            <PromotionsContent initialPromotions={promotions} />
+        </>
+    );
 }

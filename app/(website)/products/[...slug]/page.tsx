@@ -150,5 +150,34 @@ export default async function ProductCategoryPage(props: { params: Promise<{ slu
         path: slugPath
     };
 
-    return <ProductCategoryContent initialData={initialData} />;
+    const structuredData = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: initialData.products.map((p, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            item: {
+                '@type': 'Product',
+                name: p.name,
+                description: p.description,
+                image: p.images && p.images.length > 0 ? `https://seteventthailand.com${p.images[0]}` : undefined,
+                offers: p.price ? {
+                    '@type': 'Offer',
+                    price: p.price,
+                    priceCurrency: 'THB',
+                    url: `https://seteventthailand.com/products/${slugPath}#${p.slug}`
+                } : undefined
+            }
+        }))
+    };
+
+    return (
+        <>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
+            <ProductCategoryContent initialData={initialData} />
+        </>
+    );
 }
