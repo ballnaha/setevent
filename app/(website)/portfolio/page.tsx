@@ -3,7 +3,7 @@ import PortfolioContent from './PortfolioContent';
 import prisma from '@/lib/prisma';
 
 // Revalidate every 60 seconds for fresh data with caching
-export const revalidate = 60;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
     // ... metadata content (keep as is)

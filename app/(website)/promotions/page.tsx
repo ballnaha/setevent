@@ -1,9 +1,7 @@
 import { Metadata } from 'next';
-import { PrismaClient } from '@prisma/client';
+export const revalidate = 0; // Force dynamic to ensure updates are immediate
+import { prisma } from '@/lib/prisma';
 import PromotionsContent from './PromotionsContent';
-
-// Use a singleton PrismaClient for better performance
-const prisma = new PrismaClient();
 
 export const metadata: Metadata = {
     title: 'โปรโมชั่นพิเศษ | SET EVENT Thailand',

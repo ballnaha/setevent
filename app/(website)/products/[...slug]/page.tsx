@@ -4,7 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from 'next/navigation';
 
 // Revalidate every 60 seconds for fresh data with caching
-export const revalidate = 60;
+export const revalidate = 0;
 
 type Props = {
     params: Promise<{ slug: string[] }>

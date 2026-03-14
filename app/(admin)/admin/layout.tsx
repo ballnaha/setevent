@@ -25,8 +25,6 @@ const sidebarGroups = [
             { label: 'Events', href: '/admin/events', icon: Calendar, roles: ['admin', 'sales'] },
             { label: 'Chat', href: '/admin/progress', icon: Message, roles: ['admin', 'sales'] },
             { label: 'Customers', href: '/admin/customers', icon: People, roles: ['admin', 'sales'] },
-            { label: 'Valentine', href: '/admin/valentine', icon: Heart, roles: ['admin'] },
-            { label: 'Valentine Catalog', href: '/admin/valentine-products', icon: Box1, roles: ['admin'] },
         ]
     },
     {

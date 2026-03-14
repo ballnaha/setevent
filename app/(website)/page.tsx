@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import HomeContent from './HomeContent';
 import BannerSlider from '../components/BannerSlider';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 0; // Force dynamic rendering
 
 export const metadata: Metadata = {
   title: 'SET EVENT Thailand | บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร',

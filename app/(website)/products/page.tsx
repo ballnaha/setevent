@@ -3,7 +3,7 @@ import ProductsContent from './ProductsContent';
 import prisma from '@/lib/prisma';
 
 // Revalidate every 60 seconds for fresh data with caching
-export const revalidate = 60;
+export const revalidate = 0;
 
 export const metadata: Metadata = {
     title: 'สินค้าและบริการ | SET EVENT Thailand',
