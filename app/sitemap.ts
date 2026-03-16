@@ -99,56 +99,76 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
 
     // ========================================
-    // 📦 PRODUCT ROUTES (Static - update dates when adding new products)
-    // ========================================
-    const productRoutes: MetadataRoute.Sitemap = [
-        '/products/rental/led-screen',
-        '/products/rental/lighting',
-        '/products/rental/sound',
-        '/products/rental/stage',
-        '/products/rental/motion-graphic',
-        '/products/rental/interactive',
-        '/products/rental/laser',
-        '/products/rental/mapping',
-        '/products/rental/flower-souvenirs',
-        '/products/fixed/led-screen',
-    ].map((route) => ({
-        url: `${baseUrl}${route}`,
-        lastModified: new Date('2025-01-01'),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-    }));
-
-    // ========================================
-    // 📝 DYNAMIC BLOG POSTS (From Database)
+    // 📝 DYNAMIC BLOG POSTS
     // ========================================
     let blogRoutes: MetadataRoute.Sitemap = [];
     try {
         const blogs = await prisma.blog.findMany({
             where: { status: 'published' },
-            select: {
-                slug: true,
-                updatedAt: true,
-            },
-            orderBy: { publishedAt: 'desc' },
+            select: { slug: true, updatedAt: true },
         });
-
         blogRoutes = blogs.map((blog) => ({
             url: `${baseUrl}/blog/${blog.slug}`,
             lastModified: blog.updatedAt,
-            changeFrequency: 'weekly' as const,
+            changeFrequency: 'weekly',
             priority: 0.6,
         }));
-    } catch (error) {
-        console.error('Sitemap: Failed to fetch blogs', error);
-    }
+    } catch (e) { console.error('Sitemap: Blogs error', e); }
+
+    // ========================================
+    // 📁 DYNAMIC CATEGORIES & PRODUCTS
+    // ========================================
+    let productRoutes: MetadataRoute.Sitemap = [];
+    try {
+        // Fetch all active categories to build nested slugs
+        const categories = await prisma.category.findMany({
+            where: { status: 'active' },
+            select: { id: true, slug: true, parentId: true, updatedAt: true }
+        });
+
+        // Helper to build full slug path
+        const getFullSlug = (catId: string): string => {
+            const cat = categories.find(c => c.id === catId);
+            if (!cat) return '';
+            const parentSlug = cat.parentId ? getFullSlug(cat.parentId) : '';
+            return parentSlug ? `${parentSlug}/${cat.slug}` : cat.slug;
+        };
+
+        const categoryRoutes = categories.map(cat => ({
+            url: `${baseUrl}/products/${getFullSlug(cat.id)}`,
+            lastModified: cat.updatedAt,
+            changeFrequency: 'weekly' as const,
+            priority: 0.8,
+        }));
+
+        productRoutes = [...categoryRoutes];
+    } catch (e) { console.error('Sitemap: Products/Categories error', e); }
+
+    // ========================================
+    // 🎨 DYNAMIC PORTFOLIO
+    // ========================================
+    let portfolioRoutes: MetadataRoute.Sitemap = [];
+    try {
+        const portfolios = await prisma.portfolio.findMany({
+            where: { status: 'active' },
+            select: { slug: true, updatedAt: true }
+        });
+        portfolioRoutes = portfolios.map((p) => ({
+            url: `${baseUrl}/portfolio/${p.slug}`,
+            lastModified: p.updatedAt,
+            changeFrequency: 'monthly',
+            priority: 0.7,
+        }));
+    } catch (e) { console.error('Sitemap: Portfolio error', e); }
 
     // ========================================
     // 🔗 COMBINE ALL ROUTES
     // ========================================
     return [
         ...staticRoutes,
-        ...productRoutes,
         ...blogRoutes,
+        ...productRoutes,
+        ...portfolioRoutes,
     ];
 }
+

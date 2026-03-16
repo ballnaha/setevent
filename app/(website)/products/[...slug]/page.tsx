@@ -171,11 +171,44 @@ export default async function ProductCategoryPage(props: { params: Promise<{ slu
         }))
     };
 
+    const breadcrumbSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+            {
+                '@type': 'ListItem',
+                position: 1,
+                name: 'หน้าแรก',
+                item: 'https://seteventthailand.com'
+            },
+            {
+                '@type': 'ListItem',
+                position: 2,
+                name: 'สินค้าและบริการ',
+                item: 'https://seteventthailand.com/products'
+            },
+            ...breadcrumb.map((item, index) => {
+                // Build progressive path for each breadcrumb level
+                const pathPrefix = breadcrumb.slice(0, index + 1).map(b => b.slug).join('/');
+                return {
+                    '@type': 'ListItem',
+                    position: index + 3,
+                    name: item.name,
+                    item: `https://seteventthailand.com/products/${pathPrefix}`
+                };
+            })
+        ]
+    };
+
     return (
         <>
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
             />
             <ProductCategoryContent initialData={initialData} />
         </>
