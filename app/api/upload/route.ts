@@ -43,10 +43,10 @@ export async function POST(req: NextRequest) {
 
         if (file.type.startsWith("image/")) {
             try {
-                // 1. First resize the image (1200px max for faster loading)
+                // 1. First resize the image (1920px max for faster loading but clear quality)
                 // For GIF: use animated: true to preserve animation frames
                 let pipeline = sharp(buffer, { animated: isGif })
-                    .resize(1200, 1200, {
+                    .resize(1920, 1920, {
                         fit: 'inside',
                         withoutEnlargement: true
                     });
@@ -151,10 +151,8 @@ export async function POST(req: NextRequest) {
                     }
                     isWebP = false;
                 } else {
-                    buffer = await intermediateBuffer;
-                    // Note: intermediateBuffer already contains the WebP converted data from pipeline.webp() 
-                    // Wait, let's fix the logic to be more efficient
-                    buffer = await pipeline.webp({ quality: 80 }).toBuffer();
+                    // Fix: Use intermediateBuffer which contains the applied watermark
+                    buffer = await sharp(intermediateBuffer).webp({ quality: 90 }).toBuffer();
                     isWebP = true;
                 }
             } catch (err) {
