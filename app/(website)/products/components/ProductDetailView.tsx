@@ -47,7 +47,10 @@ export default function ProductDetailView({ product, categoryName = "Product Det
     };
 
     const handleImageLoad = (index: number) => {
-        setLoadedImages(prev => ({ ...prev, [index]: true }));
+        setLoadedImages(prev => {
+            if (prev[index]) return prev;
+            return { ...prev, [index]: true };
+        });
     };
 
     const imageCount = product.images?.length || 0;
@@ -63,7 +66,8 @@ export default function ProductDetailView({ product, categoryName = "Product Det
             outline: 'none',
             bgcolor: 'var(--background)',
             overflow: isModal ? 'hidden' : 'visible',
-            '& .swiper': { width: '100%', height: '100%' }
+            '& .swiper': { width: '100%', height: '100%' },
+            '& .swiper-slide': { height: '100%' }
         }}>
             {/* Close Button */}
             {(isModal || !isModal) && (
@@ -90,13 +94,17 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                 flexDirection: { xs: 'column', lg: 'row' },
                 flex: 1,
                 minHeight: 0,
+                position: 'relative',
                 overflow: { xs: 'auto', lg: 'hidden' },
             }}>
-                {/* Left Side: Image Swiper */}
                 <Box sx={{
                     flex: { xs: '0 0 auto', lg: 1 },
                     height: { xs: '60vh', lg: 'auto' },
-                    position: 'relative',
+                    position: { xs: 'relative', lg: 'absolute' },
+                    top: { lg: 0 },
+                    left: { lg: 0 },
+                    bottom: { lg: 0 },
+                    right: { lg: '550px' },
                     minHeight: 0,
                     overflow: 'hidden',
                     borderRight: { lg: '1px solid var(--border-color)' },
@@ -117,35 +125,33 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     >
                         {product.images.map((img, idx) => (
                             <SwiperSlide key={idx}>
-                                <Box sx={{ position: 'relative', width: '100%', height: '100%', p: { xs: 1, md: 4 } }}>
-                                    <Image
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    width: '100%',
+                                    height: '100%',
+                                    p: { xs: 1, md: 4 },
+                                }}>
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
                                         src={img}
                                         alt={product.name}
-                                        fill
                                         onLoad={() => handleImageLoad(idx)}
+                                        ref={(el) => {
+                                            if (el && el.complete) {
+                                                handleImageLoad(idx);
+                                            }
+                                        }}
                                         style={{
+                                            maxWidth: '100%',
+                                            maxHeight: '100%',
                                             objectFit: 'contain',
                                             objectPosition: 'center',
                                             opacity: loadedImages[idx] ? 1 : 0,
                                             transition: 'opacity 0.4s ease-in-out'
                                         }}
-                                        priority={idx === 0}
                                     />
-                                    {!loadedImages[idx] && (
-                                        <Skeleton
-                                            variant="rectangular"
-                                            width="100%"
-                                            height="100%"
-                                            animation="wave"
-                                            sx={{
-                                                position: 'absolute',
-                                                top: 0,
-                                                left: 0,
-                                                bgcolor: 'rgba(128,128,128,0.1)',
-                                                zIndex: 1
-                                            }}
-                                        />
-                                    )}
                                 </Box>
                             </SwiperSlide>
                         ))}
@@ -203,6 +209,7 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                 {/* Right Side: Product Details */}
                 <Box sx={{
                     width: { xs: '100%', lg: 550 },
+                    marginLeft: { lg: 'auto' },
                     display: 'flex',
                     flexDirection: 'column',
                     bgcolor: 'var(--card-bg)',

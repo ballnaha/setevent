@@ -45,10 +45,24 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
         }
 
+        const normalizedSlug = slug.toLowerCase();
+
+        // Check if slug already exists
+        const existingProduct = await prisma.product.findUnique({
+            where: { slug: normalizedSlug }
+        });
+
+        if (existingProduct) {
+            return NextResponse.json(
+                { error: `สินค้าชื่อ "${existingProduct.name}" มี slug "${normalizedSlug}" อยู่แล้ว กรุณาใช้ชื่อสินค้าอื่น` },
+                { status: 409 }
+            );
+        }
+
         const product = await prisma.product.create({
             data: {
                 name,
-                slug: slug.toLowerCase(),
+                slug: normalizedSlug,
                 description,
                 price: price ? parseFloat(price) : null,
                 priceUnit: priceUnit || null,
@@ -63,8 +77,17 @@ export async function POST(req: NextRequest) {
         revalidatePath('/products');
 
         return NextResponse.json(product);
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error creating product:", error);
+
+        // Handle Prisma unique constraint violation (race condition fallback)
+        if (error?.code === 'P2002') {
+            return NextResponse.json(
+                { error: "สินค้าชื่อนี้มีอยู่ในระบบแล้ว กรุณาใช้ชื่อสินค้าอื่น" },
+                { status: 409 }
+            );
+        }
+
         return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
     }
 }

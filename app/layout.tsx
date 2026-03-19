@@ -221,6 +221,7 @@ export default function RootLayout({
       <body
         className={`${prompt.variable} ${comfortaa.variable} antialiased`}
         style={{ margin: 0 }}
+        suppressHydrationWarning
       >
         <NextTopLoader
           color="#0A5C5A"
