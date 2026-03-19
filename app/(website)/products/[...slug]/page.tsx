@@ -112,7 +112,7 @@ export default async function ProductCategoryPage(props: { params: Promise<{ slu
     });
 
     // Build breadcrumb
-    const breadcrumb = [];
+    const breadcrumb: { name: string; slug: string }[] = [];
     let tempCategory: any = currentCategory;
     while (tempCategory) {
         breadcrumb.unshift({

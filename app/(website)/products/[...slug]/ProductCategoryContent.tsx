@@ -1,21 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Box, Container, Typography, Paper, Button, Stack, Skeleton, Chip, Modal, IconButton, Tooltip } from "@mui/material";
-import { ArrowRight2, Gallery, CloseCircle, ArrowLeft2, ArrowRight, Crown, ShieldTick, TruckFast, MagicStar, MedalStar, NoteText, MessageQuestion, CallCalling, Monitor } from "iconsax-react";
+import { Box, Container, Typography, Paper, Button, Stack, Skeleton, Chip, IconButton } from "@mui/material";
+import { ArrowRight2, Gallery, MagicStar, NoteText, MessageQuestion, CallCalling, Monitor } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-
-// Swiper
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, EffectFade, Thumbs, FreeMode } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/effect-fade';
-import 'swiper/css/thumbs';
-import 'swiper/css/free-mode';
 
 interface Product {
     id: string;
@@ -23,7 +13,7 @@ interface Product {
     slug: string;
     description: string | null;
     price: number | null;
-    priceUnit: string | null; // e.g. "ต่อตารางเมตร", "ต่อชิ้น", "/วัน"
+    priceUnit: string | null; 
     images: string[];
     features: string[];
 }
@@ -53,718 +43,292 @@ interface PageData {
     children: CategoryChild[];
     products: Product[];
     breadcrumb: BreadcrumbItem[];
-    path: string;
 }
 
-// ProductCard Component - Glassmorphism Bottom Panel Style (Like Middle Card)
+// ProductCard Component
 function ProductCard({ product, categoryName, isPriority = false }: { product: Product; categoryName: string; isPriority?: boolean }) {
     const [isHovered, setIsHovered] = useState(false);
-    const [lightboxOpen, setLightboxOpen] = useState(false);
-    const [lightboxIndex, setLightboxIndex] = useState(0);
-    const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
     const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
     const handleImageLoad = (index: number) => {
         setLoadedImages(prev => ({ ...prev, [index]: true }));
     };
 
-    const prevRef = React.useRef<HTMLButtonElement>(null);
-    const nextRef = React.useRef<HTMLButtonElement>(null);
-
     const hasImages = product.images && product.images.length > 0;
     const imageCount = product.images?.length || 0;
 
-    // Open lightbox
-    const openLightbox = (index: number) => {
-        setLightboxIndex(index);
-        setLightboxOpen(true);
-    };
-
     return (
-        <>
-            <Paper
-                onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={() => setIsHovered(false)}
-                onClick={() => openLightbox(0)}
+        <Paper
+            component={Link}
+            href={`/products/p/${product.slug}`}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            sx={{
+                textDecoration: 'none',
+                position: 'relative',
+                borderRadius: 6,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                height: { xs: 400, md: 440 },
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                bgcolor: 'var(--card-bg)',
+                border: 'none',
+                boxShadow: 'none',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                }
+            }}
+        >
+            {/* Full Background Image */}
+            <Box
                 sx={{
-                    position: 'relative',
-                    borderRadius: 6,
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: { xs: 400, md: 440 },
-                    transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                    cursor: 'pointer',
-                    bgcolor: 'var(--card-bg)',
-                    border: 'none',
-                    boxShadow: 'none',
-                    '&:hover': {
-                        transform: 'translateY(-4px)',
-                    }
-                }}
-            >
-                {/* Full Background Image with Swiper */}
-                <Box
-                    sx={{
-                        flex: 1,
-                        position: 'relative',
-                        width: '100%',
-                        overflow: 'hidden',
-                        '& .swiper': { width: '100%', height: '100%' },
-                        '& .swiper-pagination': {
-                            bottom: 12,
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: 'auto',
-                            display: 'flex',
-                            gap: '6px',
-                            bgcolor: 'rgba(255,255,255,0.2)',
-                            backdropFilter: 'blur(4px)',
-                            borderRadius: 10,
-                            px: 1.2,
-                            py: 0.6
-                        },
-                        '& .swiper-pagination-bullet': {
-                            bgcolor: 'white',
-                            opacity: 0.6,
-                            width: 6,
-                            height: 6,
-                            transition: 'all 0.3s ease',
-                            margin: '0 !important'
-                        },
-                        '& .swiper-pagination-bullet-active': {
-                            opacity: 1,
-                            bgcolor: 'white',
-                            width: 16,
-                            borderRadius: 4
-                        }
-                    }}
-                >
-                    {hasImages ? (
-                        <>
-                            <Swiper
-                                modules={[Navigation, Pagination]}
-                                navigation={{
-                                    prevEl: prevRef.current,
-                                    nextEl: nextRef.current,
-                                }}
-                                onBeforeInit={(swiper) => {
-                                    if (typeof swiper.params.navigation !== 'boolean') {
-                                        swiper.params.navigation!.prevEl = prevRef.current;
-                                        swiper.params.navigation!.nextEl = nextRef.current;
-                                    }
-                                }}
-                                pagination={{ clickable: true }}
-                                loop={imageCount > 1}
-                                onClick={(swiper, e) => {
-                                    e.stopPropagation();
-                                    openLightbox(swiper.realIndex);
-                                }}
-                            >
-                                {product.images.map((img, idx) => (
-                                    <SwiperSlide key={idx}>
-                                        <Box sx={{
-                                            position: 'relative',
-                                            width: '100%',
-                                            height: '100%',
-                                            transform: isHovered ? 'scale(1.08)' : 'scale(1)',
-                                            transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
-                                        }}>
-                                            <Image
-                                                src={img}
-                                                alt={product.name}
-                                                fill
-                                                priority={idx === 0 && isPriority}
-                                                sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"
-                                                onLoad={() => handleImageLoad(idx)}
-                                                style={{
-                                                    objectFit: 'contain',
-                                                    backgroundColor: 'transparent',
-                                                    opacity: loadedImages[idx] ? 1 : 0,
-                                                    transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
-                                                }}
-                                            />
-                                            {!loadedImages[idx] && (
-                                                <Skeleton
-                                                    variant="rectangular"
-                                                    width="100%"
-                                                    height="100%"
-                                                    animation="wave"
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        left: 0,
-                                                        bgcolor: 'rgba(128,128,128,0.06)',
-                                                        zIndex: 1
-                                                    }}
-                                                />
-                                            )}
-                                        </Box>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-
-                            {/* Navigation Arrows */}
-                            {imageCount > 1 && (
-                                <>
-                                    <IconButton
-                                        ref={prevRef}
-                                        onClick={(e) => e.stopPropagation()}
-                                        sx={{
-                                            position: 'absolute',
-                                            left: 12,
-                                            top: '40%',
-                                            transform: 'translateY(-50%)',
-                                            zIndex: 20,
-                                            bgcolor: 'rgba(255,255,255,0.15)',
-                                            backdropFilter: 'blur(4px)',
-                                            color: 'white',
-                                            width: 32,
-                                            height: 32,
-                                            opacity: isHovered ? 1 : 0,
-                                            transition: 'all 0.3s ease',
-                                            '&:hover': { bgcolor: 'rgba(255,255,255,0.25)' }
-                                        }}
-                                    >
-                                        <ArrowLeft2 size="16" color="white" />
-                                    </IconButton>
-                                    <IconButton
-                                        ref={nextRef}
-                                        onClick={(e) => e.stopPropagation()}
-                                        sx={{
-                                            position: 'absolute',
-                                            right: 12,
-                                            top: '40%',
-                                            transform: 'translateY(-50%)',
-                                            zIndex: 20,
-                                            bgcolor: 'rgba(255,255,255,0.15)',
-                                            backdropFilter: 'blur(4px)',
-                                            color: 'white',
-                                            width: 32,
-                                            height: 32,
-                                            opacity: isHovered ? 1 : 0,
-                                            transition: 'all 0.3s ease',
-                                            '&:hover': { bgcolor: 'rgba(255,255,255,0.25)' }
-                                        }}
-                                    >
-                                        <ArrowRight2 size="16" color="white" />
-                                    </IconButton>
-                                </>
-                            )}
-                        </>
-                    ) : (
-                        <Box sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
-                        }}>
-                            <Stack spacing={1.5} alignItems="center" sx={{ opacity: 0.2, transform: 'translateY(-20px)' }}>
-                                <Gallery size="56" color="var(--primary)" variant="Outline" />
-                                <Typography sx={{
-                                    fontFamily: 'var(--font-prompt)',
-                                    fontSize: '0.7rem',
-                                    fontWeight: 600,
-                                    color: 'var(--primary)',
-                                    letterSpacing: 1.5,
-                                    textTransform: 'uppercase'
-                                }}>
-                                    No Image Available
-                                </Typography>
-                            </Stack>
-                        </Box>
-                    )}
-                </Box>
-
-                {/* Soft Dark Glassmorphism Bottom Panel */}
-                <Box sx={{
-                    bgcolor: 'var(--card-bg)',
-                    pt: 2.5,
-                    pb: 2.5,
-                    px: 3,
-                    zIndex: 10,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    borderTop: '1px solid var(--border-color)',
-                }}>
-                    {/* Name & Title Row */}
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        justifyContent: 'space-between',
-                        gap: 2,
-                        mb: 2
-                    }}>
-                        {/* Product Name */}
-                        <Typography sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            fontWeight: 600,
-                            fontSize: { xs: '0.95rem', md: '1.1rem' },
-                            color: 'var(--foreground)',
-                            lineHeight: 1.3,
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            flex: 1
-                        }}>
-                            {product.name}
-                        </Typography>
-
-                        {/* Price or View Details (Moved to Top Right) */}
-                        <Box sx={{ flexShrink: 0 }}>
-                            {product.price ? (
-                                <Box sx={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'flex-end',
-                                }}>
-                                    <Typography sx={{
-                                        fontFamily: 'var(--font-prompt)',
-                                        fontWeight: 700,
-                                        fontSize: '1.1rem',
-                                        color: 'var(--primary)',
-                                        lineHeight: 1,
-                                    }}>
-                                        ฿{product.price.toLocaleString()}
-                                    </Typography>
-                                    {product.priceUnit && (
-                                        <Typography sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontSize: '0.7rem',
-                                            color: 'var(--foreground)',
-                                            opacity: 0.6,
-                                            mt: 0.2
-                                        }}>
-                                            {product.priceUnit}
-                                        </Typography>
-                                    )}
-                                </Box>
-                            ) : (
-                                <Box sx={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    bgcolor: 'var(--border-color)',
-                                    borderRadius: 3,
-                                    px: 1.2,
-                                    py: 0.5,
-                                    gap: 0.5,
-                                    border: '1px solid var(--border-color)'
-                                }}>
-                                    <Typography sx={{
-                                        fontFamily: 'var(--font-prompt)',
-                                        fontWeight: 500,
-                                        fontSize: '0.75rem',
-                                        color: 'var(--foreground)',
-                                        lineHeight: 1
-                                    }}>
-                                        ดูรายละเอียด
-                                    </Typography>
-                                    <ArrowRight2 size="14" color="var(--foreground)" />
-                                </Box>
-                            )}
-                        </Box>
-                    </Box>
-
-                    {/* Bottom Area: Features, Desc, Author & Share */}
-                    <Box sx={{
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        justifyContent: 'space-between',
-                        gap: 2,
-                        mt: 'auto',
-                        pt: 2,
-                        borderTop: '1px solid var(--border-color)'
-                    }}>
-                        {/* Left Column: Features & Description */}
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                            {/* Features */}
-                            {product.features && product.features.length > 0 && (
-                                <Stack direction="row" spacing={1.5} sx={{ mb: 1 }}>
-                                    {product.features.slice(0, 2).map((feature, idx) => (
-                                        <Box key={idx} sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.6
-                                        }}>
-                                            <Gallery size="14" color="var(--primary)" />
-                                            <Typography sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontSize: '0.75rem',
-                                                color: 'var(--foreground)',
-                                                opacity: 0.8,
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                {feature}
-                                            </Typography>
-                                        </Box>
-                                    ))}
-                                </Stack>
-                            )}
-
-                            {/* Description (Multi-line support) */}
-                            {product.description && (
-                                <Typography sx={{
-                                    fontFamily: 'var(--font-prompt)',
-                                    fontSize: '0.8rem',
-                                    color: 'var(--foreground)',
-                                    opacity: 0.6,
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden',
-                                    lineHeight: 1.5,
-                                    mb: 1
-                                }}>
-                                    {product.description}
-                                </Typography>
-                            )}
-
-                            {/* Author / Signature */}
-                            <Typography sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                fontSize: '0.65rem',
-                                color: 'var(--foreground)',
-                                opacity: 0.4,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 0.5
-                            }}>
-                                Collection <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--primary)', opacity: 0.5 }}></span> {categoryName}
-                            </Typography>
-                        </Box>
-
-
-                    </Box>
-                </Box>
-            </Paper>
-
-            {/* Lightbox Modal using Swiper */}
-            <Modal
-                open={lightboxOpen}
-                onClose={() => setLightboxOpen(false)}
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    p: 0, // Truly full screen
-                    '& .MuiBackdrop-root': {
-                        bgcolor: 'var(--background)',
-                        opacity: '1 !important'
-                    }
-                }}
-            >
-                <Box sx={{
+                    flex: 1,
                     position: 'relative',
                     width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    outline: 'none',
-                    bgcolor: 'var(--background)',
-                    '& .swiper': { width: '100%', height: '100%' }
-                }}>
-                    {/* Close Button */}
-                    <IconButton
-                        onClick={() => setLightboxOpen(false)}
-                        aria-label="ปิดภาพขยาย"
-                        sx={{
-                            position: 'absolute',
-                            top: { xs: 16, md: 24 },
-                            right: { xs: 16, md: 24 },
-                            zIndex: 100,
-                            color: 'var(--foreground)',
-                            bgcolor: 'var(--border-color)',
-                            backdropFilter: 'blur(4px)',
-                            '&:hover': { bgcolor: 'var(--background)', border: '1px solid var(--primary)' }
-                        }}
-                    >
-                        <CloseCircle size="28" color='var(--primary)' variant='Outline' />
-                    </IconButton>
-
+                    overflow: 'hidden',
+                }}
+            >
+                {hasImages ? (
                     <Box sx={{
-                        display: 'flex',
-                        flexDirection: { xs: 'column', lg: 'row' },
+                        position: 'relative',
+                        width: '100%',
                         height: '100%',
-                        overflow: 'hidden'
+                        transform: isHovered ? 'scale(1.08)' : 'scale(1)',
+                        transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}>
-                        {/* Left Side: Image Swiper */}
-                        <Box sx={{
-                            flex: { xs: '0 0 auto', lg: 1 },
-                            height: { xs: '60vh', lg: '100%' }, // Increased mobile height
-                            position: 'relative',
-                            minHeight: 0,
-                            overflow: 'hidden',
-                            borderRight: { lg: '1px solid var(--border-color)' }
-                        }}>
-                            <Swiper
-                                modules={[Navigation, EffectFade, Thumbs]}
-                                navigation={{
-                                    prevEl: '.lightbox-prev',
-                                    nextEl: '.lightbox-next',
+                        <Image
+                            src={product.images[0]}
+                            alt={product.name}
+                            fill
+                            priority={isPriority}
+                            sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"
+                            onLoad={() => handleImageLoad(0)}
+                            style={{
+                                objectFit: 'contain',
+                                backgroundColor: 'transparent',
+                                opacity: loadedImages[0] ? 1 : 0,
+                                transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                        />
+                        {!loadedImages[0] && (
+                            <Skeleton
+                                variant="rectangular"
+                                width="100%"
+                                height="100%"
+                                animation="wave"
+                                sx={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    bgcolor: 'rgba(128,128,128,0.06)',
+                                    zIndex: 1
                                 }}
-                                effect="fade"
-                                loop={imageCount > 1}
-                                initialSlide={lightboxIndex}
-                                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-                                onSlideChange={(swiper) => setLightboxIndex(swiper.realIndex)}
-                                style={{ height: '100%' }}
-                            >
-                                {product.images.map((img, idx) => (
-                                    <SwiperSlide key={idx}>
-                                        <Box sx={{ position: 'relative', width: '100%', height: '100%', p: { xs: 1, md: 2 } }}>
-                                            <Image
-                                                src={img}
-                                                alt={product.name}
-                                                fill
-                                                onLoad={() => handleImageLoad(idx)}
-                                                style={{
-                                                    objectFit: 'contain',
-                                                    objectPosition: 'center',
-                                                    opacity: loadedImages[idx] ? 1 : 0,
-                                                    transition: 'opacity 0.4s ease-in-out'
-                                                }}
-                                                priority={idx === lightboxIndex || Math.abs(idx - lightboxIndex) <= 1}
-                                            />
-                                            {!loadedImages[idx] && (
-                                                <Skeleton
-                                                    variant="rectangular"
-                                                    width="100%"
-                                                    height="100%"
-                                                    animation="wave"
-                                                    sx={{
-                                                        position: 'absolute',
-                                                        top: 0,
-                                                        left: 0,
-                                                        bgcolor: 'rgba(128,128,128,0.1)',
-                                                        zIndex: 1
-                                                    }}
-                                                />
-                                            )}
-                                        </Box>
-                                    </SwiperSlide>
-                                ))}
-                            </Swiper>
-
-                            {/* Lightbox Navigation Arrows */}
-                            {imageCount > 1 && (
-                                <>
-                                    <IconButton
-                                        className="lightbox-prev"
-                                        sx={{
-                                            position: 'absolute',
-                                            left: 16,
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            zIndex: 100,
-                                            color: 'var(--foreground)',
-                                            bgcolor: 'var(--border-color)',
-                                            backdropFilter: 'blur(10px)',
-                                            width: 44,
-                                            height: 44,
-                                            borderRadius: '50%',
-                                            transition: 'all 0.3s ease',
-                                            '&:hover': { bgcolor: 'var(--background)', border: '1px solid var(--primary)' },
-                                            '&.swiper-button-disabled': { opacity: 0 }
-                                        }}
-                                    >
-                                        <ArrowLeft2 size="24" />
-                                    </IconButton>
-                                    <IconButton
-                                        className="lightbox-next"
-                                        sx={{
-                                            position: 'absolute',
-                                            right: 16,
-                                            top: '50%',
-                                            transform: 'translateY(-50%)',
-                                            zIndex: 100,
-                                            color: 'var(--foreground)',
-                                            bgcolor: 'var(--border-color)',
-                                            backdropFilter: 'blur(10px)',
-                                            width: 44,
-                                            height: 44,
-                                            borderRadius: '50%',
-                                            transition: 'all 0.3s ease',
-                                            '&:hover': { bgcolor: 'var(--background)', border: '1px solid var(--primary)' },
-                                            '&.swiper-button-disabled': { opacity: 0 }
-                                        }}
-                                    >
-                                        <ArrowRight2 size="24" />
-                                    </IconButton>
-                                </>
-                            )}
-                        </Box>
-
-                        {/* Right Side: Product Details */}
-                        <Box sx={{
-                            width: { xs: '100%', lg: 400 },
-                            display: 'flex',
-                            flexDirection: 'column',
-                            bgcolor: 'var(--card-bg)',
-                            height: { xs: 'auto', lg: '100%' },
-                            overflowY: 'auto',
-                            p: { xs: 3, md: 5 },
-                            position: 'relative'
-                        }}>
-                            {/* Category Badge */}
-                            <Typography sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                fontSize: '0.75rem',
-                                color: 'var(--primary)',
-                                fontWeight: 700,
-                                textTransform: 'uppercase',
-                                letterSpacing: 1.5,
-                                mb: 1,
+                            />
+                        )}
+                        
+                        {/* More images indicator */}
+                        {imageCount > 1 && (
+                            <Box sx={{
+                                position: 'absolute',
+                                top: 12,
+                                right: 12,
+                                bgcolor: 'rgba(255,255,255,0.2)',
+                                backdropFilter: 'blur(4px)',
+                                borderRadius: 1.5,
+                                px: 1,
+                                py: 0.5,
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 1
+                                gap: 0.5,
+                                zIndex: 2
                             }}>
-                                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--primary)' }}></span>
-                                {categoryName}
-                            </Typography>
-
-                            {/* Title */}
+                                <Gallery size="12" color="white" />
+                                <Typography sx={{ color: 'white', fontSize: '0.65rem', fontWeight: 600 }}>
+                                    +{imageCount - 1}
+                                </Typography>
+                            </Box>
+                        )}
+                    </Box>
+                ) : (
+                    <Box sx={{
+                        width: '100%',
+                        height: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
+                    }}>
+                        <Stack spacing={1.5} alignItems="center" sx={{ opacity: 0.2, transform: 'translateY(-20px)' }}>
+                            <Gallery size="56" color="var(--primary)" variant="Outline" />
                             <Typography sx={{
                                 fontFamily: 'var(--font-prompt)',
-                                fontWeight: 700,
-                                fontSize: { xs: '1.5rem', md: '1.8rem' },
-                                color: 'var(--foreground)',
-                                lineHeight: 1.2,
-                                mb: 3
+                                fontSize: '0.7rem',
+                                fontWeight: 600,
+                                color: 'var(--primary)',
+                                letterSpacing: 1.5,
+                                textTransform: 'uppercase'
                             }}>
-                                {product.name}
+                                No Image Available
                             </Typography>
+                        </Stack>
+                    </Box>
+                )}
+            </Box>
 
-                            {/* Price */}
-                            {product.price && (
-                                <Box sx={{ mb: 4, p: 2, bgcolor: 'rgba(10, 92, 90, 0.05)', borderRadius: 2, border: '1px solid rgba(10, 92, 90, 0.1)' }}>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.8rem', mb: 0.5 }}>
-                                        ราคาประมาณการ
-                                    </Typography>
-                                    <Stack direction="row" alignItems="baseline" spacing={1}>
-                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, fontSize: '2rem', color: 'var(--primary)' }}>
-                                            ฿{product.price.toLocaleString()}
-                                        </Typography>
-                                        {product.priceUnit && (
-                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '1rem' }}>
-                                                {product.priceUnit}
-                                            </Typography>
-                                        )}
-                                    </Stack>
-                                </Box>
-                            )}
+            {/* Soft Dark Glassmorphism Bottom Panel */}
+            <Box sx={{
+                bgcolor: 'var(--card-bg)',
+                pt: 2.5,
+                pb: 2.5,
+                px: 3,
+                zIndex: 10,
+                display: 'flex',
+                flexDirection: 'column',
+                borderTop: '1px solid var(--border-color)',
+            }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    mb: 2
+                }}>
+                    <Typography sx={{
+                        fontFamily: 'var(--font-prompt)',
+                        fontWeight: 600,
+                        fontSize: { xs: '0.95rem', md: '1.1rem' },
+                        color: 'var(--foreground)',
+                        lineHeight: 1.3,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        flex: 1
+                    }}>
+                        {product.name}
+                    </Typography>
 
-                            {/* Features Section */}
-                            {product.features && product.features.length > 0 && (
-                                <Box sx={{ mb: 4 }}>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                        <MagicStar size="20" color="var(--primary)" variant="Bold" />
-                                        จุดเด่นสินค้า
-                                    </Typography>
-                                    <Stack spacing={1.5}>
-                                        {product.features.map((feature, idx) => (
-                                            <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
-                                                <Box sx={{ mt: 0.5, width: 6, height: 6, borderRadius: '50%', bgcolor: 'var(--primary)', flexShrink: 0 }} />
-                                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8 }}>
-                                                    {feature}
-                                                </Typography>
-                                            </Box>
-                                        ))}
-                                    </Stack>
-                                </Box>
-                            )}
-
-                            {/* Description Section */}
-                            {product.description && (
-                                <Box sx={{ mb: 4 }}>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                        <NoteText size="20" color="var(--primary)" variant="Bold" />
-                                        รายละเอียดเพิ่มเติม
-                                    </Typography>
+                    <Box sx={{ flexShrink: 0 }}>
+                        {product.price ? (
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-end',
+                            }}>
+                                <Typography sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontWeight: 700,
+                                    fontSize: '1.1rem',
+                                    color: 'var(--primary)',
+                                    lineHeight: 1,
+                                }}>
+                                    ฿{product.price.toLocaleString()}
+                                </Typography>
+                                {product.priceUnit && (
                                     <Typography sx={{
                                         fontFamily: 'var(--font-prompt)',
-                                        fontSize: '0.9rem',
+                                        fontSize: '0.7rem',
                                         color: 'var(--foreground)',
-                                        opacity: 0.7,
-                                        lineHeight: 1.8,
-                                        whiteSpace: 'pre-line'
+                                        opacity: 0.6,
+                                        mt: 0.2
                                     }}>
-                                        {product.description}
+                                        {product.priceUnit}
                                     </Typography>
-                                </Box>
-                            )}
-
-                            {/* Action Button */}
-                            <Button
-                                href="https://line.me/ti/p/~@setevent"
-                                target="_blank"
-                                variant="contained"
-                                fullWidth
-                                startIcon={<MessageQuestion size="20" variant="Bold" color="white" />}
-                                sx={{
-                                    mt: 'auto',
-                                    bgcolor: '#1a1a1a',
-                                    color: 'white',
-                                    py: 2,
-                                    borderRadius: 3,
+                                )}
+                            </Box>
+                        ) : (
+                            <Box sx={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                bgcolor: 'var(--border-color)',
+                                borderRadius: 3,
+                                px: 1.2,
+                                py: 0.5,
+                                gap: 0.5,
+                                border: '1px solid var(--border-color)'
+                            }}>
+                                <Typography sx={{
                                     fontFamily: 'var(--font-prompt)',
-                                    fontWeight: 600,
-                                    '&:hover': { bgcolor: 'var(--primary)' }
-                                }}
-                            >
-                                สอบถามข้อมูลเพิ่มเติม
-                            </Button>
-
-                            {/* Thumbnail Swiper for the current view */}
-                            {imageCount > 1 && (
-                                <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid var(--border-color)' }}>
-                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem', opacity: 0.5, mb: 1.5 }}>
-                                        รูปภาพอื่น ({imageCount})
-                                    </Typography>
-                                    <Swiper
-                                        onSwiper={setThumbsSwiper}
-                                        modules={[FreeMode, Navigation, Thumbs]}
-                                        spaceBetween={8}
-                                        slidesPerView={'auto'}
-                                        freeMode={true}
-                                        watchSlidesProgress={true}
-                                        style={{ height: 60 }}
-                                    >
-                                        {product.images.map((img, idx) => (
-                                            <SwiperSlide key={idx} style={{ width: 'auto' }}>
-                                                <Box
-                                                    sx={{
-                                                        width: 80,
-                                                        height: 60,
-                                                        borderRadius: 1.5,
-                                                        overflow: 'hidden',
-                                                        cursor: 'pointer',
-                                                        border: idx === lightboxIndex ? '2px solid var(--primary)' : '1px solid var(--border-color)',
-                                                        opacity: idx === lightboxIndex ? 1 : 0.6,
-                                                        transition: 'all 0.2s',
-                                                        '&:hover': { opacity: 1 }
-                                                    }}
-                                                >
-                                                    <Image
-                                                        src={img}
-                                                        alt={`Thumbnail ${idx + 1}`}
-                                                        width={80}
-                                                        height={60}
-                                                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                                                    />
-                                                </Box>
-                                            </SwiperSlide>
-                                        ))}
-                                    </Swiper>
-                                </Box>
-                            )}
-                        </Box>
+                                    fontWeight: 500,
+                                    fontSize: '0.75rem',
+                                    color: 'var(--foreground)',
+                                    lineHeight: 1
+                                }}>
+                                    ดูรายละเอียด
+                                </Typography>
+                                <ArrowRight2 size="14" color="var(--foreground)" />
+                            </Box>
+                        )}
                     </Box>
                 </Box>
-            </Modal>
-        </>
+
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    mt: 'auto',
+                    pt: 2,
+                    borderTop: '1px solid var(--border-color)'
+                }}>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                        {product.features && product.features.length > 0 && (
+                            <Stack direction="row" spacing={1.5} sx={{ mb: 1 }}>
+                                {product.features.slice(0, 2).map((feature, idx) => (
+                                    <Box key={idx} sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 0.6
+                                    }}>
+                                        <Gallery size="14" color="var(--primary)" />
+                                        <Typography sx={{
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontSize: '0.75rem',
+                                            color: 'var(--foreground)',
+                                            opacity: 0.8,
+                                            whiteSpace: 'nowrap'
+                                        }}>
+                                            {feature}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        )}
+
+                        {product.description && (
+                            <Typography sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontSize: '0.8rem',
+                                color: 'var(--foreground)',
+                                opacity: 0.6,
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                lineHeight: 1.5,
+                                mb: 1
+                            }}>
+                                {product.description}
+                            </Typography>
+                        )}
+
+                        <Typography sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontSize: '0.65rem',
+                            color: 'var(--foreground)',
+                            opacity: 0.4,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.5
+                        }}>
+                            Collection <span style={{ width: 3, height: 3, borderRadius: '50%', background: 'var(--primary)', opacity: 0.5 }}></span> {categoryName}
+                        </Typography>
+                    </Box>
+                </Box>
+            </Box>
+        </Paper>
     );
 }
 
@@ -802,19 +366,11 @@ export default function ProductCategoryContent({ initialData = null }: { initial
         }
 
         fetchData();
-    }, [slugPath]);
-
-    // Build breadcrumb path
-    const buildBreadcrumbHref = (index: number) => {
-        if (!data?.breadcrumb) return '/products';
-        const slugs = data.breadcrumb.slice(0, index + 1).map(b => b.slug);
-        return `/products/${slugs.join('/')}`;
-    };
+    }, [slugPath, initialData]);
 
     if (loading) {
         return (
             <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
-                {/* Hero Skeleton - More Minimal & Beautiful */}
                 <Box sx={{
                     pt: { xs: 15, md: 22 },
                     pb: { xs: 8, md: 10 },
@@ -877,20 +433,18 @@ export default function ProductCategoryContent({ initialData = null }: { initial
         );
     }
 
-    const { category, children, products, breadcrumb } = data;
+    const { category, children, products } = data;
     const hasSubcategories = children && children.length > 0;
     const hasProducts = products && products.length > 0;
 
     return (
         <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden' }}>
-            {/* Header Section with Geometric background */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
                 bgcolor: "var(--background)",
             }}>
-                {/* Background Decor */}
                 <Box sx={{
                     position: 'absolute',
                     top: '-20%',
@@ -973,7 +527,6 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                 </Container>
             </Box>
 
-            {/* Subcategories Section - Minimal Cards */}
             {hasSubcategories && (
                 <Container maxWidth="lg" sx={{ mt: -4, position: 'relative', zIndex: 2, mb: 6 }}>
                     <Box sx={{
@@ -981,136 +534,105 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
                         gap: { xs: 2, md: 3 }
                     }}>
-                        {children.map((child) => {
-                            const isIndoor = child.name.toLowerCase().includes('indoor') || child.slug.includes('indoor');
-                            const isOutdoor = child.name.toLowerCase().includes('outdoor') || child.slug.includes('outdoor');
-
-                            return (
-                                <Paper
-                                    key={child.id}
-                                    component={Link}
-                                    href={`/products/${slugPath}/${child.slug}`}
+                        {children.map((child) => (
+                            <Paper
+                                key={child.id}
+                                component={Link}
+                                href={`/products/${slugPath}/${child.slug}`}
+                                sx={{
+                                    p: { xs: 3, md: 4 },
+                                    bgcolor: 'rgba(128,128,128,0.03)',
+                                    borderRadius: 3,
+                                    textDecoration: 'none',
+                                    color: 'inherit',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 3,
+                                    transition: 'all 0.3s ease',
+                                    border: '1px solid',
+                                    borderColor: 'rgba(128,128,128,0.2)',
+                                    boxShadow: '0 4px 20px var(--border-color)',
+                                    '&:hover': {
+                                        transform: 'translateY(-4px)',
+                                        boxShadow: '0 12px 40px var(--border-color)',
+                                        borderColor: 'var(--primary)',
+                                        '& .card-icon': {
+                                            bgcolor: 'var(--primary)',
+                                            color: 'white'
+                                        },
+                                        '& .card-arrow': {
+                                            bgcolor: 'var(--primary)',
+                                            color: 'white'
+                                        }
+                                    }
+                                }}
+                            >
+                                <Box
+                                    className="card-icon"
                                     sx={{
-                                        p: { xs: 3, md: 4 },
-                                        bgcolor: 'rgba(128,128,128,0.03)',
-                                        borderRadius: 3,
-                                        textDecoration: 'none',
-                                        color: 'inherit',
+                                        width: 56,
+                                        height: 56,
+                                        borderRadius: 2,
+                                        bgcolor: 'rgba(16, 185, 129, 0.1)',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 3,
-                                        transition: 'all 0.3s ease',
-                                        border: '1px solid',
-                                        borderColor: 'rgba(128,128,128,0.2)',
-                                        boxShadow: '0 4px 20px var(--border-color)',
-                                        '&:hover': {
-                                            transform: 'translateY(-4px)',
-                                            boxShadow: '0 12px 40px var(--border-color)',
-                                            borderColor: 'var(--primary)',
-                                            '& .card-icon': {
-                                                bgcolor: 'var(--primary)',
-                                                color: 'white',
-                                                '& svg path': {
-                                                    stroke: 'white'
-                                                }
-                                            },
-                                            '& .card-arrow': {
-                                                bgcolor: 'var(--primary)',
-                                                color: 'white'
-                                            }
-                                        }
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        transition: 'all 0.3s ease'
                                     }}
                                 >
-                                    {/* Icon */}
-                                    <Box
-                                        className="card-icon"
-                                        sx={{
-                                            width: 56,
-                                            height: 56,
-                                            borderRadius: 2,
-                                            bgcolor: 'rgba(16, 185, 129, 0.1)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            flexShrink: 0,
-                                            transition: 'all 0.3s ease'
-                                        }}
-                                    >
-                                        {isIndoor ? (
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M22 22H2M2 11L10.126 4.04a3 3 0 013.748 0L22 11M15.5 5.5V3.5a1 1 0 011-1h2a1 1 0 011 1v5M4 22V9.5M20 22V9.5M9 22v-4a3 3 0 016 0v4M10 9a2 2 0 104 0 2 2 0 00-4 0Z" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        ) : isOutdoor ? (
-                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M18 12a6 6 0 11-12 0 6 6 0 0112 0Z" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                            </svg>
-                                        ) : (
-                                            <Monitor size="24" color="var(--primary)" variant="Outline" />
-                                        )}
-                                    </Box>
+                                    <Monitor size="24" color="var(--primary)" variant="Outline" />
+                                </Box>
 
-                                    {/* Content */}
-                                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                                        <Typography sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontWeight: 600,
-                                            fontSize: { xs: '1.1rem', md: '1.25rem' },
-                                            color: 'var(--foreground)',
-                                            mb: 0.5
-                                        }}>
-                                            {child.name}
-                                        </Typography>
-                                        <Typography sx={{
-                                            fontFamily: 'var(--font-prompt)',
-                                            fontSize: '0.9rem',
-                                            color: 'var(--foreground)',
-                                            opacity: 0.6
-                                        }}>
-                                            {isIndoor ? 'สำหรับงานในร่ม' : isOutdoor ? 'สำหรับงานกลางแจ้ง' : 'ดูรายละเอียด'}
-                                        </Typography>
-                                        <Chip
-                                            label={`${child._count.products} สินค้า`}
-                                            size="small"
-                                            sx={{
-                                                mt: 1.5,
-                                                bgcolor: 'rgba(16, 185, 129, 0.08)',
-                                                color: 'var(--primary)',
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontSize: '0.75rem',
-                                                fontWeight: 500,
-                                                height: 24
-                                            }}
-                                        />
-                                    </Box>
-
-                                    {/* Arrow */}
-                                    <Box
-                                        className="card-arrow"
+                                <Box sx={{ flex: 1, minWidth: 0 }}>
+                                    <Typography sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontWeight: 600,
+                                        fontSize: { xs: '1.1rem', md: '1.25rem' },
+                                        color: 'var(--foreground)',
+                                        mb: 0.5
+                                    }}>
+                                        {child.name}
+                                    </Typography>
+                                    <Chip
+                                        label={`${child._count.products} สินค้า`}
+                                        size="small"
                                         sx={{
-                                            width: 40,
-                                            height: 40,
-                                            borderRadius: '50%',
-                                            bgcolor: 'rgba(128,128,128,0.1)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            flexShrink: 0,
-                                            transition: 'all 0.3s ease'
+                                            mt: 1.5,
+                                            bgcolor: 'rgba(16, 185, 129, 0.08)',
+                                            color: 'var(--primary)',
+                                            fontFamily: 'var(--font-prompt)',
+                                            fontSize: '0.75rem',
+                                            fontWeight: 500,
+                                            height: 24
                                         }}
-                                    >
-                                        <ArrowRight2 size="20" color="var(--primary)" />
-                                    </Box>
-                                </Paper>
-                            );
-                        })}
+                                    />
+                                </Box>
+
+                                <Box
+                                    className="card-arrow"
+                                    sx={{
+                                        width: 40,
+                                        height: 40,
+                                        borderRadius: '50%',
+                                        bgcolor: 'rgba(128,128,128,0.1)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    <ArrowRight2 size="20" color="var(--primary)" />
+                                </Box>
+                            </Paper>
+                        ))}
                     </Box>
                 </Container>
             )}
 
-            {/* Products Grid */}
             {hasProducts && (
                 <Container maxWidth="lg" sx={{ mt: hasSubcategories ? 0 : 6 }}>
-                    {/* Section Header - Compact Layout */}
                     <Box sx={{
                         display: 'flex',
                         flexDirection: { xs: 'column', sm: 'row' },
@@ -1163,7 +685,6 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                 </Container>
             )}
 
-            {/* Empty State */}
             {!hasSubcategories && !hasProducts && (
                 <Box sx={{
                     display: 'flex',
@@ -1186,18 +707,12 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                         ยังไม่มีสินค้าในหมวดหมู่นี้
                     </Typography>
                 </Box>
-
             )}
 
-            {/* --- NEW BOTTOM SECTIONS --- */}
-
-            {/* --- CTA Section --- */}
-
-            {/* 3. New CTA (Gradient) */}
             <Box sx={{
                 position: 'relative',
                 py: { xs: 8, md: 10 },
-                bgcolor: '#0a5c5a', // Fallback
+                bgcolor: '#0a5c5a',
                 background: 'linear-gradient(135deg, #0a5c5a 0%, #06403e 100%)',
                 overflow: 'hidden',
                 color: 'white',
@@ -1218,7 +733,6 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                             href="https://line.me/ti/p/~@setevent"
                             target="_blank"
                             rel="noopener noreferrer"
-                            aria-label="ติดต่อเราผ่าน LINE @setevent"
                             variant="contained"
                             startIcon={<MessageQuestion size="24" variant="Bold" color="white" />}
                             sx={{
@@ -1236,7 +750,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                             แอด LINE @setevent
                         </Button>
                         <Button
-                            href="tel:0812345678"
+                            href="tel:0937265055"
                             variant="outlined"
                             startIcon={<CallCalling size="24" variant="Bold" color="white" />}
                             sx={{
