@@ -165,7 +165,6 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                             borderRadius: 4,
                             border: '1px solid rgba(10, 92, 90, 0.1)',
                             position: 'relative',
-
                         }}>
                             <Box sx={{ position: 'absolute', top: -10, right: -10, width: 60, height: 60, background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)', opacity: 0.1 }} />
                             <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.85rem', fontWeight: 500, mb: 1 }}>
