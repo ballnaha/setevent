@@ -404,7 +404,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                 </Stack>
                             )}
 
-                            {/* Description (Moved to Bottom) */}
+                            {/* Description (Multi-line support) */}
                             {product.description && (
                                 <Typography sx={{
                                     fontFamily: 'var(--font-prompt)',
@@ -412,11 +412,11 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                     color: 'var(--foreground)',
                                     opacity: 0.6,
                                     display: '-webkit-box',
-                                    WebkitLineClamp: 1,
+                                    WebkitLineClamp: 2,
                                     WebkitBoxOrient: 'vertical',
                                     overflow: 'hidden',
-                                    lineHeight: 1.4,
-                                    mb: 0.5
+                                    lineHeight: 1.5,
+                                    mb: 1
                                 }}>
                                     {product.description}
                                 </Typography>
@@ -449,7 +449,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    p: { xs: 0, md: 4 },
+                    p: 0, // Truly full screen
                     '& .MuiBackdrop-root': {
                         bgcolor: 'var(--background)',
                         opacity: '1 !important'
@@ -460,8 +460,6 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                     position: 'relative',
                     width: '100%',
                     height: '100%',
-                    maxWidth: 1200,
-                    maxHeight: '100vh',
                     display: 'flex',
                     flexDirection: 'column',
                     outline: 'none',
@@ -486,158 +484,283 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         <CloseCircle size="28" color='var(--primary)' variant='Outline' />
                     </IconButton>
 
-                    {/* Main Swiper */}
-                    <Box sx={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
-                        <Swiper
-                            modules={[Navigation, EffectFade, Thumbs]}
-                            navigation={{
-                                prevEl: '.lightbox-prev',
-                                nextEl: '.lightbox-next',
-                            }}
-                            effect="fade"
-                            loop={imageCount > 1}
-                            initialSlide={lightboxIndex}
-                            thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-                            onSlideChange={(swiper) => setLightboxIndex(swiper.realIndex)}
-                            style={{ height: '100%' }}
-                        >
-                            {product.images.map((img, idx) => (
-                                <SwiperSlide key={idx}>
-                                    <Box sx={{ position: 'relative', width: '100%', height: '100%', p: { xs: 2, md: 10 } }}>
-                                        <Image
-                                            src={img}
-                                            alt={product.name}
-                                            fill
-                                            onLoad={() => handleImageLoad(idx)}
-                                            style={{
-                                                objectFit: 'contain',
-                                                opacity: loadedImages[idx] ? 1 : 0,
-                                                transition: 'opacity 0.4s ease-in-out'
-                                            }}
-                                            priority={idx === lightboxIndex || Math.abs(idx - lightboxIndex) <= 1}
-                                        />
-                                        {!loadedImages[idx] && (
-                                            <Skeleton
-                                                variant="rectangular"
-                                                width="100%"
-                                                height="100%"
-                                                animation="wave"
-                                                sx={{
-                                                    position: 'absolute',
-                                                    top: 0,
-                                                    left: 0,
-                                                    bgcolor: 'rgba(128,128,128,0.1)',
-                                                    zIndex: 1
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', lg: 'row' },
+                        height: '100%',
+                        overflow: 'hidden'
+                    }}>
+                        {/* Left Side: Image Swiper */}
+                        <Box sx={{
+                            flex: { xs: '0 0 auto', lg: 1 },
+                            height: { xs: '60vh', lg: '100%' }, // Increased mobile height
+                            position: 'relative',
+                            minHeight: 0,
+                            overflow: 'hidden',
+                            borderRight: { lg: '1px solid var(--border-color)' }
+                        }}>
+                            <Swiper
+                                modules={[Navigation, EffectFade, Thumbs]}
+                                navigation={{
+                                    prevEl: '.lightbox-prev',
+                                    nextEl: '.lightbox-next',
+                                }}
+                                effect="fade"
+                                loop={imageCount > 1}
+                                initialSlide={lightboxIndex}
+                                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                                onSlideChange={(swiper) => setLightboxIndex(swiper.realIndex)}
+                                style={{ height: '100%' }}
+                            >
+                                {product.images.map((img, idx) => (
+                                    <SwiperSlide key={idx}>
+                                        <Box sx={{ position: 'relative', width: '100%', height: '100%', p: { xs: 1, md: 2 } }}>
+                                            <Image
+                                                src={img}
+                                                alt={product.name}
+                                                fill
+                                                onLoad={() => handleImageLoad(idx)}
+                                                style={{
+                                                    objectFit: 'contain',
+                                                    objectPosition: 'center',
+                                                    opacity: loadedImages[idx] ? 1 : 0,
+                                                    transition: 'opacity 0.4s ease-in-out'
                                                 }}
+                                                priority={idx === lightboxIndex || Math.abs(idx - lightboxIndex) <= 1}
                                             />
-                                        )}
-                                    </Box>
-                                </SwiperSlide>
-                            ))}
-                        </Swiper>
+                                            {!loadedImages[idx] && (
+                                                <Skeleton
+                                                    variant="rectangular"
+                                                    width="100%"
+                                                    height="100%"
+                                                    animation="wave"
+                                                    sx={{
+                                                        position: 'absolute',
+                                                        top: 0,
+                                                        left: 0,
+                                                        bgcolor: 'rgba(128,128,128,0.1)',
+                                                        zIndex: 1
+                                                    }}
+                                                />
+                                            )}
+                                        </Box>
+                                    </SwiperSlide>
+                                ))}
+                            </Swiper>
 
-                        {/* Lightbox Navigation Arrows */}
-                        {imageCount > 1 && (
-                            <>
-                                <IconButton
-                                    className="lightbox-prev"
-                                    aria-label="ภาพก่อนหน้า"
-                                    sx={{
-                                        position: 'absolute',
-                                        left: { xs: 8, md: 24 },
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        zIndex: 100,
-                                        color: 'var(--foreground)',
-                                        bgcolor: 'var(--border-color)',
-                                        backdropFilter: 'blur(10px)',
-                                        width: { xs: 40, md: 56 },
-                                        height: { xs: 40, md: 56 },
-                                        borderRadius: '50%',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': { bgcolor: 'var(--background)', borderColor: 'var(--primary)', border: '1px solid var(--primary)' },
-                                        '&.swiper-button-disabled': { opacity: 0, pointerEvents: 'none' }
-                                    }}
-                                >
-                                    <ArrowLeft2 size="28" />
-                                </IconButton>
-                                <IconButton
-                                    className="lightbox-next"
-                                    aria-label="ภาพถัดไป"
-                                    sx={{
-                                        position: 'absolute',
-                                        right: { xs: 8, md: 24 },
-                                        top: '50%',
-                                        transform: 'translateY(-50%)',
-                                        zIndex: 100,
-                                        color: 'var(--foreground)',
-                                        bgcolor: 'var(--border-color)',
-                                        backdropFilter: 'blur(10px)',
-                                        width: { xs: 40, md: 56 },
-                                        height: { xs: 40, md: 56 },
-                                        borderRadius: '50%',
-                                        transition: 'all 0.3s ease',
-                                        '&:hover': { bgcolor: 'var(--background)', borderColor: 'var(--primary)', border: '1px solid var(--primary)' },
-                                        '&.swiper-button-disabled': { opacity: 0, pointerEvents: 'none' }
-                                    }}
-                                >
-                                    <ArrowRight2 size="28" />
-                                </IconButton>
-                            </>
-                        )}
-                    </Box>
-
-                    {/* Footer: Counter & Thumbnails */}
-                    <Box sx={{ pb: 4, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5 }}>
-                        {/* Image Counter */}
-                        <Box sx={{ bgcolor: 'var(--border-color)', borderRadius: 2, px: 2, py: 0.5 }}>
-                            <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontSize: '0.9rem', fontWeight: 600 }}>
-                                {lightboxIndex + 1} / {imageCount}
-                            </Typography>
+                            {/* Lightbox Navigation Arrows */}
+                            {imageCount > 1 && (
+                                <>
+                                    <IconButton
+                                        className="lightbox-prev"
+                                        sx={{
+                                            position: 'absolute',
+                                            left: 16,
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 100,
+                                            color: 'var(--foreground)',
+                                            bgcolor: 'var(--border-color)',
+                                            backdropFilter: 'blur(10px)',
+                                            width: 44,
+                                            height: 44,
+                                            borderRadius: '50%',
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': { bgcolor: 'var(--background)', border: '1px solid var(--primary)' },
+                                            '&.swiper-button-disabled': { opacity: 0 }
+                                        }}
+                                    >
+                                        <ArrowLeft2 size="24" />
+                                    </IconButton>
+                                    <IconButton
+                                        className="lightbox-next"
+                                        sx={{
+                                            position: 'absolute',
+                                            right: 16,
+                                            top: '50%',
+                                            transform: 'translateY(-50%)',
+                                            zIndex: 100,
+                                            color: 'var(--foreground)',
+                                            bgcolor: 'var(--border-color)',
+                                            backdropFilter: 'blur(10px)',
+                                            width: 44,
+                                            height: 44,
+                                            borderRadius: '50%',
+                                            transition: 'all 0.3s ease',
+                                            '&:hover': { bgcolor: 'var(--background)', border: '1px solid var(--primary)' },
+                                            '&.swiper-button-disabled': { opacity: 0 }
+                                        }}
+                                    >
+                                        <ArrowRight2 size="24" />
+                                    </IconButton>
+                                </>
+                            )}
                         </Box>
 
-                        {/* Thumbnail Swiper */}
-                        {imageCount > 1 && (
-                            <Box sx={{ width: '100%', maxWidth: 600, height: { xs: 50, md: 70 } }}>
-                                <Swiper
-                                    onSwiper={setThumbsSwiper}
-                                    modules={[FreeMode, Navigation, Thumbs]}
-                                    spaceBetween={10}
-                                    slidesPerView={'auto'}
-                                    freeMode={true}
-                                    watchSlidesProgress={true}
-                                    centerInsufficientSlides={true}
-                                    style={{ height: '100%' }}
-                                    className="thumb-swiper"
-                                >
-                                    {product.images.map((img, idx) => (
-                                        <SwiperSlide key={idx} style={{ width: 'auto' }}>
-                                            <Box
-                                                sx={{
-                                                    width: { xs: 60, md: 90 },
-                                                    height: '100%',
-                                                    borderRadius: 1,
-                                                    overflow: 'hidden',
-                                                    cursor: 'pointer',
-                                                    border: idx === lightboxIndex ? '2px solid var(--primary)' : '2px solid transparent',
-                                                    opacity: idx === lightboxIndex ? 1 : 0.5,
-                                                    transition: 'all 0.2s',
-                                                    '&:hover': { opacity: 1 }
-                                                }}
-                                            >
-                                                <Image
-                                                    src={img}
-                                                    alt={`Thumbnail ${idx + 1}`}
-                                                    width={90}
-                                                    height={70}
-                                                    style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                                                />
+                        {/* Right Side: Product Details */}
+                        <Box sx={{
+                            width: { xs: '100%', lg: 400 },
+                            display: 'flex',
+                            flexDirection: 'column',
+                            bgcolor: 'var(--card-bg)',
+                            height: { xs: 'auto', lg: '100%' },
+                            overflowY: 'auto',
+                            p: { xs: 3, md: 5 },
+                            position: 'relative'
+                        }}>
+                            {/* Category Badge */}
+                            <Typography sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontSize: '0.75rem',
+                                color: 'var(--primary)',
+                                fontWeight: 700,
+                                textTransform: 'uppercase',
+                                letterSpacing: 1.5,
+                                mb: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1
+                            }}>
+                                <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: 'var(--primary)' }}></span>
+                                {categoryName}
+                            </Typography>
+
+                            {/* Title */}
+                            <Typography sx={{
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 700,
+                                fontSize: { xs: '1.5rem', md: '1.8rem' },
+                                color: 'var(--foreground)',
+                                lineHeight: 1.2,
+                                mb: 3
+                            }}>
+                                {product.name}
+                            </Typography>
+
+                            {/* Price */}
+                            {product.price && (
+                                <Box sx={{ mb: 4, p: 2, bgcolor: 'rgba(10, 92, 90, 0.05)', borderRadius: 2, border: '1px solid rgba(10, 92, 90, 0.1)' }}>
+                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.8rem', mb: 0.5 }}>
+                                        ราคาประมาณการ
+                                    </Typography>
+                                    <Stack direction="row" alignItems="baseline" spacing={1}>
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, fontSize: '2rem', color: 'var(--primary)' }}>
+                                            ฿{product.price.toLocaleString()}
+                                        </Typography>
+                                        {product.priceUnit && (
+                                            <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '1rem' }}>
+                                                {product.priceUnit}
+                                            </Typography>
+                                        )}
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {/* Features Section */}
+                            {product.features && product.features.length > 0 && (
+                                <Box sx={{ mb: 4 }}>
+                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        <MagicStar size="20" color="var(--primary)" variant="Bold" />
+                                        จุดเด่นสินค้า
+                                    </Typography>
+                                    <Stack spacing={1.5}>
+                                        {product.features.map((feature, idx) => (
+                                            <Box key={idx} sx={{ display: 'flex', alignItems: 'flex-start', gap: 1.5 }}>
+                                                <Box sx={{ mt: 0.5, width: 6, height: 6, borderRadius: '50%', bgcolor: 'var(--primary)', flexShrink: 0 }} />
+                                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem', color: 'var(--foreground)', opacity: 0.8 }}>
+                                                    {feature}
+                                                </Typography>
                                             </Box>
-                                        </SwiperSlide>
-                                    ))}
-                                </Swiper>
-                            </Box>
-                        )}
+                                        ))}
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {/* Description Section */}
+                            {product.description && (
+                                <Box sx={{ mb: 4 }}>
+                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', mb: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                        <NoteText size="20" color="var(--primary)" variant="Bold" />
+                                        รายละเอียดเพิ่มเติม
+                                    </Typography>
+                                    <Typography sx={{
+                                        fontFamily: 'var(--font-prompt)',
+                                        fontSize: '0.9rem',
+                                        color: 'var(--foreground)',
+                                        opacity: 0.7,
+                                        lineHeight: 1.8,
+                                        whiteSpace: 'pre-line'
+                                    }}>
+                                        {product.description}
+                                    </Typography>
+                                </Box>
+                            )}
+
+                            {/* Action Button */}
+                            <Button
+                                href="https://line.me/ti/p/~@setevent"
+                                target="_blank"
+                                variant="contained"
+                                fullWidth
+                                startIcon={<MessageQuestion size="20" variant="Bold" color="white" />}
+                                sx={{
+                                    mt: 'auto',
+                                    bgcolor: '#1a1a1a',
+                                    color: 'white',
+                                    py: 2,
+                                    borderRadius: 3,
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontWeight: 600,
+                                    '&:hover': { bgcolor: 'var(--primary)' }
+                                }}
+                            >
+                                สอบถามข้อมูลเพิ่มเติม
+                            </Button>
+
+                            {/* Thumbnail Swiper for the current view */}
+                            {imageCount > 1 && (
+                                <Box sx={{ mt: 4, pt: 4, borderTop: '1px solid var(--border-color)' }}>
+                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem', opacity: 0.5, mb: 1.5 }}>
+                                        รูปภาพอื่น ({imageCount})
+                                    </Typography>
+                                    <Swiper
+                                        onSwiper={setThumbsSwiper}
+                                        modules={[FreeMode, Navigation, Thumbs]}
+                                        spaceBetween={8}
+                                        slidesPerView={'auto'}
+                                        freeMode={true}
+                                        watchSlidesProgress={true}
+                                        style={{ height: 60 }}
+                                    >
+                                        {product.images.map((img, idx) => (
+                                            <SwiperSlide key={idx} style={{ width: 'auto' }}>
+                                                <Box
+                                                    sx={{
+                                                        width: 80,
+                                                        height: 60,
+                                                        borderRadius: 1.5,
+                                                        overflow: 'hidden',
+                                                        cursor: 'pointer',
+                                                        border: idx === lightboxIndex ? '2px solid var(--primary)' : '1px solid var(--border-color)',
+                                                        opacity: idx === lightboxIndex ? 1 : 0.6,
+                                                        transition: 'all 0.2s',
+                                                        '&:hover': { opacity: 1 }
+                                                    }}
+                                                >
+                                                    <Image
+                                                        src={img}
+                                                        alt={`Thumbnail ${idx + 1}`}
+                                                        width={80}
+                                                        height={60}
+                                                        style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                                                    />
+                                                </Box>
+                                            </SwiperSlide>
+                                        ))}
+                                    </Swiper>
+                                </Box>
+                            )}
+                        </Box>
                     </Box>
                 </Box>
             </Modal>
