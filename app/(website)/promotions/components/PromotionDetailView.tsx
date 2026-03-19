@@ -54,12 +54,13 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
         <Box sx={{
             position: 'relative',
             width: '100%',
-            height: isModal ? '100%' : 'auto',
-            minHeight: isModal ? '100%' : '100vh',
+            height: isModal ? '100vh' : 'auto',
+            minHeight: isModal ? '100vh' : '100vh',
             display: 'flex',
             flexDirection: 'column',
             outline: 'none',
             bgcolor: 'var(--background)',
+            overflow: isModal ? 'hidden' : 'visible',
         }}>
             {/* Close Button */}
             <IconButton
@@ -82,15 +83,14 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
             <Box sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', lg: 'row' },
-                height: isModal ? '100%' : 'auto',
-                minHeight: isModal ? '100%' : '100vh',
-                overflowY: { xs: 'auto', lg: 'hidden' },
-                overflowX: 'hidden'
+                flex: 1,
+                minHeight: 0,
+                overflow: { xs: 'auto', lg: 'hidden' },
             }}>
                 {/* Left Side: Image Display */}
                 <Box sx={{
                     flex: { xs: '0 0 auto', lg: 1 },
-                    height: { xs: '60vh', lg: '100vh' },
+                    height: { xs: '60vh', lg: 'auto' },
                     position: 'relative',
                     minHeight: 0,
                     overflow: 'hidden',
@@ -115,14 +115,14 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                     </Box>
                 </Box>
 
-                {/* Right Side: Promotion Details (Matches Product Detail Sidebar) */}
+                {/* Right Side: Promotion Details */}
                 <Box sx={{
                     width: { xs: '100%', lg: 550 },
                     display: 'flex',
                     flexDirection: 'column',
                     bgcolor: 'var(--card-bg)',
-                    height: { xs: 'auto', lg: '100vh' },
-                    overflowY: { xs: 'visible', lg: 'auto' },
+                    flexShrink: 0,
+                    overflowY: 'auto',
                     p: { xs: 4, md: 6 },
                     position: 'relative'
                 }}>
@@ -165,7 +165,7 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                             borderRadius: 4,
                             border: '1px solid rgba(10, 92, 90, 0.1)',
                             position: 'relative',
-                            overflow: 'hidden'
+
                         }}>
                             <Box sx={{ position: 'absolute', top: -10, right: -10, width: 60, height: 60, background: 'radial-gradient(circle, var(--primary) 0%, transparent 70%)', opacity: 0.1 }} />
                             <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.85rem', fontWeight: 500, mb: 1 }}>

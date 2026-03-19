@@ -30,14 +30,14 @@ export default function ModalWrapper({ children }: { children: React.ReactNode }
             }}
         >
             <Box sx={{
-                width: '100%',
-                height: '100%',
-                maxWidth: '100vw',
-                maxHeight: '100vh',
+                width: '100vw',
+                height: '100vh',
                 bgcolor: 'var(--background)',
-                overflow: 'hidden',
                 outline: 'none',
                 boxShadow: 24,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
             }}>
                 {/* Clone the children but pass the handleClose if possible */}
                 {React.Children.map(children, child => {

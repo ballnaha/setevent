@@ -56,12 +56,13 @@ export default function ProductDetailView({ product, categoryName = "Product Det
         <Box sx={{
             position: 'relative',
             width: '100%',
-            height: isModal ? '100%' : 'auto',
-            minHeight: isModal ? '100%' : '100vh',
+            height: isModal ? '100vh' : 'auto',
+            minHeight: isModal ? '100vh' : '100vh',
             display: 'flex',
             flexDirection: 'column',
             outline: 'none',
             bgcolor: 'var(--background)',
+            overflow: isModal ? 'hidden' : 'visible',
             '& .swiper': { width: '100%', height: '100%' }
         }}>
             {/* Close Button */}
@@ -87,15 +88,14 @@ export default function ProductDetailView({ product, categoryName = "Product Det
             <Box sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', lg: 'row' },
-                height: isModal ? '100%' : 'auto',
-                minHeight: isModal ? '100%' : '100vh',
-                overflowY: { xs: 'auto', lg: 'hidden' },
-                overflowX: 'hidden'
+                flex: 1,
+                minHeight: 0,
+                overflow: { xs: 'auto', lg: 'hidden' },
             }}>
                 {/* Left Side: Image Swiper */}
                 <Box sx={{
                     flex: { xs: '0 0 auto', lg: 1 },
-                    height: { xs: '60vh', lg: '100vh' },
+                    height: { xs: '60vh', lg: 'auto' },
                     position: 'relative',
                     minHeight: 0,
                     overflow: 'hidden',
@@ -206,8 +206,8 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     display: 'flex',
                     flexDirection: 'column',
                     bgcolor: 'var(--card-bg)',
-                    height: { xs: 'auto', lg: '100vh' },
-                    overflowY: { xs: 'visible', lg: 'auto' },
+                    flexShrink: 0,
+                    overflowY: 'auto',
                     p: { xs: 4, md: 6 },
                     position: 'relative'
                 }}>

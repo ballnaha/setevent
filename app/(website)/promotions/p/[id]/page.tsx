@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+export const revalidate = 0;
 import { prisma } from "@/lib/prisma";
 import { notFound } from 'next/navigation';
 import PromotionDetailView from '../../components/PromotionDetailView';

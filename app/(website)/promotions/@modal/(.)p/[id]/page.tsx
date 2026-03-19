@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+export const revalidate = 0;
 import { notFound } from 'next/navigation';
 import PromotionDetailView from '../../../components/PromotionDetailView';
 import ModalWrapper from '../../../../products/components/ModalWrapper'; // Re-use the modal wrapper from products
