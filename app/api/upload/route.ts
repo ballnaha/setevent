@@ -66,8 +66,8 @@ export async function POST(req: NextRequest) {
                         // Check if watermark exists
                         await fs.access(watermarkPath);
 
-                        // Resize watermark to 10% of image width (Reduced from 15%)
-                        const wmWidth = Math.max(Math.round(width * 0.10), 80);
+                        // Resize watermark to 7.5% of image width (Reduced for a smaller logo)
+                        const wmWidth = Math.max(Math.round(width * 0.075), 60);
 
                         const watermarkBuffer = await sharp(watermarkPath)
                             .resize(wmWidth)
@@ -77,28 +77,29 @@ export async function POST(req: NextRequest) {
                         const wmHeight = wmMetadata.height || 40;
 
                         // Calculate position (bottom-right with padding)
-                        const padding = Math.round(width * 0.02); // 2% padding
+                        const paddingX = Math.round(width * 0.06); // 6% padding from right - moves watermark to the left
+                        const paddingY = Math.round(width * 0.03); // 3% padding from bottom
 
                         // Create website text watermark using SVG with Cinzel font and wide spacing
                         const rawText = "SETEVENTTHAILAND.COM";
                         const websiteText = rawText.split('').join(' '); // Add space between every letter
 
-                        const fontSize = Math.max(Math.round(width * 0.012), 11); // Reduced from 0.018
-                        // Increase width calculation to account for extra spaces and Cinzel's width
-                        const textWidth = Math.round(fontSize * websiteText.length * 0.55);
+                        const fontSize = Math.max(Math.round(width * 0.009), 10); // Reduced font size
+                        // Give plenty of width for the SVG so text doesn't clip
+                        const textWidth = Math.round(fontSize * websiteText.length * 0.8);
                         const textHeight = Math.round(fontSize * 1.5);
 
                         const textSvg = `
                             <svg xmlns="http://www.w3.org/2000/svg" width="${textWidth}" height="${textHeight}">
                                 <text 
-                                    x="50%" 
+                                    x="100%" 
                                     y="${fontSize}" 
-                                    text-anchor="middle"
+                                    text-anchor="end"
                                     font-family="Cinzel, serif" 
                                     font-size="${fontSize}" 
                                     font-weight="400" 
                                     fill="white" 
-                                    opacity="1"
+                                    opacity="0.9"
                                 >${websiteText}</text>
                             </svg>`;
 
@@ -106,13 +107,13 @@ export async function POST(req: NextRequest) {
                             .png()
                             .toBuffer();
 
-                        // Position for logo (above text)
-                        const logoLeft = width - wmWidth - padding;
-                        const textTop = height - textHeight - padding;
-                        const logoTop = textTop - wmHeight - Math.round(padding * 0.3);
+                        // Text position (bottom right)
+                        const textLeft = width - textWidth - paddingX;
+                        const textTop = height - textHeight - paddingY;
 
-                        // Position for text (below logo, right aligned)
-                        const textLeft = width - textWidth - padding;
+                        // Logo position (above text, right aligned too)
+                        const logoLeft = width - wmWidth - paddingX;
+                        const logoTop = textTop - wmHeight - Math.round(paddingY * 0.3);
 
                         // Apply both watermarks
                         intermediateBuffer = await sharp(intermediateBuffer)
