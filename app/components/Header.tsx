@@ -101,6 +101,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         { label: "PROMOTIONS", href: "/promotions" },
         { label: "PORTFOLIO", href: "/portfolio" },
         { label: "NEW DESIGN", href: "/designs" },
+        { label: "WEDDING E-CARD", href: "/wedding-e-card" },
     ], [productSections]);
 
     // Desktop Menu States
@@ -115,9 +116,6 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
     // Track expanded items for Desktop Mega Menu
     const [desktopExpandedItems, setDesktopExpandedItems] = useState<string[]>([]);
 
-    // State for Contact Menu
-    const [contactAnchorEl, setContactAnchorEl] = useState<null | HTMLElement>(null);
-    const openContact = Boolean(contactAnchorEl);
 
     const pathname = usePathname();
     const decodedPathname = decodeURIComponent(pathname);
@@ -128,6 +126,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         pathname === "/contact" ||
         pathname === "/promotions" ||
         pathname === "/designs" ||
+        pathname === "/wedding-e-card" ||
         pathname.startsWith("/portfolio") ||
         decodedPathname.startsWith("/portfolio") ||
         pathname.startsWith("/products") ||
@@ -143,6 +142,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         pathname.startsWith("/blog") ||
         pathname.startsWith("/faq") ||
         pathname === "/designs" ||
+        pathname === "/wedding-e-card" ||
         pathname.startsWith("/portfolio") ||
         decodedPathname.startsWith("/portfolio") ||
         pathname === "/promotions" ||
@@ -159,12 +159,6 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         setMobileOpen(!mobileOpen);
     };
 
-    const handleContactClick = (event: React.MouseEvent<HTMLElement>) => {
-        setContactAnchorEl(event.currentTarget);
-    };
-    const handleContactClose = () => {
-        setContactAnchorEl(null);
-    };
 
     // Desktop Hover Handlers
     const handleHoverOpen = (event: React.MouseEvent<HTMLElement>, menuName: string) => {
@@ -699,113 +693,6 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                             )}
                         </IconButton>
 
-                        <Button
-                            variant="outlined"
-                            component="a"
-                            href="/contact"
-                            sx={{
-                                color: isDarkText ? 'var(--foreground)' : 'white',
-                                borderColor: isDarkText ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.5)',
-                                borderRadius: '0',
-                                fontFamily: 'var(--font-prompt)',
-                                px: 3,
-                                py: 1,
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                letterSpacing: 0.5,
-                                fontSize: '0.9rem',
-                                '&:hover': {
-                                    bgcolor: 'var(--secondary)',
-                                    borderColor: 'var(--secondary)',
-                                    color: 'white'
-                                }
-                            }}
-                        >
-                            ติดต่อเรา
-                        </Button>
-                        <Menu
-                            anchorEl={contactAnchorEl}
-                            open={openContact}
-                            onClose={handleContactClose}
-                            TransitionComponent={Fade}
-                            disableScrollLock={true}
-                            PaperProps={{
-                                elevation: 0,
-                                sx: {
-                                    mt: 1.5,
-                                    overflow: 'visible',
-                                    filter: 'drop-shadow(0px 20px 50px rgba(0,0,0,0.1))',
-                                    bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                    backdropFilter: 'blur(20px)',
-                                    border: '1px solid rgba(255, 255, 255, 0.8)',
-                                    borderRadius: 2,
-                                    minWidth: 200,
-                                    '&:before': {
-                                        content: '""',
-                                        display: 'block',
-                                        position: 'absolute',
-                                        top: 0,
-                                        right: 25,
-                                        width: 10,
-                                        height: 10,
-                                        bgcolor: 'rgba(255, 255, 255, 0.95)',
-                                        transform: 'translateY(-50%) rotate(45deg)',
-                                        zIndex: 0,
-                                        borderLeft: '1px solid rgba(255, 255, 255, 0.8)',
-                                        borderTop: '1px solid rgba(255, 255, 255, 0.8)',
-                                    },
-                                },
-                            }}
-                            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-                        >
-                            <MenuItem onClick={handleContactClose} component="a" href={settings.lineUrl} target="_blank" rel="noopener noreferrer" aria-label="ติดต่อเราผ่าน Line Official">
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Box sx={{
-                                        width: 36,
-                                        height: 36,
-                                        borderRadius: '50%',
-                                        bgcolor: '#06C755',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <Message size="20" color="white" variant="Bold" />
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>
-                                            {settings.line}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
-                                            Line Official
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            </MenuItem>
-                            <MenuItem onClick={handleContactClose} component="a" href={`tel:${settings.phone.replace(/[^0-9]/g, '')}`}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                    <Box sx={{
-                                        width: 36,
-                                        height: 36,
-                                        borderRadius: '50%',
-                                        bgcolor: 'var(--secondary)',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <Call size="20" color="white" variant="Bold" />
-                                    </Box>
-                                    <Box>
-                                        <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, color: 'var(--foreground)' }}>
-                                            {settings.phone}
-                                        </Typography>
-                                        <Typography variant="caption" sx={{ fontFamily: 'var(--font-prompt)', color: 'text.secondary' }}>
-                                            ติดต่อด่วน
-                                        </Typography>
-                                    </Box>
-                                </Box>
-                            </MenuItem>
-                        </Menu>
                     </Box>
 
                 </Toolbar>
