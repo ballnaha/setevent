@@ -21,7 +21,10 @@ export default function WeddingECardContent() {
                     right: '-10%',
                     width: '600px',
                     height: '600px',
-                    background: 'radial-gradient(circle, rgba(255, 182, 193, 0.2) 0%, rgba(255, 182, 193, 0) 70%)',
+                    background: 'radial-gradient(circle, rgba(255, 182, 193, 0.15) 0%, rgba(255, 182, 193, 0) 70%)',
+                    '.dark &': {
+                        background: 'radial-gradient(circle, rgba(255, 105, 180, 0.08) 0%, rgba(255, 105, 180, 0) 70%)'
+                    },
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -32,6 +35,9 @@ export default function WeddingECardContent() {
                     width: '500px',
                     height: '500px',
                     background: 'radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0) 70%)',
+                    '.dark &': {
+                        background: 'radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, rgba(212, 175, 55, 0) 70%)'
+                    },
                     filter: 'blur(60px)',
                     zIndex: 0
                 }} />
@@ -88,7 +94,7 @@ export default function WeddingECardContent() {
             </Box>
 
             {/* Benefits & Pricing Section */}
-            <Box sx={{ py: 10, bgcolor: 'rgba(128,128,128,0.02)' }}>
+            <Box sx={{ py: 10, bgcolor: 'var(--card-bg)', borderTop: '1px solid var(--border-color)' }}>
                 <Container maxWidth="lg">
                     <Stack spacing={10}>
                         {/* Benefits Grid */}
@@ -98,7 +104,8 @@ export default function WeddingECardContent() {
                                 fontWeight: 800,
                                 textAlign: 'center',
                                 mb: 6,
-                                fontSize: { xs: '2rem', md: '3rem' }
+                                fontSize: { xs: '2rem', md: '3rem' },
+                                color: 'var(--foreground)'
                             }}>
                                 ทำไมต้องมี <span style={{ color: '#FF69B4' }}>E-Card</span> งานแต่งงาน?
                             </Typography>
@@ -129,14 +136,19 @@ export default function WeddingECardContent() {
                                         bgcolor: 'var(--background)',
                                         borderRadius: 4,
                                         border: '1px solid var(--border-color)',
-                                        transition: 'transform 0.3s ease',
-                                        '&:hover': { transform: 'translateY(-10px)' }
+                                        boxShadow: 'var(--card-shadow)',
+                                        transition: 'all 0.3s ease',
+                                        '&:hover': { 
+                                            transform: 'translateY(-10px)',
+                                            borderColor: '#FF69B4',
+                                            boxShadow: '0 10px 30px rgba(255, 105, 180, 0.1)'
+                                        }
                                     }}>
                                         <Box sx={{ mb: 2 }}>{benefit.icon}</Box>
-                                        <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 1.5 }}>
+                                        <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 1.5, color: 'var(--foreground)' }}>
                                             {benefit.title}
                                         </Typography>
-                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.95rem', lineHeight: 1.6 }}>
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.7, fontSize: '0.95rem', lineHeight: 1.6 }}>
                                             {benefit.desc}
                                         </Typography>
                                     </Box>
@@ -175,7 +187,7 @@ export default function WeddingECardContent() {
                                     borderRadius: 8,
                                     border: '2px solid rgba(255, 105, 180, 0.2)',
                                     overflow: 'hidden',
-                                    boxShadow: '0 20px 40px rgba(0,0,0,0.1)'
+                                    boxShadow: 'var(--card-shadow)'
                                 }}>
                                     <Box sx={{
                                         p: { xs: 4, md: 5 },
@@ -185,17 +197,18 @@ export default function WeddingECardContent() {
                                     }}>
                                         {/* Price Info */}
                                         <Box sx={{ textAlign: 'left' }}>
-                                            <Chip
+                                            <Chip 
                                                 label="Best Value Package"
                                                 sx={{
                                                     bgcolor: '#FF69B4',
-                                                    color: 'white',
+                                                    color: 'white !important', // Force white for visibility
                                                     fontFamily: 'var(--font-prompt)',
                                                     fontWeight: 700,
-                                                    mb: 2
+                                                    mb: 2,
+                                                    '& .MuiChip-label': { color: 'white' }
                                                 }}
                                             />
-                                            <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, mb: 1 }}>
+                                            <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, mb: 1, color: 'var(--foreground)' }}>
                                                 Professional <br /> Online Wedding Card
                                             </Typography>
                                             <Box sx={{ display: 'flex', alignItems: 'baseline', mt: 3, flexWrap: 'wrap', gap: 2 }}>
@@ -207,7 +220,7 @@ export default function WeddingECardContent() {
                                                     }}>
                                                         3,500
                                                     </Typography>
-                                                    <Typography variant="h6" sx={{ ml: 1, fontFamily: 'var(--font-prompt)', opacity: 0.6 }}>
+                                                    <Typography variant="h6" sx={{ ml: 1, fontFamily: 'var(--font-prompt)', opacity: 0.7, color: 'var(--foreground)' }}>
                                                         บาท
                                                     </Typography>
                                                 </Box>
@@ -216,7 +229,7 @@ export default function WeddingECardContent() {
                                                     px: 2,
                                                     py: 1,
                                                     borderRadius: 2,
-                                                    bgcolor: 'rgba(212, 175, 55, 0.1)',
+                                                    bgcolor: 'rgba(212, 175, 55, 0.15)',
                                                     border: '1px dashed #D4AF37',
                                                     display: 'flex',
                                                     alignItems: 'center'
@@ -225,20 +238,21 @@ export default function WeddingECardContent() {
                                                         fontFamily: 'var(--font-prompt)',
                                                         color: '#D4AF37',
                                                         fontWeight: 700,
-                                                        fontSize: '0.9rem'
+                                                        fontSize: '0.9rem',
+                                                        textShadow: '0 0 10px rgba(212, 175, 55, 0.2)'
                                                     }}>
                                                         หรือรับสิทธิ์ใช้งาน <span style={{ color: '#FF69B4', fontSize: '1.1rem' }}>ฟรี!</span> เมื่อเช่าจอ LED กับเรา
                                                     </Typography>
                                                 </Box>
                                             </Box>
-                                            <Typography sx={{ mt: 2, fontFamily: 'var(--font-prompt)', opacity: 0.6 }}>
+                                            <Typography sx={{ mt: 2, fontFamily: 'var(--font-prompt)', opacity: 0.7, color: 'var(--foreground)' }}>
                                                 ราคาเดียว จบครบทุกฟังก์ชัน <br /> ไม่มีค่าใช้จ่ายแอบแฝง
                                             </Typography>
                                         </Box>
 
                                         {/* Features List */}
                                         <Box>
-                                            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 3 }}>
+                                            <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 3, color: 'var(--foreground)' }}>
                                                 สิ่งที่จะได้รับภายในแพ็คเกจ:
                                             </Typography>
                                             <Box sx={{
@@ -271,7 +285,7 @@ export default function WeddingECardContent() {
                                                         }}>
                                                             <ArrowCircleRight size="16" color="#FF69B4" variant="Bold" />
                                                         </Box>
-                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'var(--foreground)' }}>
                                                             {feature}
                                                         </Typography>
                                                     </Box>
@@ -319,7 +333,8 @@ export default function WeddingECardContent() {
                                         height: '100%',
                                         position: 'relative',
                                         bgcolor: '#fff',
-                                        overflow: 'hidden'
+                                        overflow: 'hidden',
+                                        '.dark &': { bgcolor: '#000' }
                                     }}>
                                         {/* Auto-playing video demo of the e-card */}
                                         {/* Auto-playing video demo - Clickable Link */}
@@ -373,12 +388,13 @@ export default function WeddingECardContent() {
             {/* CTA Section */}
             <Container maxWidth="md" sx={{ mt: 10, mb: 5 }}>
                 <Box sx={{
-                    p: 6,
+                    p: { xs: 4, md: 6 },
                     borderRadius: 6,
-                    background: 'linear-gradient(135deg, rgba(255, 105, 180, 0.05) 0%, rgba(212, 175, 55, 0.05) 100%)',
-                    border: '1px solid rgba(255, 105, 180, 0.1)',
+                    background: 'linear-gradient(135deg, rgba(255, 105, 180, 0.08) 0%, rgba(212, 175, 55, 0.08) 100%)',
+                    border: '1px solid var(--border-color)',
                     textAlign: 'center',
-                    backdropFilter: 'blur(10px)'
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: 'var(--card-shadow)'
                 }}>
                     <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 2, color: 'var(--foreground)' }}>
                         สนใจสร้างการ์ดงานแต่งของคุณ?
