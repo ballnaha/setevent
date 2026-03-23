@@ -5,9 +5,15 @@ import BannerSlider from '../components/BannerSlider';
 export const revalidate = 0; // Force dynamic rendering
 
 export const metadata: Metadata = {
-  title: 'SET EVENT Thailand | บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร',
-  description: 'SET EVENT Thailand - บริการให้เช่าจอ LED, เวที, แสง, เสียง และอุปกรณ์งานอีเวนต์ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา และอีเวนต์ทุกประเภท พร้อมทีมงานมืออาชีพ',
+  title: 'SET EVENT Thailand | บริการเช่าจอ LED ราคาถูก จัดงานราคาประหยัด',
+  description: 'SET EVENT Thailand - บริการให้เช่าจอ LED ราคาถูก, เวที, แสง, เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร รับจัดงานอีเว้นท์ จัดงานราคาประหยัด ครบจบในงบเดียว พร้อมทีมงานมืออาชีพ',
   keywords: [
+    'เช่าจอ LED ราคาถูก',
+    'จัดงานราคาประหยัด',
+    'เช่าเครื่องเสียงราคาถูก',
+    'เช่าไฟพาร์ราคาถูก',
+    'จัดงานอีเว้นท์ราคาถูก',
+    'รับจัดงานอีเว้นท์ราคาประหยัด',
     'เช่าจอ LED',
     'จอ LED งานอีเวนต์',
     'เช่าเครื่องเสียง',
@@ -21,8 +27,8 @@ export const metadata: Metadata = {
     'อีเวนต์ประเทศไทย'
   ],
   openGraph: {
-    title: 'SET EVENT Thailand | บริการให้เช่าจอ LED เวที แสง เสียง ครบวงจร',
-    description: 'บริการให้เช่าจอ LED, เวที, แสง เสียง และอุปกรณ์งานอีเวนต์ครบวงจร พร้อมทีมงานมืออาชีพ',
+    title: 'SET EVENT Thailand | จอ LED ราคาถูก เช่าเครื่องเสียง และจัดงานราคาประหยัด',
+    description: 'บริการให้เช่าจอ LED ราคาถูก, เวที, แสง เสียง และอุปกรณ์งานอีเวนต์ครบวงจร จัดงานราคาประหยัด พร้อมทีมงานมืออาชีพ',
     url: 'https://seteventthailand.com',
     siteName: 'SET EVENT Thailand',
     locale: 'th_TH',
@@ -38,8 +44,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SET EVENT Thailand | เช่าจอ LED เวที แสง เสียง',
-    description: 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเวนต์ครบวงจร',
+    title: 'SET EVENT Thailand | เช่าจอ LED ราคาถูก เวที แสง เสียง',
+    description: 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเวนต์ครบวงจร จัดงานราคาประหยัด',
     images: ['https://seteventthailand.com/og-image.jpg'],
   },
   robots: {

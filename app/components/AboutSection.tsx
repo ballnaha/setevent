@@ -8,12 +8,12 @@ import Link from "next/link";
 
 export default function AboutSection() {
     const features = [
-        { text: "รับจัดงานอีเวนต์ครบวงจร", icon: <MagicStar size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "งานแต่งงาน & งานเลี้ยงสังสรรค์", icon: <StatusUp size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "งานสัมมนา & เปิดตัวสินค้า", icon: <People size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "เช่าจอ LED ทุกขนาดทั่วประเทศ", icon: <Monitor size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "ระบบแสง สี เสียง เวทีมาตรฐาน", icon: <Speaker size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "ทีมงาน Support มืออาชีพ", icon: <Award size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "รับจัดงานอีเวนต์ และจัดงานราคาประหยัด", icon: <MagicStar size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "งานแต่งงาน & สังสรรค์ คุ้มค่าทุกงบประมาณ", icon: <StatusUp size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "งานสัมมนา & เปิดตัวสินค้า ระดับมืออาชีพ", icon: <People size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "บริการเช่าจอ LED ราคาถูก ทั่วประเทศ", icon: <Monitor size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "เช่าเครื่องเสียง แสง สี ราคาเป็นกันเอง", icon: <Speaker size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "ดูแลงานด้วยทีมงาน Support มืออาชีพ", icon: <Award size="24" variant="Bulk" color="var(--primary)" /> },
     ];
 
     return (
@@ -82,7 +82,7 @@ export default function AboutSection() {
                             }}
                         >
                             <span style={{ color: "var(--primary)" }}>ผู้นำด้านการจัดอีเวนต์</span> <br />
-                            และอุปกรณ์โปรดักชั่นครบวงจร
+                            บริการเช่าจอ LED ราคาถูก และการจัดงานราคาประหยัด
                         </Typography>
                         <Typography
                             variant="body1"
@@ -96,8 +96,8 @@ export default function AboutSection() {
                             }}
                         >
                             SET EVENT Thailand มุ่งมั่นสร้างสรรค์ประสบการณ์ที่เหนือระดับ
-                            ด้วยบริการรับจัดงานอีเวนต์ครบวงจร ตั้งแต่งานแต่งงาน งานสัมมนา ไปจนถึงคอนเสิร์ต
-                            พร้อมเทคโนโลยีจอ LED และระบบแสงสีเสียงมาตรฐานสากล
+                            เราคือผู้เชี่ยวชาญด้านบริการจัดงานอีเวนต์ครบวงจร จัดงานราคาประหยัด ตั้งแต่งานแต่งงาน งานสัมมนา ไปจนถึงคอนเสิร์ต
+                            พร้อมบริการเช่าจอ LED ราคาถูก และระบบแสงสีเสียงมาตรฐานสากล ในงบประมาณที่คุณพึงพอใจ
                         </Typography>
                     </Stack>
 

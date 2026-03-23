@@ -8,15 +8,15 @@ const services = [
     {
         title: "บริการเช่าอุปกรณ์",
         subtitle: "All-in-One Rental Solutions",
-        desc: "บริการจำหน่ายและให้เช่าจอ LED , TV , Pointer คุณภาพสูง พร้อมทีมงานติดตั้งมืออาชีพที่พร้อมดูแลทุกขั้นตอน",
+        desc: "บริการให้เช่าจอ LED ราคาถูก นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง ดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณสัมผัสได้",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
         buttonText: "เช่าอุปกรณ์"
     },
     {
-        title: "บริการรับจัดดอกไม้ & Souvenir",
-        subtitle: "Floral & Souvenir Arrangements",
-        desc: "บริการจัดดอกไม้ตกแต่งสถานที่และของที่ระลึกดีไซน์เอกลักษณ์ ประณีตในทุกรายละเอียด เพื่อมอบความทรงจำอันล้ำค่าให้แก่แขกคนสำคัญของคุณ และของที่ระลึก",
+        title: "บริการรับจัดงานอีเว้นท์",
+        subtitle: "Event Organizing & Planning",
+        desc: "บริการจัดงานราคาประหยัด ไม่ว่าจะเป็นงานแต่งงาน งานเลี้ยง ดอกไม้ตกแต่ง สถานที่ และของที่ระลึก เราพร้อมเนรมิตงานในฝันให้ออกมาสมบูรณ์แบบ คุ้มค่าในงบของคุณ",
         icon: <MagicStar size="50" color="currentColor" variant="Outline" />,
         color: "#F2A900", // Tertiary (Gold/Yellow adjusted for visibility)
         buttonText: "บริการจัดงาน"
@@ -24,7 +24,7 @@ const services = [
     {
         title: "ระบบแสงสีเสียง",
         subtitle: "Lighting & Sound Production",
-        desc: "ระบบแสง สี เสียงมาตรฐานสากล ผสานเทคโนโลยีทันสมัย ให้ภาพ แสง และเสียงสมจริง คมชัด รองรับทุกประเภทงาน",
+        desc: "บริการเช่าเครื่องเสียง ราคาเป็นมิตร จัดเต็มด้วยระบบแสง สี เสียงมาตรฐานระดับสากล ผสานเทคโนโลยีทันสมัย สร้างบรรยากาศให้งานของคุณโดดเด่น",
         icon: <Music size="50" color="currentColor" variant="Outline" />,
         color: "#00C2CB", // Primary
         buttonText: "ระบบแสง สี เสียง"
@@ -50,7 +50,7 @@ export default function ServicesSection() {
                     border: 0,
                 }}
             >
-                บริการเช่าอุปกรณ์จัดงานอีเว้นท์ครบวงจร - SET EVENT Thailand
+                บริการเช่าจอ LED ราคาถูก จัดงานราคาประหยัด และอุปกรณ์จัดงานอีเว้นท์ครบวงจร - SET EVENT Thailand
             </Typography>
             {/* Geometric Decor - Left */}
             <Box sx={{ position: 'absolute', top: '20%', left: 0, zIndex: 0, display: { xs: 'none', lg: 'block' } }}>

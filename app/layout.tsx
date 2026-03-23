@@ -23,11 +23,30 @@ const comfortaa = Comfortaa({
 
 export const metadata: Metadata = {
   title: {
-    default: "SetEvent - บริการให้เช่าอุปกรณ์จัดงาน และรับจัดงานอีเว้นท์ครบวงจร",
+    default: "SetEvent - บริการให้เช่าอุปกรณ์จัดงาน เช่าจอ LED ราคาถูก รับจัดงานราคาประหยัด",
     template: "%s | SetEvent",
   },
-  description: "SetEvent ผู้นำด้านบริการให้เช่าอุปกรณ์จัดงานอีเว้นท์ รับจัดงานอีเว้นท์ งานแต่งงาน งานเปิดตัวสินค้า และงานเลี้ยงสังสรรค์ ด้วยอุปกรณ์คุณภาพสูงและทีมงานมืออาชีพ ครบจบในที่เดียว",
-  keywords: ["ให้เช่าอุปกรณ์อีเว้นท์", "รับจัดงานอีเว้นท์", "รับจัดงานแต่งงาน", "เช่าเวที", "เช่าเครื่องเสียง", "SetEvent", "เซ็ทอีเว้นท์", "อุปกรณ์จัดงาน", "รับจัดอีเว้นท์ครบวงจร", "งานสัมมนา", "งานเปิดตัวสินค้า", "งานปาร์ตี้"],
+  description: "SetEvent ผู้นำด้านบริการให้เช่าอุปกรณ์จัดงานอีเว้นท์ เช่าจอ LED ราคาถูก รับจัดงานอีเว้นท์ จัดงานราคาประหยัด งานแต่ง งานเปิดตัวสินค้า จบในงบที่คุณต้องการ",
+  keywords: [
+    "เช่าจอ led ราคาถูก",
+    "จัดงานราคาประหยัด",
+    "เช่าเครื่องเสียงราคาถูก",
+    "เช่าไฟพาร์ราคาถูก",
+    "จัดงานอีเว้นท์ราคาถูก",
+    "รับจัดงานอีเว้นท์ราคาประหยัด",
+    "ให้เช่าอุปกรณ์อีเว้นท์",
+    "รับจัดงานอีเว้นท์",
+    "รับจัดงานแต่งงาน",
+    "เช่าเวที",
+    "เช่าเครื่องเสียง",
+    "SetEvent",
+    "เซ็ทอีเว้นท์",
+    "อุปกรณ์จัดงาน",
+    "รับจัดอีเว้นท์ครบวงจร",
+    "งานสัมมนา",
+    "งานเปิดตัวสินค้า",
+    "งานปาร์ตี้"
+  ],
   authors: [{ name: "SetEvent Team" }],
   creator: "SetEvent Team",
   publisher: "SetEvent Team",
@@ -41,8 +60,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "SetEvent - บริการให้เช่าอุปกรณ์จัดงาน และรับจัดงานอีเว้นท์ครบวงจร",
-    description: "บริการให้เช่าอุปกรณ์จัดงานอีเว้นท์ และรับจัดงานทุกรูปแบบ งานแต่ง งานเลี้ยง งานเปิดตัวสินค้า มืออาชีพ ราคามิตรภาพ",
+    title: "SetEvent - เช่าจอ LED ราคาถูก รับจัดงานอีเว้นท์ราคาประหยัด",
+    description: "บริการให้เช่าอุปกรณ์จัดงานอีเว้นท์ เช่าจอ LED ราคาถูก และรับจัดงานทุกรูปแบบ งานแต่ง งานเลี้ยง จัดงานราคาประหยัด มืออาชีพ",
     url: "https://seteventthailand.com",
     siteName: "SetEvent",
     images: [
@@ -50,7 +69,7 @@ export const metadata: Metadata = {
         url: "/images/logo.png",
         width: 1200,
         height: 630,
-        alt: "SetEvent บริการเช่าอุปกรณ์และรับจัดงานอีเว้นท์",
+        alt: "SetEvent บริการเช่าอุปกรณ์และรับจัดงานอีเว้นท์ ราคาถูก",
       },
     ],
     locale: "th_TH",
@@ -58,8 +77,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "SetEvent - บริการให้เช่าอุปกรณ์จัดงาน และรับจัดงานอีเว้นท์ครบวงจร",
-    description: "ผู้นำด้านอีเว้นท์ ให้เช่าอุปกรณ์และรับจัดงานครบวงจร",
+    title: "SetEvent - บริการเช่าจอ LED ราคาถูก และรับจัดงานอีเว้นท์",
+    description: "ผู้นำด้านอีเว้นท์ ให้เช่าอุปกรณ์และรับจัดงานครบวงจร จัดงานราคาประหยัด",
     images: ["/images/icon-512x512.png"],
   },
   robots: {
@@ -144,7 +163,7 @@ export default function RootLayout({
               "@id": "https://seteventthailand.com/#website",
               "name": "SET EVENT Thailand",
               "url": "https://seteventthailand.com",
-              "description": "บริการให้เช่าจอ LED เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร",
+              "description": "บริการให้เช่าจอ LED ราคาถูก เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร จัดงานราคาประหยัด",
               "inLanguage": "th-TH",
               "publisher": {
                 "@id": "https://seteventthailand.com/#organization"
@@ -179,7 +198,7 @@ export default function RootLayout({
                 "height": 512
               },
               "image": "https://seteventthailand.com/images/og-image.jpg",
-              "description": "SET EVENT Thailand - บริการให้เช่าจอ LED, เวที, แสง เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร พร้อมทีมงานมืออาชีพ",
+              "description": "SET EVENT Thailand - บริการให้เช่าจอ LED ราคาถูก, เวที, แสง เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร พร้อมทีมงานมืออาชีพ จัดงานราคาประหยัด",
               "telephone": "+66-93-726-5055",
               "email": "setevent26@gmail.com",
               "address": {
@@ -258,7 +277,7 @@ export default function RootLayout({
                 "https://seteventthailand.com/images/logo.png",
                 "https://seteventthailand.com/images/og-image.jpg"
               ],
-              "description": "บริการให้เช่าจอ LED เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร รับจัดงานแต่งงาน งานสัมมนา งานเปิดตัวสินค้า งานคอนเสิร์ต ด้วยทีมงานมืออาชีพ",
+              "description": "บริการให้เช่าจอ LED ราคาถูก เวที แสง เสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร รับจัดงานแต่งงาน งานสัมมนา จัดงานราคาประหยัด ด้วยทีมงานมืออาชีพ",
               "url": "https://seteventthailand.com",
               "telephone": "+66-93-726-5055",
               "email": "setevent26@gmail.com",
@@ -300,8 +319,8 @@ export default function RootLayout({
                     "@type": "Offer",
                     "itemOffered": {
                       "@type": "Service",
-                      "name": "เช่าจอ LED",
-                      "description": "บริการให้เช่าจอ LED ทุกขนาด Indoor และ Outdoor"
+                      "name": "เช่าจอ LED ราคาถูก",
+                      "description": "บริการให้เช่าจอ LED ราคาถูก ทุกขนาด Indoor และ Outdoor พร้อมติดตั้ง"
                     }
                   },
                   {
@@ -309,7 +328,7 @@ export default function RootLayout({
                     "itemOffered": {
                       "@type": "Service",
                       "name": "เช่าเวที",
-                      "description": "บริการให้เช่าเวทีและโครงสร้าง Truss"
+                      "description": "บริการให้เช่าเวทีและโครงสร้าง Truss ราคาประหยัด"
                     }
                   },
                   {
@@ -317,7 +336,7 @@ export default function RootLayout({
                     "itemOffered": {
                       "@type": "Service",
                       "name": "เช่าระบบแสงเสียง",
-                      "description": "บริการให้เช่าระบบแสง เสียง ครบวงจร"
+                      "description": "บริการให้เช่าระบบแสง เสียง เครื่องเสียง ครบวงจร ราคาถูก"
                     }
                   },
                   {
@@ -325,7 +344,7 @@ export default function RootLayout({
                     "itemOffered": {
                       "@type": "Service",
                       "name": "รับจัดงานอีเว้นท์",
-                      "description": "รับจัดงานอีเว้นท์ครบวงจร งานแต่งงาน งานสัมมนา"
+                      "description": "รับจัดงานอีเว้นท์ครบวงจร งานแต่งงาน งานสัมมนา จัดงานราคาประหยัด"
                     }
                   }
                 ]
