@@ -9,7 +9,7 @@ type Props = {
 
 export default async function InterceptedProductPage(props: Props) {
     const params = await props.params;
-    const slug = params.slug;
+    const slug = decodeURIComponent(params.slug);
 
     const productData = await prisma.product.findFirst({
         where: { slug: slug, status: 'active' },

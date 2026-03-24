@@ -10,7 +10,7 @@ type Props = {
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
     const params = await props.params;
-    const slug = params.slug;
+    const slug = decodeURIComponent(params.slug);
 
     const product = await prisma.product.findFirst({
         where: { slug: slug, status: 'active' },
@@ -41,7 +41,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function ProductPage(props: Props) {
     const params = await props.params;
-    const slug = params.slug;
+    const slug = decodeURIComponent(params.slug);
 
     const productData = await prisma.product.findFirst({
         where: { slug: slug, status: 'active' },

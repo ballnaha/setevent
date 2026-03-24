@@ -64,13 +64,14 @@ function ProductsContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(true);
-    const [filterCategory, setFilterCategory] = useState('all');
+    const [filterCategory, setFilterCategory] = useState(searchParams.get('categoryId') || 'all');
     const [searchQuery, setSearchQuery] = useState('');
 
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
     const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -99,9 +100,7 @@ function ProductsContent() {
 
     // Initialize filter from URL if present
     useEffect(() => {
-        if (urlCategoryId) {
-            setFilterCategory(urlCategoryId);
-        }
+        setFilterCategory(urlCategoryId || 'all');
     }, [urlCategoryId]);
 
     useEffect(() => {
@@ -378,6 +377,7 @@ function ProductsContent() {
 
     const handleDelete = async () => {
         if (!deletingProduct) return;
+        setIsDeleting(true);
         try {
             // Delete images associated with product
             let imagesToDelete: string[] = [];
@@ -398,6 +398,7 @@ function ProductsContent() {
         } catch {
             setSnackbar({ open: true, message: 'ลบไม่สำเร็จ', severity: 'error' });
         } finally {
+            setIsDeleting(false);
             setDeleteDialogOpen(false);
         }
     };
@@ -751,15 +752,17 @@ function ProductsContent() {
             </Dialog>
 
             {/* Delete Confirm */}
-            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
+            <Dialog open={deleteDialogOpen} onClose={() => !isDeleting && setDeleteDialogOpen(false)} maxWidth="xs" fullWidth>
                 <DialogTitle sx={{ fontFamily: 'var(--font-prompt)', textAlign: 'center' }}>ยืนยันลบสินค้า</DialogTitle>
                 <DialogContent sx={{ textAlign: 'center' }}>
                     <Typography>คุณแน่ใจหรือไม่ที่จะลบสินค้านี้?</Typography>
                     <Typography fontWeight="bold" sx={{ mt: 1, fontSize: '1.2rem' }}>{deletingProduct?.name}</Typography>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: 'center', pb: 3, gap: 2 }}>
-                    <Button onClick={() => setDeleteDialogOpen(false)} variant="outlined" sx={{ borderRadius: 2 }}>ยกเลิก</Button>
-                    <Button variant="contained" color="error" onClick={handleDelete} sx={{ borderRadius: 2 }}>ลบสินค้า</Button>
+                    <Button onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting} variant="outlined" sx={{ borderRadius: 2 }}>ยกเลิก</Button>
+                    <Button variant="contained" color="error" onClick={handleDelete} disabled={isDeleting} sx={{ borderRadius: 2 }}>
+                        {isDeleting ? 'กำลังลบ...' : 'ลบสินค้า'}
+                    </Button>
                 </DialogActions>
             </Dialog>
 

@@ -408,7 +408,7 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
                                                         }}>
                                                             {child.name}
                                                         </Typography>
-                                                        <ArrowRight2 size="18" color="var(--primary)" />
+                                                        <ArrowRight2 size="18" color="var(--primary)" variant="Bold" />
                                                     </Box>
                                                     {child._count.products > 0 && (
                                                         <Typography sx={{

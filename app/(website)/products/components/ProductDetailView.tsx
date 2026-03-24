@@ -5,14 +5,12 @@ import { Box, Typography, Button, Stack, Skeleton, IconButton } from "@mui/mater
 import { CloseCircle, ArrowLeft2, ArrowRight2, MagicStar, NoteText, MessageQuestion } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, EffectFade, Thumbs, FreeMode } from 'swiper/modules';
+import { Navigation, EffectFade } from 'swiper/modules';
 import { useRouter } from "next/navigation";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
-import 'swiper/css/thumbs';
-import 'swiper/css/free-mode';
 
 interface Product {
     id: string;
@@ -35,7 +33,7 @@ interface ProductDetailViewProps {
 export default function ProductDetailView({ product, categoryName = "Product Detail", onClose, isModal = false }: ProductDetailViewProps) {
     const router = useRouter();
     const [lightboxIndex, setLightboxIndex] = useState(0);
-    const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
+    const [mainSwiper, setMainSwiper] = useState<any>(null);
     const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
     const handleClose = () => {
@@ -111,15 +109,16 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     bgcolor: 'rgba(0,0,0,0.02)'
                 }}>
                     <Swiper
-                        modules={[Navigation, EffectFade, Thumbs]}
+                        onSwiper={setMainSwiper}
+                        modules={[Navigation, EffectFade]}
                         navigation={{
                             prevEl: '.lightbox-prev',
                             nextEl: '.lightbox-next',
                         }}
                         effect="fade"
+                        fadeEffect={{ crossFade: true }}
                         loop={imageCount > 1}
                         initialSlide={0}
-                        thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
                         onSlideChange={(swiper) => setLightboxIndex(swiper.realIndex)}
                         style={{ height: '100%' }}
                     >
@@ -179,7 +178,7 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                                     '&.swiper-button-disabled': { opacity: 0 }
                                 }}
                             >
-                                <ArrowLeft2 size="28" />
+                                <ArrowLeft2 size="28" variant="Bold" color="var(--primary)" />
                             </IconButton>
                             <IconButton
                                 className="lightbox-next"
@@ -200,7 +199,7 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                                     '&.swiper-button-disabled': { opacity: 0 }
                                 }}
                             >
-                                <ArrowRight2 size="28" />
+                                <ArrowRight2 size="28" variant="Bold" color="var(--primary)" />
                             </IconButton>
                         </>
                     )}
@@ -392,45 +391,57 @@ export default function ProductDetailView({ product, categoryName = "Product Det
 
                     {/* Image Selector Strip */}
                     {imageCount > 1 && (
-                        <Box sx={{ mt: 6, pt: 4, borderTop: '1px solid var(--border-color)' }}>
+                        <Box sx={{ mt: 6, pt: 4, borderTop: '1px solid var(--border-color)', flexShrink: 0 }}>
                             <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.4, mb: 2, fontWeight: 600, textTransform: 'uppercase' }}>
                                 ดูภาพเพิ่มเติม ({imageCount})
                             </Typography>
-                            <Swiper
-                                onSwiper={setThumbsSwiper}
-                                modules={[FreeMode, Navigation, Thumbs]}
-                                spaceBetween={12}
-                                slidesPerView={'auto'}
-                                freeMode={true}
-                                watchSlidesProgress={true}
-                                style={{ height: 80 }}
-                            >
+                            <Box sx={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))',
+                                gap: 1.5,
+                                maxHeight: 220,
+                                overflowY: 'auto',
+                                pr: 1,
+                                pb: 1,
+                                '&::-webkit-scrollbar': { width: '4px' },
+                                '&::-webkit-scrollbar-track': { background: 'transparent' },
+                                '&::-webkit-scrollbar-thumb': { background: 'var(--border-color)', borderRadius: '4px' }
+                            }}>
                                 {product.images.map((img, idx) => (
-                                    <SwiperSlide key={idx} style={{ width: 'auto' }}>
-                                        <Box
-                                            sx={{
-                                                width: 100,
-                                                height: 80,
-                                                borderRadius: 2,
-                                                overflow: 'hidden',
-                                                cursor: 'pointer',
-                                                border: idx === lightboxIndex ? '2.5px solid var(--primary)' : '1px solid var(--border-color)',
-                                                opacity: idx === lightboxIndex ? 1 : 0.6,
-                                                transition: 'all 0.3s',
-                                                '&:hover': { opacity: 1, transform: 'scale(1.05)' }
-                                            }}
-                                        >
-                                            <Image
-                                                src={img}
-                                                alt={`Thumbnail ${idx + 1}`}
-                                                width={100}
-                                                height={80}
-                                                style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                                            />
-                                        </Box>
-                                    </SwiperSlide>
+                                    <Box
+                                        key={idx}
+                                        onClick={() => {
+                                            if (mainSwiper) {
+                                                if (mainSwiper.params.loop) {
+                                                    mainSwiper.slideToLoop(idx);
+                                                } else {
+                                                    mainSwiper.slideTo(idx);
+                                                }
+                                            }
+                                        }}
+                                        sx={{
+                                            aspectRatio: '5/4',
+                                            width: '100%',
+                                            borderRadius: 2,
+                                            overflow: 'hidden',
+                                            cursor: 'pointer',
+                                            position: 'relative',
+                                            border: idx === lightboxIndex ? '2.5px solid var(--primary)' : '1px solid var(--border-color)',
+                                            opacity: idx === lightboxIndex ? 1 : 0.6,
+                                            transition: 'all 0.3s',
+                                            '&:hover': { opacity: 1, transform: 'scale(1.03)' }
+                                        }}
+                                    >
+                                        <Image
+                                            src={img}
+                                            alt={`Thumbnail ${idx + 1}`}
+                                            fill
+                                            sizes="(max-width: 768px) 100px, 120px"
+                                            style={{ objectFit: 'cover' }}
+                                        />
+                                    </Box>
                                 ))}
-                            </Swiper>
+                            </Box>
                         </Box>
                     )}
                 </Box>
