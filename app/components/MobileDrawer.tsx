@@ -33,6 +33,7 @@ interface NavItem {
 interface MobileDrawerProps {
     navItems: NavItem[];
     isActive: (href: string) => boolean;
+    isItemActive?: (item: NavItem) => boolean;
     handleDrawerToggle: () => void;
     setTheme: (theme: string) => void;
     resolvedTheme: string | undefined;
@@ -49,6 +50,7 @@ interface MobileDrawerProps {
 export default function MobileDrawer({
     navItems,
     isActive,
+    isItemActive,
     handleDrawerToggle,
     setTheme,
     resolvedTheme,
@@ -164,6 +166,7 @@ export default function MobileDrawer({
                         const hasChildren = !!item.children || !!item.sections;
                         const itemId = `root-${item.label}`;
                         const isExpanded = expandedItems.includes(itemId);
+                        const activeItem = isItemActive ? isItemActive(item) : isActive(item.href);
 
                         return (
                             <React.Fragment key={item.label}>
@@ -176,17 +179,17 @@ export default function MobileDrawer({
                                             textAlign: "left",
                                             px: 4,
                                             py: 2,
-                                            bgcolor: isActive(item.href) ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                            borderLeft: isActive(item.href) ? '4px solid var(--primary)' : '4px solid transparent',
+                                            bgcolor: activeItem ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                            borderLeft: activeItem ? '4px solid var(--primary)' : '4px solid transparent',
                                         }}
                                     >
                                         <ListItemText
                                             primary={
                                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: 1 }}>
-                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', color: isActive(item.href) ? 'var(--primary)' : 'inherit' }}>
+                                                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '1rem', color: activeItem ? 'var(--primary)' : 'inherit' }}>
                                                         {item.label}
                                                     </Typography>
-                                                    {hasChildren && <ArrowDown2 size="18" color={isActive(item.href) ? 'var(--primary)' : 'rgba(255,255,255,0.5)'} style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />}
+                                                    {hasChildren && <ArrowDown2 size="18" color={activeItem ? 'var(--primary)' : 'rgba(255,255,255,0.5)'} style={{ transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />}
                                                 </Box>
                                             }
                                         />

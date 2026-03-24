@@ -101,7 +101,14 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         { label: "PROMOTIONS", href: "/promotions" },
         { label: "PORTFOLIO", href: "/portfolio" },
         { label: "NEW DESIGN", href: "/designs" },
-        { label: "WEDDING E-CARD", href: "/wedding-e-card" },
+        {
+            label: "WEDDING",
+            href: "#",
+            children: [
+                { label: "E-CARD", href: "/wedding-e-card" },
+                { label: "ฤกษ์มงคลสมรส", href: "/auspicious-dates" }
+            ]
+        },
     ], [productSections]);
 
     // Desktop Menu States
@@ -127,6 +134,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         pathname === "/promotions" ||
         pathname === "/designs" ||
         pathname === "/wedding-e-card" ||
+        pathname === "/auspicious-dates" ||
         pathname.startsWith("/portfolio") ||
         decodedPathname.startsWith("/portfolio") ||
         pathname.startsWith("/products") ||
@@ -143,6 +151,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         pathname.startsWith("/faq") ||
         pathname === "/designs" ||
         pathname === "/wedding-e-card" ||
+        pathname === "/auspicious-dates" ||
         pathname.startsWith("/portfolio") ||
         decodedPathname.startsWith("/portfolio") ||
         pathname === "/promotions" ||
@@ -195,7 +204,19 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
 
     const isActive = (href: string) => {
         if (href === "/") return pathname === "/";
+        if (href === "#") return false;
         return pathname.startsWith(href);
+    };
+
+    const isItemActive = (item: NavItem) => {
+        if (isActive(item.href)) return true;
+        if (item.children) {
+            return item.children.some(child => isActive(child.href));
+        }
+        if (item.sections) {
+            return item.sections.some(sec => sec.items.some(child => isActive(child.href)));
+        }
+        return false;
     };
 
     // Mobile Expand/Collapse Handler
@@ -354,6 +375,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         <MobileDrawer
             navItems={navItems}
             isActive={isActive}
+            isItemActive={isItemActive}
             handleDrawerToggle={handleDrawerToggle}
             setTheme={setTheme}
             resolvedTheme={resolvedTheme}
@@ -466,7 +488,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                     <Box sx={{ display: { xs: "none", md: "flex" }, gap: 4, alignItems: 'center' }}>
                         {navItems.map((item) => {
                             const hasDropdown = !!item.children || !!item.isMega;
-                            const active = isActive(item.href);
+                            const active = isItemActive(item);
                             const isDarkTextLocal = isDarkText; // Use parent scope
                             const baseColor = isDarkTextLocal ? 'var(--foreground)' : 'rgba(255,255,255,0.9)';
                             const finalColor = active ? 'var(--secondary)' : baseColor;
@@ -475,8 +497,6 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                 return (
                                     <Box
                                         key={item.label}
-                                        onMouseLeave={item.isMega ? undefined : handleHoverClose}
-                                        onMouseEnter={item.isMega ? undefined : (e) => handleHoverOpen(e, item.label)}
                                     >
                                         <Box
                                             onClick={(e) => {
@@ -532,11 +552,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                             TransitionComponent={Fade}
                                             TransitionProps={{ timeout: 200 }}
                                             disableScrollLock={true}
-                                            MenuListProps={item.isMega ? { sx: { py: 0 } } : {
-                                                onMouseEnter: handleMenuEnter,
-                                                onMouseLeave: handleMenuLeave,
-                                                sx: { py: 0 }
-                                            }}
+                                            MenuListProps={{ sx: { py: 0 } }}
                                             PaperProps={{
                                                 elevation: 0,
                                                 sx: {
