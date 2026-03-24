@@ -22,14 +22,19 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     const images = product.images ? JSON.parse(product.images) : [];
+    const baseUrl = 'https://seteventthailand.com';
 
     return {
         title: `${product.name} - SET EVENT`,
         description: product.description || `บริการเช่า ${product.name} สำหรับงานอีเวนต์ครบวงจร`,
+        alternates: {
+            canonical: `${baseUrl}/products/p/${slug}`,
+        },
         openGraph: {
             title: `${product.name} | SET EVENT`,
             description: product.description || undefined,
-            images: images.length > 0 ? [{ url: images[0] }] : [],
+            images: images.length > 0 ? [{ url: `${baseUrl}${images[0]}` }] : [],
+            url: `${baseUrl}/products/p/${slug}`,
         }
     };
 }

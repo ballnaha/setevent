@@ -15,11 +15,15 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const slugs = params.slug;
     let currentCategory: { id: string; name: string; description: string | null } | null = null;
     let parentId: string | null = null;
+    const baseUrl = 'https://seteventthailand.com';
 
     if (!slugs || !Array.isArray(slugs)) {
         return {
             title: 'Products | SET EVENT',
-            description: 'สินค้าและบริการครบวงจร สำหรับงาน Event ทุกรูปแบบ'
+            description: 'สินค้าและบริการครบวงจร สำหรับงาน Event ทุกรูปแบบ',
+            alternates: {
+                canonical: `${baseUrl}/products`,
+            },
         };
     }
 
@@ -48,16 +52,23 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     }
 
     if (currentCategory) {
+        const slugPath = slugs.map(decodeURIComponent).join('/');
         return {
             title: `${currentCategory.name} - SET EVENT`,
             description: currentCategory.description || `สินค้าและบริการในหมวด ${currentCategory.name} จาก SET EVENT ผู้ให้บริการจัดงานอีเวนต์ครบวงจร`,
-            keywords: [currentCategory.name, 'เช่าอุปกรณ์', 'อีเวนต์', 'SET EVENT', ...(slugs || [])]
+            keywords: [currentCategory.name, 'เช่าอุปกรณ์', 'อีเวนต์', 'SET EVENT', ...slugs],
+            alternates: {
+                canonical: `${baseUrl}/products/${slugPath}`,
+            },
         };
     }
 
     return {
         title: 'Products | SET EVENT',
-        description: 'สินค้าและบริการครบวงจร สำหรับงาน Event ทุกรูปแบบ'
+        description: 'สินค้าและบริการครบวงจร สำหรับงาน Event ทุกรูปแบบ',
+        alternates: {
+            canonical: `${baseUrl}/products`,
+        },
     };
 }
 
