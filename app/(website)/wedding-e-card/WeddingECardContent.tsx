@@ -55,7 +55,7 @@ export default function WeddingECardContent() {
                             }}
                         />
                         <Typography
-                            component="h1"
+                            variant="h1"
                             sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 800,
