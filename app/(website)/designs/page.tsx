@@ -8,7 +8,10 @@ export const revalidate = 0;
 export const metadata: Metadata = {
     title: 'New Designs | SET EVENT',
     description: 'ผลงานการออกแบบและจัดอีเวนต์ที่สวยงาม สร้างสรรค์โดยทีมงาน SET EVENT',
-    keywords: ['งานแต่งงาน', 'อีเวนต์', 'ออกแบบเวที', 'Stage Design', 'Wedding Planner', 'Event Organizer']
+    keywords: ['งานแต่งงาน', 'อีเวนต์', 'ออกแบบเวที', 'Stage Design', 'Wedding Planner', 'Event Organizer', 'สัมมนา', 'คอนเสิร์ต', 'งานเปิดตัวสินค้า', 'SET EVENT'],
+    alternates: {
+        canonical: 'https://seteventthailand.com/designs',
+    },
 };
 
 export default async function DesignsPage() {
