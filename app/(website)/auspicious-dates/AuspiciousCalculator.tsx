@@ -26,8 +26,9 @@ import {
 } from '@mui/material';
 import {
     CalendarSearch, Heart, Star, Warning2, ArrowDown2, InfoCircle, Chart,
-    CloseCircle, Book
+    CloseCircle, Book, Box1
 } from 'iconsax-react';
+import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useTheme } from 'next-themes';
 
@@ -825,7 +826,7 @@ export default function AuspiciousCalculator() {
                                                                             px: 2, py: 1, borderRadius: '15px', border: '1px solid rgba(211, 47, 47, 0.2)',
                                                                         }}>
                                                                             <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: colorHex, border: '1px solid rgba(0,0,0,0.2)', position: 'relative', overflow: 'hidden' }}>
-                                                                                 <Box sx={{ position: 'absolute', top: '50%', left: '50%', width: '150%', height: 1.5, bgcolor: '#D32F2F', transform: 'translate(-50%, -50%) rotate(45deg)' }} />
+                                                                                <Box sx={{ position: 'absolute', top: '50%', left: '50%', width: '150%', height: 1.5, bgcolor: '#D32F2F', transform: 'translate(-50%, -50%) rotate(45deg)' }} />
                                                                             </Box>
                                                                             <Typography variant="caption" sx={{ fontWeight: 700, color: '#D32F2F', opacity: 0.9 }}>{trimmedName}</Typography>
                                                                         </Box>
@@ -853,10 +854,51 @@ export default function AuspiciousCalculator() {
                             </Box>
                         ))}
                     </Stack>
-                    <Box sx={{ mt: 5, p: 3, borderRadius: 4, bgcolor: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.1)' }}>
-                        <Typography variant="body2" sx={{ opacity: 0.7, lineHeight: 1.8, fontSize: '0.85rem', color: 'var(--foreground)' }}>
-                            <strong style={{ color: '#D4AF37' }}>📌 หมายเหตุ:</strong> การได้คะแนนเต็ม 100 นั้นเป็นไปได้ยากมากเนื่องจากต้องมีเงื่อนไขสมพงษ์ครบทุกมิติ โดยทั่วไปคะแนน 60 ขึ้นไปถือว่าเป็นฤกษ์มงคลที่ดีมากแล้วครับ
+
+                    {/* Integrated Product Promotion Section */}
+                    <Box sx={{ mt: 5, p: { xs: 4, md: 6 }, borderRadius: '40px', bgcolor: isDark ? 'rgba(212, 175, 55, 0.05)' : '#FFFBF0', border: '1px solid rgba(212, 175, 55, 0.2)', textAlign: 'center' }}>
+                        <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, mb: 2, color: '#D4AF37' }}>
+                            ✨ จัดเตรียมงานให้สมบูรณ์แบบตามฤกษ์มงคลของคุณ
                         </Typography>
+                        <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, mb: 4, maxWidth: 600, mx: 'auto' }}>
+                            จากผลการคำนวณ เราขอแนะนำแพ็กเกจอุปกรณณ์งานอีเวนต์ที่คัดสรรมาเพื่อเสริมความรุ่งเรืองและบรรยากาศในวันมงคลของคุณโดยเฉพาะ
+                        </Typography>
+
+                        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
+                            {[
+                                { title: 'ระบบจอ LED พรีเมียม', desc: 'เหมาะสำหรับเปิด Presentation และสร้างบรรยากาศงานแต่งให้ดูสวยงามระดับโรงแรม 5 ดาว', slug: 'rental/led-screen-indoor', icon: <Box1 size={32} variant="Bulk" color="#D4AF37" /> },
+                                { title: 'ระบบเสียง & ไมค์ไร้สาย', desc: 'เพื่อให้ทุกถ้อยคำแห่งความรักส่งถึงแขกทุกคนในงานอย่างชัดเจนและไพเราะที่สุด', slug: 'rental/sound', icon: <InfoCircle size={32} variant="Bulk" color="#D4AF37" /> },
+                                { title: 'แสงสี & เลเซอร์โชว์', desc: 'สร้างมิติแห่งความมหัศจรรย์ด้วยระบบแสงที่ปรับตามธีมสีมงคลที่คุณได้รับ', slug: 'rental/lighting', icon: <Star size={32} variant="Bulk" color="#D4AF37" /> }
+                            ].map((item, i) => (
+                                <Paper key={i} elevation={0} sx={{
+                                    p: 3, borderRadius: '24px', bgcolor: isDark ? 'rgba(255,255,255,0.03)' : 'white',
+                                    border: '1px solid var(--border-color)', transition: 'all 0.3s ease',
+                                    '&:hover': { transform: 'translateY(-8px)', borderColor: '#D4AF37', boxShadow: '0 12px 24px rgba(212, 175, 55, 0.1)' }
+                                }}>
+                                    <Box sx={{ mb: 2 }}>{item.icon}</Box>
+                                    <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 1, fontFamily: 'var(--font-prompt)' }}>{item.title}</Typography>
+                                    <Typography variant="caption" sx={{ color: 'var(--foreground)', opacity: 0.6, display: 'block', mb: 3, minHeight: 48 }}>{item.desc}</Typography>
+                                    <Button
+                                        component={Link}
+                                        href={`/products/${item.slug}`}
+                                        variant="outlined" size="small"
+                                        sx={{ borderRadius: '10px', color: '#D4AF37', borderColor: '#D4AF37', fontFamily: 'var(--font-prompt)', '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.05)', borderColor: '#D4AF37' } }}>
+                                        ดูรายละเอียดแพ็กเกจ
+                                    </Button>
+                                </Paper>
+                            ))}
+                        </Box>
+
+                        <Box sx={{ mt: 5 }}>
+                            <Button
+                                component={Link}
+                                href="/products"
+                                variant="contained"
+                                sx={{ bgcolor: '#D4AF37', color: 'white', px: 6, py: 1.5, borderRadius: '15px', fontWeight: 800, '&:hover': { bgcolor: '#B8860B' } }}
+                            >
+                                เลือกชมสินค้าทั้งหมด
+                            </Button>
+                        </Box>
                     </Box>
                 </Box>
             )}
