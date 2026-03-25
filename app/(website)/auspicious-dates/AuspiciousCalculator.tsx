@@ -866,7 +866,7 @@ export default function AuspiciousCalculator() {
 
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>
                             {[
-                                { title: 'ระบบจอ LED พรีเมียม', desc: 'เหมาะสำหรับเปิด Presentation และสร้างบรรยากาศงานแต่งให้ดูสวยงามระดับโรงแรม 5 ดาว', slug: 'rental/led-screen-indoor', icon: <Box1 size={32} variant="Bulk" color="#D4AF37" /> },
+                                { title: 'ระบบจอ LED พรีเมียม', desc: 'เหมาะสำหรับเปิด Presentation และสร้างบรรยากาศงานแต่งให้ดูสวยงามระดับโรงแรม 5 ดาว', slug: 'rental/led-screen/led-screen-indoor', icon: <Box1 size={32} variant="Bulk" color="#D4AF37" /> },
                                 { title: 'ระบบเสียง & ไมค์ไร้สาย', desc: 'เพื่อให้ทุกถ้อยคำแห่งความรักส่งถึงแขกทุกคนในงานอย่างชัดเจนและไพเราะที่สุด', slug: 'rental/sound', icon: <InfoCircle size={32} variant="Bulk" color="#D4AF37" /> },
                                 { title: 'แสงสี & เลเซอร์โชว์', desc: 'สร้างมิติแห่งความมหัศจรรย์ด้วยระบบแสงที่ปรับตามธีมสีมงคลที่คุณได้รับ', slug: 'rental/lighting', icon: <Star size={32} variant="Bulk" color="#D4AF37" /> }
                             ].map((item, i) => (
