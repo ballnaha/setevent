@@ -40,6 +40,7 @@ export async function PUT(
                 excerpt: data.excerpt || null,
                 content: data.content || null,
                 coverImage: data.coverImage || null,
+                subImages: data.subImages || null,
                 author: data.author || 'Admin',
                 category: data.category || 'General',
                 status: data.status || 'draft',

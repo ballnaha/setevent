@@ -13,6 +13,7 @@ interface Blog {
     excerpt: string;
     content: string;
     coverImage: string;
+    subImages?: string | string[]; // Can be JSON string or array
     category: string;
     author: string;
     publishedAt: string;
@@ -365,6 +366,48 @@ export default function BlogDetailContent({ params, initialBlog = null }: Props)
                     }}
                     dangerouslySetInnerHTML={{ __html: blog.content || '' }}
                 />
+
+                {/* Sub-images Gallery */}
+                {blog.subImages && (
+                    <Box sx={{ mt: 8 }}>
+                        <Typography variant="h5" sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontWeight: 700,
+                            color: 'var(--foreground)',
+                            mb: 4,
+                            textAlign: 'center'
+                        }}>
+                            ภาพบรรยากาศเพิ่มเติม
+                        </Typography>
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+                            gap: 3
+                        }}>
+                            {(typeof blog.subImages === 'string' ? JSON.parse(blog.subImages) : blog.subImages).map((img: string, i: number) => (
+                                <Box key={i} sx={{
+                                    position: 'relative',
+                                    borderRadius: 3,
+                                    overflow: 'hidden',
+                                    height: 250,
+                                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
+                                    transition: 'transform 0.3s ease',
+                                    '&:hover': {
+                                        transform: 'scale(1.03)',
+                                        boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
+                                    }
+                                }}>
+                                    <Image
+                                        src={img}
+                                        alt={`${blog.title} - Galleri ${i + 1}`}
+                                        fill
+                                        style={{ objectFit: 'cover' }}
+                                    />
+                                </Box>
+                            ))}
+                        </Box>
+                    </Box>
+                )}
 
                 {/* Share Section */}
                 <Divider sx={{ my: 6, bgcolor: 'var(--border-color)' }} />

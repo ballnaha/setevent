@@ -34,6 +34,7 @@ interface Blog {
     excerpt: string | null;
     content: string | null;
     coverImage: string | null;
+    subImages: string | null; // Stores JSON array of URLs
     author: string;
     category: string;
     status: string;
@@ -69,6 +70,7 @@ export default function BlogsAdminPage() {
         excerpt: "",
         content: "",
         coverImage: "",
+        subImages: [] as string[], // Store as array in state
         author: "Admin",
         category: "General",
         status: "draft"
@@ -99,6 +101,7 @@ export default function BlogsAdminPage() {
                 excerpt: blog.excerpt || "",
                 content: blog.content || "",
                 coverImage: blog.coverImage || "",
+                subImages: blog.subImages ? JSON.parse(blog.subImages) : [],
                 author: blog.author || "Admin",
                 category: blog.category || "General",
                 status: blog.status
@@ -114,6 +117,7 @@ export default function BlogsAdminPage() {
                 excerpt: "",
                 content: "",
                 coverImage: "",
+                subImages: [],
                 author: "Admin",
                 category: "General",
                 status: "draft"
@@ -158,6 +162,43 @@ export default function BlogsAdminPage() {
         }
     };
 
+    const handleSubImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        setUploading(true);
+        const newUrls: string[] = [];
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const uploadFormData = new FormData();
+                uploadFormData.append("file", files[i]);
+                uploadFormData.append("folder", "blogs/gallery");
+
+                const res = await fetch("/api/upload", {
+                    method: "POST",
+                    body: uploadFormData
+                });
+                const data = await res.json();
+                if (data.url) newUrls.push(data.url);
+            }
+            setFormData(prev => ({
+                ...prev,
+                subImages: [...prev.subImages, ...newUrls]
+            }));
+        } catch (error) {
+            console.error("Gallery upload failed", error);
+        } finally {
+            setUploading(false);
+        }
+    };
+
+    const handleRemoveSubImage = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            subImages: prev.subImages.filter((_, i) => i !== index)
+        }));
+    };
+
     const handleSubmit = async () => {
         setSaving(true);
         setUploading(true);
@@ -187,7 +228,8 @@ export default function BlogsAdminPage() {
 
             const payload = {
                 ...formData,
-                coverImage: imageUrl
+                coverImage: imageUrl,
+                subImages: JSON.stringify(formData.subImages) // Convert array to JSON string for DB
             };
 
             const url = editId ? `/api/admin/blogs/${editId}` : "/api/admin/blogs";
@@ -506,6 +548,50 @@ export default function BlogsAdminPage() {
                                     </Box>
                                 )}
                             </Box>
+                        </Box>
+
+                        <Box>
+                            <Typography variant="body2" sx={{ mb: 1.5, fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>รูปภาพเสริม (Gallery)</Typography>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
+                                {formData.subImages.map((url, index) => (
+                                    <Box key={index} sx={{ position: 'relative', width: 120, height: 120, borderRadius: 2, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                                        <img src={url} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleRemoveSubImage(index)}
+                                            sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': { bgcolor: 'white' } }}
+                                        >
+                                            <CloseCircle size="16" color="#ef4444" variant="Bold" />
+                                        </IconButton>
+                                    </Box>
+                                ))}
+                                <Box sx={{
+                                    width: 120,
+                                    height: 120,
+                                    borderRadius: 2,
+                                    border: '2px dashed var(--border-color)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    position: 'relative',
+                                    '&:hover': { bgcolor: 'rgba(0,0,0,0.02)', borderColor: 'var(--primary)' }
+                                }}>
+                                    <Add size="24" color="var(--primary)" />
+                                    <Typography variant="caption" sx={{ mt: 0.5 }}>เพิ่มรูป</Typography>
+                                    <input
+                                        type="file"
+                                        multiple
+                                        accept="image/*"
+                                        onChange={handleSubImagesUpload}
+                                        style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer' }}
+                                    />
+                                </Box>
+                            </Box>
+                            <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                                รูปภาพเหล่านี้จะแสดงที่ส่วนท้ายของบทความในรูปแบบแกลเลอรี
+                            </Typography>
                         </Box>
 
                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>

@@ -33,6 +33,7 @@ model blog {
   excerpt     String?  @db.Text
   content     String?  @db.Text
   coverImage  String?  @db.Text
+  subImages   String?  @db.Text
   author      String?  @default("Admin")
   category    String?  @default("General")
   views       Int      @default(0)
