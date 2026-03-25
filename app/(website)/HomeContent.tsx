@@ -21,6 +21,10 @@ const WhyChooseUs = dynamic(() => import("../components/WhyChooseUs"), {
     loading: () => <Box sx={{ minHeight: 400 }}><Skeleton variant="rectangular" height={400} /></Box>,
 });
 
+const HomeFAQ = dynamic(() => import("../components/HomeFAQ"), {
+    loading: () => <Box sx={{ minHeight: 400 }}><Skeleton variant="rectangular" height={400} /></Box>,
+});
+
 const CTASection = dynamic(() => import("../components/CTASection"), {
     loading: () => <Box sx={{ minHeight: 300 }}><Skeleton variant="rectangular" height={300} /></Box>,
 });
@@ -33,6 +37,7 @@ export default function HomeContent() {
             <FeaturedEvents />
             <PortfolioGallery />
             <WhyChooseUs />
+            <HomeFAQ />
             <CTASection />
         </Box>
     );

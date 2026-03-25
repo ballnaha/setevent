@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     siteName: "SetEvent",
     images: [
       {
-        url: "/images/logo.png",
+        url: "/images/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "SetEvent บริการเช่าอุปกรณ์และรับจัดงานอีเว้นท์ ราคาถูก",

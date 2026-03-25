@@ -473,12 +473,35 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                             )}
                         </Box>
 
-                        {/* Date/Location Text - Hide on mobile */}
-                        <Box sx={{ display: { xs: 'none', lg: 'block' }, ml: 3, borderLeft: isDarkText ? '1px solid rgba(0,0,0,0.1)' : '1px solid rgba(255,255,255,0.3)', pl: 3 }}>
-                            <Typography variant="caption" sx={{ color: isDarkText ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.8)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                        {/* Tagline - Hide on mobile */}
+                        <Box sx={{ 
+                            display: { xs: 'none', lg: 'block' }, 
+                            ml: 3, 
+                            borderLeft: isDarkText ? '1.5px solid var(--primary)' : '1.5px solid rgba(255,255,255,0.5)', 
+                            pl: 2.5,
+                            opacity: 0.9
+                        }}>
+                            <Typography variant="caption" sx={{ 
+                                color: isDarkText ? 'var(--foreground)' : 'white', 
+                                display: 'block', 
+                                lineHeight: 1.3, 
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 700,
+                                letterSpacing: '1px',
+                                fontSize: '0.75rem',
+                                textTransform: 'uppercase'
+                            }}>
                                 PROFESSIONAL TEAM
                             </Typography>
-                            <Typography variant="caption" sx={{ color: isDarkText ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.6)', display: 'block', lineHeight: 1.2, fontFamily: 'var(--font-prompt)' }}>
+                            <Typography variant="caption" sx={{ 
+                                color: isDarkText ? 'var(--primary)' : 'rgba(255,255,255,0.7)', 
+                                display: 'block', 
+                                lineHeight: 1.3, 
+                                fontFamily: 'var(--font-prompt)',
+                                fontWeight: 500,
+                                fontSize: '0.7rem',
+                                letterSpacing: '0.5px'
+                            }}>
                                 End-to-End Event Solution
                             </Typography>
                         </Box>

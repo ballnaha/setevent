@@ -3,18 +3,20 @@ import { prisma } from '@/lib/prisma';
 
 // 📅 Fixed dates for static pages (only update when content actually changes)
 const STATIC_PAGE_DATES = {
-    home: '2025-01-01',
-    products: '2025-01-01',
-    services: '2025-01-01',
-    portfolio: '2025-01-01',
-    promotions: '2025-01-01',
-    contact: '2025-01-01',
-    faq: '2025-01-01',
-    about: '2025-01-01',
-    blog: '2025-01-15',
-    designs: '2025-01-10',
+    home: '2026-03-25',
+    products: '2026-03-25',
+    services: '2026-03-25',
+    portfolio: '2026-03-25',
+    promotions: '2026-03-25',
+    contact: '2026-03-25',
+    faq: '2026-03-25',
+    about: '2026-03-25',
+    blog: '2026-03-25',
+    designs: '2026-03-25',
     privacyPolicy: '2025-01-01',
     termsOfService: '2025-01-01',
+    weddingECard: '2026-03-25',
+    auspiciousDates: '2026-03-25',
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -98,9 +100,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         },
         {
             url: `${baseUrl}/wedding-e-card`,
-            lastModified: new Date('2026-03-24'),
+            lastModified: new Date(STATIC_PAGE_DATES.weddingECard),
             changeFrequency: 'weekly',
             priority: 0.8,
+        },
+        {
+            url: `${baseUrl}/auspicious-dates`,
+            lastModified: new Date(STATIC_PAGE_DATES.auspiciousDates),
+            changeFrequency: 'weekly',
+            priority: 0.9,
         },
     ];
 
