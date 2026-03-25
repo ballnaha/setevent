@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Box, Container, Typography, Chip, Stack, Skeleton, Divider, Button, Avatar, Snackbar, Alert } from '@mui/material';
 import { Calendar, Clock, User, ArrowLeft, Eye, Share, Facebook, Link21 } from 'iconsax-react';
+import { Masonry } from '@mui/lab';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -256,65 +257,118 @@ export default function BlogDetailContent({ params, initialBlog = null }: Props)
                         </Typography>
                     )}
 
-                    {/* Meta Info */}
+                    {/* Compact Meta Info Section */}
                     <Stack
-                        direction={{ xs: 'column', sm: 'row' }}
-                        spacing={{ xs: 2, sm: 4 }}
-                        alignItems={{ xs: 'flex-start', sm: 'center' }}
-                        sx={{ color: 'var(--foreground)', opacity: 0.6 }}
+                        direction="row"
+                        spacing={{ xs: 2.5, sm: 4 }}
+                        alignItems="center"
+                        flexWrap="wrap"
+                        sx={{ color: 'var(--foreground)', opacity: 0.7 }}
                     >
-                        <Stack direction="row" spacing={1.5} alignItems="center">
-                            <Avatar sx={{ width: 40, height: 40, bgcolor: 'var(--primary)' }}>
-                                <User size="20" color="white" />
-                            </Avatar>
-                            <Box>
-                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--foreground)' }}>
-                                    {blog.author || 'Admin'}
-                                </Typography>
-                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem', opacity: 0.7 }}>
-                                    ผู้เขียน
-                                </Typography>
+                        {/* Author */}
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <Box sx={{ width: 28, height: 28, borderRadius: '50%', bgcolor: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <User size="14" color="white" variant="Bold" />
                             </Box>
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, fontSize: '0.85rem' }}>
+                                {blog.author || 'Admin'}
+                            </Typography>
                         </Stack>
 
-                        <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' }, bgcolor: 'var(--border-color)' }} />
+                        {/* Date */}
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <Calendar size="16" color="var(--primary)" />
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                                {formatDate(blog.publishedAt)}
+                            </Typography>
+                        </Stack>
 
-                        <Stack direction="row" spacing={3}>
-                            <Stack direction="row" spacing={0.5} alignItems="center">
-                                <Calendar size="18" color="var(--primary)" />
-                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
-                                    {formatDate(blog.publishedAt)}
-                                </Typography>
-                            </Stack>
-                            <Stack direction="row" spacing={0.5} alignItems="center">
-                                <Eye size="18" color="var(--primary)" />
-                                <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.9rem' }}>
-                                    {blog.views.toLocaleString()} views
-                                </Typography>
-                            </Stack>
+                        {/* Views */}
+                        <Stack direction="row" spacing={1} alignItems="center">
+                            <Eye size="16" color="var(--primary)" />
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem' }}>
+                                {blog.views.toLocaleString()} views
+                            </Typography>
                         </Stack>
                     </Stack>
                 </Container>
             </Box>
 
-            {/* Cover Image */}
+            {/* Cover Image - Enhanced Cinematic Look */}
             {blog.coverImage && (
-                <Container maxWidth="lg" sx={{ mb: 8 }}>
+                <Container maxWidth="lg" sx={{ mb: 10, position: 'relative' }}>
+                    {/* Shadow Decor behind image */}
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '10%',
+                        left: '5%',
+                        right: '5%',
+                        bottom: '5%',
+                        background: 'var(--primary)',
+                        opacity: 0.1,
+                        filter: 'blur(100px)',
+                        zIndex: 0
+                    }} />
+
                     <Box sx={{
                         position: 'relative',
                         width: '100%',
-                        height: { xs: 300, md: 500 },
-                        borderRadius: 4,
+                        height: { xs: 350, md: 600 },
+                        borderRadius: { xs: 0, md: 0 },
                         overflow: 'hidden',
-                        boxShadow: '0 20px 60px rgba(0,0,0,0.15)'
+                        boxShadow: '0 30px 70px rgba(0,0,0,0.25)',
+                        border: '1px solid rgba(255,255,255,0.05)',
+                        zIndex: 1,
+                        transition: 'transform 0.5s cubic-bezier(0.165, 0.84, 0.44, 1)',
+                        '&:hover': {
+                            transform: 'translateY(-10px)'
+                        }
                     }}>
                         <Image
                             src={blog.coverImage}
                             alt={blog.title}
                             fill
-                            style={{ objectFit: 'cover' }}
+                            style={{
+                                objectFit: 'cover',
+                                transition: 'transform 10s ease-out'
+                            }}
+                            onLoadingComplete={(img) => {
+                                img.style.transform = 'scale(1.1)';
+                                setTimeout(() => {
+                                    img.style.transform = 'scale(1)';
+                                }, 100);
+                            }}
                             priority
                         />
+
+                        {/* Overlay Gradient for depth */}
+                        <Box sx={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4))',
+                        }} />
+
+                        {/* Decorative floating category label on image */}
+                        <Box sx={{
+                            position: 'absolute',
+                            bottom: 30,
+                            left: 30,
+                            bgcolor: 'rgba(255,255,255,0.1)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                            borderRadius: '50px',
+                            px: 3,
+                            py: 1,
+                            display: { xs: 'none', md: 'flex' },
+                            alignItems: 'center',
+                            gap: 1.5,
+                            color: 'white'
+                        }}>
+                            <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'var(--primary)', boxShadow: '0 0 10px var(--primary)' }} />
+                            <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '1px' }}>
+                                FEATURED STORY
+                            </Typography>
+                        </Box>
                     </Box>
                 </Container>
             )}
@@ -367,48 +421,6 @@ export default function BlogDetailContent({ params, initialBlog = null }: Props)
                     dangerouslySetInnerHTML={{ __html: blog.content || '' }}
                 />
 
-                {/* Sub-images Gallery */}
-                {blog.subImages && (
-                    <Box sx={{ mt: 8 }}>
-                        <Typography variant="h5" sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            fontWeight: 700,
-                            color: 'var(--foreground)',
-                            mb: 4,
-                            textAlign: 'center'
-                        }}>
-                            ภาพบรรยากาศเพิ่มเติม
-                        </Typography>
-                        <Box sx={{
-                            display: 'grid',
-                            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
-                            gap: 3
-                        }}>
-                            {(typeof blog.subImages === 'string' ? JSON.parse(blog.subImages) : blog.subImages).map((img: string, i: number) => (
-                                <Box key={i} sx={{
-                                    position: 'relative',
-                                    borderRadius: 3,
-                                    overflow: 'hidden',
-                                    height: 250,
-                                    boxShadow: '0 10px 30px rgba(0,0,0,0.1)',
-                                    transition: 'transform 0.3s ease',
-                                    '&:hover': {
-                                        transform: 'scale(1.03)',
-                                        boxShadow: '0 20px 40px rgba(0,0,0,0.2)'
-                                    }
-                                }}>
-                                    <Image
-                                        src={img}
-                                        alt={`${blog.title} - Galleri ${i + 1}`}
-                                        fill
-                                        style={{ objectFit: 'cover' }}
-                                    />
-                                </Box>
-                            ))}
-                        </Box>
-                    </Box>
-                )}
-
                 {/* Share Section */}
                 <Divider sx={{ my: 6, bgcolor: 'var(--border-color)' }} />
 
@@ -448,7 +460,47 @@ export default function BlogDetailContent({ params, initialBlog = null }: Props)
                         </Button>
                     </Stack>
                 </Stack>
+            </Container>
 
+            {/* Gallery moved here to be LG width like featured image */}
+            {blog.subImages && (
+                <Container maxWidth="lg" sx={{ mt: 8 }}>
+                    <Typography variant="h5" sx={{
+                        fontFamily: 'var(--font-prompt)',
+                        fontWeight: 700,
+                        color: 'var(--foreground)',
+                        mb: 4,
+                        textAlign: 'center'
+                    }}>
+                        ภาพบรรยากาศเพิ่มเติม
+                    </Typography>
+                    <Masonry columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} spacing={1}>
+                        {(typeof blog.subImages === 'string' ? JSON.parse(blog.subImages) : blog.subImages).map((img: string, i: number) => (
+                            <Box key={i} sx={{
+                                position: 'relative',
+                                borderRadius: 0,
+                                overflow: 'hidden',
+                                transition: 'transform 0.3s ease',
+                                '&:hover': {
+                                    transform: 'scale(1.02)',
+                                    zIndex: 1
+                                }
+                            }}>
+                                <img
+                                    src={img}
+                                    alt={`${blog.title} - Galleri ${i + 1}`}
+                                    style={{
+                                        width: '100%',
+                                        display: 'block'
+                                    }}
+                                />
+                            </Box>
+                        ))}
+                    </Masonry>
+                </Container>
+            )}
+
+            <Container maxWidth="md">
                 {/* Back to Blog */}
                 <Box sx={{ textAlign: 'center', mt: 8 }}>
                     <Button

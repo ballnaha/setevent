@@ -62,6 +62,8 @@ export default function BlogsAdminPage() {
     const [deleteImageDialogOpen, setDeleteImageDialogOpen] = useState(false);
     const [deletingImage, setDeletingImage] = useState(false);
     const [pendingDeleteImage, setPendingDeleteImage] = useState<string | null>(null);
+    const [pendingDeleteSubImages, setPendingDeleteSubImages] = useState<string[]>([]);
+    const [newGalleryFiles, setNewGalleryFiles] = useState<File[]>([]); // New files waiting for upload
 
     const [editId, setEditId] = useState<string | null>(null);
     const [formData, setFormData] = useState({
@@ -126,6 +128,7 @@ export default function BlogsAdminPage() {
         setSelectedFile(null);
         setPreviewUrl(null);
         setPendingDeleteImage(null);
+        setPendingDeleteSubImages([]);
         setOpen(true);
     };
 
@@ -134,6 +137,8 @@ export default function BlogsAdminPage() {
         setPreviewUrl(null);
         setSelectedFile(null);
         setPendingDeleteImage(null);
+        setPendingDeleteSubImages([]);
+        setNewGalleryFiles([]);
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,74 +167,77 @@ export default function BlogsAdminPage() {
         }
     };
 
-    const handleSubImagesUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSubImagesUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
-
-        setUploading(true);
-        const newUrls: string[] = [];
-        try {
-            for (let i = 0; i < files.length; i++) {
-                const uploadFormData = new FormData();
-                uploadFormData.append("file", files[i]);
-                uploadFormData.append("folder", "blogs/gallery");
-
-                const res = await fetch("/api/upload", {
-                    method: "POST",
-                    body: uploadFormData
-                });
-                const data = await res.json();
-                if (data.url) newUrls.push(data.url);
-            }
-            setFormData(prev => ({
-                ...prev,
-                subImages: [...prev.subImages, ...newUrls]
-            }));
-        } catch (error) {
-            console.error("Gallery upload failed", error);
-        } finally {
-            setUploading(false);
-        }
+        setNewGalleryFiles(prev => [...prev, ...Array.from(files)]);
     };
 
     const handleRemoveSubImage = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            subImages: prev.subImages.filter((_, i) => i !== index)
-        }));
+        // 1. If it's an existing image (from DB)
+        if (index < formData.subImages.length) {
+            const urlToRemove = formData.subImages[index];
+            if (urlToRemove && urlToRemove.startsWith('/uploads/')) {
+                setPendingDeleteSubImages(prev => [...prev, urlToRemove]);
+            }
+            setFormData(prev => ({
+                ...prev,
+                subImages: prev.subImages.filter((_, i) => i !== index)
+            }));
+        } else {
+            // 2. If it's a new file (not uploaded yet)
+            const newIndex = index - formData.subImages.length;
+            setNewGalleryFiles(prev => prev.filter((_, i) => i !== newIndex));
+        }
     };
 
     const handleSubmit = async () => {
         setSaving(true);
         setUploading(true);
         try {
-            // Delete pending image file first (if user removed/replaced the old image)
+            // 1. Delete pending images
             if (pendingDeleteImage) {
                 await deleteFile(pendingDeleteImage);
                 setPendingDeleteImage(null);
             }
+            if (pendingDeleteSubImages.length > 0) {
+                for (const url of pendingDeleteSubImages) {
+                    await deleteFile(url);
+                }
+                setPendingDeleteSubImages([]);
+            }
 
+            // 2. Upload main cover image if set
             let imageUrl = formData.coverImage;
-
             if (selectedFile) {
                 const uploadFormData = new FormData();
                 uploadFormData.append("file", selectedFile);
                 uploadFormData.append("folder", "blogs");
-
-                const uploadRes = await fetch("/api/upload", {
-                    method: "POST",
-                    body: uploadFormData
-                });
+                const uploadRes = await fetch("/api/upload", { method: "POST", body: uploadFormData });
                 const uploadData = await uploadRes.json();
-                if (uploadData.url) {
-                    imageUrl = uploadData.url;
+                if (uploadData.url) imageUrl = uploadData.url;
+            }
+
+            // 3. Upload new gallery files (Sub-images)
+            const newlyUploadedUrls: string[] = [];
+            if (newGalleryFiles.length > 0) {
+                for (const file of newGalleryFiles) {
+                    const galleryFormData = new FormData();
+                    galleryFormData.append("file", file);
+                    galleryFormData.append("folder", "blogs/gallery");
+                    const galleryRes = await fetch("/api/upload", { method: "POST", body: galleryFormData });
+                    const galleryData = await galleryRes.json();
+                    if (galleryData.url) newlyUploadedUrls.push(galleryData.url);
                 }
             }
+
+            // 4. Combine existing subImages and newly uploaded ones
+            const finalSubImages = [...formData.subImages, ...newlyUploadedUrls];
 
             const payload = {
                 ...formData,
                 coverImage: imageUrl,
-                subImages: JSON.stringify(formData.subImages) // Convert array to JSON string for DB
+                subImages: JSON.stringify(finalSubImages)
             };
 
             const url = editId ? `/api/admin/blogs/${editId}` : "/api/admin/blogs";
@@ -254,9 +262,24 @@ export default function BlogsAdminPage() {
         setDeleting(true);
         try {
             const blog = blogs.find(b => b.id === deleteId);
+            // 1. Delete Cover Image
             if (blog?.coverImage) {
                 await deleteFile(blog.coverImage);
             }
+            // 2. Delete All Sub Images from folder
+            if (blog?.subImages) {
+                try {
+                    const subImages: string[] = JSON.parse(blog.subImages);
+                    for (const url of subImages) {
+                        if (url && url.startsWith('/uploads/')) {
+                            await deleteFile(url);
+                        }
+                    }
+                } catch (e) {
+                    console.error("Failed to parse subImages for deletion", e);
+                }
+            }
+            // 3. Delete Blog from DB
             await fetch(`/api/admin/blogs/${deleteId}`, { method: "DELETE" });
             fetchBlogs();
         } catch (error) {
@@ -554,8 +577,8 @@ export default function BlogsAdminPage() {
                             <Typography variant="body2" sx={{ mb: 1.5, fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>รูปภาพเสริม (Gallery)</Typography>
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 2 }}>
                                 {formData.subImages.map((url, index) => (
-                                    <Box key={index} sx={{ position: 'relative', width: 120, height: 120, borderRadius: 2, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
-                                        <img src={url} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <Box key={`existing-${index}`} sx={{ position: 'relative', width: 120, height: 120, borderRadius: 2, overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                                        <img src={url} alt={`Gallery Existing ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                         <IconButton
                                             size="small"
                                             onClick={() => handleRemoveSubImage(index)}
@@ -563,6 +586,21 @@ export default function BlogsAdminPage() {
                                         >
                                             <CloseCircle size="16" color="#ef4444" variant="Bold" />
                                         </IconButton>
+                                    </Box>
+                                ))}
+                                {newGalleryFiles.map((file, index) => (
+                                    <Box key={`new-${index}`} sx={{ position: 'relative', width: 120, height: 120, borderRadius: 2, overflow: 'hidden', border: '1px solid var(--primary)', opacity: 0.8 }}>
+                                        <img src={URL.createObjectURL(file)} alt={`Gallery New ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        <IconButton
+                                            size="small"
+                                            onClick={() => handleRemoveSubImage(formData.subImages.length + index)}
+                                            sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(255,255,255,0.8)', '&:hover': { bgcolor: 'white' } }}
+                                        >
+                                            <CloseCircle size="16" color="#ef4444" variant="Bold" />
+                                        </IconButton>
+                                        <Box sx={{ position: 'absolute', bottom: 0, left: 0, right: 0, bgcolor: 'var(--primary)', color: 'white', fontSize: '10px', textAlign: 'center', py: 0.5 }}>
+                                            Pending
+                                        </Box>
                                     </Box>
                                 ))}
                                 <Box sx={{
@@ -590,7 +628,7 @@ export default function BlogsAdminPage() {
                                 </Box>
                             </Box>
                             <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                                รูปภาพเหล่านี้จะแสดงที่ส่วนท้ายของบทความในรูปแบบแกลเลอรี
+                                รูปภาพเหล่านี้จะยังไม่ถูกอัปโหลดจนกว่าจะกด "บันทึก"
                             </Typography>
                         </Box>
 
