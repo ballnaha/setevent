@@ -144,15 +144,17 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                     </Typography>
 
                     {/* Title */}
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 800,
-                        fontSize: { xs: '1.8rem', md: '2.4rem' },
-                        color: 'var(--foreground)',
-                        lineHeight: 1.1,
-                        mb: 4,
-                        letterSpacing: '-0.5px'
-                    }}>
+                    <Typography 
+                        component={isModal ? "h2" : "h1"}
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontWeight: 800,
+                            fontSize: { xs: '1.8rem', md: '2.4rem' },
+                            color: 'var(--foreground)',
+                            lineHeight: 1.1,
+                            mb: 4,
+                            letterSpacing: '-0.5px'
+                        }}>
                         {promotion.title}
                     </Typography>
 
@@ -185,7 +187,10 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                     {/* Features/Details Grid */}
                     {promotion.features && promotion.features.length > 0 && (
                         <Box sx={{ mb: 5 }}>
-                            <Typography sx={{
+                            <Typography 
+                                component="h2"
+                                variant="h6"
+                                sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 700,
                                 fontSize: '1.1rem',
@@ -236,7 +241,10 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
 
                     {/* Description Section */}
                     <Box sx={{ mb: 6 }}>
-                        <Typography sx={{
+                        <Typography 
+                            component="h2"
+                            variant="h6"
+                            sx={{
                             fontFamily: 'var(--font-prompt)',
                             fontWeight: 700,
                             fontSize: '1.1rem',

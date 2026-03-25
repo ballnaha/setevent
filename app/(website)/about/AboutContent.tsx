@@ -36,13 +36,9 @@ export default function AboutContent() {
         }
     ];
 
-    if (!mounted) {
-        return <Box sx={{ minHeight: '100vh', bgcolor: 'var(--background)' }} />;
-    }
-
     return (
         <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', overflow: 'hidden', pb: 10 }}>
-            {/* Hero Section */}
+            {/* Hero Section - Always render for SEO */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 12 },
@@ -64,7 +60,7 @@ export default function AboutContent() {
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
                     <Stack spacing={3} alignItems="center">
                         <Chip
-                            label="Our Expertise"
+                            label="About SET EVENT"
                             sx={{
                                 bgcolor: 'rgba(16, 185, 129, 0.1)',
                                 color: '#10B981',
