@@ -18,10 +18,18 @@ import {
     AccordionSummary,
     AccordionDetails,
     Divider,
-    LinearProgress
+    LinearProgress,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    IconButton
 } from '@mui/material';
-import { CalendarSearch, Heart, Star, Warning2, ArrowDown2, InfoCircle, Chart } from 'iconsax-react';
+import {
+    CalendarSearch, Heart, Star, Warning2, ArrowDown2, InfoCircle, Chart,
+    CloseCircle, Book
+} from 'iconsax-react';
 import dynamic from 'next/dynamic';
+import { useTheme } from 'next-themes';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
@@ -90,6 +98,57 @@ const THAI_GOOD_MONTHS: Record<number, string> = {
 };
 
 export default function AuspiciousCalculator() {
+    const [mounted, setMounted] = React.useState(false);
+    const { resolvedTheme } = useTheme();
+
+    const [openLogicDialog, setOpenLogicDialog] = useState(false);
+    const [selectedLogic, setSelectedLogic] = useState<any>(null);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    const isDark = mounted && resolvedTheme === 'dark';
+
+    const PRINCIPLE_LOGICS = [
+        {
+            id: 1, title: 'เดือนมงคล (Auspicious Months)',
+            icon: <CalendarSearch size={48} color="#D4AF37" variant="Bulk" />,
+            logic: 'ยึดตามคัมภีร์มหาทักษาและพรหมชาติ โดยวิเคราะห์ "กำลังเดือน" (Monthly Magnitude) เฉพาะเดือนคู่ที่มีความเป็นหยาง (Yang Energy) สูงสุด เพื่อเสริมความมั่นคงของฐานเศรษฐกิจครอบครัว',
+            technical: 'เกณฑ์ที่ใช้: การคัดเลือกเดือนคู่ (2, 4, 6, 9, 12) ตามตำราพรหมชาติเพื่อให้ได้จุดสมดุลของพลังงานธาตุในแต่ละฤดูกาล'
+        },
+        {
+            id: 2, title: 'อธิบดีวัน (Ruling Planetary)',
+            icon: <Star size={48} color="#D4AF37" variant="Bulk" />,
+            logic: 'วิเคราะห์ดาวเคราะห์ที่เสวยพลังงาน "ศรี" (Lucky) และ "เดช" (Power) ประจำวัน โดยให้น้ำหนักคะแนนสูงสุดกับดาวพุธ (สติปัญญา), ดาวศุกร์ (ความรักบริบูรณ์) และดาวจันทร์ (ความเมตตาเอื้ออาทร)',
+            technical: 'เกณฑ์ที่ใช้: การระบุตำแหน่งดาวเคราะห์ที่มีกำลัง "อธิบดี" ทับตำแหน่งเกษตรตราธิบดีของคู่บ่าวสาวในวันนั้นๆ'
+        },
+        {
+            id: 3, title: 'วันธงชัย (Thongchai Logic)',
+            icon: <Chart size={48} color="#D4AF37" variant="Bulk" />,
+            logic: 'คำนวณจากสูตรมหาจักรวาลประจำเดือน (Monthly Cycle Alignment) เพื่อหา "วันแห่งชัยชนะ" ที่โคจรทับตำแหน่งมงคลของจักรราศีในช่วงเวลานั้น ช่วยขจัดเมฆหมอกและอุปสรรคให้การเริ่มต้นชีวิตคู่ราบรื่น',
+            technical: 'เกณฑ์ที่ใช้: การคำนวณวงกตพระอาทิตย์และพระจันทร์ตามคัมภีร์สุริยยาตร์เพื่อระบุจุด "ชัยชนะเหนืออุปสรรค"'
+        },
+        {
+            id: 4, title: 'สมพงษ์นักษัตร (Zodiac Sync)',
+            icon: <Heart size={48} color="#D4AF37" variant="Bulk" />,
+            logic: 'ใช้หลัก "ปัญจธาตุ" (Five Elements) และ "ตรีโกณ" (Trine Groups) เพื่อตรวจสอบว่าวันนั้นๆ ส่งเสริมปีนักษัตรของบ่าวสาวหรือไม่ โดยต้องไม่ตกตำแหน่ง "ชง" (Clash) และต้องเป็นธาตุที่เกื้อหนุนกัน',
+            technical: 'เกณฑ์ที่ใช้: การตรวจสอบความสัมพันธ์แบบ "สามสหาย" (Trine) และหลักการหลีกเลี่ยง "ชง" เพื่อความสงบสุขร่มเย็นของชีวิตคู่'
+        },
+        {
+            id: 5, title: 'จันทรคติ (Lunar Flow)',
+            icon: <InfoCircle size={48} color="#D4AF37" variant="Bulk" />,
+            logic: 'วิเคราะห์ข้างขึ้น-ข้างแรม (Lunar Phase) โดยเน้น "ข้างขึ้น" (Khang Khuen) ตั้งแต่ 1-15 ค่ำ ซึ่งสื่อถึงความเจริญเติมเต็ม (Waxing Moon) และความสว่างไสวที่เพิ่มพูนตามกาลเวลา',
+            technical: 'เกณฑ์ที่ใช้: การวิเคราะห์ดิถีมงคลในช่วง "ศุกลปักษ์" (ข้างขึ้น) เพื่อเสริมพลังงานการเติบโตและทวีพูนของทรัพย์สิน'
+        },
+        {
+            id: 6, title: 'ทักษาปกรณ์ (Auspicious Colors)',
+            icon: <Chart size={48} color="#D4AF37" variant="Bulk" />,
+            logic: 'ใช้หลักภูมิพยากรณ์ตาม "ทักษาจร" ประจำวันเพื่อหาค่าพลังงานที่เป็น "ศรี" (ความสิริมงคล) และ "เดช" (อำนาจวาสนา) ซึ่งจะส่งผลต่อความราบรื่นและโชคลาภของคู่บ่าวสาวตลอดการจัดงาน',
+            technical: 'เกณฑ์ที่ใช้: การคำนวณตำแหน่งดาวพระเคราะห์ตามดวงทักษา เพื่อระบุสีมงคลที่เสริมสิริมงคลระดับสูงสุดและหลีกเลี่ยงสีที่เป็นกาลกิณีประจำวัน'
+        }
+    ];
+
     const [groomDate, setGroomDate] = useState<Dayjs | null>(null);
     const [brideDate, setBrideDate] = useState<Dayjs | null>(null);
 
@@ -173,7 +232,7 @@ export default function AuspiciousCalculator() {
         if (hasDirectGroom && hasDirectBride) {
             parts.push('ดวงชะตาของทั้งเจ้าบ่าวและเจ้าสาวสมพงษ์กับวันนี้โดยตรง ชีวิตสมรสจะมีความเข้าใจกันเป็นอย่างดี');
         } else if (hasDirectGroom) {
-            parts.push('ดวงเจ้าบ่าวจะเป็นผู้นำพาครอบครัวด้วยความมั่นคง เพราะวันนี้หนุนดวงชะตาเจ้าบ่าวโดยตรง');
+            parts.push('ดวงเจ้าบ่าวจะเป็นผู้นำพาครอบครัวด้วยความมั่นคง เพราะวันนี้หนูนดวงชะตาเจ้าบ่าวโดยตรง');
         } else if (hasDirectBride) {
             parts.push('ดวงเจ้าสาวจะเป็นศูนย์กลางของครอบครัว วันนี้เสริมบุญบารมีเจ้าสาวอย่างพิเศษ');
         } else if (hasTrine) {
@@ -209,6 +268,13 @@ export default function AuspiciousCalculator() {
             return;
         }
 
+        const groomAge = dayjs().diff(groomDate, 'year');
+        const brideAge = dayjs().diff(brideDate, 'year');
+        if (groomAge < 17 || brideAge < 17) {
+            setError('คู่บ่าวสาวต้องมีอายุอย่างน้อย 17 ปีบริบูรณ์ตามกฎหมายครับ');
+            return;
+        }
+
         setLoading(true);
         setResults(null);
 
@@ -219,11 +285,6 @@ export default function AuspiciousCalculator() {
             const groomYear = groomDateObj.getFullYear();
             const brideYear = brideDateObj.getFullYear();
 
-            // ใช้ปีนักษัตรแบบไทย (ง่ายๆ ตามปี ค.ศ.)
-            const groomZodiac = (groomYear + 12 - 4) % 12; // 0 = ชวด ? ไม่สิ อิงตามโค้ดเดิม
-            // โค้ดเดิม: const groomZodiac = groomDateObj.getFullYear() % 12;
-            // แต่ getDayZodiac ใช้สูตรต่างออกไป 
-            // ให้ยึดตามโค้ดเดิมที่เคยทำงานได้
             const gz = groomDateObj.getFullYear() % 12;
             const bz = brideDateObj.getFullYear() % 12;
 
@@ -338,8 +399,12 @@ export default function AuspiciousCalculator() {
 
     return (
         <Paper elevation={0} sx={{
-            p: { xs: 3, md: 5 }, borderRadius: 6, bgcolor: 'var(--card-bg)', border: '1px solid var(--border-color)',
-            backdropFilter: 'blur(10px)', boxShadow: '0 20px 40px rgba(0,0,0,0.05)'
+            p: { xs: 3, md: 5 }, borderRadius: 6,
+            bgcolor: 'var(--card-bg)',
+            border: '1px solid var(--border-color)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: isDark ? '0 20px 40px rgba(0,0,0,0.3)' : '0 20px 40px rgba(0,0,0,0.05)',
+            color: 'var(--foreground)'
         }}>
             <Box textAlign="center" mb={4}>
                 <Box sx={{ display: 'inline-flex', p: 2, borderRadius: '50%', bgcolor: 'rgba(212, 175, 55, 0.1)', color: '#D4AF37', mb: 2 }}>
@@ -363,12 +428,106 @@ export default function AuspiciousCalculator() {
                         )}
                         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 3 }}>
                             <DatePicker
-                                label="วันเกิดเจ้าบ่าว (ค.ศ. เท่านั้น)" format="DD/MM/YYYY" value={groomDate} onChange={(nV) => { setGroomDate(nV); setError(null); }}
-                                slotProps={{ textField: { fullWidth: true, required: true, sx: { '& .MuiOutlinedInput-root': { fontFamily: 'var(--font-prompt)' } } } }}
+                                label="วันเกิดเจ้าบ่าว (ค.ศ. เท่านั้น)"
+                                format="DD/MM/YYYY"
+                                value={groomDate}
+                                onChange={(nV) => { setGroomDate(nV); setError(null); }}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        required: true,
+                                        sx: {
+                                            '& .MuiOutlinedInput-root': {
+                                                fontFamily: 'var(--font-prompt)',
+                                                color: 'var(--foreground)',
+                                                '& fieldset': { borderColor: 'var(--border-color)' },
+                                                '&:hover fieldset': { borderColor: 'rgba(212, 175, 55, 0.5)' },
+                                                '&.Mui-focused fieldset': { borderColor: '#D4AF37' },
+                                                '& input::placeholder': {
+                                                    color: 'var(--foreground)',
+                                                    opacity: 0.4
+                                                }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                fontFamily: 'var(--font-prompt)',
+                                                color: 'var(--foreground)',
+                                                opacity: 0.7,
+                                                '&.Mui-focused': { color: '#D4AF37', opacity: 1 }
+                                            },
+                                            '& .MuiInputAdornment-root .MuiIconButton-root': {
+                                                color: '#D4AF37'
+                                            }
+                                        }
+                                    },
+                                    popper: {
+                                        sx: {
+                                            '& .MuiPaper-root': {
+                                                bgcolor: 'var(--card-bg)',
+                                                color: 'var(--foreground)',
+                                                border: '1px solid var(--border-color)',
+                                                backgroundImage: 'none'
+                                            },
+                                            '& .MuiPickersDay-root': {
+                                                color: 'var(--foreground)',
+                                                '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' },
+                                                '&.Mui-selected': { bgcolor: '#D4AF37', color: 'black' }
+                                            },
+                                            '& .MuiTypography-root': { color: 'var(--foreground)' },
+                                            '& .MuiDayCalendar-weekDayLabel': { color: 'var(--foreground)', opacity: 0.5 }
+                                        }
+                                    }
+                                }}
                             />
                             <DatePicker
-                                label="วันเกิดเจ้าสาว (ค.ศ. เท่านั้น)" format="DD/MM/YYYY" value={brideDate} onChange={(nV) => { setBrideDate(nV); setError(null); }}
-                                slotProps={{ textField: { fullWidth: true, required: true, sx: { '& .MuiOutlinedInput-root': { fontFamily: 'var(--font-prompt)' } } } }}
+                                label="วันเกิดเจ้าสาว (ค.ศ. เท่านั้น)"
+                                format="DD/MM/YYYY"
+                                value={brideDate}
+                                onChange={(nV) => { setBrideDate(nV); setError(null); }}
+                                slotProps={{
+                                    textField: {
+                                        fullWidth: true,
+                                        required: true,
+                                        sx: {
+                                            '& .MuiOutlinedInput-root': {
+                                                fontFamily: 'var(--font-prompt)',
+                                                color: 'var(--foreground)',
+                                                '& fieldset': { borderColor: 'var(--border-color)' },
+                                                '&:hover fieldset': { borderColor: 'rgba(212, 175, 55, 0.5)' },
+                                                '&.Mui-focused fieldset': { borderColor: '#D4AF37' },
+                                                '& input::placeholder': {
+                                                    color: 'var(--foreground)',
+                                                    opacity: 0.4
+                                                }
+                                            },
+                                            '& .MuiInputLabel-root': {
+                                                fontFamily: 'var(--font-prompt)',
+                                                color: 'var(--foreground)',
+                                                opacity: 0.7,
+                                                '&.Mui-focused': { color: '#D4AF37', opacity: 1 }
+                                            },
+                                            '& .MuiInputAdornment-root .MuiIconButton-root': {
+                                                color: '#D4AF37'
+                                            }
+                                        }
+                                    },
+                                    popper: {
+                                        sx: {
+                                            '& .MuiPaper-root': {
+                                                bgcolor: 'var(--card-bg)',
+                                                color: 'var(--foreground)',
+                                                border: '1px solid var(--border-color)',
+                                                backgroundImage: 'none'
+                                            },
+                                            '& .MuiPickersDay-root': {
+                                                color: 'var(--foreground)',
+                                                '&:hover': { bgcolor: 'rgba(212, 175, 55, 0.1)' },
+                                                '&.Mui-selected': { bgcolor: '#D4AF37', color: 'black' }
+                                            },
+                                            '& .MuiTypography-root': { color: 'var(--foreground)' },
+                                            '& .MuiDayCalendar-weekDayLabel': { color: 'var(--foreground)', opacity: 0.5 }
+                                        }
+                                    }
+                                }}
                             />
                         </Box>
                         <Button
@@ -382,7 +541,14 @@ export default function AuspiciousCalculator() {
             </LocalizationProvider>
 
             <Box sx={{ mt: 5, mb: 1 }}>
-                <Accordion elevation={0} sx={{ bgcolor: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.2)', borderRadius: '12px !important' }}>
+                <Accordion elevation={0} sx={{
+                    bgcolor: isDark ? 'rgba(212, 175, 55, 0.05)' : 'rgba(212, 175, 55, 0.05)',
+                    border: '1px solid',
+                    borderColor: isDark ? 'rgba(212, 175, 55, 0.2)' : 'rgba(212, 175, 55, 0.2)',
+                    borderRadius: '12px !important',
+                    backgroundImage: 'none',
+                    '&:before': { display: 'none' }
+                }}>
                     <AccordionSummary expandIcon={<ArrowDown2 size={20} color="#D4AF37" />}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                             <InfoCircle size={22} color="#D4AF37" variant="Bulk" />
@@ -390,87 +556,216 @@ export default function AuspiciousCalculator() {
                         </Box>
                     </AccordionSummary>
                     <AccordionDetails sx={{ px: { xs: 2, sm: 4 }, pb: 4 }}>
-                        <Stack spacing={2.5}>
-                            {BREAKDOWN_LABELS.map((item, i) => (
-                                <Box key={i}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700 }}>{item.icon} {i + 1}. {item.label} ({item.max} คะแนน)</Typography>
-                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', opacity: 0.8 }}>อิงตามตำราโหราศาสตร์ไทยฉบับดั้งเดิมและจันทรคติ</Typography>
+                        <Stack spacing={3}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>📅 1. เดือนมงคล (Auspicious Months)</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
+                                        คัดเลือกเฉพาะเดือนคู่ที่เป็นสิริมงคลตามตำราโหราศาสตร์ไทยโบราณ (เดือน 2, 4, 6, 9, และ 12)
+                                    </Typography>
                                 </Box>
-                            ))}
-                            <Box>
-                                <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700 }}>✨ 7. สีมงคลและสถานที่จัดงาน</Typography>
-                                <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', opacity: 0.8 }}>วิเคราะห์ตามทักษาปกรณ์และพลังธาตุวันเกิด</Typography>
+                                <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[0]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
+                                    <Book size={20} variant="Bulk" color="#D4AF37" /> <Typography variant="caption" sx={{ ml: 0.5 }}>LOGIC</Typography>
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>☀️ 2. อธิบดีวัน (Ruling Planetary Energy)</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
+                                        วิเคราะห์ดาวเคราะห์ที่เสวยพลังอำนาจในวันนั้นๆ โดยเลือกวันศุกร์ หรือวันจันทร์ เป็นอธิบดี
+                                    </Typography>
+                                </Box>
+                                <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[1]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
+                                    <Book size={20} variant="Bulk" color="#D4AF37" /> <Typography variant="caption" sx={{ ml: 0.5 }}>LOGIC</Typography>
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🚩 3. วันธงชัย (Thongchai Victorious Day)</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
+                                        คำนวณวันแห่งชัยชนะตามคัมภีร์มหาทักษาประจำเดือน เพื่อความเป็นสิริมงคล
+                                    </Typography>
+                                </Box>
+                                <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[2]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
+                                    <Book size={20} variant="Bulk" color="#D4AF37" /> <Typography variant="caption" sx={{ ml: 0.5 }}>LOGIC</Typography>
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🤵👰 4-5. สมพงษ์นักษัตร (Zodiac Compatibility)</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
+                                        ตรวจสอบความสัมพันธ์ระหว่าง "นักษัตรวัน" และ "ปีเกิดบ่าวสาว" โดยต้องไม่ตกตำแหน่ง "ชง"
+                                    </Typography>
+                                </Box>
+                                <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[3]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
+                                    <Book size={20} variant="Bulk" color="#D4AF37" /> <Typography variant="caption" sx={{ ml: 0.5 }}>LOGIC</Typography>
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🌙 6. จันทรคติ (Lunar Cycle Assessment)</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
+                                        เน้นหาฤกษ์ในช่วง "ข้างขึ้น" (Khang Khuen) โดยเฉพาะวันเพ็ญเปรียบเสมือนความรักที่เต็มเปี่ยม
+                                    </Typography>
+                                </Box>
+                                <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[4]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
+                                    <Book size={20} variant="Bulk" color="#D4AF37" /> <Typography variant="caption" sx={{ ml: 0.5 }}>LOGIC</Typography>
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                <Box sx={{ flexGrow: 1 }}>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>✨ 7. ทักษาปกรณ์ (Auspicious Directions & Colors)</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
+                                        วิเคราะห์สีมงคล (สีเดช/สีศรี) และสไตล์สถานที่จัดงานตามพลังงานธาตุของวัน
+                                    </Typography>
+                                </Box>
+                                <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[5]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
+                                    <Book size={20} variant="Bulk" color="#D4AF37" /> <Typography variant="caption" sx={{ ml: 0.5 }}>LOGIC</Typography>
+                                </Button>
                             </Box>
                         </Stack>
                     </AccordionDetails>
                 </Accordion>
             </Box>
 
+            {/* Scientific Logic Dialog */}
+            <Dialog
+                open={openLogicDialog}
+                onClose={() => setOpenLogicDialog(false)}
+                maxWidth="sm"
+                fullWidth
+                PaperProps={{
+                    sx: {
+                        bgcolor: 'var(--card-bg)',
+                        color: 'var(--foreground)',
+                        borderRadius: 6,
+                        backgroundImage: 'none',
+                        border: '1px solid var(--border-color)',
+                        p: 1
+                    }
+                }}
+            >
+                <DialogTitle component="div" sx={{ m: 0, p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box sx={{ fontFamily: 'var(--font-prompt)', fontSize: '1.25rem', fontWeight: 800, color: '#D4AF37' }}>
+                        Astrological Deep-Dive
+                    </Box>
+                    <IconButton onClick={() => setOpenLogicDialog(false)} sx={{ color: 'var(--foreground)', opacity: 0.5 }}>
+                        <CloseCircle />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ pb: 4 }}>
+                    {selectedLogic && (
+                        <Stack spacing={3} alignItems="center" sx={{ textAlign: 'center' }}>
+                            <Box sx={{ p: 2, borderRadius: '50%', bgcolor: 'rgba(212, 175, 55, 0.1)' }}>
+                                {selectedLogic.icon}
+                            </Box>
+                            <Box>
+                                <Typography variant="h5" sx={{ fontWeight: 800, mb: 1 }}>{selectedLogic.title}</Typography>
+                                <Divider sx={{ width: 40, borderBottomWidth: 3, borderColor: '#D4AF37', mx: 'auto', mb: 2 }} />
+                                <Typography variant="body1" sx={{ lineHeight: 1.8, opacity: 0.9, mb: 3 }}>
+                                    {selectedLogic.logic}
+                                </Typography>
+                                <Box sx={{ p: 2, borderRadius: 3, bgcolor: isDark ? 'rgba(212, 175, 55, 0.05)' : 'rgba(212, 175, 55, 0.03)', border: '1px dashed #D4AF37' }}>
+                                    <Typography variant="overline" sx={{ color: '#D4AF37', fontWeight: 900, fontFamily: 'var(--font-prompt)', letterSpacing: 0.5 }}>วิธีการเลือกตามหลักโหราศาสตร์</Typography>
+                                    <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', mt: 1, fontStyle: 'italic', color: 'var(--foreground)', opacity: 0.9 }}>
+                                        {selectedLogic.technical}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Stack>
+                    )}
+                </DialogContent>
+            </Dialog>
+
             {results && (
                 <Box sx={{ mt: 5 }}>
-                    <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 4, textAlign: 'center' }}>ผลการคำนวณฤกษ์แต่งงานของคุณ</Typography>
+                    <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 4, textAlign: 'center', color: 'var(--foreground)' }}>ผลการคำนวณฤกษ์แต่งงานของคุณ</Typography>
                     <Stack spacing={4}>
                         {results.map((result, idx) => (
                             <Box key={idx} sx={{
-                                p: { xs: 3, sm: 5 }, borderRadius: 6,
-                                border: idx === 0 ? '2px solid #D4AF37' : '1px solid var(--border-color)',
-                                background: idx === 0 ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%)' : 'rgba(255, 255, 255, 0.02)',
-                                transition: 'all 0.4s ease', position: 'relative', overflow: 'hidden',
-                                boxShadow: idx === 0 ? '0 24px 48px rgba(212, 175, 55, 0.15)' : '0 4px 20px rgba(0,0,0,0.03)',
-                                '&:hover': { transform: 'translateY(-5px)', borderColor: '#D4AF37' }
+                                p: { xs: 3, sm: 5 }, borderRadius: '40px',
+                                border: idx === 0 ? '3px solid #D4AF37' : '1px solid var(--border-color)',
+                                background: idx === 0 ?
+                                    (isDark ? 'linear-gradient(135deg, rgba(212, 175, 55, 0.15) 0%, rgba(255, 182, 193, 0.1) 100%)' : 'linear-gradient(135deg, #FFF9F2 0%, #FFF0F5 100%)')
+                                    : (isDark ? 'rgba(255, 255, 255, 0.02)' : 'rgba(0, 0, 0, 0.01)'),
+                                transition: 'all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                                position: 'relative', overflow: 'hidden',
+                                boxShadow: idx === 0 ? (isDark ? '0 24px 48px rgba(0, 0, 0, 0.4)' : '0 24px 48px rgba(212, 175, 55, 0.15)') : '0 4px 20px rgba(0,0,0,0.03)',
+                                '&:hover': { transform: 'scale(1.02)', borderColor: '#D4AF37' }
                             }}>
                                 {idx === 0 && (
-                                    <Box sx={{ position: 'absolute', top: 20, right: -40, bgcolor: '#D4AF37', color: 'black', px: 6, py: 0.5, transform: 'rotate(45deg)', fontFamily: 'var(--font-prompt)', fontWeight: 800, fontSize: '0.7rem' }}>
-                                        BEST CHOICE
+                                    <Box sx={{ position: 'absolute', top: 20, right: 20, display: 'flex', gap: 0.5 }}>
+                                        <Typography sx={{ color: '#D4AF37', fontSize: '1.2rem' }}>✨</Typography>
                                     </Box>
                                 )}
 
-                                <Box sx={{ mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', md: 'center' }, gap: 3 }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2.5 }}>
-                                        <Box sx={{ width: 64, height: 64, borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: idx === 0 ? 'linear-gradient(135deg, #D4AF37, #FFD700)' : 'var(--border-color)', color: idx === 0 ? 'white' : '#D4AF37' }}>
-                                            {idx === 0 ? <Heart size={32} variant="Bold" /> : <Star size={32} variant="Bulk" />}
-                                        </Box>
-                                        <Box>
-                                            <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800 }}>{formatDate(result.date)}</Typography>
-                                            <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', opacity: 0.6 }}>{result.description}</Typography>
+                                <Box sx={{ mb: 4, textAlign: 'center' }}>
+                                    <Box sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
+                                        <Box sx={{ width: 80, height: 80, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: idx === 0 ? 'linear-gradient(135deg, #D4AF37, #FFD700)' : 'var(--border-color)', boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}>
+                                            {idx === 0 ? <Heart size={40} variant="Bold" color="white" /> : <Star size={40} variant="Bulk" color="#D4AF37" />}
                                         </Box>
                                     </Box>
-                                    <Box sx={{ textAlign: { xs: 'left', md: 'right' } }}>
-                                        <Typography variant="caption" sx={{ fontWeight: 800, color: '#D4AF37', letterSpacing: 1.5 }}>คะแนนมงคลสุทธิ</Typography>
-                                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-                                            <Typography variant="h3" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 900, color: idx === 0 ? '#D4AF37' : 'inherit' }}>{result.score}</Typography>
-                                            <Typography variant="h6" sx={{ opacity: 0.3 }}>/100</Typography>
+                                    <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, color: 'var(--foreground)', mb: 1 }}>{formatDate(result.date)}</Typography>
+                                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: '#D4AF37', fontWeight: 600, opacity: 0.8 }}>{result.description}</Typography>
+
+                                    <Box sx={{ mt: 3, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                                        <Box sx={{ px: 3, py: 1, borderRadius: '20px', bgcolor: 'rgba(212, 175, 55, 0.1)', border: '1px solid #D4AF37' }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 800, color: '#D4AF37', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <Heart size={20} variant="Bold" color="#D4AF37" /> คะแนนความสมพงษ์ {result.score}%
+                                            </Typography>
                                         </Box>
                                     </Box>
                                 </Box>
 
+                                <Divider sx={{ my: 4, borderStyle: 'dotted', borderColor: 'rgba(212, 175, 55, 0.3)', borderBottomWidth: 2 }} />
+
                                 <Box sx={{ display: 'flex', flexDirection: { xs: 'column', lg: 'row' }, gap: 4 }}>
                                     {/* Left: Visualization & Breakdown */}
-                                    <Box sx={{ flex: { xs: '1 1 100%', lg: '7' }, width: '100%' }}>
-                                        <Box sx={{ p: 3, borderRadius: 4, border: '1px solid var(--border-color)', height: '100%' }}>
-                                            <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2, display: 'flex', alignItems: 'center', gap: 1, color: '#D4AF37' }}>
-                                                <Chart size={20} /> วิเคราะห์ความสมพงษ์
+                                    <Box sx={{ flex: { xs: '1 1 100%', lg: '6' } }}>
+                                        <Box sx={{ p: 3, borderRadius: '30px', bgcolor: isDark ? 'rgba(255,255,255,0.02)' : 'white', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
+                                            <Typography variant="subtitle2" sx={{ fontWeight: 800, mb: 3, display: 'flex', alignItems: 'center', gap: 1, color: '#D4AF37', justifyContent: 'center' }}>
+                                                <Chart size={20} variant="Bold" /> สถิติความมงคลเจาะลึก
                                             </Typography>
-                                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center' }}>
-                                                <Box sx={{ width: 250 }}>
+                                            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, alignItems: 'center', gap: 2 }}>
+                                                <Box sx={{ width: { xs: '100%', sm: 220 } }}>
                                                     <ReactApexChart
-                                                        type="radar" height={250}
+                                                        type="radar" height={220}
                                                         series={[{ name: 'คะแนน', data: Object.values(result.breakdown).map((v, i) => Math.round((v / BREAKDOWN_LABELS[i].max) * 100)) }]}
                                                         options={{
-                                                            chart: { toolbar: { show: false } }, stroke: { width: 2, colors: ['#D4AF37'] }, fill: { opacity: 0.2, colors: ['#D4AF37'] },
-                                                            xaxis: { categories: BREAKDOWN_LABELS.map(l => l.label), labels: { style: { colors: '#D4AF37', fontSize: '10px' } } },
-                                                            yaxis: { show: false, max: 100 }, plotOptions: { radar: { polygons: { strokeColors: 'rgba(212, 175, 55, 0.1)' } } }
+                                                            chart: { toolbar: { show: false }, background: 'transparent' },
+                                                            theme: { mode: isDark ? 'dark' : 'light' },
+                                                            stroke: { width: 3, colors: ['#D4AF37'] },
+                                                            fill: { opacity: 0.3, colors: ['#D4AF37'] },
+                                                            xaxis: {
+                                                                categories: BREAKDOWN_LABELS.map(l => l.label),
+                                                                labels: { style: { colors: isDark ? '#CCC' : '#666', fontSize: '9px', fontFamily: 'var(--font-prompt)' } }
+                                                            },
+                                                            yaxis: { show: false, max: 100 },
+                                                            plotOptions: {
+                                                                radar: {
+                                                                    polygons: {
+                                                                        strokeColors: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(212, 175, 55, 0.1)',
+                                                                        fill: { colors: ['transparent'] }
+                                                                    }
+                                                                }
+                                                            },
+                                                            markers: { size: 3, colors: ['#D4AF37'] }
                                                         }}
                                                     />
                                                 </Box>
-                                                <Stack spacing={1} sx={{ flexGrow: 1, width: '100%' }}>
+                                                <Stack spacing={1.5} sx={{ flexGrow: 1, width: '100%' }}>
                                                     {BREAKDOWN_LABELS.map(lbl => (
                                                         <Box key={lbl.key}>
                                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-                                                                <Typography variant="caption" sx={{ fontWeight: 600 }}>{lbl.label}</Typography>
-                                                                <Typography variant="caption" sx={{ fontWeight: 700, color: '#D4AF37' }}>{result.breakdown[lbl.key]}/{lbl.max}</Typography>
+                                                                <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--foreground)', opacity: 0.8 }}>{lbl.label}</Typography>
+                                                                <Typography variant="caption" sx={{ fontWeight: 800, color: '#D4AF37' }}>{result.breakdown[lbl.key]}/{lbl.max}</Typography>
                                                             </Box>
-                                                            <LinearProgress variant="determinate" value={(result.breakdown[lbl.key] / lbl.max) * 100} sx={{ height: 4, borderRadius: 2, bgcolor: 'rgba(212, 175, 55, 0.05)', '& .MuiLinearProgress-bar': { bgcolor: '#D4AF37' } }} />
+                                                            <LinearProgress variant="determinate" value={(result.breakdown[lbl.key] / lbl.max) * 100} sx={{ height: 6, borderRadius: 3, bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', '& .MuiLinearProgress-bar': { bgcolor: '#D4AF37', borderRadius: 3 } }} />
                                                         </Box>
                                                     ))}
                                                 </Stack>
@@ -479,39 +774,69 @@ export default function AuspiciousCalculator() {
                                     </Box>
 
                                     {/* Right: Prediction & Tips */}
-                                    <Box sx={{ flex: { xs: '1 1 100%', lg: '5' }, width: '100%' }}>
+                                    <Box sx={{ flex: { xs: '1 1 100%', lg: '6' } }}>
                                         <Stack spacing={3}>
-                                            <Box sx={{ p: 3, borderRadius: 4, bgcolor: 'rgba(212, 175, 55, 0.08)', border: '1px solid rgba(212, 175, 55, 0.1)' }}>
-                                                <Typography variant="h6" sx={{ color: '#D4AF37', fontWeight: 700, mb: 1 }}>{result.headline}</Typography>
-                                                <Typography variant="body2" sx={{ lineHeight: 1.8, opacity: 0.9 }}>{result.prediction}</Typography>
+                                            <Box sx={{ p: 4, borderRadius: '30px', bgcolor: idx === 0 ? (isDark ? 'rgba(212, 175, 55, 0.2)' : '#FFF0F5') : 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.2)', textAlign: 'center' }}>
+                                                <Typography variant="h6" sx={{ color: '#D4AF37', fontWeight: 800, mb: 1.5 }}>🌸 {result.headline}</Typography>
+                                                <Typography variant="body2" sx={{ lineHeight: 1.8, color: 'var(--foreground)', fontSize: '0.95rem' }}>{result.prediction}</Typography>
                                             </Box>
-                                            <Box sx={{ p: 3, borderRadius: 4, border: '1px solid var(--border-color)', bgcolor: 'rgba(255,255,255,0.01)' }}>
-                                                <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2, color: '#D4AF37' }}>✨ เคล็ดลับจัดงาน</Typography>
-                                                <Stack spacing={2}>
+                                            <Box sx={{ p: 4, borderRadius: '30px', border: '2px dashed rgba(212, 175, 55, 0.2)', bgcolor: isDark ? 'rgba(255,255,255,0.01)' : 'rgba(255,255,255,0.5)' }}>
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 800, mb: 3, color: '#D4AF37', display: 'flex', alignItems: 'center', gap: 1, justifyContent: 'center' }}>✨ เคล็ดลับจัดงานสุดโรแมนติก</Typography>
+                                                <Stack spacing={2.5}>
                                                     <Box>
-                                                        <Typography variant="caption" sx={{ color: '#D4AF37', fontWeight: 800, display: 'block', mb: 1 }}>ธีมสีมงคล (Auspicious Colors)</Typography>
-                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 0.5 }}>
+                                                        <Typography variant="caption" sx={{ color: '#D4AF37', fontWeight: 900, display: 'block', mb: 1.5, textAlign: 'center', letterSpacing: 1 }}>🎨 ธีมสีมงคลที่แนะนำ</Typography>
+                                                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center', mb: 1 }}>
                                                             {result.goodColors.split(',').map((colorName, cIdx) => {
                                                                 const trimmedName = colorName.trim();
                                                                 const COLOR_MAP: Record<string, string> = {
-                                                                    'แดง': '#FFB3BA', 'ชมพู': '#FFD1DC', 'เขียว': '#B2F2BB', 'ฟ้า': '#BAE1FF',
-                                                                    'น้ำเงิน': '#AEC6CF', 'ขาว': '#FFFFFF', 'เหลือง': '#FFFFBA', 'ส้ม': '#FFD8B1',
-                                                                    'ดำ': '#696969', 'เทา': '#D3D3D3', 'ม่วง': '#E0BBE4', 'บรอนซ์': '#C0C0C0', 'น้ำเงิน/ฟ้า': '#BAE1FF'
+                                                                    'แดง': '#C05555', 'ชมพู': '#D47D95', 'เขียว': '#6B8E6B', 'ฟ้า': '#5F8DA3',
+                                                                    'น้ำเงิน': '#4A6D8C', 'ขาว': '#F5F5F5', 'เหลือง': '#D4A373', 'ส้ม': '#C08552',
+                                                                    'ดำ': '#3D3D3D', 'เทา': '#8E8E8E', 'ม่วง': '#8E7AB5', 'บรอนซ์': '#8D6E63', 'น้ำเงิน/ฟ้า': '#5F8DA3'
                                                                 };
-                                                                const colorHex = COLOR_MAP[trimmedName] || '#DDD';
+                                                                const colorHex = COLOR_MAP[trimmedName] || '#9E9E9E';
                                                                 return (
-                                                                    <Box key={cIdx} sx={{ display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(255,255,255,0.05)', px: 1, py: 0.5, borderRadius: 2, border: '1px solid var(--border-color)' }}>
-                                                                        <Box sx={{ width: 14, height: 14, borderRadius: '50%', bgcolor: colorHex, border: '1px solid rgba(0,0,0,0.1)' }} />
-                                                                        <Typography variant="caption" sx={{ fontWeight: 600 }}>{trimmedName}</Typography>
+                                                                    <Box key={cIdx} sx={{
+                                                                        display: 'flex', alignItems: 'center', gap: 1,
+                                                                        bgcolor: isDark ? 'rgba(255,255,255,0.08)' : 'white',
+                                                                        px: 2, py: 1, borderRadius: '15px', border: '1px solid var(--border-color)',
+                                                                        boxShadow: '0 4px 10px rgba(0,0,0,0.05)'
+                                                                    }}>
+                                                                        <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: colorHex, border: '1px solid rgba(0,0,0,0.1)' }} />
+                                                                        <Typography variant="caption" sx={{ fontWeight: 700, color: 'var(--foreground)' }}>{trimmedName}</Typography>
                                                                     </Box>
                                                                 );
                                                             })}
                                                         </Box>
-                                                        <Typography variant="caption" sx={{ opacity: 0.5 }}>เลี่ยง: {result.badColor}</Typography>
+                                                        <Box sx={{ mt: 2, p: 1.5, borderRadius: '20px', bgcolor: 'rgba(211, 47, 47, 0.08)', border: '1px dashed rgba(211, 47, 47, 0.4)' }}>
+                                                            <Typography variant="caption" sx={{ color: '#D32F2F', fontWeight: 900, display: 'block', mb: 1.5, textAlign: 'center', letterSpacing: 1 }}>⚠️ สีที่ควรเลี่ยง (กาลกิณี)</Typography>
+                                                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center' }}>
+                                                                {result.badColor.split('/').map((colorName, bIdx) => {
+                                                                    const trimmedName = colorName.trim();
+                                                                    const COLOR_MAP: Record<string, string> = {
+                                                                        'แดง': '#C05555', 'ชมพู': '#D47D95', 'เขียว': '#6B8E6B', 'ฟ้า': '#5F8DA3',
+                                                                        'น้ำเงิน': '#4A6D8C', 'ขาว': '#F5F5F5', 'เหลือง': '#D4A373', 'ส้ม': '#C08552',
+                                                                        'ดำ': '#3D3D3D', 'เทา': '#8E8E8E', 'ม่วง': '#8E7AB5', 'บรอนซ์': '#8D6E63', 'น้ำเงิน/ฟ้า': '#5F8DA3'
+                                                                    };
+                                                                    const colorHex = COLOR_MAP[trimmedName] || '#9E9E9E';
+                                                                    return (
+                                                                        <Box key={bIdx} sx={{
+                                                                            display: 'flex', alignItems: 'center', gap: 1,
+                                                                            bgcolor: isDark ? 'rgba(255,255,255,0.05)' : 'white',
+                                                                            px: 2, py: 1, borderRadius: '15px', border: '1px solid rgba(211, 47, 47, 0.2)',
+                                                                        }}>
+                                                                            <Box sx={{ width: 16, height: 16, borderRadius: '50%', bgcolor: colorHex, border: '1px solid rgba(0,0,0,0.2)', position: 'relative', overflow: 'hidden' }}>
+                                                                                 <Box sx={{ position: 'absolute', top: '50%', left: '50%', width: '150%', height: 1.5, bgcolor: '#D32F2F', transform: 'translate(-50%, -50%) rotate(45deg)' }} />
+                                                                            </Box>
+                                                                            <Typography variant="caption" sx={{ fontWeight: 700, color: '#D32F2F', opacity: 0.9 }}>{trimmedName}</Typography>
+                                                                        </Box>
+                                                                    );
+                                                                })}
+                                                            </Box>
+                                                        </Box>
                                                     </Box>
-                                                    <Box>
-                                                        <Typography variant="caption" sx={{ color: '#D4AF37', fontWeight: 800, display: 'block', mb: 0.5 }}>สถานที่แนะนำ</Typography>
-                                                        <Typography variant="body2" sx={{ lineHeight: 1.6 }}>{result.venueStyle}</Typography>
+                                                    <Box sx={{ textAlign: 'center' }}>
+                                                        <Typography variant="caption" sx={{ color: '#D4AF37', fontWeight: 900, display: 'block', mb: 1 }}>🏠 สไตล์สถานที่แนะนำ</Typography>
+                                                        <Typography variant="body2" sx={{ lineHeight: 1.6, color: 'var(--foreground)', fontWeight: 500 }}>{result.venueStyle}</Typography>
                                                     </Box>
                                                 </Stack>
                                             </Box>
@@ -519,9 +844,9 @@ export default function AuspiciousCalculator() {
                                     </Box>
                                 </Box>
                                 {result.reasons.length > 0 && (
-                                    <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid var(--border-color)', display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                                    <Box sx={{ mt: 5, pt: 3, borderTop: '1px solid var(--border-color)', display: 'flex', flexWrap: 'wrap', gap: 1.5, justifyContent: 'center' }}>
                                         {result.reasons.map((r, i) => (
-                                            <Chip key={i} label={r.replace(/✅ \[.*?\] /, '')} size="small" variant="outlined" sx={{ fontSize: '0.7rem', opacity: 0.7 }} />
+                                            <Chip key={i} label={r.replace(/✅ \[.*?\] /, '🌸 ')} size="medium" variant="outlined" sx={{ borderRadius: '12px', fontSize: '0.8rem', color: '#D4AF37', borderColor: 'rgba(212, 175, 55, 0.3)', bgcolor: 'rgba(212, 175, 55, 0.03)' }} />
                                         ))}
                                     </Box>
                                 )}
@@ -529,7 +854,7 @@ export default function AuspiciousCalculator() {
                         ))}
                     </Stack>
                     <Box sx={{ mt: 5, p: 3, borderRadius: 4, bgcolor: 'rgba(212, 175, 55, 0.05)', border: '1px solid rgba(212, 175, 55, 0.1)' }}>
-                        <Typography variant="body2" sx={{ opacity: 0.7, lineHeight: 1.8, fontSize: '0.85rem' }}>
+                        <Typography variant="body2" sx={{ opacity: 0.7, lineHeight: 1.8, fontSize: '0.85rem', color: 'var(--foreground)' }}>
                             <strong style={{ color: '#D4AF37' }}>📌 หมายเหตุ:</strong> การได้คะแนนเต็ม 100 นั้นเป็นไปได้ยากมากเนื่องจากต้องมีเงื่อนไขสมพงษ์ครบทุกมิติ โดยทั่วไปคะแนน 60 ขึ้นไปถือว่าเป็นฤกษ์มงคลที่ดีมากแล้วครับ
                         </Typography>
                     </Box>
