@@ -44,8 +44,8 @@ export default function WhyChooseUs() {
                         <Stack spacing={4}>
                             {[
                                 { title: 'ระบบติดตามงานอัจฉริยะ', desc: 'ตรวจสอบสถานะการจัดงานและการติดตั้งอุปกรณ์ได้แบบ Real-time ผ่าน Web Application ส่วนตัวที่เราพัฒนาขึ้นเพื่อคุณ' },
-                                { title: 'ทีมงานมืออาชีพ', desc: 'ประสบการณ์กว่า 10 ปี พร้อมแก้ปัญหาหน้างานได้ทันท่วงที' },
-                                { title: 'ราคาที่จับต้องได้', desc: 'บริการคุณภาพระดับพรีเมียม ในราคาที่สมเหตุสมผลและคุ้มค่า' }
+                                { title: 'ทีมงานมืออาชีพ', desc: 'ประสบการณ์กว่า 10 ปี นอกจากนี้ ยังพร้อมแก้ปัญหาหน้างานได้ทันท่วงทีเพื่อให้งานของคุณราบรื่นที่สุด' },
+                                { title: 'ราคาที่จับต้องได้', desc: 'บริการคุณภาพระดับพรีเมียม ในราคาที่สมเหตุสมผลและคุ้มค่าที่สุด' }
                             ].map((item, i) => (
                                 <Box key={i} sx={{ borderLeft: '4px solid var(--primary)', pl: 3 }}>
                                     <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', color: 'var(--foreground)', mb: 1, fontSize: '1.1rem' }}>

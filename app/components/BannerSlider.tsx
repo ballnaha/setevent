@@ -75,10 +75,19 @@ export default function BannerSlider() {
                 </svg>
             </div>
 
-            {/* Main Center Content */}
             <div className="hero-content">
                 <h1 className="hero-title">
                     EVENT<br />RENTAL<br />SERVICE
+                    <span style={{ 
+                        display: 'block', 
+                        fontSize: 'clamp(1rem, 3vw, 2rem)', 
+                        letterSpacing: '2px',
+                        marginTop: '10px',
+                        fontWeight: 600,
+                        opacity: 0.9
+                    }}>
+                        เช่าจอ LED ราคาถูก · จัดงานราคาประหยัด
+                    </span>
                 </h1>
 
                 <p className="hero-subtitle">

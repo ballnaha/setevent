@@ -8,7 +8,7 @@ const services = [
     {
         title: "บริการเช่าอุปกรณ์",
         subtitle: "All-in-One Rental Solutions",
-        desc: "บริการให้เช่าจอ LED ราคาถูก นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง ดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณสัมผัสได้",
+        desc: "บริการ<strong>เช่าจอ LED ราคาถูก</strong> นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง <strong>นอกจากนี้</strong> ยังดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณพึงพอใจ",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
         buttonText: "เช่าอุปกรณ์"
@@ -16,7 +16,7 @@ const services = [
     {
         title: "บริการรับจัดงานอีเว้นท์",
         subtitle: "Event Organizing & Planning",
-        desc: "บริการจัดงานราคาประหยัด ไม่ว่าจะเป็นงานแต่งงาน งานเลี้ยง ดอกไม้ตกแต่ง สถานที่ และของที่ระลึก เราพร้อมเนรมิตงานในฝันให้ออกมาสมบูรณ์แบบ คุ้มค่าในงบของคุณ",
+        desc: "บริการ<strong>จัดงานราคาประหยัด</strong> ไม่ว่าจะเป็นงานแต่งงาน งานสังสรรค์ <strong>ดังนั้น</strong> เราพร้อมเนรมิตงานในฝันของคุณให้ออกมาสมบูรณ์แบบและคุ้มค่าที่สุดในงบประมาณที่กำหนด",
         icon: <MagicStar size="50" color="currentColor" variant="Outline" />,
         color: "#F2A900", // Tertiary (Gold/Yellow adjusted for visibility)
         buttonText: "บริการจัดงาน"
@@ -24,7 +24,7 @@ const services = [
     {
         title: "ระบบแสงสีเสียง",
         subtitle: "Lighting & Sound Production",
-        desc: "บริการเช่าเครื่องเสียง ราคาเป็นมิตร จัดเต็มด้วยระบบแสง สี เสียงมาตรฐานระดับสากล ผสานเทคโนโลยีทันสมัย สร้างบรรยากาศให้งานของคุณโดดเด่น",
+        desc: "บริการเช่าเครื่องเสียง <strong>เพราะว่า</strong> เราจัดเต็มด้วยระบบแสงสีเสียงมาตรฐานระดับสากล <strong>นอกจากนี้</strong> ยังผสานเทคโนโลยีทันสมัยเพื่อสร้างบรรยากาศงานให้โดดเด่นที่สุด",
         icon: <Music size="50" color="currentColor" variant="Outline" />,
         color: "#00C2CB", // Primary
         buttonText: "ระบบแสง สี เสียง"

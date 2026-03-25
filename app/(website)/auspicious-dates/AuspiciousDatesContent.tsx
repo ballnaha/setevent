@@ -72,7 +72,7 @@ export default function AuspiciousDatesContent() {
                                 WebkitBackgroundClip: 'text',
                                 WebkitTextFillColor: 'transparent'
                             }}>
-                                DATES
+                                ฤกษ์แต่งงาน
                             </span>
                         </Typography>
                         <Typography
@@ -80,14 +80,14 @@ export default function AuspiciousDatesContent() {
                             sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 color: 'var(--foreground)',
-                                opacity: 0.7,
+                                opacity: 0.8,
                                 fontSize: { xs: '1rem', md: '1.2rem' },
-                                maxWidth: 600,
+                                maxWidth: 700,
                                 lineHeight: 1.8,
                                 mx: 'auto'
                             }}
                         >
-                            เริ่มต้นชีวิตคู่อย่างสมบูรณ์แบบ ด้วยการหาฤกษ์แต่งงานที่แม่นยำ วิเคราะห์ดวงชะตาส่วนบุคคล เพื่อให้คุณและคู่รักมีวันเกิดสิริมงคลที่สุด
+                            ค้นหาฤกษ์มงคลสมรสที่เหมาะสมที่สุดสำหรับคุณ วิเคราะห์ตามหลักโหราศาสตร์ที่แม่นยำ เพื่อเริ่มต้นชีวิตคู่ด้วยความสิริมงคลและความเจริญรุ่งเรือง
                         </Typography>
                     </Stack>
                 </Container>
@@ -100,7 +100,33 @@ export default function AuspiciousDatesContent() {
                 </Container>
             </Box>
 
+            {/* SEO Content Section with Transition Words */}
+            <Container maxWidth="md">
+                <Box sx={{
+                    p: { xs: 4, md: 6 },
+                    borderRadius: 4,
+                    bgcolor: 'rgba(255, 255, 255, 0.03)',
+                    border: '1px solid rgba(212, 175, 55, 0.1)',
+                    backdropFilter: 'blur(10px)',
+                    mb: 10
+                }}>
+                    <Typography variant="h4" sx={{ mb: 3, fontWeight: 700, fontFamily: 'var(--font-prompt)', color: '#D4AF37' }}>
+                        ความสำคัญของการเลือกฤกษ์แต่งงาน
+                    </Typography>
 
+                    <Typography sx={{ mb: 3, lineHeight: 2, opacity: 0.9, fontFamily: 'var(--font-prompt)' }}>
+                        การเลือก <strong>ฤกษ์แต่งงาน</strong> ถือเป็นจุดเริ่มต้นที่สำคัญที่สุดสำหรับการใช้ชีวิตคู่ <strong>เพราะว่า</strong> ตามหลักความเชื่อของไทย การเริ่มต้นในวันและเวลาที่เป็นมงคลจะช่วยส่งเสริมความรัก ความมั่นคง และความเจริญรุ่งเรืองในชีวิตครอบครัว <strong>นอกจากนี้</strong> การคำนวณฤกษ์ที่แม่นยำยังต้องพิจารณาจากพื้นดวงชะตาของทั้งเจ้าบ่าวและเจ้าสาวประกอบกัน <strong>เพื่อให้</strong> มั่นใจว่าวันดังกล่าวเป็นวันที่ส่งเสริมดวงชะตาของทั้งคู่ได้อย่างดีที่สุด
+                    </Typography>
+
+                    <Typography sx={{ mb: 3, lineHeight: 2, opacity: 0.9, fontFamily: 'var(--font-prompt)' }}>
+                        <strong>อย่างไรก็ตาม</strong> การหาฤกษ์มงคลนั้นไม่ได้มีเพียงแค่วันที่สะดวกเท่านั้น <strong>แต่ยังรวมถึง</strong> การพิจารณา "เวลาดี" หรือยามมงคลในการเริ่มต้นพิธีการต่างๆ <strong>ตัวอย่างเช่น</strong> เวลาแห่ขันหมาก เวลาสวมแหวน หรือเวลาส่งตัวเข้าหอ <strong>ดังนั้น</strong> การปรึกษาผู้เชี่ยวชาญจึงเป็นทางเลือกที่ดีที่จะช่วยให้คุณเตรียมการทุกอย่างได้อย่างมั่นใจและสมบูรณ์แบบ
+                    </Typography>
+
+                    <Typography sx={{ lineHeight: 2, opacity: 0.9, fontFamily: 'var(--font-prompt)' }}>
+                        <strong>สรุปสุดท้าย</strong> การเลือกฤกษ์งามยามดีที่ SET EVENT พรีเซนต์ให้นั้น เป็นการนำหลักโหราศาสตร์มาประยุกต์ใช้ร่วมกับไลฟ์สไตล์ปัจจุบัน <strong>ส่งผลให้</strong> คุณได้วันจัดงานที่ไม่เพียงแต่เป็นมงคล <strong>แต่ยังเป็น</strong> วันที่เหมาะสมกับการเชิญแขกและจัดเตรียมงานแต่งงานในฝันของคุณอีกด้วย
+                    </Typography>
+                </Box>
+            </Container>
         </Box>
     );
 }
