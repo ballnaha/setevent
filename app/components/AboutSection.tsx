@@ -8,12 +8,12 @@ import Link from "next/link";
 
 export default function AboutSection() {
     const features = [
-        { text: "รับจัดงานอีเวนต์ และจัดงานราคาประหยัด", icon: <MagicStar size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "งานแต่งงาน & สังสรรค์ คุ้มค่าทุกงบประมาณ", icon: <StatusUp size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "งานสัมมนา & เปิดตัวสินค้า ระดับมืออาชีพ", icon: <People size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "บริการเช่าจอ LED ราคาถูก ทั่วประเทศ", icon: <Monitor size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "เช่าเครื่องเสียง แสง สี ราคาเป็นกันเอง", icon: <Speaker size="24" variant="Bulk" color="var(--primary)" /> },
-        { text: "ดูแลงานด้วยทีมงาน Support มืออาชีพ", icon: <Award size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "จัดงานแต่งงาน & งานสัมมนา ราคาประหยัด", icon: <MagicStar size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "บริการเช่าจอ LED งานแต่ง ราคาถูกที่สุด", icon: <StatusUp size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "เช่าเครื่องเสียง แสง สี งานอีเว้นท์ระดับพรีเมียม", icon: <People size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "จอ LED คุณภาพชัด ติดตั้งด่วน", icon: <Monitor size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "จัดงานอีเวนท์ครบวงจร ในงบที่คุณกำหนดได้", icon: <Speaker size="24" variant="Bulk" color="var(--primary)" /> },
+        { text: "ทีมงานดูแลหน้างานแบบ Professional Support", icon: <Award size="24" variant="Bulk" color="var(--primary)" /> },
     ];
 
     return (
@@ -81,8 +81,8 @@ export default function AboutSection() {
                                 lineHeight: 1.2,
                             }}
                         >
-                            <span style={{ color: "var(--primary)" }}>ผู้นำด้านการจัดอีเวนต์</span> <br />
-                            บริการเช่าจอ LED ราคาถูก และการจัดงานราคาประหยัด
+                            <span style={{ color: "var(--primary)" }}>ผู้นำการเช่าจอ LED และจัดอีเวนต์</span> <br />
+                            บริการเช่าจอ LED งานแต่ง งานสัมมนา ราคาถูกที่สุด
                         </Typography>
                         <Typography
                             variant="body1"

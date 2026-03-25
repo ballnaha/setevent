@@ -18,7 +18,7 @@ export default function BannerSlider() {
                 <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                     <Image
                         src="/images/banner1-4.webp"
-                        alt="SET EVENT Thailand - บริการเช่าจอ LED เวที แสง เสียง และรับจัดงานอีเว้นท์ครบวงจร จัดงานราคาประหยัด"
+                        alt="SET EVENT Thailand - บริการเช่าจอ LED งานแต่ง งานสัมมนา และรับจัดงานอีเว้นท์ราคาถูก ครบวงจร"
                         fill
                         priority
                         sizes="100vw"
@@ -51,7 +51,7 @@ export default function BannerSlider() {
                         <span className="led-highlight">LED SCREEN</span> <br className="mobile-only" /> & EVENT SOLUTIONS
                     </span>
                     <span className="hero-thai-keywords">
-                        เช่าจอ LED ราคาถูก · รับจัดงานอีเว้นท์ครบวงจร
+                        เช่าจอ LED ราคาถูก · งานแต่ง · งานสัมมนา · จัดอีเว้นท์ครบวงจร
                     </span>
                 </h1>
 
@@ -60,8 +60,8 @@ export default function BannerSlider() {
                 </p>
 
                 <p className="hero-description">
-                    ยกระดับงานของคุณด้วยระบบจอ LED แสง สี เสียง และเวทีคุณภาพมาตรฐานสากล <br className="desktop-only" />
-                    พร้อมทีมงานมืออาชีพที่ดูแลคุณตั้งแต่ต้นจนจบงาน ในราคาที่คุ้มค่าที่สุด
+                    ยกระดับงานแต่งงานหรืองานสัมมนาของคุณด้วยระบบจอ LED แสง สี เสียง และเวทีคุณภาพมาตรฐานสากล <br className="desktop-only" />
+                    พร้อมทีมงานมืออาชีพที่ดูแลคุณทั่วกรุงเทพและปริมณฑล ในราคาเช่าที่คุ้มค่าที่สุด
                 </p>
 
                 <div className="hero-actions">

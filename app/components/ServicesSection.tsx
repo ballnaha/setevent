@@ -8,7 +8,7 @@ const services = [
     {
         title: "บริการเช่าอุปกรณ์",
         subtitle: "All-in-One Rental Solutions",
-        desc: "บริการ<strong>เช่าจอ LED ราคาถูก</strong> นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง นอกจากนี้ ยังดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณพึงพอใจ",
+        desc: "บริการ<strong>เช่าจอ LED งานแต่ง ราคาถูก</strong> กทม. นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง ดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณพึงพอใจ",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
         buttonText: "เช่าอุปกรณ์"
@@ -16,7 +16,7 @@ const services = [
     {
         title: "บริการรับจัดงานอีเว้นท์",
         subtitle: "Event Organizing & Planning",
-        desc: "บริการ<strong>จัดงานราคาประหยัด</strong> ไม่ว่าจะเป็นงานแต่งงาน งานสังสรรค์ ดังนั้น เราพร้อมเนรมิตงานในฝันของคุณให้ออกมาสมบูรณ์แบบและคุ้มค่าที่สุดในงบประมาณที่กำหนด",
+        desc: "บริการ<strong>จัดงานแต่ง หรือ งานสัมมนา ราคาประหยัด</strong> ครบจบในที่เดียว ดังนั้น เราพร้อมเนรมิตงานในฝันของคุณให้ออกมาสมบูรณ์แบบและคุ้มค่าที่สุดในงบประมาณที่กำหนด",
         icon: <MagicStar size="50" color="currentColor" variant="Outline" />,
         color: "#F2A900", // Tertiary (Gold/Yellow adjusted for visibility)
         buttonText: "บริการจัดงาน"
@@ -50,7 +50,7 @@ export default function ServicesSection() {
                     border: 0,
                 }}
             >
-                บริการเช่าจอ LED ราคาถูก จัดงานราคาประหยัด และอุปกรณ์จัดงานอีเว้นท์ครบวงจร - SET EVENT Thailand
+                บริการเช่าจอ LED ราคาถูก งานแต่ง งานสัมมนา เช่าเครื่องเสียง และอุปกรณ์จัดงานอีเว้นท์ครบวงจร กทม. ปริมณฑล - SET EVENT Thailand
             </Typography>
             {/* Geometric Decor - Left */}
             <Box sx={{ position: 'absolute', top: '20%', left: 0, zIndex: 0, display: { xs: 'none', lg: 'block' } }}>
