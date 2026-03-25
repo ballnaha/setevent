@@ -31,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
             type: 'website',
             images: [
                 {
-                    url: 'https://seteventthailand.com/images/logo_black1.png', // Assuming base logo exists, replace if custom hero image exists
+                    url: 'https://seteventthailand.com/images/icon-512x512.png', // Assuming base logo exists, replace if custom hero image exists
                     width: 1200,
                     height: 630,
                     alt: 'หาฤกษ์แต่งงาน ฤกษ์มงคลสมรส SET EVENT'
@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
             card: 'summary_large_image',
             title: 'หาฤกษ์มงคลสมรส ฤกษ์แต่งงาน | SET EVENT Thailand',
             description: 'หาฤกษ์มงคลสมรสและฤกษ์แต่งงานที่ดีที่สุด พร้อมวิเคราะห์ดวงคู่บ่าวสาว เริ่มต้นชีวิตคู่ด้วยความสิริมงคล ปรึกษาฟรี',
-            images: ['https://seteventthailand.com/images/logo_black1.png'],
+            images: ['https://seteventthailand.com/images/icon-512x512.png'],
         },
         alternates: {
             canonical: 'https://seteventthailand.com/auspicious-dates',
