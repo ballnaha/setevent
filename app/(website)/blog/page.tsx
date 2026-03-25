@@ -3,6 +3,8 @@ import React from 'react';
 import type { Metadata } from 'next';
 import BlogContent from './BlogContent';
 
+export const revalidate = 0; // Force dynamic rendering on production
+
 export const metadata: Metadata = {
     title: 'บทความและสาระน่ารู้ | SetEvent Thailand',
     description: 'อัปเดตเทรนด์งานอีเวนต์ ความรู้เรื่องจอ LED ระบบเสียง แสง สี และไอเดียจัดงานแต่งงาน โดยทีมงานมืออาชีพ',
