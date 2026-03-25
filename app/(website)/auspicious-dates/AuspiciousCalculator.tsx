@@ -560,9 +560,9 @@ export default function AuspiciousCalculator() {
                         <Stack spacing={3}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>📅 1. เดือนมงคล (Auspicious Months)</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>📅 1. <strong>เดือนมงคล</strong> (Auspicious Months)</Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
-                                        คัดเลือกเฉพาะเดือนคู่ที่เป็นสิริมงคลตามตำราโหราศาสตร์ไทยโบราณ (เดือน 2, 4, 6, 9, และ 12)
+                                        คัดเลือกเฉพาะเดือนคู่ที่เป็นสิริมงคลตามตำรา <strong>โหราศาสตร์ไทยโบราณ</strong> (เดือน 2, 4, 6, 9, และ 12)
                                     </Typography>
                                 </Box>
                                 <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[0]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
@@ -572,9 +572,9 @@ export default function AuspiciousCalculator() {
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>☀️ 2. อธิบดีวัน (Ruling Planetary Energy)</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>☀️ 2. <strong>อธิบดีวัน</strong> (Ruling Planetary Energy)</Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
-                                        วิเคราะห์ดาวเคราะห์ที่เสวยพลังอำนาจในวันนั้นๆ โดยเลือกวันศุกร์ หรือวันจันทร์ เป็นอธิบดี
+                                        วิเคราะห์ดาวเคราะห์ที่เสวยพลังอำนาจในวันนั้นๆ โดยเลือก <strong>วันศุกร์</strong> หรือ <strong>วันจันทร์</strong> เป็นอธิบดี
                                     </Typography>
                                 </Box>
                                 <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[1]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
@@ -584,7 +584,7 @@ export default function AuspiciousCalculator() {
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🚩 3. วันธงชัย (Thongchai Victorious Day)</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🚩 3. <strong>วันธงชัย</strong> (Thongchai Victorious Day)</Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
                                         คำนวณวันแห่งชัยชนะตามคัมภีร์มหาทักษาประจำเดือน เพื่อความเป็นสิริมงคล
                                     </Typography>
@@ -596,9 +596,9 @@ export default function AuspiciousCalculator() {
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🤵👰 4-5. สมพงษ์นักษัตร (Zodiac Compatibility)</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🤵👰 4-5. <strong>สมพงษ์นักษัตร</strong> (Zodiac Compatibility)</Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
-                                        ตรวจสอบความสัมพันธ์ระหว่าง "นักษัตรวัน" และ "ปีเกิดบ่าวสาว" โดยต้องไม่ตกตำแหน่ง "ชง"
+                                        ตรวจสอบความสัมพันธ์ระหว่าง "นักษัตรวัน" และ "ปีเกิดบ่าวสาว" โดยต้องไม่ตกตำแหน่ง <strong>ชง</strong>
                                     </Typography>
                                 </Box>
                                 <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[3]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
@@ -608,9 +608,9 @@ export default function AuspiciousCalculator() {
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🌙 6. จันทรคติ (Lunar Cycle Assessment)</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>🌙 6. <strong>จันทรคติ</strong> (Lunar Cycle Assessment)</Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
-                                        เน้นหาฤกษ์ในช่วง "ข้างขึ้น" (Khang Khuen) โดยเฉพาะวันเพ็ญเปรียบเสมือนความรักที่เต็มเปี่ยม
+                                        เน้นหาฤกษ์ในช่วง <strong>ข้างขึ้น</strong> (Khang Khuen) โดยเฉพาะวันเพ็ญเปรียบเสมือนความรักที่เต็มเปี่ยม
                                     </Typography>
                                 </Box>
                                 <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[4]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
@@ -620,9 +620,9 @@ export default function AuspiciousCalculator() {
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                 <Box sx={{ flexGrow: 1 }}>
-                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>✨ 7. ทักษาปกรณ์ (Auspicious Directions & Colors)</Typography>
+                                    <Typography variant="subtitle1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)', display: 'flex', alignItems: 'center', gap: 1 }}>✨ 7. <strong>ทักษาปกรณ์</strong> (Auspicious Directions & Colors)</Typography>
                                     <Typography variant="body2" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.6 }}>
-                                        วิเคราะห์สีมงคล (สีเดช/สีศรี) และสไตล์สถานที่จัดงานตามพลังงานธาตุของวัน
+                                        วิเคราะห์ <strong>สีมงคล</strong> (สีเดช/สีศรี) และสไตล์สถานที่จัดงานตามพลังงานธาตุของวัน
                                     </Typography>
                                 </Box>
                                 <Button size="small" onClick={() => { setSelectedLogic(PRINCIPLE_LOGICS[5]); setOpenLogicDialog(true); }} sx={{ color: '#D4AF37', ml: 2, minWidth: 'auto' }}>
