@@ -33,6 +33,11 @@ export default function BannerSlider() {
                     {/* Gradient Overlays for Depth and Branding */}
                     <div className="vibrant-overlay" />
                     <div className="glow-effect" />
+                    
+                    {/* Geometric Triangle Accents (The requested elements) */}
+                    <div className="triangle-shape ts-1" />
+                    <div className="triangle-shape ts-2" />
+                    <div className="triangle-shape ts-3" />
                 </div>
 
                 {/* Dot Pattern Overlay */}
@@ -111,6 +116,41 @@ export default function BannerSlider() {
                     filter: blur(100px);
                     z-index: 1;
                 }
+                
+                /* Requested Triangular Shapes */
+                .triangle-shape {
+                    position: absolute;
+                    opacity: 0.5; /* Increased for better visibility */
+                    filter: blur(1px);
+                    pointer-events: none;
+                    z-index: 2;
+                }
+                .ts-1 {
+                    top: 15%;
+                    right: 8%;
+                    width: 450px; /* Bigger */
+                    height: 450px;
+                    background: linear-gradient(135deg, var(--primary), transparent);
+                    clip-path: polygon(100% 0, 0 0, 100% 100%);
+                }
+                .ts-2 {
+                    bottom: 12%;
+                    left: 6%;
+                    width: 350px; /* Bigger */
+                    height: 350px;
+                    background: linear-gradient(315deg, #00ffd5, transparent);
+                    clip-path: polygon(0 100%, 0 0, 100% 100%);
+                }
+                .ts-3 {
+                    top: 40%;
+                    left: 2%;
+                    width: 300px; /* Bigger red accent */
+                    height: 300px;
+                    background: linear-gradient(135deg, rgba(233, 69, 96, 0.4), transparent); /* Brand Red Accent #E94560 */
+                    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+                    filter: blur(50px); /* Soft energy glow */
+                }
+
                 .dot-overlay {
                     position: absolute;
                     inset: 0;
@@ -127,7 +167,7 @@ export default function BannerSlider() {
                     justify-content: center;
                     align-items: center;
                     text-align: center;
-                    padding: 80px 40px;
+                    padding: 140px 40px 80px 40px; /* Increased top padding to avoid menu */
                     max-width: 1400px;
                     margin: 0 auto;
                 }
@@ -211,14 +251,16 @@ export default function BannerSlider() {
                     min-width: 180px;
                 }
                 .btn-primary {
-                    background: var(--primary);
+                    background: #E94560; /* Brand Red Signature */
                     color: white;
-                    box-shadow: 0 10px 30px rgba(10, 92, 90, 0.3);
+                    box-shadow: 0 10px 30px rgba(233, 69, 96, 0.4);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
                 }
                 .btn-primary:hover {
                     transform: translateY(-5px);
-                    box-shadow: 0 15px 40px rgba(10, 92, 90, 0.5);
+                    box-shadow: 0 15px 40px rgba(233, 69, 96, 0.6);
                     filter: brightness(1.1);
+                    background: #d13a53; /* Darker Brand Red */
                 }
                 .btn-secondary {
                     border: 2px solid rgba(255,255,255,0.3);
