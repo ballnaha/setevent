@@ -88,21 +88,13 @@ export default function ContactContent() {
         }] : [])
     ];
 
-    // Prevent hydration mismatch - show minimal placeholder until mounted
-    if (!mounted) {
-        return (
-            <Box sx={{ minHeight: '100vh', bgcolor: 'var(--background)' }} />
-        );
-    }
-
     return (
         <Box sx={{ bgcolor: 'var(--background)', minHeight: '100vh', overflow: 'hidden', pb: 10 }}>
-            {/* Hero Section */}
+            {/* Hero Section - Always render for SEO */}
             <Box sx={{
                 pt: { xs: 15, md: 22 },
                 pb: { xs: 8, md: 10 },
                 position: 'relative',
-
                 bgcolor: 'var(--background)'
             }}>
                 {/* Background Decor - Teal/Emerald gradients */}
@@ -130,7 +122,7 @@ export default function ContactContent() {
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
                     <Stack spacing={3} alignItems="center">
                         <Chip
-                            label="Get in Touch"
+                            label="Contact Us"
                             sx={{
                                 bgcolor: 'rgba(16, 185, 129, 0.1)',
                                 color: '#10B981',
