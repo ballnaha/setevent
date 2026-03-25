@@ -35,13 +35,13 @@ export default function CTASection() {
                 {/* Badge */}
                 <Box sx={{
                     display: 'inline-block',
-                    bgcolor: 'var(--primary)',
+                    bgcolor: '#E94560',
                     color: 'white',
                     py: 1,
                     px: 3,
                     borderRadius: '50px',
                     mb: 4,
-                    boxShadow: '0 0 20px rgba(0,194,203,0.5)'
+                    boxShadow: '0 0 20px rgba(233, 69, 96, 0.5)'
                 }}>
                     <Typography variant="subtitle2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', letterSpacing: 1 }}>
                         End-to-End Event Solution
@@ -58,7 +58,7 @@ export default function CTASection() {
                     textShadow: '0 10px 30px rgba(0,0,0,0.5)'
                 }}>
                     รับจัดงานอีเว้นท์ครบวงจร<br />
-                    <span style={{ color: 'var(--primary)' }}>ให้เกิดขึ้นจริงกับ SET EVENT</span>
+                    <span style={{ color: '#E94560' }}>ให้เกิดขึ้นจริงกับ SET EVENT</span>
                 </Typography>
 
                 <Typography variant="h6" sx={{
@@ -84,7 +84,7 @@ export default function CTASection() {
                         endIcon={<ArrowRight />}
                         aria-label="ขอใบเสนอราคาบริการจัดงานอีเว้นท์"
                         sx={{
-                            bgcolor: "var(--primary)",
+                            bgcolor: "#E94560",
                             color: "white",
                             fontFamily: "var(--font-prompt)",
                             borderRadius: '50px',
@@ -92,12 +92,12 @@ export default function CTASection() {
                             py: { xs: 1.5, md: 2 },
                             fontSize: { xs: "0.9rem", md: "1.1rem" },
                             fontWeight: 600,
-                            boxShadow: '0 0 30px rgba(0, 194, 203, 0.4)',
-                            border: '2px solid var(--primary)',
+                            boxShadow: '0 0 30px rgba(233, 69, 96, 0.4)',
+                            border: '2px solid #E94560',
                             '&:hover': {
                                 bgcolor: "transparent",
-                                color: "var(--primary)",
-                                boxShadow: '0 0 40px rgba(0, 194, 203, 0.6)',
+                                color: "#E94560",
+                                boxShadow: '0 0 40px rgba(233, 69, 96, 0.6)',
                                 transform: 'scale(1.05)'
                             },
                         }}

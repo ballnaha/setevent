@@ -43,17 +43,24 @@ export default function WhyChooseUs() {
 
                         <Stack spacing={4}>
                             {[
-                                { title: 'ระบบติดตามงานอัจฉริยะ', desc: 'ตรวจสอบสถานะการจัดงานและการติดตั้งอุปกรณ์ได้แบบ Real-time ผ่าน Web Application ส่วนตัวที่เราพัฒนาขึ้นเพื่อคุณ' },
-                                { title: 'ทีมงานมืออาชีพ', desc: 'ประสบการณ์กว่า 10 ปี นอกจากนี้ ยังพร้อมแก้ปัญหาหน้างานได้ทันท่วงทีเพื่อให้งานของคุณราบรื่นที่สุด' },
-                                { title: 'ราคาที่จับต้องได้', desc: 'บริการคุณภาพระดับพรีเมียม ในราคาที่สมเหตุสมผลและคุ้มค่าที่สุด' }
+                                { title: 'ระบบติดตามงานอัจฉริยะ', desc: 'ตรวจสอบสถานะการจัดงานและ<strong>การติดตั้งอุปกรณ์ได้แบบ Real-time</strong> ผ่าน Web Application ส่วนตัวที่เราพัฒนาขึ้นเพื่อคุณ' },
+                                { title: 'ทีมงานมืออาชีพ', desc: '<strong>ประสบการณ์กว่า 10 ปี</strong> เราพร้อมแก้ปัญหาหน้างานได้ทันท่วงทีเพื่อให้งานของคุณราบรื่นที่สุด' },
+                                { title: 'ราคาที่จับต้องได้', desc: 'บริการคุณภาพระดับพรีเมียม ใน<strong>ราคาที่สมเหตุสมผลและคุ้มค่าที่สุด</strong>' }
                             ].map((item, i) => (
                                 <Box key={i} sx={{ borderLeft: '4px solid var(--primary)', pl: 3 }}>
                                     <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 'bold', color: 'var(--foreground)', mb: 1, fontSize: '1.1rem' }}>
                                         {item.title}
                                     </Typography>
-                                    <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.7, fontSize: '0.95rem' }}>
-                                        {item.desc}
-                                    </Typography>
+                                    <Typography 
+                                        variant="body1" 
+                                        dangerouslySetInnerHTML={{ __html: item.desc }}
+                                        sx={{ 
+                                            fontFamily: 'var(--font-prompt)', 
+                                            color: 'var(--foreground)', 
+                                            opacity: 0.7, 
+                                            fontSize: '0.95rem' 
+                                        }} 
+                                    />
                                 </Box>
                             ))}
                         </Stack>

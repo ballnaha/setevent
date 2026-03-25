@@ -8,7 +8,7 @@ const services = [
     {
         title: "บริการเช่าอุปกรณ์",
         subtitle: "All-in-One Rental Solutions",
-        desc: "บริการ<strong>เช่าจอ LED ราคาถูก</strong> นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง <strong>นอกจากนี้</strong> ยังดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณพึงพอใจ",
+        desc: "บริการ<strong>เช่าจอ LED ราคาถูก</strong> นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง นอกจากนี้ ยังดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณพึงพอใจ",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
         buttonText: "เช่าอุปกรณ์"
@@ -16,7 +16,7 @@ const services = [
     {
         title: "บริการรับจัดงานอีเว้นท์",
         subtitle: "Event Organizing & Planning",
-        desc: "บริการ<strong>จัดงานราคาประหยัด</strong> ไม่ว่าจะเป็นงานแต่งงาน งานสังสรรค์ <strong>ดังนั้น</strong> เราพร้อมเนรมิตงานในฝันของคุณให้ออกมาสมบูรณ์แบบและคุ้มค่าที่สุดในงบประมาณที่กำหนด",
+        desc: "บริการ<strong>จัดงานราคาประหยัด</strong> ไม่ว่าจะเป็นงานแต่งงาน งานสังสรรค์ ดังนั้น เราพร้อมเนรมิตงานในฝันของคุณให้ออกมาสมบูรณ์แบบและคุ้มค่าที่สุดในงบประมาณที่กำหนด",
         icon: <MagicStar size="50" color="currentColor" variant="Outline" />,
         color: "#F2A900", // Tertiary (Gold/Yellow adjusted for visibility)
         buttonText: "บริการจัดงาน"
@@ -24,7 +24,7 @@ const services = [
     {
         title: "ระบบแสงสีเสียง",
         subtitle: "Lighting & Sound Production",
-        desc: "บริการเช่าเครื่องเสียง <strong>เพราะว่า</strong> เราจัดเต็มด้วยระบบแสงสีเสียงมาตรฐานระดับสากล <strong>นอกจากนี้</strong> ยังผสานเทคโนโลยีทันสมัยเพื่อสร้างบรรยากาศงานให้โดดเด่นที่สุด",
+        desc: "บริการเช่าเครื่องเสียง เพราะว่า เราจัดเต็มด้วย<strong>ระบบแสงสีเสียงมาตรฐานระดับสากล</strong> นอกจากนี้ ยังผสานเทคโนโลยีทันสมัยเพื่อสร้างบรรยากาศงานให้โดดเด่นที่สุด",
         icon: <Music size="50" color="currentColor" variant="Outline" />,
         color: "#00C2CB", // Primary
         buttonText: "ระบบแสง สี เสียง"
@@ -135,21 +135,23 @@ export default function ServicesSection() {
                             </Typography>
 
                             {/* Description */}
-                            <Typography variant="body1" sx={{
-                                fontFamily: "var(--font-prompt)",
-                                color: 'var(--foreground)',
-                                opacity: 0.6,
-                                lineHeight: 1.6,
-                                mb: { xs: 3, md: 5 },
-                                maxWidth: '300px',
-                                fontSize: { xs: '0.9rem', md: '1rem' },
-                                display: '-webkit-box',
-                                WebkitLineClamp: { xs: 3, md: 'unset' }, // Limit lines on mobile
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden'
-                            }}>
-                                {service.desc}
-                            </Typography>
+                             <Typography 
+                                variant="body1" 
+                                dangerouslySetInnerHTML={{ __html: service.desc }}
+                                sx={{
+                                    fontFamily: "var(--font-prompt)",
+                                    color: 'var(--foreground)',
+                                    opacity: 0.6,
+                                    lineHeight: 1.6,
+                                    mb: { xs: 3, md: 5 },
+                                    maxWidth: '300px',
+                                    fontSize: { xs: '0.9rem', md: '1rem' },
+                                    display: '-webkit-box',
+                                    WebkitLineClamp: { xs: 3, md: 'unset' }, // Limit lines on mobile
+                                    WebkitBoxOrient: 'vertical',
+                                    overflow: 'hidden'
+                                }}
+                            />
 
 
                         </Box>

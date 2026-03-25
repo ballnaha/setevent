@@ -10,18 +10,18 @@ const events = [
     {
         title: "บริการจอ LED คุณภาพสูง",
         items: [
-            "จอ LED ภายใน (P1.5 - P3.9)",
-            "จอ LED ภายนอก (P3.9 - P10)",
+            "<strong>จอ LED</strong> ภายใน (P1.5 - P3.9)",
+            "<strong>จอ LED</strong> ภายนอก (P3.9 - P10)",
             "จอโค้งและรูปทรงพิเศษ",
             "ปรับจูนสีมาตรฐานระดับโปร",
-            "ดูแลระบบครบวงจร"
+            "<strong>ดูแลระบบครบวงจร</strong>"
         ],
         link: "/products/rental/led-screen"
     },
     {
         title: "Visual & Interactive",
         items: [
-            "3D Projection Mapping",
+            "<strong>3D Projection Mapping</strong>",
             "ระบบ Interactive (Wall/Floor)",
             "ออกแบบ Motion Graphic",
             "Laser และ Special Effects",
@@ -32,7 +32,7 @@ const events = [
     {
         title: "งานติดตั้งและโครงสร้าง",
         items: [
-            "ติดตั้งจอ LED (Indoor/Outdoor)",
+            "<strong>ติดตั้งจอ LED</strong> (Indoor/Outdoor)",
             "ระบบเสียง (Sound System)",
             "ระบบแสง (Lighting System)",
             "เวทีและสเตจ (Stage Platform)",
@@ -43,7 +43,7 @@ const events = [
     {
         title: "จัดดอกไม้และของชำร่วย",
         items: [
-            "ออกแบบและจัดดอกไม้ในงาน",
+            "ออกแบบและ<strong>จัดดอกไม้ในงาน</strong>",
             "Backdrop และซุ้มถ่ายภาพ",
             "ช่อดอกไม้และพวงมาลัย",
             "ของชำร่วยและกิ๊ฟเซ็ต",
@@ -57,26 +57,26 @@ const events = [
 const infoBlocks = [
     {
         icon: <Note size="32" color="white" variant="Outline" />,
-        title: "ปรึกษาและออกแบบฟรี",
+        title: "ปรึกษาและออกแบบ<strong>ฟรี</strong>",
         subtitle: "ประเมินราคาตามงบประมาณ",
         color: "#E94560", // Red
     },
     {
         icon: <MedalStar size="32" color="white" variant="Outline" />,
         title: "ทีมงานมืออาชีพ",
-        subtitle: "ประสบการณ์กว่า 10 ปี",
+        subtitle: "ประสบการณ์<strong>กว่า 10 ปี</strong>",
         color: "#F2A900", // Gold/Yellow
     },
     {
         icon: <Monitor size="32" color="white" variant="Outline" />,
         title: "อุปกรณ์มาตรฐานสากล",
-        subtitle: "จอ LED และระบบเสียง High-End",
+        subtitle: "<strong>จอ LED</strong> และระบบเสียง High-End",
         color: "#00C2CB", // Teal
     },
     {
         icon: <Location size="32" color="white" variant="Outline" />,
         title: "บริการทั่วประเทศ",
-        subtitle: "พร้อมทีมติดตั้งหน้างาน",
+        subtitle: "พร้อม<strong>ทีมติดตั้งหน้างาน</strong>",
         color: "#1A5F7A", // Blue
     }
 ];
@@ -188,7 +188,7 @@ export default function FeaturedEvents() {
                                             letterSpacing: 0.3
                                         }}>
                                             <Box sx={{ width: 4, height: 4, bgcolor: 'var(--primary)', borderRadius: '50%', flexShrink: 0 }} />
-                                            {item}
+                                            <span dangerouslySetInnerHTML={{ __html: item }} />
                                         </Box>
                                     ))}
                                 </Box>
@@ -254,24 +254,28 @@ export default function FeaturedEvents() {
                             <Box sx={{ mb: 1.5 }}>
                                 {block.icon}
                             </Box>
-                            <Typography variant="h6" sx={{
-                                fontFamily: "var(--font-prompt)",
-                                fontWeight: 700,
-                                color: "white",
-                                textTransform: 'uppercase',
-                                mb: 0.5,
-                                fontSize: { xs: '0.9rem', md: '1.1rem' } // Responsive font size
-                            }}>
-                                {block.title}
-                            </Typography>
-                            <Typography variant="body2" sx={{
-                                fontFamily: "var(--font-prompt)",
-                                fontWeight: 400,
-                                color: "rgba(255,255,255,0.9)",
-                                fontSize: { xs: '0.8rem', md: '1rem' }
-                            }}>
-                                {block.subtitle}
-                            </Typography>
+                            <Typography 
+                                variant="h6" 
+                                dangerouslySetInnerHTML={{ __html: block.title }}
+                                sx={{
+                                    fontFamily: "var(--font-prompt)",
+                                    fontWeight: 700,
+                                    color: "white",
+                                    textTransform: 'uppercase',
+                                    mb: 0.5,
+                                    fontSize: { xs: '0.9rem', md: '1.1rem' } // Responsive font size
+                                }}
+                            />
+                            <Typography 
+                                variant="body2" 
+                                dangerouslySetInnerHTML={{ __html: block.subtitle }}
+                                sx={{
+                                    fontFamily: "var(--font-prompt)",
+                                    fontWeight: 400,
+                                    color: "rgba(255,255,255,0.9)",
+                                    fontSize: { xs: '0.8rem', md: '1rem' }
+                                }}
+                            />
                         </Box>
                     ))
                 }
