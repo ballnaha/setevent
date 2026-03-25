@@ -10,7 +10,7 @@ const faqData = [
   },
   {
     q: "รับจัดงานอีเว้นท์ราคาประหยัด ครอบคลุมพื้นที่ไหนบ้าง?",
-    a: "เราให้บริการรับจัดงานอีเว้นท์ราคาประหยัดทั่วประเทศไทย โดยเน้นพื้นที่กรุงเทพฯ นนทบุรี ปทุมธานี และสมุทรปราการ ครอบคลุมทั้งงานเปิดตัวสินค้า งานเลี้ยงบริษัท และงานสัมมนาวิชาการแบบครบวงจร"
+    a: "เราให้บริการรับจัดงานอีเว้นท์ราคาประหยัดทั่วประเทศไทย โดยเน้นพื้นที่กรุงเทพฯ นนทบุรี ปทุมธานี ชลบุรี ภูเก็ต และสมุทรปราการ ครอบคลุมทั้งงานเปิดตัวสินค้า งานเลี้ยงบริษัท และงานสัมมนาวิชาการแบบครบวงจร"
   },
   {
     q: "แพ็คเกจจัดงานแต่งงานราคาประหยัดของ SET EVENT มีอะไรบ้าง?",
@@ -48,28 +48,28 @@ export default function HomeFAQ() {
       />
       <Container maxWidth="md">
         <Box textAlign="center" mb={6}>
-          <Box sx={{ 
-            display: 'inline-flex', 
-            p: 1.5, 
-            borderRadius: '50%', 
-            bgcolor: 'var(--decor-emerald)', 
-            color: 'var(--primary)', 
-            mb: 2 
+          <Box sx={{
+            display: 'inline-flex',
+            p: 1.5,
+            borderRadius: '50%',
+            bgcolor: 'var(--decor-emerald)',
+            color: 'var(--primary)',
+            mb: 2
           }}>
             <InfoCircle size={32} variant="Bulk" color="var(--primary)" />
           </Box>
-          <Typography variant="h3" sx={{ 
-            fontFamily: 'var(--font-prompt)', 
-            fontWeight: 800, 
+          <Typography variant="h3" sx={{
+            fontFamily: 'var(--font-prompt)',
+            fontWeight: 800,
             mb: 1.5,
             color: 'var(--foreground)'
           }}>
             คำถามที่พบบ่อย (FAQ)
           </Typography>
-          <Typography sx={{ 
-            fontFamily: 'var(--font-prompt)', 
-            color: 'var(--foreground)', 
-            opacity: 0.7 
+          <Typography sx={{
+            fontFamily: 'var(--font-prompt)',
+            color: 'var(--foreground)',
+            opacity: 0.7
           }}>
             รวบรวมข้อมูลที่คุณต้องการทราบเกี่ยวกับการเช่าจอ LED และการจัดงานอีเว้นท์ราคาประหยัด
           </Typography>
