@@ -14,7 +14,7 @@ interface Blog {
     excerpt: string;
     content: string;
     coverImage: string;
-    subImages?: string | string[]; // Can be JSON string or array
+    subImages?: string | string[] | null; // Can be JSON string or array
     category: string;
     author: string;
     publishedAt: string;

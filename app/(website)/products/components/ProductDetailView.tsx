@@ -235,15 +235,17 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     </Typography>
 
                     {/* Title */}
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 800,
-                        fontSize: { xs: '1.8rem', md: '2.4rem' },
-                        color: 'var(--foreground)',
-                        lineHeight: 1.1,
-                        mb: 4,
-                        letterSpacing: '-0.5px'
-                    }}>
+                    <Typography
+                        component="h1"
+                        sx={{
+                            fontFamily: 'var(--font-prompt)',
+                            fontWeight: 800,
+                            fontSize: { xs: '1.8rem', md: '2.4rem' },
+                            color: 'var(--foreground)',
+                            lineHeight: 1.1,
+                            mb: 4,
+                            letterSpacing: '-0.5px'
+                        }}>
                         {product.name}
                     </Typography>
 
@@ -284,16 +286,18 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     {/* Features Section */}
                     {product.features && product.features.length > 0 && (
                         <Box sx={{ mb: 5 }}>
-                            <Typography sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                fontWeight: 700,
-                                fontSize: '1.1rem',
-                                mb: 2.5,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 2,
-                                color: 'var(--foreground)'
-                            }}>
+                            <Typography
+                                component="h2"
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontWeight: 700,
+                                    fontSize: '1.1rem',
+                                    mb: 2.5,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    color: 'var(--foreground)'
+                                }}>
                                 <MagicStar size="24" color="var(--primary)" variant="Bold" />
                                 จุดเด่นและสเปคสินค้า
                             </Typography>
@@ -321,16 +325,18 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     {/* Description Section */}
                     {product.description && (
                         <Box sx={{ mb: 6 }}>
-                            <Typography sx={{
-                                fontFamily: 'var(--font-prompt)',
-                                fontWeight: 700,
-                                fontSize: '1.1rem',
-                                mb: 2.5,
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 2,
-                                color: 'var(--foreground)'
-                            }}>
+                            <Typography
+                                component="h2"
+                                sx={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontWeight: 700,
+                                    fontSize: '1.1rem',
+                                    mb: 2.5,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    color: 'var(--foreground)'
+                                }}>
                                 <NoteText size="24" color="var(--primary)" variant="Bold" />
                                 รายละเอียดงานบริการ
                             </Typography>

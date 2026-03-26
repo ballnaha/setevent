@@ -40,7 +40,7 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   // Setup images
   const albumImages = portfolio.images || [];

@@ -91,11 +91,15 @@ export default async function BlogDetailPage({ params }: Props) {
         notFound();
     }
 
-    // Convert Date to string for client component
+    // Convert for client component, and pick only necessary fields for the Blog interface
     const serializedBlog = {
-        ...blog,
+        id: blog.id,
+        title: blog.title,
+        slug: blog.slug,
+        views: blog.views,
+        subImages: blog.subImages,
         publishedAt: blog.publishedAt.toISOString(),
-        author: blog.author || 'Admin', // Ensure author is string
+        author: blog.author || 'Admin',
         category: blog.category || 'General',
         excerpt: blog.excerpt || '',
         content: blog.content || '',
