@@ -3,6 +3,7 @@ import BlogDetailContent from './BlogDetailContent';
 import { prisma } from '@/lib/prisma';
 import { cache } from 'react';
 import { notFound } from 'next/navigation';
+import { getSEODescription, SEO_FALLBACKS } from '@/lib/seo';
 
 type Props = {
     params: Promise<{ slug: string }>;
@@ -43,7 +44,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     }
 
     const title = `${blog.title} | SetEvent Thailand`;
-    const description = blog.excerpt || blog.title;
+    const description = getSEODescription(
+        blog.excerpt,
+        SEO_FALLBACKS.blog(blog.title, blog.excerpt)
+    );
     const imageUrl = blog.coverImage 
         ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${baseUrl}${blog.coverImage}`)
         : `${baseUrl}/images/og-image.jpg`;

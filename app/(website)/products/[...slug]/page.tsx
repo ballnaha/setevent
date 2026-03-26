@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import ProductCategoryContent from './ProductCategoryContent';
 import { prisma } from "@/lib/prisma";
 import { notFound } from 'next/navigation';
+import { getSEODescription, SEO_FALLBACKS } from '@/lib/seo';
 
 // Revalidate every 60 seconds for fresh data with caching
 export const revalidate = 0;
@@ -53,9 +54,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     if (currentCategory) {
         const slugPath = slugs.map(decodeURIComponent).join('/');
+        const desc = getSEODescription(
+            currentCategory.description,
+            SEO_FALLBACKS.category(currentCategory.name)
+        );
+
         return {
             title: `${currentCategory.name} - SET EVENT`,
-            description: currentCategory.description || `สินค้าและบริการในหมวด ${currentCategory.name} จาก SET EVENT ผู้ให้บริการจัดงานอีเวนต์ครบวงจร`,
+            description: desc,
             keywords: [currentCategory.name, 'เช่าอุปกรณ์', 'อีเวนต์', 'SET EVENT', ...slugs],
             alternates: {
                 canonical: `${baseUrl}/products/${slugPath}`,

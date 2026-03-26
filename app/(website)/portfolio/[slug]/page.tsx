@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import PortfolioDetailContent from './PortfolioDetailContent';
 
 import { Metadata } from 'next';
+import { getSEODescription, SEO_FALLBACKS } from '@/lib/seo';
 
 interface PortfolioPageProps {
   params: Promise<{ slug: string }>;
@@ -24,19 +25,20 @@ export async function generateMetadata({ params }: PortfolioPageProps): Promise<
     };
   }
 
-  // Use the cover image or a default fallback
+  const desc = getSEODescription(
+    portfolio.description,
+    SEO_FALLBACKS.portfolio(portfolio.title, portfolio.category || '')
+  );
+
   const ogImage = portfolio.image ? portfolio.image : 'https://seteventthailand.com/images/og-image.jpg';
-  const rawDesc = portfolio.description || `ผลงาน ${portfolio.title} ในหมวดหมู่ ${portfolio.category} จาก SET EVENT Thailand`;
-  // Strip simple HTML tags if description is stored as rich text, max 160 chars
-  const plainDesc = rawDesc.replace(/<[^>]*>?/gm, '').substring(0, 160) + (rawDesc.length > 160 ? '...' : '');
 
   return {
     title: `${portfolio.title} | ผลงาน SET EVENT Thailand`,
-    description: plainDesc,
+    description: desc,
     keywords: [portfolio.title, portfolio.category || '', 'ผลงานอีเวนต์', 'SET EVENT', 'จัดงาน', 'เช่าอุปกรณ์'],
     openGraph: {
       title: `${portfolio.title} | SET EVENT Thailand`,
-      description: plainDesc,
+      description: desc,
       url: `https://seteventthailand.com/portfolio/${slug}`,
       siteName: 'SET EVENT Thailand',
       images: [
@@ -53,7 +55,7 @@ export async function generateMetadata({ params }: PortfolioPageProps): Promise<
     twitter: {
       card: 'summary_large_image',
       title: `${portfolio.title} | SET EVENT`,
-      description: plainDesc,
+      description: desc,
       images: [ogImage],
     }
   };

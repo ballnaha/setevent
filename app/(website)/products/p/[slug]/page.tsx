@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { notFound } from 'next/navigation';
 import ProductDetailView from '../../components/ProductDetailView';
 import { Box } from "@mui/material";
+import { getSEODescription, SEO_FALLBACKS } from '@/lib/seo';
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -24,9 +25,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     const images = product.images ? JSON.parse(product.images) : [];
     const baseUrl = 'https://seteventthailand.com';
 
+    const desc = getSEODescription(
+        product.description,
+        SEO_FALLBACKS.product(product.name, product.category?.name || '')
+    );
+    
     return {
         title: `${product.name} - SET EVENT`,
-        description: product.description || `บริการเช่า ${product.name} สำหรับงานอีเวนต์ครบวงจร`,
+        description: desc,
         alternates: {
             canonical: `${baseUrl}/products/p/${slug}`,
         },
