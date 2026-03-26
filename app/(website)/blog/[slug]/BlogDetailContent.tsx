@@ -6,6 +6,7 @@ import { Calendar, Clock, User, ArrowLeft, Eye, Share, Facebook, Link21 } from '
 import { Masonry } from '@mui/lab';
 import Link from 'next/link';
 import Image from 'next/image';
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 interface Blog {
     id: string;
@@ -189,30 +190,12 @@ export default function BlogDetailContent({ params, initialBlog = null }: Props)
                 }} />
 
                 <Container maxWidth="md" sx={{ position: 'relative', zIndex: 1 }}>
-                    {/* Back Button - Positioned nicely */}
-                    <Box sx={{ mb: 4 }}>
-                        <Button
-                            component={Link}
-                            href="/blog"
-                            startIcon={<ArrowLeft size="18" color="var(--primary)" />}
-                            sx={{
-                                color: 'var(--primary)',
-                                fontFamily: 'var(--font-prompt)',
-                                fontWeight: 500,
-                                border: '1px solid',
-                                borderColor: 'rgba(0, 194, 203, 0.3)',
-                                borderRadius: 2,
-                                px: 2,
-                                py: 0.75,
-                                '&:hover': {
-                                    bgcolor: 'rgba(0, 194, 203, 0.1)',
-                                    borderColor: 'var(--primary)'
-                                }
-                            }}
-                        >
-                            กลับหน้าบทความ
-                        </Button>
-                    </Box>
+                    {/* Breadcrumbs */}
+                    <Breadcrumbs items={[
+                        { label: 'Blog', href: '/blog' },
+                        { label: blog.category, href: '/blog' },
+                        { label: blog.title }
+                    ]} />
 
                     {/* Category */}
                     <Chip

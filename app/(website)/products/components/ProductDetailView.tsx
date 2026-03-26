@@ -11,6 +11,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 interface Product {
     id: string;
@@ -218,21 +219,12 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     position: 'relative'
                 }}>
                     {/* Category/Breadcrumb */}
-                    <Typography sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontSize: '0.8rem',
-                        color: 'var(--primary)',
-                        fontWeight: 700,
-                        textTransform: 'uppercase',
-                        letterSpacing: 2,
-                        mb: 1.5,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 1.5
-                    }}>
-                        <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: 'var(--primary)' }}></span>
-                        {categoryName}
-                    </Typography>
+                    {/* Breadcrumbs */}
+                    <Breadcrumbs items={[
+                        { label: 'Products', href: '/products' },
+                        { label: categoryName, href: '/products' }, // Approximation
+                        { label: product.name }
+                    ]} />
 
                     {/* Title */}
                     <Typography

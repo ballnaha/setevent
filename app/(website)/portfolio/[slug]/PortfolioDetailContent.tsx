@@ -5,6 +5,7 @@ import { Box, Chip, Container, Typography, Button, Stack, IconButton, Modal, Ske
 import Link from 'next/link';
 import { ArrowLeft, Gallery, CloseCircle, ArrowLeft2, ArrowRight2, MessageQuestion, CallCalling } from 'iconsax-react';
 import Image from 'next/image';
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 // Swiper for Lightbox
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -124,33 +125,12 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
         }} />
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-          {/* Navigation Path */}
-          <Stack direction="row" spacing={1} alignItems="center" justifyContent="center" sx={{ mb: 4 }}>
-            <Button
-              component={Link}
-              href="/portfolio"
-              startIcon={<ArrowLeft size="18" color="var(--foreground)" />}
-              sx={{
-                color: 'var(--foreground)',
-                opacity: 0.6,
-                fontFamily: 'var(--font-prompt)',
-                fontSize: '0.9rem',
-                textTransform: 'none',
-                '&:hover': { opacity: 1, bgcolor: 'transparent' }
-              }}
-            >
-              Portfolio
-            </Button>
-            <Typography sx={{ color: 'var(--foreground)', opacity: 0.3 }}>/</Typography>
-            <Typography sx={{
-              color: 'var(--primary)',
-              fontFamily: 'var(--font-prompt)',
-              fontSize: '0.9rem',
-              fontWeight: 500
-            }}>
-              Detail
-            </Typography>
-          </Stack>
+          {/* Breadcrumbs */}
+          <Breadcrumbs items={[
+            { label: 'Portfolio', href: '/portfolio' },
+            { label: portfolio.category, href: '/portfolio' },
+            { label: portfolio.title }
+          ]} />
 
           <Stack spacing={3} alignItems="center">
             {/* Category Chip */}
