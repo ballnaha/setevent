@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { getSEODescription, SEO_FALLBACKS } from '@/lib/seo';
 import DesignsContent from './DesignsContent';
 import prisma from '@/lib/prisma';
 
@@ -7,7 +8,7 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
     title: 'New Designs | SET EVENT',
-    description: 'ผลงานการออกแบบและจัดอีเวนต์ที่สวยงาม สร้างสรรค์โดยทีมงาน SET EVENT',
+    description: SEO_FALLBACKS.design(),
     keywords: ['งานแต่งงาน', 'อีเวนต์', 'ออกแบบเวที', 'Stage Design', 'Wedding Planner', 'Event Organizer', 'สัมมนา', 'คอนเสิร์ต', 'งานเปิดตัวสินค้า', 'SET EVENT'],
     alternates: {
         canonical: 'https://seteventthailand.com/designs',

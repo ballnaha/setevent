@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { ArrowLeft, Gallery, CloseCircle, ArrowLeft2, ArrowRight2, MessageQuestion, CallCalling } from 'iconsax-react';
 import Image from 'next/image';
 import Breadcrumbs from "@/app/components/Breadcrumbs";
+import StandardServiceInfo from "@/app/components/StandardServiceInfo";
 
 // Swiper for Lightbox
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -583,6 +584,8 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
           </Box>
         </Box>
       </Modal>
+      {/* Standard Service Information (Fixes Thin Content SEO) */}
+      <StandardServiceInfo />
     </Box>
   );
 }

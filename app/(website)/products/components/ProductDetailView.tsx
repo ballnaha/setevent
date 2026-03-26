@@ -12,6 +12,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import 'swiper/css/effect-fade';
 import Breadcrumbs from "@/app/components/Breadcrumbs";
+import StandardServiceInfo from "@/app/components/StandardServiceInfo";
 
 interface Product {
     id: string;
@@ -91,10 +92,11 @@ export default function ProductDetailView({ product, categoryName = "Product Det
             <Box sx={{
                 display: 'flex',
                 flexDirection: { xs: 'column', lg: 'row' },
-                flex: 1,
+                flex: { lg: '0 0 auto' },
+                height: { lg: '100vh' },
                 minHeight: 0,
                 position: 'relative',
-                overflow: { xs: 'auto', lg: 'hidden' },
+                overflow: 'visible',
             }}>
                 <Box sx={{
                     flex: { xs: '0 0 auto', lg: 1 },
@@ -443,6 +445,11 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                         </Box>
                     )}
                 </Box>
+            </Box>
+
+            {/* Standard Service Information (Fixes Thin Content SEO) */}
+            <Box sx={{ bgcolor: 'var(--background)', width: '100%' }}>
+                <StandardServiceInfo />
             </Box>
         </Box>
     );

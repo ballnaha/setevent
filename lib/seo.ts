@@ -40,5 +40,11 @@ export const SEO_FALLBACKS = {
     `ชมตัวอย่างผลงาน ${title} ${category ? `ประเภท ${category}` : ''} จากทีมงาน SET EVENT Thailand บริการจัดงานอีเวนต์มืออาชีพทั่วไทยด้วยระบบภาพและเสียงมาตรฐาน`,
     
   blog: (title: string, excerpt: string | null | undefined = '') => 
-    excerpt || `อ่านบทความ ${title} เกร็ดความรู้และเทคนิคการจัดงานอีเวนต์ เช่าจอ LED และระบบแสงสีเสียงจากผู้เชี่ยวชาญ SET EVENT Thailand`
+    excerpt || `อ่านบทความ ${title} เกร็ดความรู้และเทคนิคการจัดงานอีเวนต์ เช่าจอ LED และระบบแสงสีเสียงจากผู้เชี่ยวชาญ SET EVENT Thailand`,
+
+  promotion: (title: string, description: string | null | undefined = '') => 
+    description || `รับดีลพิเศษเช่าอุปกรณ์งานอีเวนต์: ${title} โปรโมชั่นราคาถูกที่สุดจาก SET EVENT Thailand ครบวงจรสำหรับงานแต่งและสัมมนา จองเลยวันนี้!`,
+
+  design: () => 
+    `รวมไอเดียการออกแบบเวที Stage Design, Wedding Planner และงานอีเวนต์ระดับพรีเมียม สวยงาม ทันสมัย สร้างสรรค์โดยทีมงานมืออาชีพจาก SET EVENT Thailand`
 };

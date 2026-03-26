@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { getSEODescription, SEO_FALLBACKS } from '@/lib/seo';
 export const revalidate = 0;
 import { prisma } from "@/lib/prisma";
 import { notFound } from 'next/navigation';
@@ -26,12 +27,17 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         return { title: 'Promotion Not Found | SET EVENT' };
     }
 
+    const desc = getSEODescription(
+        promo.description,
+        SEO_FALLBACKS.promotion(promo.title, promo.description)
+    );
+
     return {
         title: `${promo.title} - โปรโมชั่นพิเศษ SET EVENT`,
-        description: promo.description || `รับดีลพิเศษเช่าอุปกรณ์งานอีเวนต์: ${promo.title}`,
+        description: desc,
         openGraph: {
             title: `${promo.title} | SET EVENT`,
-            description: promo.description || undefined,
+            description: desc,
             images: promo.image ? [{ url: promo.image }] : [],
         }
     };
