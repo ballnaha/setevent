@@ -162,8 +162,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             priority: 0.8,
         }));
 
-        productRoutes = [...categoryRoutes];
+        // Fetch all active individual products
+        const products = await prisma.product.findMany({
+            where: { status: 'active' },
+            select: { slug: true, updatedAt: true }
+        });
+
+        const individualProductRoutes = products.map(p => ({
+            url: `${baseUrl}/products/p/${p.slug}`,
+            lastModified: p.updatedAt,
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+        }));
+
+        productRoutes = [...categoryRoutes, ...individualProductRoutes];
     } catch (e) { console.error('Sitemap: Products/Categories error', e); }
+
+    // ========================================
+    // 🏷️ DYNAMIC PROMOTIONS
+    // ========================================
+    let promotionRoutes: MetadataRoute.Sitemap = [];
+    try {
+        const promotions = await prisma.promotion.findMany({
+            where: { status: 'active' },
+            select: { title: true, updatedAt: true }
+        });
+        promotionRoutes = promotions.map((p) => ({
+            url: `${baseUrl}/promotions/p/${encodeURIComponent(p.title)}`,
+            lastModified: p.updatedAt,
+            changeFrequency: 'daily' as const,
+            priority: 0.8,
+        }));
+    } catch (e) { console.error('Sitemap: Promotions error', e); }
 
     // ========================================
     // 🎨 DYNAMIC PORTFOLIO
@@ -190,6 +220,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         ...blogRoutes,
         ...productRoutes,
         ...portfolioRoutes,
+        ...promotionRoutes,
     ];
 }
 
