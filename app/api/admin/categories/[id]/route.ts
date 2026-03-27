@@ -1,6 +1,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 // params is a Promise in Next.js 15+, but in 14 it's an object. 
 // However, the types provided usually expect params to be awaited or treated carefully.
@@ -28,6 +29,11 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
                 order: order ? parseInt(order) : undefined
             }
         });
+
+        // Clear menu cache
+        revalidatePath('/', 'layout');
+        revalidatePath('/products');
+
         return NextResponse.json(category);
     } catch (error) {
         console.error("Error updating category:", error);
@@ -41,6 +47,11 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
         await prisma.category.delete({
             where: { id }
         });
+
+        // Clear menu cache
+        revalidatePath('/', 'layout');
+        revalidatePath('/products');
+
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error("Error deleting category:", error);
