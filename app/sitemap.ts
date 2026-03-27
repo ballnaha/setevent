@@ -17,6 +17,7 @@ const STATIC_PAGE_DATES = {
     termsOfService: '2025-01-01',
     weddingECard: '2026-03-25',
     auspiciousDates: '2026-03-25',
+    promotionsMonthly: '2026-03-27',
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -108,6 +109,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             url: `${baseUrl}/auspicious-dates`,
             lastModified: new Date(STATIC_PAGE_DATES.auspiciousDates),
             changeFrequency: 'weekly',
+            priority: 0.9,
+        },
+        {
+            url: `${baseUrl}/promotions/monthly`,
+            lastModified: new Date(STATIC_PAGE_DATES.promotionsMonthly),
+            changeFrequency: 'daily',
             priority: 0.9,
         },
     ];
