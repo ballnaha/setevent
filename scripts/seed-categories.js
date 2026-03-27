@@ -17,7 +17,7 @@ const rentalItems = [
     { label: "Motion Graphic", href: "/products/rental/motion-graphic" },
     { label: "Interactive", href: "/products/rental/interactive" },
     { label: "Laser", href: "/products/rental/laser" },
-    { label: "Mapping", href: "/products/rental/mapping" },
+    { label: "Mapping", href: "/products/rental/projection_mapping" },
     { label: "Flower & Souvenirs", href: "/products/rental/flower-souvenirs" },
 ];
 

@@ -27,7 +27,7 @@ const events = [
             "Laser และ Special Effects",
             "Immersive Experience"
         ],
-        link: "/products/rental/mapping"
+        link: "/products/rental/projection_mapping"
     },
     {
         title: "งานติดตั้งและโครงสร้าง",
@@ -254,8 +254,8 @@ export default function FeaturedEvents() {
                             <Box sx={{ mb: 1.5 }}>
                                 {block.icon}
                             </Box>
-                            <Typography 
-                                variant="h6" 
+                            <Typography
+                                variant="h6"
                                 dangerouslySetInnerHTML={{ __html: block.title }}
                                 sx={{
                                     fontFamily: "var(--font-prompt)",
@@ -266,8 +266,8 @@ export default function FeaturedEvents() {
                                     fontSize: { xs: '0.9rem', md: '1.1rem' } // Responsive font size
                                 }}
                             />
-                            <Typography 
-                                variant="body2" 
+                            <Typography
+                                variant="body2"
                                 dangerouslySetInnerHTML={{ __html: block.subtitle }}
                                 sx={{
                                     fontFamily: "var(--font-prompt)",
