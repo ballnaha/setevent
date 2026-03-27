@@ -22,6 +22,7 @@ export async function GET(req: Request) {
         // Find category by traversing the slug path
         let currentCategory: any = null;
         let parentId: string | null = null;
+        const breadcrumbData: { name: string, slug: string }[] = [];
 
         for (const rawSlug of slugs) {
             const slug = decodeURIComponent(rawSlug).toLowerCase();
@@ -54,6 +55,12 @@ export async function GET(req: Request) {
 
             currentCategory = foundCategory;
             parentId = foundCategory.id;
+            
+            // Collect path segments for breadcrumb
+            breadcrumbData.push({
+                name: foundCategory.name,
+                slug: slugs.slice(0, breadcrumbData.length + 1).join('/')
+            });
         }
 
         if (!currentCategory) {
@@ -69,16 +76,11 @@ export async function GET(req: Request) {
             orderBy: { order: 'asc' }
         });
 
-        // Build breadcrumb
-        const breadcrumb = [];
-        let tempCategory: any = currentCategory;
-        while (tempCategory) {
-            breadcrumb.unshift({
-                name: tempCategory.name,
-                slug: tempCategory.slug
-            });
-            tempCategory = tempCategory.parent;
-        }
+        // Build breadcrumb using the path slugs
+        const breadcrumb = [
+            { name: 'Products', slug: '' },
+            ...breadcrumbData
+        ];
 
         return NextResponse.json({
             success: true,

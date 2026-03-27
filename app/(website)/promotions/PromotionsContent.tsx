@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Ticket } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 // Parsed interface for display
 interface Promotion {
@@ -260,6 +261,7 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                 <Box sx={{ position: 'absolute', bottom: '-10%', left: '-10%', width: '500px', height: '500px', background: 'radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0) 70%)', filter: 'blur(60px)', zIndex: 0 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'โปรโมชั่น (Promotions)' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip label="Special Deals" sx={{ bgcolor: 'rgba(233, 69, 96, 0.1)', color: '#E94560', border: '1px solid rgba(233, 69, 96, 0.2)', fontFamily: 'var(--font-prompt)', fontWeight: 600 }} />
                         <Typography component="h1" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, fontSize: { xs: '2.5rem', md: '4.5rem' }, color: 'var(--foreground)', lineHeight: 1.1, letterSpacing: '-1px' }}>

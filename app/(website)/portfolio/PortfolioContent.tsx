@@ -5,6 +5,7 @@ import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, S
 import { CloseCircle, Gallery, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectCoverflow, Thumbs, FreeMode } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -209,6 +210,7 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'Portfolio' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="Our Masterpieces"

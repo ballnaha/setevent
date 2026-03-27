@@ -6,6 +6,7 @@ import { ArrowRight2, Gallery, MagicStar, NoteText, MessageQuestion, CallCalling
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 interface Product {
     id: string;
@@ -467,6 +468,13 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs 
+                        center 
+                        items={data.breadcrumb.map(b => ({ 
+                            label: b.name, 
+                            href: b.slug ? `/products/${b.slug}` : '/products' 
+                        }))} 
+                    />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="Products Category"

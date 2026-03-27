@@ -127,7 +127,7 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
 
         <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
           {/* Breadcrumbs */}
-          <Breadcrumbs items={[
+          <Breadcrumbs center items={[
             { label: 'Portfolio', href: '/portfolio' },
             { label: portfolio.category, href: '/portfolio' },
             { label: portfolio.title }

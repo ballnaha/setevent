@@ -5,6 +5,7 @@ import { Box, Container, Typography, Paper, Skeleton, Chip, Stack, Button } from
 import { ArrowRight2, Box1, Category2, MessageQuestion, CallCalling } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 interface CategoryChild {
     id: string;
@@ -92,6 +93,7 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'สินค้าและบริการ' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="Our Products & Services"

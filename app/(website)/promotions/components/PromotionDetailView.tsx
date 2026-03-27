@@ -6,6 +6,7 @@ import { CloseCircle, MagicStar, NoteText, MessageQuestion } from "iconsax-react
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Button } from "@mui/material";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 interface Promotion {
     id: string;
@@ -126,6 +127,18 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                     p: { xs: 4, md: 6 },
                     position: 'relative'
                 }}>
+                    {/* Breadcrumbs (Visual only on full page) */}
+                    {!isModal && (
+                        <Box sx={{ mb: 3 }}>
+                            <Breadcrumbs 
+                                items={[
+                                    { label: 'โปรโมชั่น (Promotions)', href: '/promotions' },
+                                    { label: promotion.title }
+                                ]} 
+                            />
+                        </Box>
+                    )}
+
                     {/* Header/Period Badge */}
                     <Typography sx={{
                         fontFamily: 'var(--font-prompt)',

@@ -14,6 +14,7 @@ import {
     Button
 } from "@mui/material";
 import { ArrowDown2, MessageQuestion, Call, Whatsapp } from "iconsax-react";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { useTheme as useNextTheme } from 'next-themes';
 
 interface FAQItem {
@@ -88,6 +89,7 @@ export default function FAQContent() {
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
                     <Stack spacing={3} alignItems="center" textAlign="center">
+                        <Breadcrumbs center items={[{ label: 'คำถามที่พบบ่อย (FAQ)' }]} />
                         <Chip
                             label="Help Center"
                             sx={{

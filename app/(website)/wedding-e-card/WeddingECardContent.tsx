@@ -4,6 +4,7 @@ import React from "react";
 import { Box, Container, Typography, Chip, Stack, Button } from "@mui/material";
 import { Gallery, ArrowCircleRight, Notification as NotificationIcon, MagicStar } from "iconsax-react";
 import Image from "next/image";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 export default function WeddingECardContent() {
     return (
@@ -43,6 +44,7 @@ export default function WeddingECardContent() {
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'การ์ดแต่งงานออนไลน์ (Wedding E-Card)' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="Wedding Experience"

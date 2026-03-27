@@ -90,5 +90,38 @@ export default async function PortfolioDetailPage({ params }: PortfolioPageProps
     notFound();
   }
 
-  return <PortfolioDetailContent portfolio={portfolio} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "หน้าแรก",
+                "item": "https://seteventthailand.com"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "ผลงานของเรา",
+                "item": "https://seteventthailand.com/portfolio"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": portfolio.title,
+                "item": `https://seteventthailand.com/portfolio/${slug}`
+              }
+            ]
+          })
+        }}
+      />
+      <PortfolioDetailContent portfolio={portfolio} />
+    </>
+  );
 }

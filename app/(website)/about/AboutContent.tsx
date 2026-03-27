@@ -5,6 +5,7 @@ import { Box, Container, Typography, Stack, Button, Skeleton, Chip, Grid } from 
 import { ArrowRight, MagicStar, StatusUp, People, Award } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 export default function AboutContent() {
     const [mounted, setMounted] = useState(false);
@@ -58,6 +59,7 @@ export default function AboutContent() {
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'About Us' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="About SET EVENT"

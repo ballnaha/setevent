@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Box, Container, Typography, Stack, Button, Skeleton, Chip } from "@mui/material";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { Call, Message, Location, Instagram, Facebook, Sms, MessageText } from "iconsax-react";
 
 interface ContactSettings {
@@ -120,6 +121,7 @@ export default function ContactContent() {
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'Contact' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="Contact Us"

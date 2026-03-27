@@ -3,6 +3,7 @@
 import React from "react";
 import { Box, Container, Typography, Chip, Stack, Button } from "@mui/material";
 import { Calendar, Magicpen, Clock, ShieldTick, MessageAdd1 } from "iconsax-react";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import AuspiciousCalculator from "./AuspiciousCalculator";
 
 export default function AuspiciousDatesContent() {
@@ -43,6 +44,7 @@ export default function AuspiciousDatesContent() {
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'ดูฤกษ์แต่งงาน (Auspicious Dates)' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="Wedding Experience"

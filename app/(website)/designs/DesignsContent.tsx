@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack, Button } from "@mui/material";
 import { CloseCircle, Gallery, ArrowLeft2, ArrowRight2 } from "iconsax-react";
 import Image from "next/image";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, EffectCoverflow, Zoom } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
@@ -153,6 +154,7 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                 }} />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    <Breadcrumbs center items={[{ label: 'New Design' }]} />
                     <Stack spacing={3} alignItems="center">
                         <Chip
                             label="SetEvent Gallery"
@@ -421,13 +423,13 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                         modules={[Navigation, Pagination, Zoom]}
                         initialSlide={lightboxIndex}
                         navigation
-                        pagination={{ 
+                        pagination={{
                             type: 'fraction',
-                            clickable: true 
+                            clickable: true
                         }}
                         zoom={{ maxRatio: 3 }}
                         loop={filteredItems.length > 1}
-                        style={{ 
+                        style={{
                             flex: 1,
                             width: '100%',
                             height: '100%',

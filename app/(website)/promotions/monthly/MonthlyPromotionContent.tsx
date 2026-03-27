@@ -14,9 +14,9 @@ import {
     TableRow,
     Stack,
     Chip,
-    Divider,
-    Breadcrumbs
+    Divider
 } from "@mui/material";
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { Monitor, ArrowRight2, Ticket, Calculator, MagicStar } from "iconsax-react";
 import Link from "next/link";
 
@@ -40,6 +40,73 @@ export default function MonthlyPromotionContent() {
 
     return (
         <Box sx={{ bgcolor: "var(--background)", minHeight: "100vh", pb: 10, overflow: 'hidden', position: 'relative' }}>
+            {/* SEO Structured Data */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "BreadcrumbList",
+                        "itemListElement": [
+                            {
+                                "@type": "ListItem",
+                                "position": 1,
+                                "name": "หน้าหลัก",
+                                "item": "https://seteventthailand.com/"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 2,
+                                "name": "โปรโมชั่น",
+                                "item": "https://seteventthailand.com/promotions"
+                            },
+                            {
+                                "@type": "ListItem",
+                                "position": 3,
+                                "name": "โปรโมชั่นประจำเดือน",
+                                "item": "https://seteventthailand.com/promotions/monthly"
+                            }
+                        ]
+                    })
+                }}
+            />
+
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{
+                    __html: JSON.stringify({
+                        "@context": "https://schema.org",
+                        "@type": "FAQPage",
+                        "mainEntity": [
+                            {
+                                "@type": "Question",
+                                "name": "ราคาเช่าจอ LED ประจำเดือนนี้คุ้มค่าอย่างไร?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "โปรโมชั่นเช่าจอ LED ประจำเดือนนี้ราคาเริ่มต้นเพียง 1,750 - 3,500 บาทต่อตารางเมตร ขึ้นอยู่กับความละเอียดของจอ (PH) และขนาดพื้นที่ติดตั้ง รวมทีมงานติดตั้งและควบคุมมืออาชีพ"
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "แพ็คเกจงานแต่งงานและอีเวนต์ครอบคลุมอะไรบ้าง?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "เรามีแพ็คเกจเริ่มต้นที่ 20,000 บาท ครอบคลุมจอ LED ขนาด 2x4 เมตร พร้อมทีมงาน และแพ็คเกจระดับลักชัวรี่ 60,000 บาท ที่รวมระบบแสง สี เสียง ครบวงจร"
+                                }
+                            },
+                            {
+                                "@type": "Question",
+                                "name": "มีค่าใช้จ่ายในการขอใบเสนอราคาหรือไม่?",
+                                "acceptedAnswer": {
+                                    "@type": "Answer",
+                                    "text": "ไม่มีค่าใช้จ่ายครับ SETEVENT ให้บริการปรึกษาและประเมินราคาฟรี 24 ชั่วโมง พร้อมส่งใบเสนอราคาอย่างรวดเร็วเพื่อให้ท่านนำไปประกอบการตัดสินใจ"
+                                }
+                            }
+                        ]
+                    })
+                }}
+            />
+
             {/* Dynamic Background Elements */}
             <Box sx={{ position: 'absolute', top: '5%', right: '-5%', width: '500px', height: '500px', background: 'radial-gradient(circle, var(--decor-ruby) 0%, rgba(233, 69, 96, 0) 70%)', filter: 'blur(80px)', zIndex: 0 }} />
             <Box sx={{ position: 'absolute', bottom: '15%', left: '-5%', width: '400px', height: '400px', background: 'radial-gradient(circle, var(--decor-cyan) 0%, rgba(139, 92, 246, 0) 70%)', filter: 'blur(80px)', zIndex: 0 }} />
@@ -47,18 +114,13 @@ export default function MonthlyPromotionContent() {
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, pt: { xs: 15, md: 22 } }}>
 
                 {/* Breadcrumbs */}
-                <Breadcrumbs
-                    separator={<ArrowRight2 size="14" color="var(--foreground)" style={{ opacity: 0.5 }} />}
-                    sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}
-                >
-                    <Link href="/" style={{ textDecoration: 'none' }}>
-                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, '&:hover': { color: 'var(--primary)', opacity: 1 } }}>Home</Typography>
-                    </Link>
-                    <Link href="/promotions" style={{ textDecoration: 'none' }}>
-                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.6, '&:hover': { color: 'var(--primary)', opacity: 1 } }}>Promotions</Typography>
-                    </Link>
-                    <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'var(--primary)', fontWeight: 600 }}>Monthly Promotion</Typography>
-                </Breadcrumbs>
+                <Breadcrumbs 
+                    center 
+                    items={[
+                        { label: 'โปรโมชั่น (Promotions)', href: '/promotions' },
+                        { label: 'โปรโมชั่นประจำเดือน (Monthly Promotion)' }
+                    ]} 
+                />
 
                 {/* Hero Header */}
                 <Stack spacing={3} alignItems="center" textAlign="center" sx={{ mb: 8 }}>

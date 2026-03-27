@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme as useNextTheme } from 'next-themes';
+import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 interface Blog {
     id: string;
@@ -107,6 +108,7 @@ export default function BlogContent({ initialBlogs = [] }: BlogContentProps) {
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
                     <Stack spacing={3} alignItems="center" textAlign="center">
+                        <Breadcrumbs center items={[{ label: 'บทความและสาระน่ารู้' }]} />
                         <Chip
                             label="SetEvent Knowledge Hub"
                             sx={{
