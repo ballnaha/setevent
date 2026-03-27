@@ -20,6 +20,7 @@ import Image from "next/image";
 interface SubItem {
     label: string;
     href: string;
+    description?: string;
     children?: SubItem[];
 }
 
@@ -32,7 +33,7 @@ interface NavItem {
 
 interface MobileDrawerProps {
     navItems: NavItem[];
-    isActive: (href: string) => boolean;
+    isActive: (href: string, exact?: boolean) => boolean;
     isItemActive?: (item: NavItem) => boolean;
     handleDrawerToggle: () => void;
     setTheme: (theme: string) => void;
@@ -86,8 +87,15 @@ export default function MobileDrawer({
                                 primaryTypographyProps={{
                                     fontFamily: 'var(--font-prompt)',
                                     fontSize: '0.9rem',
-                                    fontWeight: isActive(child.href) ? 600 : 400,
-                                    color: isActive(child.href) ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
+                                    fontWeight: isActive(child.href, true) ? 600 : 400,
+                                    color: isActive(child.href, true) ? 'var(--primary)' : 'rgba(255,255,255,0.7)',
+                                }}
+                                secondary={child.description}
+                                secondaryTypographyProps={{
+                                    fontFamily: 'var(--font-prompt)',
+                                    fontSize: '0.75rem',
+                                    color: 'rgba(255,255,255,0.4)',
+                                    sx: { mt: 0.2 }
                                 }}
                             />
                             {hasChildren && (

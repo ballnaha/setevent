@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Box, Container, Typography, Stack, Chip, Skeleton } from "@mui/material";
+import { useSearchParams } from "next/navigation";
 import { Ticket } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -188,8 +189,19 @@ function PromotionCard({ promotion, priority = false }: { promotion: Promotion; 
 }
 
 export default function PromotionsContent({ initialPromotions }: PromotionsContentProps) {
+    const searchParams = useSearchParams();
+    const categoryParam = searchParams.get('category');
     const [loading, setLoading] = useState(initialPromotions.length === 0);
     const [activeTab, setActiveTab] = useState('ทั้งหมด');
+
+    // Handle initial category from URL
+    React.useEffect(() => {
+        if (categoryParam === 'monthly') {
+            setActiveTab('Promotion ประจำเดือน');
+        } else if (categoryParam === 'all') {
+            setActiveTab('ทั้งหมด');
+        }
+    }, [categoryParam]);
 
     // Get unique categories and filter out empty ones
     const categories = ['ทั้งหมด', ...Array.from(new Set(initialPromotions.map(p => p.category).filter(Boolean)))];

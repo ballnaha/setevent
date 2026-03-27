@@ -20,7 +20,7 @@ import {
     Stack,
     Divider
 } from "@mui/material";
-import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Moon, Map1, Gift } from "iconsax-react";
+import { HambergerMenu, ArrowDown2, ArrowRight2, Call, Message, Add, Minus, Monitor, LampOn, Speaker, Layer, VideoCircle, MagicStar, Sun1, Moon, Map1, Gift, Ticket } from "iconsax-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
@@ -39,6 +39,7 @@ const MobileDrawer = dynamic(() => import("./MobileDrawer"), {
 type SubItem = {
     label: string;
     href: string;
+    description?: string;
     children?: SubItem[];
     icon?: React.ReactNode;
 };
@@ -98,15 +99,42 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
             isMega: true,
             sections: productSections
         },
-        { label: "PROMOTIONS", href: "/promotions" },
+        {
+            label: "PROMOTIONS",
+            href: "/promotions",
+            children: [
+                { 
+                    label: "Promotion ทั้งหมด", 
+                    href: "/promotions",
+                    description: "รวมโปรโมชั่นและดีลพิเศษทั้งหมด",
+                    icon: <Ticket size="24" variant="Bulk" color="var(--primary)" />
+                },
+                { 
+                    label: "Promotion ประจำเดือน", 
+                    href: "/promotions/monthly",
+                    description: "ข้อเสนอสุดพิเศษประจำเดือนนี้เท่านั้น",
+                    icon: <MagicStar size="24" variant="Bulk" color="var(--primary)" />
+                }
+            ]
+        },
         { label: "PORTFOLIO", href: "/portfolio" },
         { label: "NEW DESIGN", href: "/designs" },
         {
             label: "WEDDING",
             href: "#",
             children: [
-                { label: "E-CARD", href: "/wedding-e-card" },
-                { label: "ฤกษ์มงคลสมรส", href: "/auspicious-dates" }
+                { 
+                    label: "E-CARD", 
+                    href: "/wedding-e-card",
+                    description: "การ์ดแต่งงานออนไลน์ ทันสมัย ใช้งานง่าย",
+                    icon: <Message size="24" variant="Bulk" color="var(--primary)" />
+                },
+                { 
+                    label: "ฤกษ์มงคลสมรส", 
+                    href: "/auspicious-dates",
+                    description: "เช็คฤกษ์ดี วันมงคลสำหรับการเริ่มต้นชีวิตคู่",
+                    icon: <Map1 size="24" variant="Bulk" color="var(--primary)" />
+                }
             ]
         },
     ], [productSections]);
@@ -131,7 +159,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         pathname === "/" ||
         pathname === "/about" ||
         pathname === "/contact" ||
-        pathname === "/promotions" ||
+        pathname.startsWith("/promotions") ||
         pathname === "/designs" ||
         pathname === "/wedding-e-card" ||
         pathname === "/auspicious-dates" ||
@@ -154,7 +182,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         pathname === "/auspicious-dates" ||
         pathname.startsWith("/portfolio") ||
         decodedPathname.startsWith("/portfolio") ||
-        pathname === "/promotions" ||
+        pathname.startsWith("/promotions") ||
         pathname.startsWith("/products") ||
         pathname === "/contact" ||
         pathname === "/privacy-policy" ||
@@ -202,19 +230,19 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
         handleHoverClose();
     };
 
-    const isActive = (href: string) => {
+    const isActive = (href: string, exact: boolean = false) => {
         if (href === "/") return pathname === "/";
         if (href === "#") return false;
-        return pathname.startsWith(href);
+        return exact ? pathname === href : pathname.startsWith(href);
     };
 
     const isItemActive = (item: NavItem) => {
         if (isActive(item.href)) return true;
         if (item.children) {
-            return item.children.some(child => isActive(child.href));
+            return item.children.some(child => isActive(child.href, true));
         }
         if (item.sections) {
-            return item.sections.some(sec => sec.items.some(child => isActive(child.href)));
+            return item.sections.some(sec => sec.items.some(child => isActive(child.href, true)));
         }
         return false;
     };
@@ -261,7 +289,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                     top: 15,
                                     width: 8,
                                     height: 1,
-                                    bgcolor: isActive(child.href) ? 'var(--primary)' : 'rgba(0,0,0,0.1)'
+                                    bgcolor: isActive(child.href, true) ? 'var(--primary)' : 'rgba(0,0,0,0.1)'
                                 }} />
                             )}
 
@@ -286,9 +314,9 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                         alignItems: 'center',
                                         justifyContent: 'space-between',
                                         width: '100%',
-                                        bgcolor: isActive(child.href) ? 'rgba(10, 92, 90, 0.06)' : 'transparent',
+                                        bgcolor: isActive(child.href, true) ? 'rgba(10, 92, 90, 0.06)' : 'transparent',
                                         border: '1px solid',
-                                        borderColor: isActive(child.href) ? 'rgba(10, 92, 90, 0.1)' : 'transparent',
+                                        borderColor: isActive(child.href, true) ? 'rgba(10, 92, 90, 0.1)' : 'transparent',
                                         '&:hover': {
                                             bgcolor: 'rgba(0,0,0,0.03)',
                                             borderColor: 'rgba(0,0,0,0.05)'
@@ -298,7 +326,14 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                                         {/* Icon Indication based on type or explicit icon */}
                                         {child.icon ? (
-                                            <Box sx={{ display: 'flex', color: isActive(child.href) ? 'var(--primary)' : 'inherit' }}>
+                                            <Box sx={{ 
+                                                display: 'flex', 
+                                                p: 1, 
+                                                borderRadius: '12px',
+                                                bgcolor: isActive(child.href, true) ? 'rgba(10, 92, 90, 0.1)' : 'rgba(0,0,0,0.03)',
+                                                color: isActive(child.href, true) ? 'var(--primary)' : 'inherit',
+                                                transition: 'all 0.3s ease'
+                                            }}>
                                                 {child.icon}
                                             </Box>
                                         ) : hasChildren ? (
@@ -315,21 +350,36 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                                 width: 4,
                                                 height: 4,
                                                 borderRadius: '50%',
-                                                bgcolor: isActive(child.href) ? 'var(--primary)' : 'rgba(0,0,0,0.2)'
+                                                bgcolor: isActive(child.href, true) ? 'var(--primary)' : 'rgba(0,0,0,0.2)'
                                             }} />
                                         )}
 
-                                        <Typography
-                                            sx={{
-                                                fontFamily: 'var(--font-prompt)',
-                                                fontSize: level === 0 ? '0.95rem' : '0.9rem',
-                                                fontWeight: isActive(child.href) || hasChildren ? 600 : 400,
-                                                color: isActive(child.href) ? 'var(--primary)' : 'var(--foreground)',
-                                                letterSpacing: 0.3
-                                            }}
-                                        >
-                                            {child.label}
-                                        </Typography>
+                                        <Stack spacing={0.2}>
+                                            <Typography
+                                                sx={{
+                                                    fontFamily: 'var(--font-prompt)',
+                                                    fontSize: level === 0 ? '0.95rem' : '0.9rem',
+                                                    fontWeight: isActive(child.href, true) || hasChildren ? 700 : 500,
+                                                    color: isActive(child.href, true) ? 'var(--primary)' : 'var(--foreground)',
+                                                    letterSpacing: 0.3
+                                                }}
+                                            >
+                                                {child.label}
+                                            </Typography>
+                                            {child.description && (
+                                                <Typography
+                                                    sx={{
+                                                        fontFamily: 'var(--font-prompt)',
+                                                        fontSize: '0.75rem',
+                                                        color: 'text.secondary',
+                                                        fontWeight: 400,
+                                                        opacity: 0.8
+                                                    }}
+                                                >
+                                                    {child.description}
+                                                </Typography>
+                                            )}
+                                        </Stack>
                                     </Box>
 
                                     {hasChildren && (
@@ -586,7 +636,7 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
                                                     backdropFilter: 'blur(40px)',
                                                     border: '1px solid var(--border-color)',
                                                     borderRadius: 2,
-                                                    minWidth: item.isMega ? 700 : 260,
+                                                    minWidth: item.isMega ? 700 : 320,
                                                     // Invisible bridge to prevent closing when moving mouse into menu
                                                     '&::before': {
                                                         content: '""',
