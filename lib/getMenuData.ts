@@ -66,5 +66,5 @@ export const getMenuData = unstable_cache(
         }
     },
     ['menu-data'],
-    { revalidate: 3600, tags: ['menu', 'categories'] }
+    { revalidate: 60, tags: ['menu', 'categories'] }
 );
