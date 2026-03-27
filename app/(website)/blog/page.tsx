@@ -7,11 +7,11 @@ export const revalidate = 0; // Force dynamic rendering on production
 
 export const metadata: Metadata = {
     title: 'บทความและสาระน่ารู้ | SetEvent Thailand',
-    description: 'อัปเดตเทรนด์งานอีเวนต์ ความรู้เรื่องจอ LED ระบบเสียง แสง สี และไอเดียจัดงานแต่งงาน โดยทีมงานมืออาชีพ',
-    keywords: 'บทความอีเวนต์, ความรู้จอ LED, ไอเดียจัดงานแต่ง, ระบบเสียงงานแต่ง, เช่าจอ LED ความรู้',
+    description: 'อัปเดตเทรนด์งานอีเว้นท์ ความรู้เรื่องจอ LED ระบบเสียง แสง สี และไอเดียจัดงานแต่งงาน โดยทีมงานมืออาชีพ',
+    keywords: 'บทความอีเว้นท์, ความรู้จอ LED, ไอเดียจัดงานแต่ง, ระบบเสียงงานแต่ง, เช่าจอ LED ความรู้',
     openGraph: {
         title: 'บทความและสาระน่ารู้ | SetEvent Thailand',
-        description: 'รวมบทความที่น่าสนใจสำหรับผู้จัดงานอีเวนต์',
+        description: 'รวมบทความที่น่าสนใจสำหรับผู้จัดงานอีเว้นท์',
         url: 'https://seteventthailand.com/blog',
         siteName: 'SetEvent Thailand',
         images: [

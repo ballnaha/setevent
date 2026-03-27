@@ -163,7 +163,7 @@ export default function ContactContent() {
                                 lineHeight: 1.8
                             }}
                         >
-                            พร้อมให้บริการและคำปรึกษา สำหรับงานอีเวนต์ทุกรูปแบบ
+                            พร้อมให้บริการและคำปรึกษา สำหรับงานอีเว้นท์ทุกรูปแบบ
                         </Typography>
                     </Stack>
                 </Container>

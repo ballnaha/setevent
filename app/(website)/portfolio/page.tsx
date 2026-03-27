@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     description: 'ชมผลงานที่ผ่านมาของ SET EVENT Thailand - งาน Marketing Event, Seminar, นิทรรศการ, คอนเสิร์ต, งานแต่งงาน และ Fixed Installation ด้วยทีมงานมืออาชีพ',
     keywords: [
         'Portfolio SET EVENT',
-        'ผลงานจัดอีเวนต์',
+        'ผลงานจัดอีเว้นท์',
         'งาน Marketing Event',
         'คอนเสิร์ต',
         'งานแต่งงาน',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     ],
     openGraph: {
         title: 'ผลงาน Portfolio | SET EVENT Thailand',
-        description: 'ชมผลงานจัดงานอีเวนต์ที่ผ่านมาของ SET EVENT Thailand',
+        description: 'ชมผลงานจัดงานอีเว้นท์ที่ผ่านมาของ SET EVENT Thailand',
         url: 'https://seteventthailand.com/portfolio',
         siteName: 'SET EVENT Thailand',
         locale: 'th_TH',

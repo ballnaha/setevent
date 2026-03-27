@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
     title: 'สินค้าและบริการ | SET EVENT Thailand',
-    description: 'บริการเช่าจอ LED, เครื่องเสียง, ไฟเวที, โครงสร้างเวที, Motion Graphic, Interactive, Laser Show และอุปกรณ์งานอีเวนต์ครบวงจรจาก SET EVENT Thailand',
+    description: 'บริการเช่าจอ LED, เครื่องเสียง, ไฟเวที, โครงสร้างเวที, Motion Graphic, Interactive, Laser Show และอุปกรณ์งานอีเว้นท์ครบวงจรจาก SET EVENT Thailand',
     keywords: [
         'เช่าจอ LED',
         'เช่าเครื่องเสียง',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     ],
     openGraph: {
         title: 'สินค้าและบริการ | SET EVENT Thailand',
-        description: 'บริการเช่าจอ LED เครื่องเสียง ไฟเวที และอุปกรณ์งานอีเวนต์ครบวงจร',
+        description: 'บริการเช่าจอ LED เครื่องเสียง ไฟเวที และอุปกรณ์งานอีเว้นท์ครบวงจร',
         url: 'https://seteventthailand.com/products',
         siteName: 'SET EVENT Thailand',
         locale: 'th_TH',

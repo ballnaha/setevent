@@ -9,7 +9,7 @@ export const metadata: Metadata = {
         'FAQ SET EVENT',
         'คำถามที่พบบ่อย',
         'เช่าจอ LED ราคา',
-        'บริการจัดงานอีเวนต์',
+        'บริการจัดงานอีเว้นท์',
         'เช่าเครื่องเสียง',
         'งานแต่งงาน',
         'คอนเสิร์ต',
@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     ],
     openGraph: {
         title: 'คำถามที่พบบ่อย (FAQ) | SET EVENT Thailand',
-        description: 'รวมคำตอบคำถามที่พบบ่อยเกี่ยวกับบริการจัดงานอีเวนต์จาก SET EVENT',
+        description: 'รวมคำตอบคำถามที่พบบ่อยเกี่ยวกับบริการจัดงานอีเว้นท์จาก SET EVENT',
         url: 'https://seteventthailand.com/faq',
         siteName: 'SET EVENT Thailand',
         locale: 'th_TH',

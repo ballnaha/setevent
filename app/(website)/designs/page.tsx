@@ -9,7 +9,7 @@ export const revalidate = 0;
 export const metadata: Metadata = {
     title: 'New Designs | SET EVENT',
     description: SEO_FALLBACKS.design(),
-    keywords: ['งานแต่งงาน', 'อีเวนต์', 'ออกแบบเวที', 'Stage Design', 'Wedding Planner', 'Event Organizer', 'สัมมนา', 'คอนเสิร์ต', 'งานเปิดตัวสินค้า', 'SET EVENT'],
+    keywords: ['งานแต่งงาน', 'อีเว้นท์', 'ออกแบบเวที', 'Stage Design', 'Wedding Planner', 'Event Organizer', 'สัมมนา', 'คอนเสิร์ต', 'งานเปิดตัวสินค้า', 'SET EVENT'],
     alternates: {
         canonical: 'https://seteventthailand.com/designs',
     },
@@ -42,7 +42,7 @@ export default async function DesignsPage() {
         '@context': 'https://schema.org',
         '@type': 'ImageGallery',
         name: 'New Designs | SET EVENT',
-        description: 'ผลงานการออกแบบและจัดอีเวนต์ที่สวยงาม สร้างสรรค์โดยทีมงาน SET EVENT',
+        description: 'ผลงานการออกแบบและจัดอีเว้นท์ที่สวยงาม สร้างสรรค์โดยทีมงาน SET EVENT',
         url: 'https://seteventthailand.com/designs',
         image: initialData.map(d => ({
             '@type': 'ImageObject',

@@ -88,7 +88,7 @@ export default function MonthlyPromotionContent() {
                             },
                             {
                                 "@type": "Question",
-                                "name": "แพ็คเกจงานแต่งงานและอีเวนต์ครอบคลุมอะไรบ้าง?",
+                                "name": "แพ็คเกจงานแต่งงานและอีเว้นท์ครอบคลุมอะไรบ้าง?",
                                 "acceptedAnswer": {
                                     "@type": "Answer",
                                     "text": "เรามีแพ็คเกจเริ่มต้นที่ 20,000 บาท ครอบคลุมจอ LED ขนาด 2x4 เมตร พร้อมทีมงาน และแพ็คเกจระดับลักชัวรี่ 60,000 บาท ที่รวมระบบแสง สี เสียง ครบวงจร"
@@ -114,12 +114,12 @@ export default function MonthlyPromotionContent() {
             <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1, pt: { xs: 15, md: 22 } }}>
 
                 {/* Breadcrumbs */}
-                <Breadcrumbs 
-                    center 
+                <Breadcrumbs
+                    center
                     items={[
                         { label: 'โปรโมชั่น (Promotions)', href: '/promotions' },
                         { label: 'โปรโมชั่นประจำเดือน (Monthly Promotion)' }
-                    ]} 
+                    ]}
                 />
 
                 {/* Hero Header */}
@@ -155,7 +155,7 @@ export default function MonthlyPromotionContent() {
                     <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, fontSize: { xs: '1rem', md: '1.1rem' }, maxWidth: 800, lineHeight: 1.8 }}>
                         รวมโปรโมชั่นและแพ็คเกจสุดคุ้มประจำเดือนจาก SETEVENT ครบจบในที่เดียว
                         ทั้งงานเช่าจอ LED คมชัดสูง, แพ็คเกจเครื่องเสียงแสงสี และโปรโมชั่นงานแต่งงานสุดพิเศษ
-                        เลือกข้อเสนอที่ใช่สำหรับอีเวนต์ของคุณได้ที่นี่
+                        เลือกข้อเสนอที่ใช่สำหรับอีเว้นท์ของคุณได้ที่นี่
                     </Typography>
                 </Stack>
 
@@ -263,7 +263,7 @@ export default function MonthlyPromotionContent() {
                     <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 4 }}>
                         <Ticket size="32" variant="Bulk" color="var(--primary)" />
                         <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, color: 'var(--foreground)' }}>
-                            2. แพ็คเกจงานแต่งและอีเวนต์ (Wedding & Event)
+                            2. แพ็คเกจงานแต่งและอีเว้นท์ (Wedding & Event)
                         </Typography>
                     </Stack>
 

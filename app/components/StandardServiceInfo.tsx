@@ -14,7 +14,7 @@ export default function StandardServiceInfo() {
         {
             icon: <MagicStar size="32" color="var(--primary)" variant="Bulk" />,
             title: "ทีมงานมืออาชีพประสาทงานไว",
-            desc: "ทีมเทคนิคที่มีประสบการณ์จัดงานอีเวนต์ระดับประเทศ พร้อมแก้ไขปัญหาเฉพาะหน้าและดูแลคุณตลอดการจัดงาน"
+            desc: "ทีมเทคนิคที่มีประสบการณ์จัดงานอีเว้นท์ระดับประเทศ พร้อมแก้ไขปัญหาเฉพาะหน้าและดูแลคุณตลอดการจัดงาน"
         },
         {
             icon: <Timer1 size="32" color="var(--primary)" variant="Bulk" />,
@@ -140,7 +140,7 @@ export default function StandardServiceInfo() {
                 {/* Service Tagline for SEO */}
                 <Box sx={{ mt: 8, textAlign: 'center', opacity: 0.4 }}>
                     <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.8rem', letterSpacing: 1 }}>
-                        เช่าจอ LED • เช่าเครื่องเสียง • เช่าไฟเวที • จัดงานเลี้ยงบริษัท • งานสัมมนา • งานแต่งงาน • อีเวนต์ครบวงจร • SET EVENT THAILAND
+                        เช่าจอ LED • เช่าเครื่องเสียง • เช่าไฟเวที • จัดงานเลี้ยงบริษัท • งานสัมมนา • งานแต่งงาน • อีเว้นท์ครบวงจร • SET EVENT THAILAND
                     </Typography>
                 </Box>
             </Container>

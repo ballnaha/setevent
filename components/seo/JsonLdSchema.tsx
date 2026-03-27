@@ -23,7 +23,7 @@ export function OrganizationSchema({
     name = 'SET Event Thailand',
     url = 'https://seteventthailand.com',
     logo = 'https://seteventthailand.com/logo.png',
-    description = 'SET Event Thailand - บริการให้เช่าจอ LED, เวที, แสงสี เสียง และอุปกรณ์งานอีเวนต์ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา และงานอีเวนต์ทุกประเภท',
+    description = 'SET Event Thailand - บริการให้เช่าจอ LED, เวที, แสงสี เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา และงานอีเว้นท์ทุกประเภท',
     phone = '+66-93-726-5055',
     email = 'setevent26@gmail.com',
     address = {
@@ -75,7 +75,7 @@ interface LocalBusinessSchemaProps {
 
 export function LocalBusinessSchema({
     name = 'SET Event Thailand',
-    description = 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเวนต์ครบวงจร ด้วยทีมงานมืออาชีพ',
+    description = 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเว้นท์ครบวงจร ด้วยทีมงานมืออาชีพ',
     url = 'https://seteventthailand.com',
     image = 'https://seteventthailand.com/logo.png',
     priceRange = '฿฿฿',
@@ -134,7 +134,7 @@ export function ServiceSchema({
     services = [
         {
             name: 'เช่าจอ LED',
-            description: 'บริการให้เช่าจอ LED ทุกขนาด ทั้ง Indoor และ Outdoor สำหรับงานคอนเสิร์ต งานสัมมนา งานแต่งงาน และอีเวนต์ทุกประเภท',
+            description: 'บริการให้เช่าจอ LED ทุกขนาด ทั้ง Indoor และ Outdoor สำหรับงานคอนเสิร์ต งานสัมมนา งานแต่งงาน และอีเว้นท์ทุกประเภท',
             url: 'https://seteventthailand.com/products/rental/led-screen',
         },
         {
@@ -149,12 +149,12 @@ export function ServiceSchema({
         },
         {
             name: 'เช่าเวที',
-            description: 'บริการให้เช่าเวทีและโครงสร้าง Truss สำหรับงานอีเวนต์ทุกขนาด',
+            description: 'บริการให้เช่าเวทีและโครงสร้าง Truss สำหรับงานอีเว้นท์ทุกขนาด',
             url: 'https://seteventthailand.com/products/rental/stage',
         },
         {
             name: 'จัดดอกไม้ และ ของชำร่วย',
-            description: 'บริการจัดดอกไม้ และ ของชำร่วยสำหรับงานอีเวนต์ทุกประเภท',
+            description: 'บริการจัดดอกไม้ และ ของชำร่วยสำหรับงานอีเว้นท์ทุกประเภท',
             url: 'https://seteventthailand.com/products/rental/flower-souvenirs',
         }
     ],
@@ -198,7 +198,7 @@ export function FAQSchema({
     faqs = [
         {
             question: 'SET Event ให้บริการอะไรบ้าง?',
-            answer: 'SET Event ให้บริการเช่าจอ LED, เครื่องเสียง, ไฟเวที, เวทีและโครงสร้าง รวมถึงบริการติดตั้ง Motion Graphic, Interactive และ Laser Show สำหรับงานอีเวนต์ทุกประเภท',
+            answer: 'SET Event ให้บริการเช่าจอ LED, เครื่องเสียง, ไฟเวที, เวทีและโครงสร้าง รวมถึงบริการติดตั้ง Motion Graphic, Interactive และ Laser Show สำหรับงานอีเว้นท์ทุกประเภท',
         },
         {
             question: 'สามารถเช่าจอ LED ได้ขนาดเท่าไหร่?',

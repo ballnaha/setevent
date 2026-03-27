@@ -10,8 +10,8 @@ export function getSEODescription(
 ): string {
   if (!description || description.trim() === '') {
     // If fallback is provided, use it and ensure it's within limits
-    return fallback.length > maxLength 
-      ? fallback.substring(0, maxLength - 3) + '...' 
+    return fallback.length > maxLength
+      ? fallback.substring(0, maxLength - 3) + '...'
       : fallback;
   }
 
@@ -30,21 +30,21 @@ export function getSEODescription(
  * Common SEO Fallbacks for the site
  */
 export const SEO_FALLBACKS = {
-  product: (name: string, category: string = '') => 
-    `บริการเช่า ${name} ${category ? `ในหมวดหมู่ ${category}` : ''} ราคาถูก สำหรับงานแต่ง งานสัมมนา และอีเวนต์ทุกรูปแบบ พร้อมทีมงานติดตั้งมืออาชีพจาก SET EVENT Thailand ครบวงจรที่คุณกำหนดงบเองได้`,
-  
-  category: (name: string) => 
-    `รวมสินค้าและบริการในหมวด ${name} สำหรับจัดงานอีเวนต์ทุกประเภท เช่าจอ LED เครื่องเสียง แสงสีเสียง ครบวงจรในราคาประหยัดจาก SET EVENT Thailand`,
-  
-  portfolio: (title: string, category: string = '') => 
-    `ชมตัวอย่างผลงาน ${title} ${category ? `ประเภท ${category}` : ''} จากทีมงาน SET EVENT Thailand บริการจัดงานอีเวนต์มืออาชีพทั่วไทยด้วยระบบภาพและเสียงมาตรฐาน`,
-    
-  blog: (title: string, excerpt: string | null | undefined = '') => 
-    excerpt || `อ่านบทความ ${title} เกร็ดความรู้และเทคนิคการจัดงานอีเวนต์ เช่าจอ LED และระบบแสงสีเสียงจากผู้เชี่ยวชาญ SET EVENT Thailand`,
+  product: (name: string, category: string = '') =>
+    `บริการเช่า ${name} ${category ? `ในหมวดหมู่ ${category}` : ''} ราคาถูก สำหรับงานแต่ง งานสัมมนา และอีเว้นท์ทุกรูปแบบ พร้อมทีมงานติดตั้งมืออาชีพจาก SET EVENT Thailand ครบวงจรที่คุณกำหนดงบเองได้`,
 
-  promotion: (title: string, description: string | null | undefined = '') => 
-    description || `รับดีลพิเศษเช่าอุปกรณ์งานอีเวนต์: ${title} โปรโมชั่นราคาถูกที่สุดจาก SET EVENT Thailand ครบวงจรสำหรับงานแต่งและสัมมนา จองเลยวันนี้!`,
+  category: (name: string) =>
+    `รวมสินค้าและบริการในหมวด ${name} สำหรับจัดงานอีเว้นท์ทุกประเภท เช่าจอ LED เครื่องเสียง แสงสีเสียง ครบวงจรในราคาประหยัดจาก SET EVENT Thailand`,
 
-  design: () => 
-    `รวมไอเดียการออกแบบเวที Stage Design, Wedding Planner และงานอีเวนต์ระดับพรีเมียม สวยงาม ทันสมัย สร้างสรรค์โดยทีมงานมืออาชีพจาก SET EVENT Thailand`
+  portfolio: (title: string, category: string = '') =>
+    `ชมตัวอย่างผลงาน ${title} ${category ? `ประเภท ${category}` : ''} จากทีมงาน SET EVENT Thailand บริการจัดงานอีเว้นท์มืออาชีพทั่วไทยด้วยระบบภาพและเสียงมาตรฐาน`,
+
+  blog: (title: string, excerpt: string | null | undefined = '') =>
+    excerpt || `อ่านบทความ ${title} เกร็ดความรู้และเทคนิคการจัดงานอีเว้นท์ เช่าจอ LED และระบบแสงสีเสียงจากผู้เชี่ยวชาญ SET EVENT Thailand`,
+
+  promotion: (title: string, description: string | null | undefined = '') =>
+    description || `รับดีลพิเศษเช่าอุปกรณ์งานอีเว้นท์: ${title} โปรโมชั่นราคาถูกที่สุดจาก SET EVENT Thailand ครบวงจรสำหรับงานแต่งและสัมมนา จองเลยวันนี้!`,
+
+  design: () =>
+    `รวมไอเดียการออกแบบเวที Stage Design, Wedding Planner และงานอีเว้นท์ระดับพรีเมียม สวยงาม ทันสมัย สร้างสรรค์โดยทีมงานมืออาชีพจาก SET EVENT Thailand`
 };

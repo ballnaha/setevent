@@ -26,7 +26,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
     return {
         title: `${promo.title} - โปรโมชั่นพิเศษ SET EVENT`,
-        description: promo.description || `รับดีลพิเศษเช่าอุปกรณ์งานอีเวนต์: ${promo.title}`,
+        description: promo.description || `รับดีลพิเศษเช่าอุปกรณ์งานอีเว้นท์: ${promo.title}`,
         openGraph: {
             title: `${promo.title} | SET EVENT`,
             description: promo.description || undefined,
@@ -61,8 +61,8 @@ export default async function PromotionPage(props: Props) {
 
     return (
         <Box sx={{ bgcolor: '#1a1a1a' }}>
-            <PromotionDetailView 
-                promotion={promotion} 
+            <PromotionDetailView
+                promotion={promotion}
                 isModal={false}
             />
         </Box>

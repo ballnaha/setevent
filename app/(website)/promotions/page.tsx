@@ -5,17 +5,17 @@ import PromotionsContent from './PromotionsContent';
 
 export const metadata: Metadata = {
     title: 'โปรโมชั่นพิเศษ | SET EVENT Thailand',
-    description: 'รวมโปรโมชั่นและดีลพิเศษสุดคุ้มสำหรับบริการเช่าจอ LED เครื่องเสียง เวที และอุปกรณ์งานอีเวนต์ครบวงจรจาก SET EVENT Thailand',
+    description: 'รวมโปรโมชั่นและดีลพิเศษสุดคุ้มสำหรับบริการเช่าจอ LED เครื่องเสียง เวที และอุปกรณ์งานอีเว้นท์ครบวงจรจาก SET EVENT Thailand',
     keywords: [
         'โปรโมชั่น SET EVENT',
         'ส่วนลดเช่าจอ LED',
-        'ดีลพิเศษงานอีเวนต์',
+        'ดีลพิเศษงานอีเว้นท์',
         'โปรโมชั่นงานแต่งงาน',
-        'แพ็คเกจงานอีเวนต์'
+        'แพ็คเกจงานอีเว้นท์'
     ],
     openGraph: {
         title: 'โปรโมชั่นพิเศษ | SET EVENT Thailand',
-        description: 'รวมโปรโมชั่นและดีลพิเศษสุดคุ้มสำหรับบริการจัดงานอีเวนต์',
+        description: 'รวมโปรโมชั่นและดีลพิเศษสุดคุ้มสำหรับบริการจัดงานอีเว้นท์',
         url: 'https://seteventthailand.com/promotions',
         siteName: 'SET EVENT Thailand',
         locale: 'th_TH',

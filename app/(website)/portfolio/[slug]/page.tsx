@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: PortfolioPageProps): Promise<
   return {
     title: `${portfolio.title} | ผลงาน SET EVENT Thailand`,
     description: desc,
-    keywords: [portfolio.title, portfolio.category || '', 'ผลงานอีเวนต์', 'SET EVENT', 'จัดงาน', 'เช่าอุปกรณ์'],
+    keywords: [portfolio.title, portfolio.category || '', 'ผลงานอีเว้นท์', 'SET EVENT', 'จัดงาน', 'เช่าอุปกรณ์'],
     openGraph: {
       title: `${portfolio.title} | SET EVENT Thailand`,
       description: desc,

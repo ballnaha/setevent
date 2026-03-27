@@ -18,7 +18,7 @@ export default function AboutContent() {
         {
             icon: <MagicStar size="32" variant="Bulk" color="var(--primary)" />,
             title: "Event Organizing",
-            desc: "บริการรับจัดงานอีเวนต์ครบวงจร ตั้งแต่การวางกลยุทธ์ ออกแบบธีมงาน ไปจนถึงการรันคิวอย่างราบรื่น"
+            desc: "บริการรับจัดงานอีเว้นท์ครบวงจร ตั้งแต่การวางกลยุทธ์ ออกแบบธีมงาน ไปจนถึงการรันคิวอย่างราบรื่น"
         },
         {
             icon: <StatusUp size="32" variant="Bulk" color="var(--primary)" />,
@@ -101,7 +101,7 @@ export default function AboutContent() {
                             }}
                         >
                             SET EVENT Thailand - เราคือคู่คิดในการสร้างสรรค์ประสบการณ์ที่เหนือระดับ
-                            ด้วยบริการรับจัดงานอีเวนต์ครบวงจร ครอบคลุมตั้งแต่งานแต่งงาน งานสัมมนา และงาน Production
+                            ด้วยบริการรับจัดงานอีเว้นท์ครบวงจร ครอบคลุมตั้งแต่งานแต่งงาน งานสัมมนา และงาน Production
                             ที่มาพร้อมกับเทคโนโลยีล้ำสมัยเพื่อความสำเร็จของทุกโปรเจกต์
                         </Typography>
                     </Stack>
@@ -157,9 +157,9 @@ export default function AboutContent() {
                             <Typography sx={{ color: 'var(--primary)', fontWeight: 700, letterSpacing: 2, mb: 1 }}>OUR SERVICES & STORY</Typography>
                             <Typography variant="h3" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, mb: 3, color: 'var(--foreground)' }}>ผู้ช่วยมือโปรสำหรับ<br />ทุกโอกาสสำคัญของคุณ</Typography>
                             <Typography sx={{ color: 'var(--foreground)', opacity: 0.8, lineHeight: 1.8, fontSize: '1.1rem', fontFamily: 'var(--font-prompt)' }}>
-                                จากจุดเริ่มต้นในการเป็นผู้เชี่ยวชาญด้าน Production เราได้เติบโตสู่การเป็นผู้ให้บริการจัดงานอีเวนต์แบบเต็มรูปแบบ
+                                จากจุดเริ่มต้นในการเป็นผู้เชี่ยวชาญด้าน Production เราได้เติบโตสู่การเป็นผู้ให้บริการจัดงานอีเว้นท์แบบเต็มรูปแบบ
                                 ไม่ว่าจะเป็นงานแต่งงานที่ต้องการความละเอียดอ่อน งานสัมมนาที่ต้องการความเป็นมืออาชีพ
-                                หรืองานอีเวนต์ระดับประเทศ เราพร้อมดูแลคุณในทุกย่างก้าว
+                                หรืองานอีเว้นท์ระดับประเทศ เราพร้อมดูแลคุณในทุกย่างก้าว
                             </Typography>
                         </Box>
 
@@ -208,7 +208,7 @@ export default function AboutContent() {
                         }}>
                             <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, mb: 3, color: 'var(--foreground)' }}>วิสัยทัศน์ (Vision)</Typography>
                             <Typography sx={{ fontSize: '1.25rem', lineHeight: 1.8, color: 'var(--foreground)', opacity: 0.9, fontWeight: 500 }}>
-                                "มุ่งมั่นเป็นผู้เนรมิตประสบการณ์อีเวนต์ที่สมบูรณ์แบบ ผ่านการผสานความคิดสร้างสรรค์อันไร้ขีดจำกัด เข้ากับเทคโนโลยีโปรดักชั่นระดับสากล เพื่อส่งมอบความสำเร็จที่น่าจดจำและทรงคุณค่าให้กับลูกค้าทุกระดับ"
+                                "มุ่งมั่นเป็นผู้เนรมิตประสบการณ์อีเว้นท์ที่สมบูรณ์แบบ ผ่านการผสานความคิดสร้างสรรค์อันไร้ขีดจำกัด เข้ากับเทคโนโลยีโปรดักชั่นระดับสากล เพื่อส่งมอบความสำเร็จที่น่าจดจำและทรงคุณค่าให้กับลูกค้าทุกระดับ"
                             </Typography>
                         </Box>
                         <Box sx={{
@@ -222,10 +222,10 @@ export default function AboutContent() {
                             <Typography variant="h4" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 800, mb: 3, color: 'var(--foreground)' }}>พันธกิจ (Mission)</Typography>
                             <Stack spacing={2.5}>
                                 {[
-                                    "มอบโซลูชันการจัดอีเวนต์และโปรดักชั่นแบบครบวงจร (One-Stop Service) ที่มีคุณภาพระดับสากล",
+                                    "มอบโซลูชันการจัดอีเว้นท์และโปรดักชั่นแบบครบวงจร (One-Stop Service) ที่มีคุณภาพระดับสากล",
                                     "ขับเคลื่อนทุกผลงานด้วยความคิดสร้างสรรค์ที่แปลกใหม่และเทคโนโลยีล้ำสมัย",
                                     "ยกระดับการบริการด้วยทีมงานมืออาชีพที่เป็นคู่คิดและพร้อมเคียงข้างลูกค้าในทุกขั้นตอน",
-                                    "สร้างมาตรฐานใหม่ในอุตสาหกรรมอีเวนต์ไทย ด้วยความซื่อสัตย์ ความประณีต และความรับผิดชอบที่เป็นเลิศ"
+                                    "สร้างมาตรฐานใหม่ในอุตสาหกรรมอีเว้นท์ไทย ด้วยความซื่อสัตย์ ความประณีต และความรับผิดชอบที่เป็นเลิศ"
                                 ].map((text, i) => (
                                     <Stack key={i} direction="row" spacing={2} alignItems="flex-start">
                                         <Box sx={{

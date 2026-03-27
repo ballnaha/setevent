@@ -861,7 +861,7 @@ export default function AuspiciousCalculator() {
                             ✨ จัดเตรียมงานให้สมบูรณ์แบบตามฤกษ์มงคลของคุณ
                         </Typography>
                         <Typography variant="body1" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.8, mb: 4, maxWidth: 600, mx: 'auto' }}>
-                            จากผลการคำนวณ เราขอแนะนำแพ็กเกจอุปกรณณ์งานอีเวนต์ที่คัดสรรมาเพื่อเสริมความรุ่งเรืองและบรรยากาศในวันมงคลของคุณโดยเฉพาะ
+                            จากผลการคำนวณ เราขอแนะนำแพ็กเกจอุปกรณณ์งานอีเว้นท์ที่คัดสรรมาเพื่อเสริมความรุ่งเรืองและบรรยากาศในวันมงคลของคุณโดยเฉพาะ
                         </Typography>
 
                         <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr 1fr' }, gap: 3 }}>

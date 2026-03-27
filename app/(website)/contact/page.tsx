@@ -3,11 +3,11 @@ import ContactContent from "./ContactContent";
 
 export const metadata: Metadata = {
     title: "ติดต่อเรา | SET EVENT Thailand",
-    description: "ติดต่อทีมงาน SET EVENT Thailand สำหรับบริการเช่าจอ LED เครื่องเสียง เวที แสง สี สำหรับงานอีเวนต์ งานแต่งงาน คอนเสิร์ต และงานสัมมนา โทร: 093-726-5055",
-    keywords: ['ติดต่อ SET EVENT', 'เช่าจอ LED', 'เช่าเครื่องเสียง', 'จัดงานอีเวนต์', 'งานแต่งงาน', 'คอนเสิร์ต'],
+    description: "ติดต่อทีมงาน SET EVENT Thailand สำหรับบริการเช่าจอ LED เครื่องเสียง เวที แสง สี สำหรับงานอีเว้นท์ งานแต่งงาน คอนเสิร์ต และงานสัมมนา โทร: 093-726-5055",
+    keywords: ['ติดต่อ SET EVENT', 'เช่าจอ LED', 'เช่าเครื่องเสียง', 'จัดงานอีเว้นท์', 'งานแต่งงาน', 'คอนเสิร์ต'],
     openGraph: {
         title: 'ติดต่อเรา | SET EVENT Thailand',
-        description: 'ติดต่อ SET EVENT Thailand สำหรับบริการจัดงานอีเวนต์ครบวงจร',
+        description: 'ติดต่อ SET EVENT Thailand สำหรับบริการจัดงานอีเว้นท์ครบวงจร',
         url: 'https://seteventthailand.com/contact',
         siteName: 'SET EVENT Thailand',
         locale: 'th_TH',

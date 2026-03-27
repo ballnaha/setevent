@@ -5,8 +5,10 @@ import BannerSlider from '../components/BannerSlider';
 export const revalidate = 0; // Force dynamic rendering
 
 export const metadata: Metadata = {
-  title: 'SET EVENT Thailand | บริการเช่าจอ LED ราคาถูก งานแต่ง-สัมมนา พร้อมติดตั้งทั่วไทย',
-  description: 'SET EVENT Thailand - บริการให้เช่าจอ LED ราคาถูก สำหรับงานแต่งงาน งานสัมมนา และอีเวนต์ทุกรูปแบบ ครบวงจรด้วยระบบแสงสีเสียงมาตรฐาน พร้อมทีมงานติดตั้งมืออาชีพ จัดงานในงบประหยัดที่คุณกำหนดได้',
+  title: {
+    absolute: 'SET EVENT Thailand | บริการเช่าจอ LED และรับจัดงานอีเว้นท์ราคาถูก',
+  },
+  description: 'SET EVENT Thailand - บริการให้เช่าจอ LED ราคาถูก สำหรับงานแต่งงาน งานสัมมนา และอีเว้นท์ทุกรูปแบบ ครบวงจรด้วยระบบแสงสีเสียงมาตรฐาน พร้อมทีมงานติดตั้งมืออาชีพ จัดงานในงบประหยัดที่คุณกำหนดได้',
   keywords: [
     'เช่าจอ LED ราคาถูก',
     'เช่าจอ LED งานแต่ง',
@@ -14,6 +16,9 @@ export const metadata: Metadata = {
     'เช่าจอ LED กรุงเทพ',
     'เช่าจอ LED นนทบุรี',
     'เช่าจอ LED ปทุมธานี',
+    'เช่าจอ LED ชลบุรี',
+    'เช่าจอ LED นครปฐม',
+    'เช่าจอ LED สมุทรสาคร',
     'จัดงานราคาประหยัด',
     'เช่าเครื่องเสียงราคาถูก',
     'เช่าไฟพาร์ราคาถูก',
@@ -26,11 +31,11 @@ export const metadata: Metadata = {
     'งานแต่งงาน',
     'งานสัมมนา',
     'SET EVENT',
-    'อีเวนต์ประเทศไทย'
+    'อีเว้นท์ประเทศไทย'
   ],
   openGraph: {
     title: 'SET EVENT Thailand | จอ LED ราคาถูก เช่าเครื่องเสียง และจัดงานราคาประหยัด',
-    description: 'บริการให้เช่าจอ LED ราคาถูก, เวที, แสง เสียง และอุปกรณ์งานอีเวนต์ครบวงจร จัดงานราคาประหยัด พร้อมทีมงานมืออาชีพ',
+    description: 'บริการให้เช่าจอ LED ราคาถูก, เวที, แสง เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร จัดงานราคาประหยัด พร้อมทีมงานมืออาชีพ',
     url: 'https://seteventthailand.com',
     siteName: 'SET EVENT Thailand',
     locale: 'th_TH',
@@ -47,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'SET EVENT Thailand | เช่าจอ LED ราคาถูก เวที แสง เสียง',
-    description: 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเวนต์ครบวงจร จัดงานราคาประหยัด',
+    description: 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเว้นท์ครบวงจร จัดงานราคาประหยัด',
     images: ['https://seteventthailand.com/og-image.jpg'],
   },
   robots: {

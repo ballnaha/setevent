@@ -62,7 +62,7 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
         return {
             title: `${currentCategory.name} - SET EVENT`,
             description: desc,
-            keywords: [currentCategory.name, 'เช่าอุปกรณ์', 'อีเวนต์', 'SET EVENT', ...slugs],
+            keywords: [currentCategory.name, 'เช่าอุปกรณ์', 'อีเว้นท์', 'SET EVENT', ...slugs],
             alternates: {
                 canonical: `${baseUrl}/products/${slugPath}`,
             },

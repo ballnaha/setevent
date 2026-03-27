@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!blog) {
         return {
             title: 'บทความ | SetEvent Thailand',
-            description: 'บทความและสาระน่ารู้เกี่ยวกับการจัดงานอีเวนต์',
+            description: 'บทความและสาระน่ารู้เกี่ยวกับการจัดงานอีเว้นท์',
         };
     }
 
@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         blog.excerpt,
         SEO_FALLBACKS.blog(blog.title, blog.excerpt)
     );
-    const imageUrl = blog.coverImage 
+    const imageUrl = blog.coverImage
         ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${baseUrl}${blog.coverImage}`)
         : `${baseUrl}/images/og-image.jpg`;
 
