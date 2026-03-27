@@ -3,20 +3,20 @@ import { prisma } from '@/lib/prisma';
 
 // 📅 Fixed dates for static pages (only update when content actually changes)
 const STATIC_PAGE_DATES = {
-    home: '2026-03-25',
-    products: '2026-03-25',
-    services: '2026-03-25',
-    portfolio: '2026-03-25',
-    promotions: '2026-03-25',
-    contact: '2026-03-25',
-    faq: '2026-03-25',
-    about: '2026-03-25',
-    blog: '2026-03-25',
-    designs: '2026-03-25',
+    home: '2026-03-27',
+    products: '2026-03-27',
+    services: '2026-03-27',
+    portfolio: '2026-03-27',
+    promotions: '2026-03-27',
+    contact: '2026-03-27',
+    faq: '2026-03-27',
+    about: '2026-03-27',
+    blog: '2026-03-27',
+    designs: '2026-03-27',
     privacyPolicy: '2025-01-01',
     termsOfService: '2025-01-01',
-    weddingECard: '2026-03-25',
-    auspiciousDates: '2026-03-25',
+    weddingECard: '2026-03-27',
+    auspiciousDates: '2026-03-27',
     promotionsMonthly: '2026-03-27',
 };
 
