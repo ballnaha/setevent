@@ -103,3 +103,7 @@ main()
     .finally(async () => {
         await prisma.$disconnect();
     });
+
+/*
+node prisma/seed-faqs-final.js
+*/
