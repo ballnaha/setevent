@@ -27,7 +27,7 @@ const events = [
             "Laser และ Special Effects",
             "Immersive Experience"
         ],
-        link: "/products/rental/projection_mapping"
+        link: "/products/rental/projection-mapping"
     },
     {
         title: "งานติดตั้งและโครงสร้าง",
