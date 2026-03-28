@@ -29,7 +29,7 @@ const CTASection = dynamic(() => import("../components/CTASection"), {
     loading: () => <Box sx={{ minHeight: 300 }}><Skeleton variant="rectangular" height={300} /></Box>,
 });
 
-export default function HomeContent() {
+export default function HomeContent({ faqs = [] }: { faqs?: any[] }) {
     return (
         <Box>
             <AboutSection />
@@ -37,7 +37,7 @@ export default function HomeContent() {
             <FeaturedEvents />
             <PortfolioGallery />
             <WhyChooseUs />
-            <HomeFAQ />
+            <HomeFAQ initialFaqs={faqs} />
             <CTASection />
         </Box>
     );

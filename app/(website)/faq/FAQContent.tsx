@@ -24,28 +24,30 @@ interface FAQItem {
     category: string;
 }
 
-export default function FAQContent() {
-    const [faqs, setFaqs] = useState<FAQItem[]>([]);
-    const [loading, setLoading] = useState(true);
+export default function FAQContent({ initialFaqs = [] }: { initialFaqs?: FAQItem[] }) {
+    const [faqs, setFaqs] = useState<FAQItem[]>(initialFaqs);
+    const [loading, setLoading] = useState(initialFaqs.length === 0);
     const [expanded, setExpanded] = useState<string | false>(false);
     const [selectedCategory, setSelectedCategory] = useState<string>("ทั้งหมด");
 
     useEffect(() => {
-        const fetchFaqs = async () => {
-            try {
-                const res = await fetch('/api/faqs');
-                if (res.ok) {
-                    const data = await res.json();
-                    setFaqs(data);
+        if (initialFaqs.length === 0) {
+            const fetchFaqs = async () => {
+                try {
+                    const res = await fetch('/api/faqs');
+                    if (res.ok) {
+                        const data = await res.json();
+                        setFaqs(data);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch FAQs", error);
+                } finally {
+                    setLoading(false);
                 }
-            } catch (error) {
-                console.error("Failed to fetch FAQs", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchFaqs();
-    }, []);
+            };
+            fetchFaqs();
+        }
+    }, [initialFaqs]);
 
     const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
         setExpanded(isExpanded ? panel : false);

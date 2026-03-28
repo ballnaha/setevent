@@ -71,11 +71,33 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+import prisma from '@/lib/prisma';
+
+async function getFaqs() {
+  try {
+    return await prisma.faq.findMany({
+      where: { status: 'active' },
+      orderBy: { order: 'asc' },
+      take: 6, // Show only first 6 on homepage
+      select: {
+        id: true,
+        question: true,
+        answer: true
+      }
+    });
+  } catch (error) {
+    console.error("Error fetching FAQs for home:", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const faqs = await getFaqs();
+
   return (
     <>
       <BannerSlider />
-      <HomeContent />
+      <HomeContent faqs={faqs} />
     </>
   );
 }

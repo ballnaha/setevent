@@ -28,11 +28,33 @@ export const metadata: Metadata = {
     },
 };
 
-export default function FAQPage() {
+import prisma from '@/lib/prisma';
+
+async function getFaqs() {
+    try {
+        return await prisma.faq.findMany({
+            where: { status: 'active' },
+            orderBy: { order: 'asc' },
+            select: {
+                id: true,
+                question: true,
+                answer: true,
+                category: true
+            }
+        });
+    } catch (error) {
+        console.error("Error fetching FAQs for page:", error);
+        return [];
+    }
+}
+
+export default async function FAQPage() {
+    const faqs = await getFaqs();
+    
     return (
         <>
-            <FAQSchema />
-            <FAQContent />
+            <FAQSchema faqs={faqs} />
+            <FAQContent initialFaqs={faqs} />
         </>
     );
 }
