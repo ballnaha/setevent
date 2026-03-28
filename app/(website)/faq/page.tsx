@@ -4,8 +4,9 @@ import { FAQSchema } from '@/components/seo/JsonLdSchema';
 
 export const metadata: Metadata = {
     title: 'คำถามที่พบบ่อย (FAQ) | SET EVENT Thailand',
-    description: 'รวมคำตอบคำถามที่พบบ่อยเกี่ยวกับบริการเช่าจอ LED, เครื่องเสียง, เวที จาก SET EVENT Thailand - ราคา, การจอง, การติดตั้ง และอื่นๆ',
+    description: 'รวมคำตอบคำถามที่พบบ่อยเกี่ยวกับบริการเช่าจอ LED ใกล้ฉัน, เครื่องเสียง, เวที จาก SET EVENT Thailand - ราคา, การจอง, การติดตั้ง และอื่นๆ',
     keywords: [
+        'เช่าจอ LED ใกล้ฉัน',
         'FAQ SET EVENT',
         'คำถามที่พบบ่อย',
         'เช่าจอ LED ราคา',

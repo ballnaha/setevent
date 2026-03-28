@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Box, Container, Typography, IconButton, Stack, Divider, Collapse, useMediaQuery, useTheme, Grid } from "@mui/material";
-import { Facebook, Instagram, Youtube, Call, Sms, Location, ArrowDown2, ArrowRight2 } from "iconsax-react";
+import { Facebook, Instagram, Youtube, Call, Sms, Location, ArrowDown2, ArrowRight2, MagicStar } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useMenuData } from "@/app/hooks/useMenuData";
@@ -382,6 +382,41 @@ export default function Footer({ contactSettings }: FooterProps) {
                             </Box>
                         </Stack>
                     </FooterSection>
+                </Box>
+
+                {/* Service Area Badge / Text */}
+                <Box sx={{
+                    mb: { xs: 4, md: 6 },
+                    p: { xs: 2.5, md: 3 },
+                    borderRadius: 3,
+                    bgcolor: 'rgba(255,255,255,0.02)',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: { xs: 'flex-start', md: 'center' },
+                    gap: 2
+                }}>
+                    <Typography sx={{
+                        color: 'var(--primary)',
+                        fontFamily: 'var(--font-prompt)',
+                        fontWeight: 700,
+                        fontSize: '0.9rem',
+                        whiteSpace: 'nowrap',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1
+                    }}>
+                        <MagicStar size="18" variant="Bold" />
+                        พื้นที่ให้บริการ:
+                    </Typography>
+                    <Typography sx={{
+                        color: "rgba(255,255,255,0.5)",
+                        fontFamily: "var(--font-prompt)",
+                        fontSize: '0.85rem',
+                        lineHeight: 1.6
+                    }}>
+                        เราพร้อมให้บริการในพื้นที่<strong>กรุงเทพมหานคร, นนทบุรี, ปทุมธานี, สมุทรปราการ, ชลบุรี, พระนครศรีอยุธยา</strong> และจังหวัดใกล้เคียง รวมถึงบริการจัดส่งและติดตั้ง<strong>ทั่วประเทศไทย</strong>
+                    </Typography>
                 </Box>
 
                 {/* Copyright */}

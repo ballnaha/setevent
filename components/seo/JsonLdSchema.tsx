@@ -17,6 +17,7 @@ interface OrganizationSchemaProps {
         addressCountry?: string;
     };
     socialProfiles?: string[];
+    areaServed?: string[];
 }
 
 export function OrganizationSchema({
@@ -38,6 +39,7 @@ export function OrganizationSchema({
         'https://www.instagram.com/setevent',
         'https://line.me/ti/p/~@setevent',
     ],
+    areaServed = ['Bangkok', 'Nonthaburi', 'Pathum Thani', 'Samut Prakan', 'Chonburi', 'Ayutthaya', 'Thailand'],
 }: OrganizationSchemaProps) {
     const schema = {
         '@context': 'https://schema.org',
@@ -53,6 +55,10 @@ export function OrganizationSchema({
             ...address,
         },
         sameAs: socialProfiles,
+        areaServed: areaServed.map(area => ({
+            '@type': 'AdministrativeArea',
+            'name': area
+        })),
     };
 
     return (
@@ -71,6 +77,7 @@ interface LocalBusinessSchemaProps {
     image?: string;
     priceRange?: string;
     openingHours?: string[];
+    areaServed?: string[];
 }
 
 export function LocalBusinessSchema({
@@ -80,6 +87,7 @@ export function LocalBusinessSchema({
     image = 'https://seteventthailand.com/logo.png',
     priceRange = '฿฿฿',
     openingHours = ['Mo-Fr 09:00-18:00', 'Sa 09:00-18:00', 'Su 09:00-18:00'],
+    areaServed = ['Bangkok', 'Nonthaburi', 'Pathum Thani', 'Samut Prakan', 'Chonburi', 'Ayutthaya'],
 }: LocalBusinessSchemaProps) {
     const schema = {
         '@context': 'https://schema.org',
@@ -90,6 +98,10 @@ export function LocalBusinessSchema({
         url,
         image,
         priceRange,
+        areaServed: areaServed.map(area => ({
+            '@type': 'AdministrativeArea',
+            'name': area
+        })),
         openingHoursSpecification: openingHours.map((hours) => {
             const [days, time] = hours.split(' ');
             const [opens, closes] = time.split('-');
