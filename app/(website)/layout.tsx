@@ -2,7 +2,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import ScrollToTop from "../components/ScrollToTop";
 import SkipToContent from "../components/SkipToContent";
-import { HomepageSchema } from "@/components/seo/JsonLdSchema";
+import { OrganizationSchema } from "@/components/seo/JsonLdSchema";
 import { getContactSettings } from "@/lib/getContactSettings";
 import { getMenuData } from "@/lib/getMenuData";
 
@@ -21,7 +21,7 @@ export default async function WebsiteLayout({
         <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             {/* Skip to main content link for keyboard navigation */}
             <SkipToContent />
-            <HomepageSchema />
+            <OrganizationSchema />
             <Header contactSettings={contactSettings} initialMenuData={menuData} />
             <main id="main-content" style={{ flex: 1 }} tabIndex={-1}>
                 {children}

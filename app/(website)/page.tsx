@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import HomeContent from './HomeContent';
 import BannerSlider from '../components/BannerSlider';
+import { HomepageSchema } from '@/components/seo/JsonLdSchema';
 
 export const revalidate = 0; // Force dynamic rendering
 
@@ -100,6 +101,7 @@ export default async function Home() {
 
   return (
     <>
+      <HomepageSchema />
       <BannerSlider />
       <HomeContent faqs={faqs} />
     </>

@@ -78,6 +78,8 @@ interface LocalBusinessSchemaProps {
     priceRange?: string;
     openingHours?: string[];
     areaServed?: string[];
+    telephone?: string;
+    address?: any;
 }
 
 export function LocalBusinessSchema({
@@ -88,6 +90,15 @@ export function LocalBusinessSchema({
     priceRange = '฿฿฿',
     openingHours = ['Mo-Fr 09:00-18:00', 'Sa 09:00-18:00', 'Su 09:00-18:00'],
     areaServed = ['Bangkok', 'Nonthaburi', 'Pathum Thani', 'Samut Prakan', 'Chonburi', 'Ayutthaya'],
+    telephone = '+66-93-726-5055',
+    address = {
+        '@type': 'PostalAddress',
+        streetAddress: 'Bangkok',
+        addressLocality: 'Bangkok',
+        addressRegion: 'Bangkok',
+        postalCode: '10000',
+        addressCountry: 'TH',
+    },
 }: LocalBusinessSchemaProps) {
     const schema = {
         '@context': 'https://schema.org',
@@ -97,6 +108,8 @@ export function LocalBusinessSchema({
         description,
         url,
         image,
+        telephone,
+        address,
         priceRange,
         areaServed: areaServed.map(area => ({
             '@type': 'AdministrativeArea',
