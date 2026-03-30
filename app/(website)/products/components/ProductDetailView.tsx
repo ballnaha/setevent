@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Box, Typography, Button, Stack, Skeleton, IconButton } from "@mui/material";
-import { CloseCircle, ArrowLeft2, ArrowRight2, MagicStar, NoteText, MessageQuestion } from "iconsax-react";
+import { CloseCircle, ArrowLeft2, ArrowRight2, MagicStar, NoteText, MessageQuestion, Play } from "iconsax-react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, EffectFade } from 'swiper/modules';
@@ -54,6 +54,19 @@ export default function ProductDetailView({ product, categoryName = "Product Det
     };
 
     const imageCount = product.images?.length || 0;
+
+    const getYoutubeId = (url: string) => {
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
+
+    const getThumbnailUrl = (url: string) => {
+        const ytId = getYoutubeId(url);
+        if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        return url;
+    };
 
     return (
         <Box sx={{
@@ -125,39 +138,61 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                         onSlideChange={(swiper) => setLightboxIndex(swiper.realIndex)}
                         style={{ height: '100%' }}
                     >
-                        {product.images.map((img, idx) => (
-                            <SwiperSlide key={idx}>
-                                <Box sx={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    width: '100%',
-                                    height: '100%',
-                                    p: { xs: 1, md: 4 },
-                                }}>
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={img}
-                                        alt={product.name}
-                                        onLoad={() => handleImageLoad(idx)}
-                                        ref={(el) => {
-                                            if (el && el.complete) {
-                                                handleImageLoad(idx);
-                                            }
-                                        }}
-                                        style={{
-                                            maxWidth: '100%',
-                                            maxHeight: '100%',
-                                            objectFit: 'contain',
-                                            objectPosition: 'center',
-                                            opacity: loadedImages[idx] ? 1 : 0,
-                                            transition: 'opacity 0.4s ease-in-out'
-                                        }}
-                                    />
-                                </Box>
-                            </SwiperSlide>
-                        ))}
+                        {product.images.map((img, idx) => {
+                            const ytId = getYoutubeId(img);
+                            return (
+                                <SwiperSlide key={idx}>
+                                    <Box sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '100%',
+                                        height: '100%',
+                                        p: { xs: 1, md: 4 },
+                                    }}>
+                                        {ytId ? (
+                                            <Box sx={{ width: '100%', height: '100%', position: 'relative', p: { xs: 1, md: 4 } }}>
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    src={`https://www.youtube.com/embed/${ytId}?rel=0&modestbranding=1`}
+                                                    title={`${product.name} Video`}
+                                                    frameBorder="0"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                    style={{ 
+                                                        borderRadius: '8px',
+                                                        boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
+                                                    }}
+                                                />
+                                            </Box>
+                                        ) : (
+                                            /* eslint-disable-next-line @next/next/no-img-element */
+                                            <img
+                                                src={img}
+                                                alt={product.name}
+                                                onLoad={() => handleImageLoad(idx)}
+                                                ref={(el) => {
+                                                    if (el && el.complete) {
+                                                        handleImageLoad(idx);
+                                                    }
+                                                }}
+                                                style={{
+                                                    maxWidth: '100%',
+                                                    maxHeight: '100%',
+                                                    objectFit: 'contain',
+                                                    objectPosition: 'center',
+                                                    opacity: loadedImages[idx] ? 1 : 0,
+                                                    transition: 'opacity 0.4s ease-in-out'
+                                                }}
+                                            />
+                                        )}
+                                    </Box>
+                                </SwiperSlide>
+                            );
+                        })}
                     </Swiper>
+
 
                     {/* Lightbox Navigation Arrows */}
                     {imageCount > 1 && (
@@ -407,40 +442,56 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                                 '&::-webkit-scrollbar-track': { background: 'transparent' },
                                 '&::-webkit-scrollbar-thumb': { background: 'var(--border-color)', borderRadius: '4px' }
                             }}>
-                                {product.images.map((img, idx) => (
-                                    <Box
-                                        key={idx}
-                                        onClick={() => {
-                                            if (mainSwiper) {
-                                                if (mainSwiper.params.loop) {
-                                                    mainSwiper.slideToLoop(idx);
-                                                } else {
-                                                    mainSwiper.slideTo(idx);
+                                {product.images.map((img, idx) => {
+                                    const ytId = getYoutubeId(img);
+                                    return (
+                                        <Box
+                                            key={idx}
+                                            onClick={() => {
+                                                if (mainSwiper) {
+                                                    if (mainSwiper.params.loop) {
+                                                        mainSwiper.slideToLoop(idx);
+                                                    } else {
+                                                        mainSwiper.slideTo(idx);
+                                                    }
                                                 }
-                                            }
-                                        }}
-                                        sx={{
-                                            aspectRatio: '5/4',
-                                            width: '100%',
-                                            borderRadius: 2,
-                                            overflow: 'hidden',
-                                            cursor: 'pointer',
-                                            position: 'relative',
-                                            border: idx === lightboxIndex ? '2.5px solid var(--primary)' : '1px solid var(--border-color)',
-                                            opacity: idx === lightboxIndex ? 1 : 0.6,
-                                            transition: 'all 0.3s',
-                                            '&:hover': { opacity: 1, transform: 'scale(1.03)' }
-                                        }}
-                                    >
-                                        <Image
-                                            src={img}
-                                            alt={`Thumbnail ${idx + 1}`}
-                                            fill
-                                            sizes="(max-width: 768px) 100px, 120px"
-                                            style={{ objectFit: 'cover' }}
-                                        />
-                                    </Box>
-                                ))}
+                                            }}
+                                            sx={{
+                                                aspectRatio: '5/4',
+                                                width: '100%',
+                                                borderRadius: 2,
+                                                overflow: 'hidden',
+                                                cursor: 'pointer',
+                                                position: 'relative',
+                                                border: idx === lightboxIndex ? '2.5px solid var(--primary)' : '1px solid var(--border-color)',
+                                                opacity: idx === lightboxIndex ? 1 : 0.6,
+                                                transition: 'all 0.3s',
+                                                '&:hover': { opacity: 1, transform: 'scale(1.03)' }
+                                            }}
+                                        >
+                                            <Image
+                                                src={getThumbnailUrl(img)}
+                                                alt={`Thumbnail ${idx + 1}`}
+                                                fill
+                                                sizes="(max-width: 768px) 100px, 120px"
+                                                style={{ objectFit: 'cover' }}
+                                            />
+                                            {ytId && (
+                                                <Box sx={{ 
+                                                    position: 'absolute', 
+                                                    inset: 0, 
+                                                    display: 'flex', 
+                                                    alignItems: 'center', 
+                                                    justifyContent: 'center',
+                                                    bgcolor: 'rgba(0,0,0,0.2)'
+                                                }}>
+                                                    <Play size="20" variant="Bold" color="white" />
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    );
+                                })}
+
                             </Box>
                         </Box>
                     )}

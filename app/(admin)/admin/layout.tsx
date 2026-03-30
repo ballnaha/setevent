@@ -41,6 +41,7 @@ const sidebarGroups = [
     {
         title: 'System',
         items: [
+            { label: 'Home Highlights', href: '/admin/home-highlights', icon: Gallery, roles: ['admin'] },
             { label: 'Contact', href: '/admin/contact', icon: Message, roles: ['admin'] },
             { label: 'FAQs', href: '/admin/faqs', icon: MessageQuestion, roles: ['admin'] },
             { label: 'Users', href: '/admin/users', icon: ProfileCircle, roles: ['admin'] },

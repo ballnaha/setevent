@@ -55,8 +55,22 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
         setLoadedImages(prev => ({ ...prev, [index]: true }));
     };
 
+    const getYoutubeId = (url: string) => {
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
+
+    const getThumbnailUrl = (url: string) => {
+        const ytId = getYoutubeId(url);
+        if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        return url;
+    };
+
     const hasImages = product.images && product.images.length > 0;
     const imageCount = product.images?.length || 0;
+    const isVideo = hasImages && getYoutubeId(product.images[0]);
 
     return (
         <Paper
@@ -100,7 +114,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}>
                         <Image
-                            src={product.images[0]}
+                            src={getThumbnailUrl(product.images[0])}
                             alt={product.name}
                             fill
                             priority={isPriority}
@@ -113,6 +127,26 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                 transition: 'opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
                         />
+                        {isVideo && (
+                           <Box sx={{ 
+                               position: 'absolute', 
+                               inset: 0, 
+                               display: 'flex', 
+                               alignItems: 'center', 
+                               justifyContent: 'center',
+                               bgcolor: 'rgba(0,0,0,0.1)',
+                               zIndex: 2
+                           }}>
+                               <Box sx={{ 
+                                   width: 48, height: 48, borderRadius: '50%', 
+                                   bgcolor: 'rgba(255,255,255,0.2)', 
+                                   backdropFilter: 'blur(10px)',
+                                   display: 'flex', alignItems: 'center', justifyContent: 'center'
+                               }}>
+                                    <Monitor size="24" color="white" variant="Bold" />
+                               </Box>
+                           </Box>
+                        )}
                         {!loadedImages[0] && (
                             <Skeleton
                                 variant="rectangular"
@@ -128,6 +162,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                                 }}
                             />
                         )}
+
                         
                         {/* More images indicator */}
                         {imageCount > 1 && (

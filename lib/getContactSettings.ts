@@ -10,6 +10,7 @@ export interface ContactSettings {
     facebook: string;
     instagram: string;
     tiktok: string;
+    youtube: string;
     mapUrl: string;
 }
 
@@ -22,6 +23,7 @@ const DEFAULT_CONTACT: ContactSettings = {
     facebook: "",
     instagram: "",
     tiktok: "",
+    youtube: "",
     mapUrl: ""
 };
 

@@ -30,7 +30,7 @@ import {
     Checkbox,
     FormControlLabel
 } from '@mui/material';
-import { Add, Edit2, Trash, Category as CategoryIcon, SearchNormal1, Image as ImageIcon, CloudPlus } from 'iconsax-react';
+import { Add, Edit2, Trash, Category as CategoryIcon, SearchNormal1, Image as ImageIcon, CloudPlus, VideoPlay } from 'iconsax-react';
 import TopSnackbar from '@/components/ui/TopSnackbar';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -89,6 +89,7 @@ function ProductsContent() {
     const [saving, setSaving] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
     const [useWatermark, setUseWatermark] = useState(false);
+    const [youtubeUrl, setYoutubeUrl] = useState('');
 
     // State for image delete confirmation
     const [imageDeleteConfirm, setImageDeleteConfirm] = useState<{
@@ -197,6 +198,7 @@ function ProductsContent() {
         }
         setPendingImages([]);
         setPendingDeleteImages([]);
+        setYoutubeUrl('');
         setDialogOpen(true);
         if (!product) setUseWatermark(false); // Default to false for new products
     };
@@ -252,6 +254,35 @@ function ProductsContent() {
         } else if (imageDeleteConfirm.type === 'pending') {
             removePendingImage(imageDeleteConfirm.index);
         }
+    };
+
+    const getYoutubeId = (url: string) => {
+        if (!url) return null;
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    };
+
+    const getThumbnailUrl = (url: string) => {
+        const ytId = getYoutubeId(url);
+        if (ytId) return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+        return url;
+    };
+
+    const handleAddYoutube = () => {
+        const ytId = getYoutubeId(youtubeUrl);
+        if (!ytId) {
+            setSnackbar({ open: true, message: 'ลิงก์ YouTube ไม่ถูกต้อง', severity: 'error' });
+            return;
+        }
+
+        const fullUrl = `https://www.youtube.com/watch?v=${ytId}`;
+        setFormData(prev => ({
+            ...prev,
+            images: [...prev.images, fullUrl]
+        }));
+        setYoutubeUrl('');
+        setSnackbar({ open: true, message: 'เพิ่มวิดีโอ YouTube สำเร็จ', severity: 'success' });
     };
 
     const generateSlug = (val: string) => {
@@ -502,10 +533,16 @@ function ProductsContent() {
                                         <TableCell>
                                             <Box sx={{ width: 60, height: 60, borderRadius: 2, bgcolor: '#f5f5f5', position: 'relative', overflow: 'hidden', border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                                 {imgUrl ? (
-                                                    <Image src={imgUrl} alt={product.name} fill style={{ objectFit: 'cover' }} />
+                                                    <Image src={getThumbnailUrl(imgUrl)} alt={product.name} fill style={{ objectFit: 'cover' }} />
                                                 ) : <ImageIcon size="24" color="#d1d5db" variant="Bold" />}
+                                                {getYoutubeId(imgUrl) && (
+                                                    <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)' }}>
+                                                        <VideoPlay size="16" color="white" variant="Bold" />
+                                                    </Box>
+                                                )}
                                             </Box>
                                         </TableCell>
+
                                         <TableCell sx={{ fontFamily: 'var(--font-prompt)' }}>
                                             <Typography fontWeight={600} fontSize="0.95rem">{product.name}</Typography>
                                             <Typography variant="caption" color="text.secondary">{product.slug}</Typography>
@@ -623,11 +660,41 @@ function ProductsContent() {
                             label="รายละเอียดสินค้า"
                             fullWidth
                             multiline
-                            rows={3}
+                            rows={2}
                             value={formData.description}
                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                             InputLabelProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
                         />
+
+                        {/* YouTube Upload Area */}
+                        <Box sx={{ border: '1px solid #e0e0e0', p: 2.5, borderRadius: 2, bgcolor: '#f0f7ff' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                <VideoPlay size="20" color="#0066FF" variant="Bold" />
+                                <Typography variant="subtitle2" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600 }}>
+                                    เพิ่มวิดีโอจาก YouTube (Optional)
+                                </Typography>
+                            </Box>
+                            <Stack direction="row" spacing={2}>
+                                <TextField
+                                    fullWidth
+                                    size="small"
+                                    placeholder="วางลิงก์ YouTube ที่นี่..."
+                                    value={youtubeUrl}
+                                    onChange={(e) => setYoutubeUrl(e.target.value)}
+                                    sx={{ bgcolor: 'white' }}
+                                />
+                                <Button 
+                                    variant="contained" 
+                                    onClick={handleAddYoutube}
+                                    sx={{ minWidth: 120, fontFamily: 'var(--font-prompt)' }}
+                                >
+                                    เพิ่มวิดีโอ
+                                </Button>
+                            </Stack>
+                            <Typography variant="caption" sx={{ mt: 1, display: 'block', color: '#666' }}>
+                                วิดีโอจะไปปรากฏรวมกับรูปภาพสินค้าในหน้าแสดงผล
+                            </Typography>
+                        </Box>
 
                         {/* Image Upload Area */}
                         <Box sx={{ border: '1px solid #e0e0e0', p: 2.5, borderRadius: 2, bgcolor: '#fafafa' }}>
@@ -662,28 +729,56 @@ function ProductsContent() {
                             </Box>
 
                             <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-                                {/* Already uploaded images */}
-                                {formData.images.map((img, idx) => (
-                                    <Tooltip key={`uploaded-${idx}`} title="รูปนี้ Upload แล้ว - กด X เพื่อลบจาก Server" arrow>
-                                        <Box sx={{ position: 'relative', width: 120, height: 120, borderRadius: 2, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: '2px solid #22c55e' }}>
-                                            <Image src={img} alt="Product" fill style={{ objectFit: 'cover' }} />
-                                            <Box sx={{ position: 'absolute', bottom: 4, left: 4, bgcolor: '#22c55e', color: '#fff', px: 0.5, py: 0.25, borderRadius: 0.5, fontSize: '0.6rem', fontWeight: 600 }}>
-                                                Uploaded
+                                {formData.images.map((img, idx) => {
+                                    const ytId = getYoutubeId(img);
+                                    return (
+                                        <Tooltip key={`uploaded-${idx}`} title={ytId ? "วิดีโอ YouTube" : "รูปนี้ Upload แล้ว - กด X เพื่อลบจาก Server"} arrow>
+                                            <Box sx={{ position: 'relative', width: 120, height: 120, borderRadius: 2, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', border: ytId ? '2px solid #0066FF' : '2px solid #22c55e' }}>
+                                                <Image src={getThumbnailUrl(img)} alt="Product" fill style={{ objectFit: 'cover' }} />
+                                                <Box sx={{ 
+                                                    position: 'absolute', 
+                                                    bottom: 4, 
+                                                    left: 4, 
+                                                    bgcolor: ytId ? '#0066FF' : '#22c55e', 
+                                                    color: '#fff', 
+                                                    px: 0.5, 
+                                                    py: 0.25, 
+                                                    borderRadius: 0.5, 
+                                                    fontSize: '0.6rem', 
+                                                    fontWeight: 600 
+                                                }}>
+                                                    {ytId ? 'YouTube' : 'Uploaded'}
+                                                </Box>
+                                                {ytId && (
+                                                    <Box sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                        <VideoPlay size="24" color="white" variant="Bold" />
+                                                    </Box>
+                                                )}
+                                                <IconButton
+                                                    size="small"
+                                                    sx={{
+                                                        position: 'absolute', top: 4, right: 4,
+                                                        bgcolor: 'rgba(255,255,255,0.9)', color: '#dc2626',
+                                                        '&:hover': { bgcolor: '#fff' }
+                                                    }}
+                                                    onClick={() => {
+                                                        if (ytId) {
+                                                            // For YouTube, just remove from array
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                images: prev.images.filter((_, i) => i !== idx)
+                                                            }));
+                                                        } else {
+                                                            confirmDeleteImage('uploaded', idx, img);
+                                                        }
+                                                    }}
+                                                >
+                                                    <Trash size="16" color="#dc2626" />
+                                                </IconButton>
                                             </Box>
-                                            <IconButton
-                                                size="small"
-                                                sx={{
-                                                    position: 'absolute', top: 4, right: 4,
-                                                    bgcolor: 'rgba(255,255,255,0.9)', color: '#dc2626',
-                                                    '&:hover': { bgcolor: '#fff' }
-                                                }}
-                                                onClick={() => confirmDeleteImage('uploaded', idx, img)}
-                                            >
-                                                <Trash size="16" color="#dc2626" />
-                                            </IconButton>
-                                        </Box>
-                                    </Tooltip>
-                                ))}
+                                        </Tooltip>
+                                    );
+                                })}
 
                                 {/* Pending images (not yet uploaded) */}
                                 {pendingImages.map((pending, idx) => (

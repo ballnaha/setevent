@@ -13,6 +13,7 @@ const DEFAULT_CONTACT = {
     facebook: "",
     instagram: "",
     tiktok: "",
+    youtube: "",
     mapUrl: ""
 };
 

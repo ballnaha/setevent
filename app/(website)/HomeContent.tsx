@@ -29,14 +29,22 @@ const CTASection = dynamic(() => import("../components/CTASection"), {
     loading: () => <Box sx={{ minHeight: 300 }}><Skeleton variant="rectangular" height={300} /></Box>,
 });
 
+const HomePortfolioHighlights = dynamic(() => import("../components/HomePortfolioHighlights"), {
+    loading: () => <Box sx={{ minHeight: 500 }}><Skeleton variant="rectangular" height={500} /></Box>,
+});
+
+
 export default function HomeContent({ faqs = [] }: { faqs?: any[] }) {
     return (
         <Box>
             <AboutSection />
+            <HomePortfolioHighlights />
             <ServicesSection />
             <FeaturedEvents />
             <PortfolioGallery />
             <WhyChooseUs />
+
+
             <HomeFAQ initialFaqs={faqs} />
             <CTASection />
         </Box>

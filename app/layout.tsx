@@ -138,6 +138,8 @@ export const viewport: Viewport = {
 import GoogleAnalytics from './components/GoogleAnalytics';
 import CookieConsentWrapper from './components/CookieConsentWrapper';
 import NextTopLoader from 'nextjs-toploader';
+import PageScrollTop from './components/PageScrollTop';
+
 
 export default function RootLayout({
   children,
@@ -253,7 +255,9 @@ export default function RootLayout({
           speed={200}
           shadow="0 0 10px #0A5C5A,0 0 5px #0A5C5A"
         />
+        <PageScrollTop />
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID || ''} />
+
         <Providers>
           <NextThemeProvider attribute="class" defaultTheme="system" enableSystem>
             <AppRouterCacheProvider>

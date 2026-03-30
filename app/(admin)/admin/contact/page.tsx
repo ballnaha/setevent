@@ -9,9 +9,10 @@ import {
     TextField,
     Stack,
     CircularProgress,
-    Divider
+    Divider,
+    InputAdornment
 } from "@mui/material";
-import { Location, Call, Sms, Message, Facebook, Instagram, Save2 } from "iconsax-react";
+import { Location, Call, Sms, Message, Facebook, Instagram, Youtube, Save2 } from "iconsax-react";
 import TopSnackbar from "@/components/ui/TopSnackbar";
 
 interface ContactSettings {
@@ -23,6 +24,7 @@ interface ContactSettings {
     facebook: string;
     instagram: string;
     tiktok: string;
+    youtube: string;
     mapUrl: string;
 }
 
@@ -35,6 +37,7 @@ const DEFAULT_SETTINGS: ContactSettings = {
     facebook: "",
     instagram: "",
     tiktok: "",
+    youtube: "",
     mapUrl: ""
 };
 
@@ -223,7 +226,25 @@ export default function ContactSettingsPage() {
                             value={settings.tiktok}
                             onChange={handleChange("tiktok")}
                             placeholder="https://tiktok.com/@yourpage"
-                            InputProps={{ sx: { fontFamily: 'var(--font-prompt)' } }}
+                            InputProps={{ 
+                                sx: { fontFamily: 'var(--font-prompt)' },
+                                startAdornment: (
+                                    <InputAdornment position="start" style={{ marginRight: 8 }}>
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="rgba(0,0,0,0.4)"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" /></svg>
+                                    </InputAdornment>
+                                )
+                            }}
+                        />
+                        <TextField
+                            label="YouTube Channel URL"
+                            fullWidth
+                            value={settings.youtube}
+                            onChange={handleChange("youtube")}
+                            placeholder="https://youtube.com/@yourchannel"
+                            InputProps={{
+                                sx: { fontFamily: 'var(--font-prompt)' },
+                                startAdornment: <Youtube size="18" color="rgba(0,0,0,0.4)" style={{ marginRight: 8 }} />
+                            }}
                         />
                         <Divider />
                         <TextField
@@ -246,7 +267,7 @@ export default function ContactSettingsPage() {
                 <Typography variant="h6" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, mb: 3 }}>
                     Preview
                 </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(4, 1fr)' }, gap: 2 }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(5, 1fr)' }, gap: 2 }}>
                     <Box sx={{ p: 3, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2, textAlign: 'center' }}>
                         <Location size="28" color="var(--primary)" variant="Bulk" />
                         <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, mt: 1 }}>ที่อยู่</Typography>
@@ -273,6 +294,13 @@ export default function ContactSettingsPage() {
                         <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, mt: 1 }}>LINE</Typography>
                         <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.875rem', opacity: 0.7, mt: 0.5 }}>
                             {settings.line || "-"}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ p: 3, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: 2, textAlign: 'center' }}>
+                        <Youtube size="28" color="var(--primary)" variant="Bulk" />
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 600, mt: 1 }}>YouTube</Typography>
+                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.875rem', opacity: 0.7, mt: 0.5 }}>
+                            {settings.youtube ? "ตั้งค่าแล้ว" : "-"}
                         </Typography>
                     </Box>
                 </Box>
