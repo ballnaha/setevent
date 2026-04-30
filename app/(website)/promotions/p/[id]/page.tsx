@@ -17,6 +17,7 @@ const formatDate = (date: Date): string => {
 export async function generateMetadata(props: Props): Promise<Metadata> {
     const params = await props.params;
     const id = params.id;
+    const baseUrl = 'https://seteventthailand.com';
 
     const decodedTitle = decodeURIComponent(id);
     const promo = await prisma.promotion.findFirst({
@@ -35,10 +36,14 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
     return {
         title: `${promo.title} - โปรโมชั่นพิเศษ SET EVENT`,
         description: desc,
+        alternates: {
+            canonical: `${baseUrl}/promotions/p/${encodeURIComponent(promo.title)}`,
+        },
         openGraph: {
             title: `${promo.title} | SET EVENT`,
             description: desc,
-            images: promo.image ? [{ url: promo.image }] : [],
+            url: `${baseUrl}/promotions/p/${encodeURIComponent(promo.title)}`,
+            images: promo.image ? [{ url: promo.image.startsWith('http') ? promo.image : `${baseUrl}${promo.image}` }] : [],
         }
     };
 }

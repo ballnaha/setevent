@@ -23,7 +23,7 @@ interface OrganizationSchemaProps {
 export function OrganizationSchema({
     name = 'SET Event Thailand',
     url = 'https://seteventthailand.com',
-    logo = 'https://seteventthailand.com/logo.png',
+    logo = 'https://seteventthailand.com/images/logo.png',
     description = 'SET Event Thailand - บริการให้เช่าจอ LED, เวที, แสงสี เสียง และอุปกรณ์งานอีเว้นท์ครบวงจร สำหรับงานคอนเสิร์ต งานแต่งงาน งานสัมมนา และงานอีเว้นท์ทุกประเภท',
     phone = '+66-93-726-5055',
     email = 'setevent26@gmail.com',
@@ -44,6 +44,7 @@ export function OrganizationSchema({
     const schema = {
         '@context': 'https://schema.org',
         '@type': 'Organization',
+        '@id': 'https://seteventthailand.com/#organization',
         name,
         url,
         logo,
@@ -79,14 +80,21 @@ interface LocalBusinessSchemaProps {
     openingHours?: string[];
     areaServed?: string[];
     telephone?: string;
-    address?: any;
+    address?: {
+        '@type': 'PostalAddress';
+        streetAddress?: string;
+        addressLocality?: string;
+        addressRegion?: string;
+        postalCode?: string;
+        addressCountry?: string;
+    };
 }
 
 export function LocalBusinessSchema({
     name = 'SET Event Thailand',
     description = 'บริการให้เช่าจอ LED และอุปกรณ์งานอีเว้นท์ครบวงจร ด้วยทีมงานมืออาชีพ',
     url = 'https://seteventthailand.com',
-    image = 'https://seteventthailand.com/logo.png',
+    image = 'https://seteventthailand.com/images/logo.png',
     priceRange = '฿฿฿',
     openingHours = ['Mo-Fr 09:00-18:00', 'Sa 09:00-18:00', 'Su 09:00-18:00'],
     areaServed = ['Bangkok', 'Nonthaburi', 'Pathum Thani', 'Samut Prakan', 'Chonburi', 'Ayutthaya'],
@@ -103,7 +111,7 @@ export function LocalBusinessSchema({
     const schema = {
         '@context': 'https://schema.org',
         '@type': 'LocalBusiness',
-        '@id': url,
+        '@id': `${url}/#localbusiness`,
         name,
         description,
         url,

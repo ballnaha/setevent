@@ -1,9 +1,27 @@
 import { Metadata } from 'next';
 import ProductsContent from './ProductsContent';
 import prisma from '@/lib/prisma';
+import { RECOMMENDED_SEO_KEYWORDS } from '@/lib/seo';
 
 // Revalidate every 60 seconds for fresh data with caching
 export const revalidate = 0;
+
+type CategoryWithCount = {
+    id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    image: string | null;
+    parentId: string | null;
+    order: number;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
+    _count: {
+        products: number;
+        children: number;
+    };
+};
 
 export const metadata: Metadata = {
     title: 'สินค้าและบริการ | SET EVENT Thailand',
@@ -25,7 +43,8 @@ export const metadata: Metadata = {
         'เช่าจอ led ราคา',
         'เช่าจอ led เริ่มต้น',
         'เช่าจอ led งานแต่ง',
-        'ขายจอ led'
+        'ขายจอ led',
+        ...RECOMMENDED_SEO_KEYWORDS
     ],
     openGraph: {
         title: 'สินค้าและบริการ | SET EVENT Thailand',
@@ -52,10 +71,10 @@ export default async function ProductsPage() {
     });
 
     // Filter to get only root categories and build tree
-    const rootCats = data.filter((cat: any) => !cat.parentId);
-    const initialData = rootCats.map((root: any) => ({
+    const rootCats = data.filter((cat: CategoryWithCount) => !cat.parentId);
+    const initialData = rootCats.map((root: CategoryWithCount) => ({
         ...root,
-        children: data.filter((cat: any) => cat.parentId === root.id).map((child: any) => ({
+        children: data.filter((cat: CategoryWithCount) => cat.parentId === root.id).map((child: CategoryWithCount) => ({
             ...child,
             _count: {
                 products: child._count.products,
@@ -67,7 +86,7 @@ export default async function ProductsPage() {
     const structuredData = {
         '@context': 'https://schema.org',
         '@type': 'ItemList',
-        itemListElement: rootCats.map((cat: any, index: number) => ({
+        itemListElement: rootCats.map((cat: CategoryWithCount, index: number) => ({
             '@type': 'ListItem',
             position: index + 1,
             item: {

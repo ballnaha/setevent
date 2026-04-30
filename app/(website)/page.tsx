@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import HomeContent from './HomeContent';
 import BannerSlider from '../components/BannerSlider';
 import { HomepageSchema } from '@/components/seo/JsonLdSchema';
+import { RECOMMENDED_SEO_KEYWORDS } from '@/lib/seo';
 
 export const revalidate = 0; // Force dynamic rendering
 
@@ -36,7 +37,8 @@ export const metadata: Metadata = {
     'อีเว้นท์ประเทศไทย',
     'เช่าจอ led ราคา',
     'เช่าจอ led เริ่มต้น',
-    'ขายจอ led'
+    'ขายจอ led',
+    ...RECOMMENDED_SEO_KEYWORDS
   ],
   openGraph: {
     title: 'SET EVENT Thailand | จอ LED ราคาถูก เช่าเครื่องเสียง และจัดงานราคาประหยัด',

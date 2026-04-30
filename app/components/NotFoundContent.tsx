@@ -134,7 +134,7 @@ export default function NotFoundContent() {
                             component={Link}
                             href="/contact"
                             variant="outlined"
-                            startIcon={<Information size="20" />}
+                            startIcon={<Information size="20" color="var(--foreground)" />}
                             sx={{
                                 borderColor: 'var(--border-color)',
                                 color: 'var(--foreground)',

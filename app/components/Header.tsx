@@ -154,9 +154,11 @@ export default function Header({ contactSettings, initialMenuData, forceDarkText
 
     const pathname = usePathname();
     const decodedPathname = decodeURIComponent(pathname);
+    const isLedScreenRentalPage = pathname === "/led-screen-rental-bangkok";
 
     const isHome = forceTransparent ||
         pathname === "/" ||
+        isLedScreenRentalPage ||
         pathname === "/about" ||
         pathname === "/contact" ||
         pathname.startsWith("/promotions") ||

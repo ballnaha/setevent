@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma';
 const STATIC_PAGE_DATES = {
     home: '2026-03-27',
     products: '2026-03-27',
-    services: '2026-03-27',
     portfolio: '2026-03-27',
     promotions: '2026-03-27',
     contact: '2026-03-27',
@@ -18,6 +17,7 @@ const STATIC_PAGE_DATES = {
     weddingECard: '2026-03-27',
     auspiciousDates: '2026-03-27',
     promotionsMonthly: '2026-03-27',
+    ledScreenRentalBangkok: '2026-04-30',
 };
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -38,12 +38,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: new Date(STATIC_PAGE_DATES.products),
             changeFrequency: 'weekly',
             priority: 0.9,
-        },
-        {
-            url: `${baseUrl}/services`,
-            lastModified: new Date(STATIC_PAGE_DATES.services),
-            changeFrequency: 'monthly',
-            priority: 0.8,
         },
         {
             url: `${baseUrl}/portfolio`,
@@ -116,6 +110,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             lastModified: new Date(STATIC_PAGE_DATES.promotionsMonthly),
             changeFrequency: 'daily',
             priority: 0.9,
+        },
+        {
+            url: `${baseUrl}/led-screen-rental-bangkok`,
+            lastModified: new Date(STATIC_PAGE_DATES.ledScreenRentalBangkok),
+            changeFrequency: 'weekly',
+            priority: 0.95,
         },
     ];
 

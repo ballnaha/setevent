@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from 'next/navigation';
-import ProductDetailView from '../../../../components/ProductDetailView';
-import ModalWrapper from '../../../../components/ModalWrapper';
+import ProductDetailView from '../../../components/ProductDetailView';
+import ModalWrapper from '../../../components/ModalWrapper';
 
 type Props = {
     params: Promise<{ slug: string }>
@@ -30,16 +30,16 @@ export default async function InterceptedProductPage(props: Props) {
         slug: productData.slug,
         description: productData.description,
         price: productData.price ? Number(productData.price) : null,
-        priceUnit: (productData as any).priceUnit || null,
+        priceUnit: productData.priceUnit || null,
         images: productData.images ? JSON.parse(productData.images) : [],
         features: productData.features ? JSON.parse(productData.features) : []
     };
 
     return (
         <ModalWrapper>
-            <ProductDetailView 
-                product={product} 
-                categoryName={productData.category?.name || "Product"} 
+            <ProductDetailView
+                product={product}
+                categoryName={productData.category?.name || "Product"}
                 isModal={true}
             />
         </ModalWrapper>

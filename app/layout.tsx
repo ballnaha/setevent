@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import { Providers } from "./providers";
 import { ThemeProvider as NextThemeProvider } from "./theme-provider";
+import { RECOMMENDED_SEO_KEYWORDS } from "@/lib/seo";
 
 
 const prompt = Prompt({
@@ -45,7 +46,8 @@ export const metadata: Metadata = {
     "รับจัดอีเว้นท์ครบวงจร",
     "งานสัมมนา",
     "งานเปิดตัวสินค้า",
-    "งานปาร์ตี้"
+    "งานปาร์ตี้",
+    ...RECOMMENDED_SEO_KEYWORDS
   ],
   authors: [{ name: "SetEvent Team" }],
   creator: "SetEvent Team",

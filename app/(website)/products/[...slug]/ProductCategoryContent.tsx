@@ -8,6 +8,14 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 
+function normalizeSlugParam(slug: string | string[] | undefined): string {
+    if (Array.isArray(slug)) {
+        return slug.join('/');
+    }
+
+    return slug || '';
+}
+
 interface Product {
     id: string;
     name: string;
@@ -370,8 +378,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
 
 export default function ProductCategoryContent({ initialData = null }: { initialData?: PageData | null }) {
     const params = useParams();
-    const slugArray = params.slug as string[] | undefined;
-    const slugPath = slugArray?.join('/') || '';
+    const slugPath = normalizeSlugParam(params.slug as string | string[] | undefined);
 
     const [data, setData] = useState<PageData | null>(initialData);
     const [loading, setLoading] = useState(initialData === null);

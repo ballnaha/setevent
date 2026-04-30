@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { Box, Typography, Container, Paper } from "@mui/material";
+import Link from "next/link";
+import { Box, Typography, Container, Button } from "@mui/material";
 import { Monitor, MagicStar, Music } from "iconsax-react";
 
 const services = [
@@ -11,7 +12,9 @@ const services = [
         desc: "บริการ<strong>เช่าจอ LED งานแต่ง ราคาถูก</strong> กทม. นำเข้าเกรดพรีเมียม พร้อมทั้ง TV, Pointer และอุปกรณ์จัดงานคุณภาพสูง ดูแลโดยทีมงานติดตั้งมืออาชีพ ในราคาที่คุณพึงพอใจ",
         icon: <Monitor size="50" color="currentColor" variant="Outline" />,
         color: "#E94560", // Secondary
-        buttonText: "เช่าอุปกรณ์"
+        buttonText: "เช่าอุปกรณ์",
+        linkText: "เช่าจอ LED กรุงเทพ",
+        linkHref: "/led-screen-rental-bangkok"
     },
     {
         title: "บริการรับจัดงานอีเว้นท์",
@@ -153,6 +156,31 @@ export default function ServicesSection() {
                                 }}
                             />
 
+                            {service.linkHref && (
+                                <Button
+                                    component={Link}
+                                    href={service.linkHref}
+                                    variant="outlined"
+                                    aria-label={service.linkText}
+                                    sx={{
+                                        mt: 'auto',
+                                        borderColor: service.color,
+                                        color: service.color,
+                                        borderRadius: '6px',
+                                        px: 2.5,
+                                        py: 1,
+                                        fontFamily: "var(--font-prompt)",
+                                        fontWeight: 700,
+                                        textTransform: 'none',
+                                        '&:hover': {
+                                            borderColor: service.color,
+                                            bgcolor: `${service.color}14`,
+                                        }
+                                    }}
+                                >
+                                    {service.linkText}
+                                </Button>
+                            )}
 
                         </Box>
                     ))}
