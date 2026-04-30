@@ -47,8 +47,12 @@ export default function Breadcrumbs({ items, center = false }: BreadcrumbsProps)
                     aria-label="breadcrumb"
                     sx={{
                         '& .MuiBreadcrumbs-ol': {
+                            flexWrap: 'wrap',
                             alignItems: 'center',
                             justifyContent: center ? 'center' : 'flex-start',
+                        },
+                        '& .MuiBreadcrumbs-li': {
+                            minWidth: 0,
                         },
                     }}
                 >
@@ -59,6 +63,7 @@ export default function Breadcrumbs({ items, center = false }: BreadcrumbsProps)
                         sx={{
                             display: 'flex',
                             alignItems: 'center',
+                            minWidth: 0,
                             color: 'var(--foreground)',
                             opacity: 0.6,
                             transition: 'all 0.2s',
@@ -73,7 +78,9 @@ export default function Breadcrumbs({ items, center = false }: BreadcrumbsProps)
                         <Typography sx={{ 
                             fontFamily: 'var(--font-prompt)', 
                             fontSize: '0.85rem',
-                            fontWeight: 500
+                            fontWeight: 500,
+                            whiteSpace: 'normal',
+                            wordBreak: 'break-word'
                         }}>
                             Home
                         </Typography>
@@ -91,7 +98,9 @@ export default function Breadcrumbs({ items, center = false }: BreadcrumbsProps)
                                     fontSize: '0.85rem',
                                     fontWeight: 700,
                                     letterSpacing: '0.3px',
-                                    textShadow: '0 0 10px rgba(16, 185, 129, 0.2)'
+                                    textShadow: '0 0 10px rgba(16, 185, 129, 0.2)',
+                                    whiteSpace: 'normal',
+                                    wordBreak: 'break-word'
                                 }}
                             >
                                 {item.label}
@@ -103,6 +112,8 @@ export default function Breadcrumbs({ items, center = false }: BreadcrumbsProps)
                                 underline="hover"
                                 href={item.href || '#'}
                                 sx={{
+                                    display: 'inline-flex',
+                                    minWidth: 0,
                                     color: 'var(--foreground)',
                                     opacity: 0.6,
                                     transition: 'all 0.2s',
@@ -116,7 +127,9 @@ export default function Breadcrumbs({ items, center = false }: BreadcrumbsProps)
                                 <Typography sx={{ 
                                     fontFamily: 'var(--font-prompt)', 
                                     fontSize: '0.85rem',
-                                    fontWeight: 500
+                                    fontWeight: 500,
+                                    whiteSpace: 'normal',
+                                    wordBreak: 'break-word'
                                 }}>
                                     {item.label}
                                 </Typography>

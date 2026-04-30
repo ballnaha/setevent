@@ -1,19 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Box, Container, Typography, Stack, Button, Skeleton, Chip, Grid } from "@mui/material";
+import React from "react";
+import { Box, Container, Typography, Stack, Button, Chip } from "@mui/material";
 import { ArrowRight, MagicStar, StatusUp, People, Award } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 
 export default function AboutContent() {
-    const [mounted, setMounted] = useState(false);
-
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-
     const values = [
         {
             icon: <MagicStar size="32" variant="Bulk" color="var(--primary)" />,
@@ -73,7 +67,6 @@ export default function AboutContent() {
                         />
                         <Typography
                             component="h1"
-                            suppressHydrationWarning
                             sx={{
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 800,
@@ -299,25 +292,26 @@ export default function AboutContent() {
                     <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', fontWeight: 700, mb: 3, color: 'var(--foreground)' }}>
                         ให้ SET EVENT Thailand ร่วมเป็นส่วนหนึ่งในความสำเร็จของคุณ
                     </Typography>
-                    <Button
-                        component={Link}
-                        href="/contact"
-                        variant="contained"
-                        endIcon={<ArrowRight />}
-                        sx={{
-                            bgcolor: 'var(--primary)',
-                            color: 'white',
-                            px: 5,
-                            py: 2,
-                            borderRadius: '50px',
-                            fontSize: '1rem',
-                            fontWeight: 700,
-                            boxShadow: 'var(--primary-glow)',
-                            '&:hover': { bgcolor: 'var(--primary)', opacity: 0.9, boxShadow: 'var(--primary-glow)' }
-                        }}
-                    >
-                        เริ่มต้นโครงการของคุณ
-                    </Button>
+                    <Link href="/contact" style={{ textDecoration: 'none' }}>
+                        <Button
+                            component="a"
+                            variant="contained"
+                            endIcon={<ArrowRight />}
+                            sx={{
+                                bgcolor: 'var(--primary)',
+                                color: 'white',
+                                px: 5,
+                                py: 2,
+                                borderRadius: '50px',
+                                fontSize: '1rem',
+                                fontWeight: 700,
+                                boxShadow: 'var(--primary-glow)',
+                                '&:hover': { bgcolor: 'var(--primary)', opacity: 0.9, boxShadow: 'var(--primary-glow)' }
+                            }}
+                        >
+                            เริ่มต้นโครงการของคุณ
+                        </Button>
+                    </Link>
                 </Box>
             </Container>
         </Box>

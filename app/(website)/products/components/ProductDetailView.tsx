@@ -113,7 +113,7 @@ export default function ProductDetailView({ product, categoryName = "Product Det
             }}>
                 <Box sx={{
                     flex: { xs: '0 0 auto', lg: 1 },
-                    height: { xs: '60vh', lg: 'auto' },
+                    height: { xs: '72vh', sm: '74vh', md: '68vh', lg: 'auto' },
                     position: { xs: 'relative', lg: 'absolute' },
                     top: { lg: 0 },
                     left: { lg: 0 },
@@ -247,21 +247,30 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                 <Box sx={{
                     width: { xs: '100%', lg: 550 },
                     marginLeft: { lg: 'auto' },
+                    mt: { xs: -5, md: -6, lg: 0 },
                     display: 'flex',
                     flexDirection: 'column',
-                    bgcolor: 'var(--card-bg)',
+                    bgcolor: 'var(--background)',
                     flexShrink: 0,
                     overflowY: 'auto',
-                    p: { xs: 4, md: 6 },
-                    position: 'relative'
+                    p: { xs: 2.5, md: 4, lg: 6 },
+                    pt: { xs: 3, md: 4, lg: 6 },
+                    position: 'relative',
+                    zIndex: 2,
+                    borderTopLeftRadius: { xs: 24, lg: 0 },
+                    borderTopRightRadius: { xs: 24, lg: 0 },
+                    boxShadow: { xs: '0 -14px 30px rgba(0,0,0,0.12)', lg: 'none' },
+                    borderTop: { xs: '1px solid rgba(255,255,255,0.65)', lg: 'none' },
+                    backdropFilter: { xs: 'blur(8px)', lg: 'none' }
                 }}>
                     {/* Category/Breadcrumb */}
-                    {/* Breadcrumbs */}
-                    <Breadcrumbs items={[
-                        { label: 'Products', href: '/products' },
-                        { label: categoryName, href: '/products' }, // Approximation
-                        { label: product.name }
-                    ]} />
+                    <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
+                        <Breadcrumbs items={[
+                            { label: 'Products', href: '/products' },
+                            { label: categoryName, href: '/products' }, // Approximation
+                            { label: product.name }
+                        ]} />
+                    </Box>
 
                     {/* Title */}
                     <Typography
@@ -269,10 +278,10 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                         sx={{
                             fontFamily: 'var(--font-prompt)',
                             fontWeight: 800,
-                            fontSize: { xs: '1.8rem', md: '2.4rem' },
+                            fontSize: { xs: '1.35rem', md: '1.8rem', lg: '2.4rem' },
                             color: 'var(--foreground)',
-                            lineHeight: 1.1,
-                            mb: 4,
+                            lineHeight: 1.15,
+                            mb: { xs: 2.5, md: 3.5, lg: 4 },
                             letterSpacing: '-0.5px'
                         }}>
                         {product.name}
@@ -281,8 +290,8 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     {/* Price Section */}
                     {product.price && (
                         <Box sx={{
-                            mb: 5,
-                            p: 3,
+                            mb: { xs: 3, md: 4, lg: 5 },
+                            p: { xs: 2, md: 2.5, lg: 3 },
                             bgcolor: 'rgba(10, 92, 90, 0.05)',
                             borderRadius: 4,
                             border: '1px solid rgba(10, 92, 90, 0.1)',
@@ -293,11 +302,15 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                             <Typography sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', opacity: 0.6, fontSize: '0.85rem', fontWeight: 500, mb: 1 }}>
                                 ราคาเช่าประมาณการ
                             </Typography>
-                            <Stack direction="row" alignItems="baseline" spacing={1.5}>
+                            <Stack
+                                direction={{ xs: 'column', sm: 'row' }}
+                                alignItems={{ xs: 'flex-start', sm: 'baseline' }}
+                                spacing={{ xs: 0.5, sm: 1.5 }}
+                            >
                                 <Typography sx={{
                                     fontFamily: 'var(--font-prompt)',
                                     fontWeight: 800,
-                                    fontSize: { xs: '2rem', md: '2.4rem' },
+                                    fontSize: { xs: '1.65rem', md: '2rem', lg: '2.4rem' },
                                     color: 'var(--primary)',
                                     lineHeight: 1
                                 }}>
@@ -314,17 +327,17 @@ export default function ProductDetailView({ product, categoryName = "Product Det
 
                     {/* Features Section */}
                     {product.features && product.features.length > 0 && (
-                        <Box sx={{ mb: 5 }}>
+                        <Box sx={{ mb: { xs: 3.5, md: 4.5, lg: 5 } }}>
                             <Typography
                                 component="h2"
                                 sx={{
                                     fontFamily: 'var(--font-prompt)',
                                     fontWeight: 700,
-                                    fontSize: '1.1rem',
-                                    mb: 2.5,
+                                    fontSize: { xs: '1rem', md: '1.05rem', lg: '1.1rem' },
+                                    mb: { xs: 1.5, md: 2, lg: 2.5 },
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 2,
+                                    gap: 1.5,
                                     color: 'var(--foreground)'
                                 }}>
                                 <MagicStar size="24" color="var(--primary)" variant="Bold" />
@@ -336,13 +349,13 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                                         display: 'flex',
                                         alignItems: 'center',
                                         gap: 2,
-                                        p: 1.5,
+                                        p: { xs: 1, md: 1.25, lg: 1.5 },
                                         borderRadius: 2,
                                         transition: 'all 0.2s',
                                         '&:hover': { bgcolor: 'rgba(0,0,0,0.02)' }
                                     }}>
                                         <Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: 'var(--primary)', flexShrink: 0 }} />
-                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.95rem', color: 'var(--foreground)', opacity: 0.85, fontWeight: 500 }}>
+                                        <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: { xs: '0.9rem', md: '0.92rem', lg: '0.95rem' }, color: 'var(--foreground)', opacity: 0.85, fontWeight: 500 }}>
                                             {feature}
                                         </Typography>
                                     </Box>
@@ -353,17 +366,17 @@ export default function ProductDetailView({ product, categoryName = "Product Det
 
                     {/* Description Section */}
                     {product.description && (
-                        <Box sx={{ mb: 6 }}>
+                        <Box sx={{ mb: { xs: 3.5, md: 4, lg: 6 } }}>
                             <Typography
                                 component="h2"
                                 sx={{
                                     fontFamily: 'var(--font-prompt)',
                                     fontWeight: 700,
-                                    fontSize: '1.1rem',
-                                    mb: 2.5,
+                                    fontSize: { xs: '1rem', md: '1.05rem', lg: '1.1rem' },
+                                    mb: { xs: 1.5, md: 2, lg: 2.5 },
                                     display: 'flex',
                                     alignItems: 'center',
-                                    gap: 2,
+                                    gap: 1.5,
                                     color: 'var(--foreground)'
                                 }}>
                                 <NoteText size="24" color="var(--primary)" variant="Bold" />
@@ -371,10 +384,10 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                             </Typography>
                             <Typography sx={{
                                 fontFamily: 'var(--font-prompt)',
-                                fontSize: '1rem',
+                                fontSize: { xs: '0.94rem', md: '0.96rem', lg: '1rem' },
                                 color: 'var(--foreground)',
                                 opacity: 0.75,
-                                lineHeight: 1.9,
+                                lineHeight: 1.75,
                                 whiteSpace: 'pre-line',
                                 pl: 0.5
                             }}>
@@ -384,7 +397,18 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                     )}
 
                     {/* CTA Button */}
-                    <Box sx={{ mt: 'auto', pt: 4 }}>
+                    <Box sx={{
+                        mt: 'auto',
+                        pt: { xs: 2, md: 3, lg: 4 },
+                        position: { xs: 'sticky', lg: 'static' },
+                        bottom: { xs: 0, lg: 'auto' },
+                        bgcolor: { xs: 'var(--background)', lg: 'transparent' },
+                        borderTop: { xs: '1px solid var(--border-color)', lg: 'none' },
+                        mx: { xs: -2.5, md: -4, lg: 0 },
+                        px: { xs: 2.5, md: 4, lg: 0 },
+                        pb: { xs: 2, md: 2.5, lg: 0 },
+                        zIndex: 3
+                    }}>
                         <Button
                             href="https://line.me/ti/p/~@setevent"
                             target="_blank"
@@ -394,11 +418,11 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                             sx={{
                                 bgcolor: '#1a1a1a',
                                 color: 'white',
-                                py: 2.5,
+                                py: { xs: 1.6, md: 2, lg: 2.5 },
                                 borderRadius: 4,
                                 fontFamily: 'var(--font-prompt)',
                                 fontWeight: 700,
-                                fontSize: '1.1rem',
+                                fontSize: { xs: '0.98rem', md: '1.03rem', lg: '1.1rem' },
                                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                 boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                                 '&:hover': {
@@ -426,7 +450,7 @@ export default function ProductDetailView({ product, categoryName = "Product Det
 
                     {/* Image Selector Strip */}
                     {imageCount > 1 && (
-                        <Box sx={{ mt: 6, pt: 4, borderTop: '1px solid var(--border-color)', flexShrink: 0 }}>
+                        <Box sx={{ mt: { xs: 3.5, md: 4.5, lg: 6 }, pt: { xs: 2.5, md: 3, lg: 4 }, borderTop: '1px solid var(--border-color)', flexShrink: 0 }}>
                             <Typography sx={{ fontFamily: 'var(--font-prompt)', fontSize: '0.85rem', color: 'var(--foreground)', opacity: 0.4, mb: 2, fontWeight: 600, textTransform: 'uppercase' }}>
                                 ดูภาพเพิ่มเติม ({imageCount})
                             </Typography>
