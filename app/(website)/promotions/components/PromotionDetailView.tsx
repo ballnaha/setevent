@@ -42,6 +42,8 @@ const formatPrice = (price: string | undefined): string => {
 
 export default function PromotionDetailView({ promotion, onClose, isModal = false }: PromotionDetailViewProps) {
     const router = useRouter();
+    const shouldBypassOptimization =
+        promotion.image.startsWith('/uploads/') && /\.(webp|avif|gif)$/i.test(promotion.image);
 
     const handleClose = () => {
         if (onClose) {
@@ -107,6 +109,7 @@ export default function PromotionDetailView({ promotion, onClose, isModal = fals
                             alt={promotion.title}
                             fill
                             priority
+                            unoptimized={shouldBypassOptimization}
                             style={{
                                 objectFit: 'contain',
                                 objectPosition: 'center',

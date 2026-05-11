@@ -45,6 +45,8 @@ const formatPrice = (price: string | undefined): string => {
 function PromotionCard({ promotion, priority = false }: { promotion: Promotion; priority?: boolean }) {
     const [isHovered, setIsHovered] = useState(false);
     const extraFeaturesCount = Math.max(0, promotion.features.length - 2);
+    const shouldBypassOptimization =
+        promotion.image.startsWith('/uploads/') && /\.(webp|avif|gif)$/i.test(promotion.image);
 
     return (
         <Box
@@ -85,6 +87,7 @@ function PromotionCard({ promotion, priority = false }: { promotion: Promotion; 
                     height={800}
                     priority={priority}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    unoptimized={shouldBypassOptimization}
                     className="promo-image"
                     style={{
                         width: '100%',
@@ -299,7 +302,7 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                     <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, columnGap: 2, '& > div': { breakInside: 'avoid', mb: 2 } }}>
                         {filteredPromotions.map((promo, index) => (
                             <Box key={promo.id}>
-                                <PromotionCard promotion={promo} priority={index < 3} />
+                                <PromotionCard promotion={promo} priority={index === 0} />
                             </Box>
                         ))}
                     </Box>
