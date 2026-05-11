@@ -1,12 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Container, Typography, Chip, Skeleton, Stack, Button } from "@mui/material";
 import { Gallery } from "iconsax-react";
 import Image from "next/image";
 import Link from "next/link";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
-import ModalWrapper from "../products/components/ModalWrapper";
 
 // Portfolio interface
 interface PortfolioItem {
@@ -25,167 +24,6 @@ interface PortfolioImageItem {
     order: number;
 }
 
-function PortfolioQuickView({
-    item,
-    albumImages,
-    albumLoading,
-    shouldBypassOptimization,
-}: {
-    item: PortfolioItem;
-    albumImages: PortfolioImageItem[];
-    albumLoading: boolean;
-    shouldBypassOptimization: (src: string) => boolean;
-}) {
-    return (
-        <Box sx={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: { xs: 'column', lg: 'row' },
-            bgcolor: 'var(--background)',
-            overflow: 'hidden',
-        }}>
-            <Box sx={{
-                flex: { xs: '0 0 auto', lg: 1 },
-                height: { xs: '60vh', lg: '100%' },
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                bgcolor: 'rgba(0,0,0,0.02)',
-                borderRight: { lg: '1px solid var(--border-color)' },
-                p: { xs: 2, md: 4 },
-            }}>
-                <Box sx={{
-                    position: 'relative',
-                    width: '100%',
-                    height: '100%',
-                }}>
-                    {albumImages[0] && (
-                        <Image
-                            src={albumImages[0].url}
-                            alt={item.title}
-                            fill
-                            priority
-                            sizes="(max-width: 1024px) 100vw, 70vw"
-                            unoptimized={shouldBypassOptimization(albumImages[0].url)}
-                            style={{ objectFit: 'contain', objectPosition: 'center' }}
-                        />
-                    )}
-                    {albumLoading && (
-                        <Skeleton
-                            variant="rounded"
-                            width="100%"
-                            height="100%"
-                            sx={{
-                                position: 'absolute',
-                                inset: 0,
-                                bgcolor: 'var(--border-color)',
-                                opacity: 0.3,
-                            }}
-                        />
-                    )}
-                </Box>
-            </Box>
-
-            <Box sx={{
-                width: { xs: '100%', lg: 520 },
-                display: 'flex',
-                flexDirection: 'column',
-                bgcolor: 'var(--card-bg)',
-                overflowY: 'auto',
-                p: { xs: 4, md: 5 },
-            }}>
-                <Chip
-                    label={item.category}
-                    sx={{
-                        alignSelf: 'flex-start',
-                        mb: 2,
-                        bgcolor: 'rgba(10, 92, 90, 0.1)',
-                        color: 'var(--primary)',
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 600,
-                    }}
-                />
-                <Typography
-                    component="h2"
-                    sx={{
-                        fontFamily: 'var(--font-prompt)',
-                        fontWeight: 800,
-                        fontSize: { xs: '1.8rem', md: '2.3rem' },
-                        color: 'var(--foreground)',
-                        lineHeight: 1.15,
-                        mb: 2.5,
-                    }}
-                >
-                    {item.title}
-                </Typography>
-                {item.description && (
-                    <Typography
-                        sx={{
-                            fontFamily: 'var(--font-prompt)',
-                            fontSize: '1rem',
-                            color: 'var(--foreground)',
-                            opacity: 0.72,
-                            lineHeight: 1.8,
-                            mb: 3,
-                        }}
-                    >
-                        {item.description}
-                    </Typography>
-                )}
-                <Button
-                    component={Link}
-                    href={`/portfolio/${encodeURIComponent(item.slug)}`}
-                    onClick={(event) => {
-                        event.preventDefault();
-                        window.location.assign(`/portfolio/${encodeURIComponent(item.slug)}`);
-                    }}
-                    sx={{
-                        alignSelf: 'flex-start',
-                        fontFamily: 'var(--font-prompt)',
-                        color: 'var(--primary)',
-                        px: 0,
-                        mb: 3,
-                    }}
-                >
-                    ดูรายละเอียดเต็ม
-                </Button>
-                {albumImages.length > 1 && (
-                    <Box sx={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(88px, 1fr))',
-                        gap: 1.5,
-                        mt: 'auto',
-                    }}>
-                        {albumImages.map((img) => (
-                            <Box
-                                key={img.id}
-                                sx={{
-                                    position: 'relative',
-                                    aspectRatio: '4/3',
-                                    borderRadius: 2,
-                                    overflow: 'hidden',
-                                    bgcolor: 'rgba(128,128,128,0.08)',
-                                }}
-                            >
-                                <Image
-                                    src={img.url}
-                                    alt={img.caption || item.title}
-                                    fill
-                                    sizes="120px"
-                                    unoptimized={shouldBypassOptimization(img.url)}
-                                    style={{ objectFit: 'cover' }}
-                                />
-                            </Box>
-                        ))}
-                    </Box>
-                )}
-            </Box>
-        </Box>
-    );
-}
-
 // Categories are now dynamically derived from the database data.
 // Empty categories will automatically disappear from the filters.
 
@@ -193,10 +31,6 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
     const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>(initialData);
     const [loading, setLoading] = useState(initialData.length === 0);
     const [selectedCategory, setSelectedCategory] = useState("All");
-    const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
-    const [albumImages, setAlbumImages] = useState<PortfolioImageItem[]>([]);
-    const [albumLoading, setAlbumLoading] = useState(false);
-    const pushedModalPathRef = useRef<string | null>(null);
 
     const shouldBypassOptimization = (src: string) =>
         src.startsWith("/uploads/") && /\.(webp|avif|gif)$/i.test(src);
@@ -231,68 +65,6 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
     const filteredItems = selectedCategory === "All"
         ? portfolioItems
         : portfolioItems.filter((d: PortfolioItem) => d.category === selectedCategory);
-
-    const closePortfolio = useCallback((fromPopState = false) => {
-        setSelectedItem(null);
-        setAlbumImages([]);
-        setAlbumLoading(false);
-
-        if (!fromPopState && pushedModalPathRef.current && window.location.pathname === pushedModalPathRef.current) {
-            window.history.back();
-        }
-
-        if (fromPopState) {
-            pushedModalPathRef.current = null;
-        }
-    }, []);
-
-    const openPortfolio = useCallback(async (event: React.MouseEvent<HTMLAnchorElement>, item: PortfolioItem) => {
-        event.preventDefault();
-
-        setSelectedItem(item);
-        setAlbumImages(item.image ? [{
-            id: item.id,
-            url: item.image,
-            caption: item.title,
-            order: 0,
-        }] : []);
-        setAlbumLoading(true);
-
-        const detailPath = `/portfolio/${encodeURIComponent(item.slug)}`;
-        if (window.location.pathname !== detailPath) {
-            window.history.pushState({ portfolioModal: true }, "", detailPath);
-            pushedModalPathRef.current = detailPath;
-        }
-
-        try {
-            const res = await fetch(`/api/portfolios/${item.id}/images`, { cache: 'no-store' });
-            if (!res.ok) return;
-
-            const data: PortfolioImageItem[] = await res.json();
-            if (data.length > 0) {
-                const coverExistsInAlbum = item.image ? data.some((img) => img.url === item.image) : true;
-                setAlbumImages(coverExistsInAlbum || !item.image
-                    ? data
-                    : [{ id: item.id, url: item.image, caption: item.title, order: -1 }, ...data]
-                );
-            }
-        } catch (error) {
-            console.error('Error fetching portfolio album images:', error);
-        } finally {
-            setAlbumLoading(false);
-        }
-    }, []);
-
-    useEffect(() => {
-        const handlePopState = () => {
-            if (selectedItem) {
-                closePortfolio(true);
-            }
-        };
-
-        window.addEventListener('popstate', handlePopState);
-        return () => window.removeEventListener('popstate', handlePopState);
-    }, [closePortfolio, selectedItem]);
 
     if (loading) {
         return (
@@ -501,7 +273,6 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                             <Link
                                 key={item.id}
                                 href={`/portfolio/${encodeURIComponent(item.slug)}`}
-                                onClick={(event) => openPortfolio(event, item)}
                                 style={{ textDecoration: 'none' }}
                             >
                                 <Box
@@ -597,17 +368,6 @@ export default function PortfolioContent({ initialData = [] }: { initialData?: P
                     </Box>
                 )}
             </Container>
-
-            {selectedItem && (
-                <ModalWrapper>
-                    <PortfolioQuickView
-                        item={selectedItem}
-                        albumImages={albumImages}
-                        albumLoading={albumLoading}
-                        shouldBypassOptimization={shouldBypassOptimization}
-                    />
-                </ModalWrapper>
-            )}
         </Box>
     );
 }
