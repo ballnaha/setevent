@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Box, Chip, Container, Typography, Button, Stack, IconButton, Modal, Skeleton } from '@mui/material';
 import Link from 'next/link';
-import { ArrowLeft, Gallery, CloseCircle, ArrowLeft2, ArrowRight2, MessageQuestion, CallCalling } from 'iconsax-react';
+import { Gallery, CloseCircle, ArrowLeft2, ArrowRight2, MessageQuestion, CallCalling } from 'iconsax-react';
 import Image from 'next/image';
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 import StandardServiceInfo from "@/app/components/StandardServiceInfo";
@@ -43,6 +43,9 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [thumbsSwiper, setThumbsSwiper] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  const shouldBypassOptimization = (src: string) =>
+    src.startsWith('/uploads/') && /\.(webp|avif|gif)$/i.test(src);
 
   // Setup images
   const albumImages = portfolio.images || [];
@@ -257,7 +260,9 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                   alt={img.caption || portfolio.title}
                   width={800}
                   height={600}
+                  priority={index === 0}
                   sizes="(max-width: 600px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  unoptimized={shouldBypassOptimization(img.url)}
                   style={{
                     width: '100%',
                     height: 'auto',
@@ -386,50 +391,50 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
       </Box>
 
       {/* Lightbox Modal */}
-      <Modal
-        open={lightboxOpen}
-        onClose={() => setLightboxOpen(false)}
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          p: { xs: 2, md: 4 },
-          '& .MuiBackdrop-root': {
-            bgcolor: 'rgba(0,0,0,0.95)'
-          }
-        }}
-      >
-        <Box sx={{
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-          maxWidth: 1400,
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column',
-          outline: 'none',
-          '& .lightbox-main-swiper .swiper-slide:not(.swiper-slide-active)': { visibility: 'hidden' }
-        }}>
-          {/* Close Button */}
-          <IconButton
-            onClick={() => setLightboxOpen(false)}
-            sx={{
-              position: 'absolute',
-              top: { xs: 8, md: 16 },
-              right: { xs: 8, md: 16 },
-              zIndex: 100,
-              color: 'white',
-              bgcolor: 'rgba(0,0,0,0.5)',
-              backdropFilter: 'blur(4px)',
-              '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
-            }}
-          >
-            <CloseCircle size="28" color="white" />
-          </IconButton>
+      {lightboxOpen && (
+        <Modal
+          open={lightboxOpen}
+          onClose={() => setLightboxOpen(false)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: { xs: 2, md: 4 },
+            '& .MuiBackdrop-root': {
+              bgcolor: 'rgba(0,0,0,0.95)'
+            }
+          }}
+        >
+          <Box sx={{
+            position: 'relative',
+            width: '100%',
+            height: '100%',
+            maxWidth: 1400,
+            maxHeight: '90vh',
+            display: 'flex',
+            flexDirection: 'column',
+            outline: 'none',
+            '& .lightbox-main-swiper .swiper-slide:not(.swiper-slide-active)': { visibility: 'hidden' }
+          }}>
+            {/* Close Button */}
+            <IconButton
+              onClick={() => setLightboxOpen(false)}
+              sx={{
+                position: 'absolute',
+                top: { xs: 8, md: 16 },
+                right: { xs: 8, md: 16 },
+                zIndex: 100,
+                color: 'white',
+                bgcolor: 'rgba(0,0,0,0.5)',
+                backdropFilter: 'blur(4px)',
+                '&:hover': { bgcolor: 'rgba(0,0,0,0.7)' }
+              }}
+            >
+              <CloseCircle size="28" color="white" />
+            </IconButton>
 
-          {/* Main Swiper */}
-          <Box sx={{ flex: 1, position: 'relative', minHeight: 0, borderRadius: { xs: 2, md: 4 }, overflow: 'hidden' }}>
-            {lightboxOpen && (
+            {/* Main Swiper */}
+            <Box sx={{ flex: 1, position: 'relative', minHeight: 0, borderRadius: { xs: 2, md: 4 }, overflow: 'hidden' }}>
               <Swiper
                 className="lightbox-main-swiper"
                 key={`lightbox-${portfolio.id}-${lightboxOpen}`}
@@ -470,6 +475,7 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                         style={{ objectFit: 'contain' }}
                         priority={idx === lightboxIndex}
                         sizes="100vw"
+                        unoptimized={shouldBypassOptimization(img.url)}
                       />
 
                       {img.caption && (
@@ -490,103 +496,103 @@ export default function PortfolioDetailContent({ portfolio }: PortfolioDetailCon
                   </SwiperSlide>
                 ))}
               </Swiper>
-            )}
 
-            {/* Navigation Arrows */}
-            {imageCount > 1 && (
-              <>
-                <IconButton
-                  className="lightbox-prev"
-                  sx={{
-                    position: 'absolute',
-                    left: { xs: 8, md: 24 },
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 100,
-                    color: 'white',
-                    bgcolor: 'rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(10px)',
-                    width: { xs: 40, md: 56 },
-                    height: { xs: 40, md: 56 },
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
-                  }}
-                >
-                  <ArrowLeft2 size="28" color="white" />
-                </IconButton>
-                <IconButton
-                  className="lightbox-next"
-                  sx={{
-                    position: 'absolute',
-                    right: { xs: 8, md: 24 },
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    zIndex: 100,
-                    color: 'white',
-                    bgcolor: 'rgba(255,255,255,0.1)',
-                    backdropFilter: 'blur(10px)',
-                    width: { xs: 40, md: 56 },
-                    height: { xs: 40, md: 56 },
-                    '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
-                  }}
-                >
-                  <ArrowRight2 size="28" color="white" />
-                </IconButton>
-              </>
-            )}
+              {/* Navigation Arrows */}
+              {imageCount > 1 && (
+                <>
+                  <IconButton
+                    className="lightbox-prev"
+                    sx={{
+                      position: 'absolute',
+                      left: { xs: 8, md: 24 },
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      zIndex: 100,
+                      color: 'white',
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(10px)',
+                      width: { xs: 40, md: 56 },
+                      height: { xs: 40, md: 56 },
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
+                    }}
+                  >
+                    <ArrowLeft2 size="28" color="white" />
+                  </IconButton>
+                  <IconButton
+                    className="lightbox-next"
+                    sx={{
+                      position: 'absolute',
+                      right: { xs: 8, md: 24 },
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      zIndex: 100,
+                      color: 'white',
+                      bgcolor: 'rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(10px)',
+                      width: { xs: 40, md: 56 },
+                      height: { xs: 40, md: 56 },
+                      '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' }
+                    }}
+                  >
+                    <ArrowRight2 size="28" color="white" />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+
+            {/* Footer UI */}
+            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+              <Box className="lightbox-pagination" sx={{ color: 'white', fontFamily: 'var(--font-prompt)', fontSize: '1rem' }} />
+
+              {imageCount > 1 && (
+                <Box sx={{ width: '100%', height: { xs: 60, md: 80 } }}>
+                  <Swiper
+                    onSwiper={setThumbsSwiper}
+                    modules={[FreeMode, Navigation, Thumbs]}
+                    spaceBetween={12}
+                    slidesPerView={'auto'}
+                    freeMode={true}
+                    watchSlidesProgress={true}
+                    centerInsufficientSlides={true}
+                    observer={true}
+                    observeParents={true}
+                    style={{ height: '100%' }}
+                  >
+                    {allImages.map((img, idx) => (
+                      <SwiperSlide key={idx} style={{ width: 'auto' }}>
+                        <Box
+                          sx={{
+                            width: { xs: 80, md: 120 },
+                            height: '100%',
+                            borderRadius: 2,
+                            overflow: 'hidden',
+                            cursor: 'pointer',
+                            border: idx === lightboxIndex ? '2px solid var(--primary)' : '2px solid transparent',
+                            opacity: idx === lightboxIndex ? 1 : 0.4,
+                            transition: 'all 0.2s',
+                            '&:hover': { opacity: 1 }
+                          }}
+                        >
+                          <Image
+                            src={img.url}
+                            alt="Thumbnail"
+                            width={120}
+                            height={80}
+                            unoptimized={shouldBypassOptimization(img.url)}
+                            style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+                          />
+                        </Box>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
+                </Box>
+              )}
+            </Box>
           </Box>
-
-          {/* Footer UI */}
-          <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-            <Box className="lightbox-pagination" sx={{ color: 'white', fontFamily: 'var(--font-prompt)', fontSize: '1rem' }} />
-
-            {imageCount > 1 && (
-              <Box sx={{ width: '100%', height: { xs: 60, md: 80 } }}>
-                <Swiper
-                  onSwiper={setThumbsSwiper}
-                  modules={[FreeMode, Navigation, Thumbs]}
-                  spaceBetween={12}
-                  slidesPerView={'auto'}
-                  freeMode={true}
-                  watchSlidesProgress={true}
-                  centerInsufficientSlides={true}
-                  observer={true}
-                  observeParents={true}
-                  style={{ height: '100%' }}
-                >
-                  {allImages.map((img, idx) => (
-                    <SwiperSlide key={idx} style={{ width: 'auto' }}>
-                      <Box
-                        sx={{
-                          width: { xs: 80, md: 120 },
-                          height: '100%',
-                          borderRadius: 2,
-                          overflow: 'hidden',
-                          cursor: 'pointer',
-                          border: idx === lightboxIndex ? '2px solid var(--primary)' : '2px solid transparent',
-                          opacity: idx === lightboxIndex ? 1 : 0.4,
-                          transition: 'all 0.2s',
-                          '&:hover': { opacity: 1 }
-                        }}
-                      >
-                        <Image
-                          src={img.url}
-                          alt="Thumbnail"
-                          width={120}
-                          height={80}
-                          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
-                        />
-                      </Box>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </Box>
-            )}
-          </Box>
-        </Box>
-      </Modal>
+        </Modal>
+      )}
       {/* Standard Service Information (Fixes Thin Content SEO) */}
       <StandardServiceInfo />
     </Box>
   );
 }
-

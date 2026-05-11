@@ -31,6 +31,9 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
     const [loading, setLoading] = useState(initialData.length === 0);
     const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
 
+    const shouldBypassOptimization = (src: string | null) =>
+        !!src && src.startsWith('/uploads/') && /\.(webp|avif|gif)$/i.test(src);
+
     const handleImageLoad = (id: string) => {
         setLoadedImages(prev => ({ ...prev, [id]: true }));
     };
@@ -325,7 +328,7 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
                                         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr', lg: '1fr 1fr 1fr 1fr' },
                                         gap: 3
                                     }}>
-                                        {category.children.map((child) => (
+                                        {category.children.map((child, childIndex) => (
                                             <Paper
                                                 key={child.id}
                                                 component={Link}
@@ -360,8 +363,9 @@ export default function ProductsContent({ initialData = [] }: { initialData?: Ro
                                                                 src={child.image}
                                                                 alt={child.name}
                                                                 fill
-                                                                priority={category.id === categories[0]?.id && category.children.indexOf(child) < 4}
+                                                                priority={category.id === categories[0]?.id && childIndex === 0}
                                                                 sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, (max-width: 1280px) 25vw, 300px"
+                                                                unoptimized={shouldBypassOptimization(child.image)}
                                                                 onLoad={() => handleImageLoad(child.id)}
                                                                 style={{
                                                                     objectFit: 'cover',

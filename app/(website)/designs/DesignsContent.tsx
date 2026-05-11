@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { Box, Container, Typography, IconButton, Chip, Modal, Paper, Skeleton, Stack, Button } from "@mui/material";
-import { CloseCircle, Gallery, ArrowLeft2, ArrowRight2 } from "iconsax-react";
+import React, { useState, useEffect } from "react";
+import { Box, Container, Typography, IconButton, Chip, Modal, Skeleton, Stack, Button } from "@mui/material";
+import { CloseCircle, Gallery } from "iconsax-react";
 import Image from "next/image";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay, EffectCoverflow, Zoom } from "swiper/modules";
-import type { Swiper as SwiperType } from "swiper";
+import { Navigation, Pagination, Zoom } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -35,8 +34,9 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
     const [selectedItem, setSelectedItem] = useState<Design | null>(null);
     const [lightboxIndex, setLightboxIndex] = useState(0);
     const [activeLightboxIndex, setActiveLightboxIndex] = useState(0);
-    const swiperRef = useRef<SwiperType | null>(null);
-    const lightboxSwiperRef = useRef<SwiperType | null>(null);
+
+    const shouldBypassOptimization = (src: string) =>
+        src.startsWith("/uploads/") && /\.(webp|avif|gif)$/i.test(src);
 
     useEffect(() => {
         if (initialData.length === 0) {
@@ -316,10 +316,11 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                         className="design-image"
                                         width={500}
                                         height={500}
-                                        priority={idx < 3}
+                                        priority={idx === 0}
                                         sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
                                         placeholder="blur"
                                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
+                                        unoptimized={shouldBypassOptimization(item.image || "")}
                                         style={{
                                             width: '100%',
                                             height: 'auto',
@@ -378,167 +379,169 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
             </Container>
 
             {/* Lightbox Modal */}
-            <Modal
-                open={!!selectedItem}
-                onClose={closeLightbox}
-                sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    '& .MuiBackdrop-root': {
-                        bgcolor: 'rgba(0,0,0,0.98)'
-                    }
-                }}
-            >
-                <Box sx={{
-                    position: 'relative',
-                    width: '100vw',
-                    height: '100vh',
-                    bgcolor: 'black',
-                    outline: 'none',
-                    display: 'flex',
-                    flexDirection: 'column'
-                }}>
-                    {/* Close Button */}
-                    <IconButton
-                        onClick={closeLightbox}
-                        sx={{
-                            position: 'absolute',
-                            top: { xs: 16, md: 32 },
-                            right: { xs: 16, md: 32 },
-                            zIndex: 100,
-                            bgcolor: 'rgba(255,255,255,0.1)',
-                            backdropFilter: 'blur(10px)',
-                            color: 'white',
-                            '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
-                        }}
-                    >
-                        <CloseCircle size="32" color="white" />
-                    </IconButton>
+            {selectedItem && (
+                <Modal
+                    open={!!selectedItem}
+                    onClose={closeLightbox}
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        '& .MuiBackdrop-root': {
+                            bgcolor: 'rgba(0,0,0,0.98)'
+                        }
+                    }}
+                >
+                    <Box sx={{
+                        position: 'relative',
+                        width: '100vw',
+                        height: '100vh',
+                        bgcolor: 'black',
+                        outline: 'none',
+                        display: 'flex',
+                        flexDirection: 'column'
+                    }}>
+                        {/* Close Button */}
+                        <IconButton
+                            onClick={closeLightbox}
+                            sx={{
+                                position: 'absolute',
+                                top: { xs: 16, md: 32 },
+                                right: { xs: 16, md: 32 },
+                                zIndex: 100,
+                                bgcolor: 'rgba(255,255,255,0.1)',
+                                backdropFilter: 'blur(10px)',
+                                color: 'white',
+                                '&:hover': { bgcolor: 'rgba(255,255,255,0.2)' },
+                            }}
+                        >
+                            <CloseCircle size="32" color="white" />
+                        </IconButton>
 
-                    {/* Lightbox Swiper */}
-                    <Swiper
-                        onSwiper={(swiper) => { lightboxSwiperRef.current = swiper; }}
-                        onSlideChange={(swiper) => setActiveLightboxIndex(swiper.realIndex)}
-                        modules={[Navigation, Pagination, Zoom]}
-                        initialSlide={lightboxIndex}
-                        navigation
-                        pagination={{
-                            type: 'fraction',
-                            clickable: true
-                        }}
-                        zoom={{ maxRatio: 3 }}
-                        loop={filteredItems.length > 1}
-                        style={{
-                            flex: 1,
-                            width: '100%',
-                            height: '100%',
-                        }}
-                    >
-                        {filteredItems.map((item, idx) => (
-                            <SwiperSlide key={item.id}>
-                                <Box sx={{
-                                    position: 'relative',
-                                    width: '100%',
-                                    height: '100%',
-                                    bgcolor: '#000',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    overflow: 'hidden'
-                                }}>
-
-                                    <div className="swiper-zoom-container" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <Image
-                                            src={item.image || '/images/placeholder.jpg'}
-                                            alt={item.title}
-                                            fill
-                                            priority={Math.abs(idx - activeLightboxIndex) <= 1}
-                                            sizes="100vw"
-                                            style={{
-                                                objectFit: 'contain',
-                                                zIndex: 2
-                                            }}
-                                            onLoadingComplete={(img) => {
-                                                const parent = img.closest('.MuiBox-root');
-                                                if (parent) {
-                                                    const skeleton = parent.querySelector('.skeleton-loader');
-                                                    if (skeleton) (skeleton as HTMLElement).style.display = 'none';
-                                                }
-                                            }}
-                                        />
-                                    </div>
-
-                                    {/* Image Loading State - Outside zoom container */}
-                                    <Box className="skeleton-loader" sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)', zIndex: 1, pointerEvents: 'none' }}>
-                                        <Skeleton
-                                            variant="rectangular"
-                                            width="100%"
-                                            height="100%"
-                                            sx={{
-                                                bgcolor: 'rgba(255,255,255,0.05)',
-                                                position: 'absolute'
-                                            }}
-                                        />
-                                        <Box className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" sx={{
-                                            borderTopColor: '#8B5CF6',
-                                            borderBottomColor: 'transparent',
-                                            borderWidth: 4,
-                                            borderStyle: 'solid',
-                                            borderRadius: '50%',
-                                            width: 48,
-                                            height: 48,
-                                            zIndex: 1,
-                                            animation: 'spin 1s linear infinite',
-                                            '@keyframes spin': {
-                                                '0%': { transform: 'rotate(0deg)' },
-                                                '100%': { transform: 'rotate(360deg)' }
-                                            }
-                                        }} />
-                                    </Box>
-
-                                    {/* Title Overlay - Outside zoom container */}
+                        {/* Lightbox Swiper */}
+                        <Swiper
+                            onSlideChange={(swiper) => setActiveLightboxIndex(swiper.realIndex)}
+                            modules={[Navigation, Pagination, Zoom]}
+                            initialSlide={lightboxIndex}
+                            navigation
+                            pagination={{
+                                type: 'fraction',
+                                clickable: true
+                            }}
+                            zoom={{ maxRatio: 3 }}
+                            loop={filteredItems.length > 1}
+                            style={{
+                                flex: 1,
+                                width: '100%',
+                                height: '100%',
+                            }}
+                        >
+                            {filteredItems.map((item, idx) => (
+                                <SwiperSlide key={item.id}>
                                     <Box sx={{
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        left: 0,
-                                        right: 0,
-                                        p: { xs: 4, md: 6 },
-                                        pb: { xs: 8, md: 6 },
-                                        zIndex: 10,
-                                        background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
-                                        pointerEvents: 'none'
+                                        position: 'relative',
+                                        width: '100%',
+                                        height: '100%',
+                                        bgcolor: '#000',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        overflow: 'hidden'
                                     }}>
-                                        <Box sx={{ pointerEvents: 'auto', maxWidth: 800 }}>
-                                            <Typography
-                                                sx={{
-                                                    fontFamily: 'var(--font-prompt)',
-                                                    fontWeight: 700,
-                                                    fontSize: { xs: '1.5rem', md: '2.5rem' },
-                                                    color: 'white',
-                                                    mb: 1
+
+                                        <div className="swiper-zoom-container" style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                            <Image
+                                                src={item.image || '/images/placeholder.jpg'}
+                                                alt={item.title}
+                                                fill
+                                                priority={Math.abs(idx - activeLightboxIndex) <= 1}
+                                                sizes="100vw"
+                                                unoptimized={shouldBypassOptimization(item.image || "")}
+                                                style={{
+                                                    objectFit: 'contain',
+                                                    zIndex: 2
                                                 }}
-                                            >
-                                                {item.title}
-                                            </Typography>
-                                            <Chip
-                                                label={item.category}
-                                                sx={{
-                                                    bgcolor: '#8B5CF6',
-                                                    color: 'white',
-                                                    fontFamily: 'var(--font-prompt)',
-                                                    fontWeight: 600,
-                                                    px: 1
+                                                onLoadingComplete={(img) => {
+                                                    const parent = img.closest('.MuiBox-root');
+                                                    if (parent) {
+                                                        const skeleton = parent.querySelector('.skeleton-loader');
+                                                        if (skeleton) (skeleton as HTMLElement).style.display = 'none';
+                                                    }
                                                 }}
                                             />
+                                        </div>
+
+                                        {/* Image Loading State - Outside zoom container */}
+                                        <Box className="skeleton-loader" sx={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: 'rgba(0,0,0,0.1)', zIndex: 1, pointerEvents: 'none' }}>
+                                            <Skeleton
+                                                variant="rectangular"
+                                                width="100%"
+                                                height="100%"
+                                                sx={{
+                                                    bgcolor: 'rgba(255,255,255,0.05)',
+                                                    position: 'absolute'
+                                                }}
+                                            />
+                                            <Box className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary" sx={{
+                                                borderTopColor: '#8B5CF6',
+                                                borderBottomColor: 'transparent',
+                                                borderWidth: 4,
+                                                borderStyle: 'solid',
+                                                borderRadius: '50%',
+                                                width: 48,
+                                                height: 48,
+                                                zIndex: 1,
+                                                animation: 'spin 1s linear infinite',
+                                                '@keyframes spin': {
+                                                    '0%': { transform: 'rotate(0deg)' },
+                                                    '100%': { transform: 'rotate(360deg)' }
+                                                }
+                                            }} />
+                                        </Box>
+
+                                        {/* Title Overlay - Outside zoom container */}
+                                        <Box sx={{
+                                            position: 'absolute',
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            p: { xs: 4, md: 6 },
+                                            pb: { xs: 8, md: 6 },
+                                            zIndex: 10,
+                                            background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 60%, transparent 100%)',
+                                            pointerEvents: 'none'
+                                        }}>
+                                            <Box sx={{ pointerEvents: 'auto', maxWidth: 800 }}>
+                                                <Typography
+                                                    sx={{
+                                                        fontFamily: 'var(--font-prompt)',
+                                                        fontWeight: 700,
+                                                        fontSize: { xs: '1.5rem', md: '2.5rem' },
+                                                        color: 'white',
+                                                        mb: 1
+                                                    }}
+                                                >
+                                                    {item.title}
+                                                </Typography>
+                                                <Chip
+                                                    label={item.category}
+                                                    sx={{
+                                                        bgcolor: '#8B5CF6',
+                                                        color: 'white',
+                                                        fontFamily: 'var(--font-prompt)',
+                                                        fontWeight: 600,
+                                                        px: 1
+                                                    }}
+                                                />
+                                            </Box>
                                         </Box>
                                     </Box>
-                                </Box>
-                            </SwiperSlide>
-                        ))}
-                    </Swiper>
-                </Box>
-            </Modal>
+                                </SwiperSlide>
+                            ))}
+                        </Swiper>
+                    </Box>
+                </Modal>
+            )}
 
         </Box>
     );

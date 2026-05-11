@@ -38,6 +38,9 @@ export default function ProductDetailView({ product, categoryName = "Product Det
     const [mainSwiper, setMainSwiper] = useState<any>(null);
     const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
+    const shouldBypassOptimization = (src: string) =>
+        src.startsWith('/uploads/') && /\.(webp|avif|gif)$/i.test(src);
+
     const handleClose = () => {
         if (onClose) {
             onClose();
@@ -498,6 +501,7 @@ export default function ProductDetailView({ product, categoryName = "Product Det
                                                 alt={`Thumbnail ${idx + 1}`}
                                                 fill
                                                 sizes="(max-width: 768px) 100px, 120px"
+                                                unoptimized={shouldBypassOptimization(img)}
                                                 style={{ objectFit: 'cover' }}
                                             />
                                             {ytId && (

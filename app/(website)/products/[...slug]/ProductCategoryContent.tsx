@@ -59,6 +59,9 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
     const [isHovered, setIsHovered] = useState(false);
     const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
+    const shouldBypassOptimization = (src: string) =>
+        src.startsWith('/uploads/') && /\.(webp|avif|gif)$/i.test(src);
+
     const handleImageLoad = (index: number) => {
         setLoadedImages(prev => ({ ...prev, [index]: true }));
     };
@@ -79,6 +82,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
     const hasImages = product.images && product.images.length > 0;
     const imageCount = product.images?.length || 0;
     const isVideo = hasImages && getYoutubeId(product.images[0]);
+    const primaryImage = hasImages ? product.images[0] : '';
 
     return (
         <Paper
@@ -122,11 +126,12 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
                         transition: 'transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)'
                     }}>
                         <Image
-                            src={getThumbnailUrl(product.images[0])}
+                            src={getThumbnailUrl(primaryImage)}
                             alt={product.name}
                             fill
                             priority={isPriority}
                             sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 33vw"
+                            unoptimized={shouldBypassOptimization(primaryImage)}
                             onLoad={() => handleImageLoad(0)}
                             style={{
                                 objectFit: 'contain',
@@ -729,7 +734,7 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                         gap: { xs: 3, md: 4 }
                     }}>
                         {products.map((product, idx) => (
-                            <ProductCard key={product.id} product={product} categoryName={category.name} isPriority={idx < 3} />
+                            <ProductCard key={product.id} product={product} categoryName={category.name} isPriority={idx === 0} />
                         ))}
                     </Box>
                 </Container>
