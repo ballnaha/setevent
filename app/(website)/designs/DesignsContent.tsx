@@ -24,6 +24,8 @@ interface Design {
     views: number;
 }
 
+const DESIGN_CARD_RATIO = "4 / 5";
+
 // Categories are now dynamically derived from the database data.
 // Empty categories will automatically disappear from the filters.
 
@@ -97,14 +99,19 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     <Skeleton variant="text" height={24} sx={{ width: { xs: '80%', md: 600 }, bgcolor: 'var(--border-color)', opacity: 0.5 }} />
                 </Box>
                 <Container maxWidth="lg" sx={{ mt: 4 }}>
-                    <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, gap: 3 }}>
+                    <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+                        gap: 3
+                    }}>
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Box key={i} sx={{ breakInside: 'avoid', mb: 3 }}>
+                            <Box key={i}>
                                 <Skeleton
                                     variant="rounded"
-                                    height={i % 2 === 0 ? 300 : 450}
+                                    height={0}
                                     animation="wave"
                                     sx={{
+                                        aspectRatio: DESIGN_CARD_RATIO,
                                         bgcolor: 'var(--border-color)',
                                         opacity: 0.4,
                                         borderRadius: 6
@@ -272,12 +279,9 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                     </Box>
                 ) : (
                     <Box sx={{
-                        columnCount: { xs: 1, sm: 2, md: 3 },
-                        columnGap: 2,
-                        '& > div': {
-                            breakInside: 'avoid',
-                            mb: 2
-                        }
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+                        gap: 2
                     }}>
                         {filteredItems.map((item, idx) => (
                             <Box
@@ -307,24 +311,21 @@ export default function DesignsContent({ initialData = [] }: { initialData?: Des
                                     width: '100%',
                                     borderRadius: 'inherit',
                                     bgcolor: 'rgba(128,128,128,0.1)',
-                                    aspectRatio: 'unset',
+                                    aspectRatio: DESIGN_CARD_RATIO,
                                     overflow: 'hidden'
                                 }}>
                                     <Image
                                         src={item.image || '/images/placeholder.jpg'}
                                         alt={item.title}
                                         className="design-image"
-                                        width={500}
-                                        height={500}
+                                        fill
                                         priority={idx === 0}
                                         sizes="(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw"
                                         placeholder="blur"
                                         blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mPo6Oj4HwAE/gLqWTtW2QAAAABJRU5ErkJggg=="
                                         unoptimized={shouldBypassOptimization(item.image || "")}
                                         style={{
-                                            width: '100%',
-                                            height: 'auto',
-                                            display: 'block',
+                                            objectFit: 'cover',
                                             transition: 'transform 0.6s ease'
                                         }}
                                     />

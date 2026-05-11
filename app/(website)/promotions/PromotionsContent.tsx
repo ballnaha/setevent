@@ -26,6 +26,8 @@ interface PromotionsContentProps {
     initialPromotions: Promotion[];
 }
 
+const PROMOTION_CARD_RATIO = "1 / 1";
+
 // Helper function to format price with commas
 const formatPrice = (price: string | undefined): string => {
     if (!price) return '';
@@ -83,6 +85,7 @@ function PromotionCard({ promotion, priority = false, onOpen }: { promotion: Pro
             <Box sx={{
                 position: 'relative',
                 width: '100%',
+                aspectRatio: PROMOTION_CARD_RATIO,
                 overflow: 'hidden',
                 lineHeight: 0,
                 borderRadius: 0,
@@ -91,15 +94,13 @@ function PromotionCard({ promotion, priority = false, onOpen }: { promotion: Pro
                 <Image
                     src={promotion.image}
                     alt={promotion.title}
-                    width={800}
-                    height={800}
+                    fill
                     priority={priority}
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     unoptimized={shouldBypassOptimization}
                     className="promo-image"
                     style={{
-                        width: '100%',
-                        height: 'auto',
+                        objectFit: 'cover',
                         transition: 'transform 0.8s cubic-bezier(0.2, 0, 0.2, 1)',
                     }}
                 />
@@ -284,13 +285,23 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                 </Box>
                 <Container maxWidth="lg" sx={{ mt: 8 }}>
                     <Box sx={{
-                        columnCount: { xs: 1, sm: 2, md: 3 },
-                        columnGap: 2,
-                        '& > div': { breakInside: 'avoid', mb: 2 }
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+                        gap: 2
                     }}>
                         {[1, 2, 3, 4, 5, 6].map((i) => (
-                            <Box key={i} sx={{ mb: 4 }}>
-                                <Skeleton variant="rounded" width="100%" height={i % 2 === 0 ? 300 : 450} sx={{ borderRadius: 2, bgcolor: 'var(--border-color)', opacity: 0.3 }} />
+                            <Box key={i}>
+                                <Skeleton
+                                    variant="rounded"
+                                    width="100%"
+                                    height={0}
+                                    sx={{
+                                        aspectRatio: PROMOTION_CARD_RATIO,
+                                        borderRadius: 2,
+                                        bgcolor: 'var(--border-color)',
+                                        opacity: 0.3
+                                    }}
+                                />
                             </Box>
                         ))}
                     </Box>
@@ -342,7 +353,11 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                         <Typography variant="h5" sx={{ fontFamily: 'var(--font-prompt)', color: 'var(--foreground)', fontWeight: 600 }}>ยังไม่มีโปรโมชั่นในขณะนี้</Typography>
                     </Box>
                 ) : (
-                    <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, columnGap: 2, '& > div': { breakInside: 'avoid', mb: 2 } }}>
+                    <Box sx={{
+                        display: 'grid',
+                        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+                        gap: 2
+                    }}>
                         {filteredPromotions.map((promo, index) => (
                             <Box key={promo.id}>
                                 <PromotionCard promotion={promo} priority={index === 0} onOpen={() => openPromotion(promo)} />
