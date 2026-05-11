@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Container, Typography, Stack, Chip, Skeleton } from "@mui/material";
 import { useSearchParams } from "next/navigation";
 import { Ticket } from "iconsax-react";
 import Image from "next/image";
-import Link from "next/link";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
+import ModalWrapper from "../products/components/ModalWrapper";
+import PromotionDetailView from "./components/PromotionDetailView";
 
 // Parsed interface for display
 interface Promotion {
@@ -42,7 +43,7 @@ const formatPrice = (price: string | undefined): string => {
     return hasThaiCurrency ? `฿${formatted}` : formatted;
 };
 
-function PromotionCard({ promotion, priority = false }: { promotion: Promotion; priority?: boolean }) {
+function PromotionCard({ promotion, priority = false, onOpen }: { promotion: Promotion; priority?: boolean; onOpen: () => void }) {
     const [isHovered, setIsHovered] = useState(false);
     const extraFeaturesCount = Math.max(0, promotion.features.length - 2);
     const shouldBypassOptimization =
@@ -50,8 +51,9 @@ function PromotionCard({ promotion, priority = false }: { promotion: Promotion; 
 
     return (
         <Box
-            component={Link}
-            href={`/promotions/p/${encodeURIComponent(promotion.title)}`}
+            component="button"
+            type="button"
+            onClick={onOpen}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             sx={{
@@ -61,6 +63,12 @@ function PromotionCard({ promotion, priority = false }: { promotion: Promotion; 
                 cursor: 'pointer',
                 bgcolor: 'var(--background)',
                 display: 'block',
+                width: '100%',
+                border: 0,
+                p: 0,
+                m: 0,
+                textAlign: 'left',
+                appearance: 'none',
                 '&:hover': {
                     '& .promo-image': {
                         transform: 'scale(1.05)',
@@ -197,9 +205,33 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
     const categoryParam = searchParams.get('category');
     const [loading, setLoading] = useState(initialPromotions.length === 0);
     const [activeTab, setActiveTab] = useState('ทั้งหมด');
+    const [selectedPromotion, setSelectedPromotion] = useState<Promotion | null>(null);
+    const pushedModalPathRef = useRef<string | null>(null);
+
+    const closePromotion = useCallback((fromPopState = false) => {
+        setSelectedPromotion(null);
+
+        if (!fromPopState && pushedModalPathRef.current && window.location.pathname === pushedModalPathRef.current) {
+            window.history.back();
+        }
+
+        if (fromPopState) {
+            pushedModalPathRef.current = null;
+        }
+    }, []);
+
+    const openPromotion = useCallback((promotion: Promotion) => {
+        setSelectedPromotion(promotion);
+
+        const detailPath = `/promotions/p/${encodeURIComponent(promotion.title)}`;
+        if (window.location.pathname !== detailPath) {
+            window.history.pushState({ promotionModal: true }, '', detailPath);
+            pushedModalPathRef.current = detailPath;
+        }
+    }, []);
 
     // Handle initial category from URL
-    React.useEffect(() => {
+    useEffect(() => {
         if (categoryParam === 'monthly') {
             setActiveTab('Promotion ประจำเดือน');
         } else if (categoryParam === 'all') {
@@ -215,13 +247,24 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
         ? initialPromotions
         : initialPromotions.filter(p => p.category === activeTab);
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (initialPromotions.length > 0) {
             setLoading(false);
         } else {
             setLoading(false);
         }
     }, [initialPromotions]);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            if (selectedPromotion) {
+                closePromotion(true);
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [closePromotion, selectedPromotion]);
 
     if (loading) {
         return (
@@ -302,12 +345,22 @@ export default function PromotionsContent({ initialPromotions }: PromotionsConte
                     <Box sx={{ columnCount: { xs: 1, sm: 2, md: 3 }, columnGap: 2, '& > div': { breakInside: 'avoid', mb: 2 } }}>
                         {filteredPromotions.map((promo, index) => (
                             <Box key={promo.id}>
-                                <PromotionCard promotion={promo} priority={index === 0} />
+                                <PromotionCard promotion={promo} priority={index === 0} onOpen={() => openPromotion(promo)} />
                             </Box>
                         ))}
                     </Box>
                 )}
             </Container>
+
+            {selectedPromotion && (
+                <ModalWrapper>
+                    <PromotionDetailView
+                        promotion={selectedPromotion}
+                        isModal={true}
+                        onClose={() => closePromotion(false)}
+                    />
+                </ModalWrapper>
+            )}
         </Box>
     );
 }

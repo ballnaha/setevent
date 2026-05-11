@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Box, Container, Typography, Paper, Button, Stack, Skeleton, Chip, IconButton } from "@mui/material";
 import { ArrowRight2, Gallery, MagicStar, NoteText, MessageQuestion, CallCalling, Monitor } from "iconsax-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useParams } from "next/navigation";
 import Breadcrumbs from "@/app/components/Breadcrumbs";
+import ModalWrapper from "../components/ModalWrapper";
+import ProductDetailView from "../components/ProductDetailView";
 
 function normalizeSlugParam(slug: string | string[] | undefined): string {
     if (Array.isArray(slug)) {
@@ -55,7 +57,7 @@ interface PageData {
 }
 
 // ProductCard Component
-function ProductCard({ product, categoryName, isPriority = false }: { product: Product; categoryName: string; isPriority?: boolean }) {
+function ProductCard({ product, categoryName, isPriority = false, onOpen }: { product: Product; categoryName: string; isPriority?: boolean; onOpen: (event: React.MouseEvent<HTMLAnchorElement>) => void }) {
     const [isHovered, setIsHovered] = useState(false);
     const [loadedImages, setLoadedImages] = useState<Record<number, boolean>>({});
 
@@ -88,6 +90,7 @@ function ProductCard({ product, categoryName, isPriority = false }: { product: P
         <Paper
             component={Link}
             href={`/products/p/${product.slug}`}
+            onClick={onOpen}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             sx={{
@@ -388,6 +391,8 @@ export default function ProductCategoryContent({ initialData = null }: { initial
     const [data, setData] = useState<PageData | null>(initialData);
     const [loading, setLoading] = useState(initialData === null);
     const [error, setError] = useState<string | null>(null);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+    const pushedModalPathRef = useRef<string | null>(null);
 
     useEffect(() => {
         if (initialData) return;
@@ -415,6 +420,40 @@ export default function ProductCategoryContent({ initialData = null }: { initial
 
         fetchData();
     }, [slugPath, initialData]);
+
+    const closeProduct = useCallback((fromPopState = false) => {
+        setSelectedProduct(null);
+
+        if (!fromPopState && pushedModalPathRef.current && window.location.pathname === pushedModalPathRef.current) {
+            window.history.back();
+        }
+
+        if (fromPopState) {
+            pushedModalPathRef.current = null;
+        }
+    }, []);
+
+    const openProduct = useCallback((event: React.MouseEvent<HTMLAnchorElement>, product: Product) => {
+        event.preventDefault();
+        setSelectedProduct(product);
+
+        const detailPath = `/products/p/${product.slug}`;
+        if (window.location.pathname !== detailPath) {
+            window.history.pushState({ productModal: true }, '', detailPath);
+            pushedModalPathRef.current = detailPath;
+        }
+    }, []);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            if (selectedProduct) {
+                closeProduct(true);
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [closeProduct, selectedProduct]);
 
     if (loading) {
         return (
@@ -734,7 +773,13 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                         gap: { xs: 3, md: 4 }
                     }}>
                         {products.map((product, idx) => (
-                            <ProductCard key={product.id} product={product} categoryName={category.name} isPriority={idx === 0} />
+                            <ProductCard
+                                key={product.id}
+                                product={product}
+                                categoryName={category.name}
+                                isPriority={idx === 0}
+                                onOpen={(event) => openProduct(event, product)}
+                            />
                         ))}
                     </Box>
                 </Container>
@@ -824,6 +869,17 @@ export default function ProductCategoryContent({ initialData = null }: { initial
                     </Stack>
                 </Container>
             </Box>
+
+            {selectedProduct && (
+                <ModalWrapper>
+                    <ProductDetailView
+                        product={selectedProduct}
+                        categoryName={category.name}
+                        isModal={true}
+                        onClose={() => closeProduct(false)}
+                    />
+                </ModalWrapper>
+            )}
         </Box>
     );
 }

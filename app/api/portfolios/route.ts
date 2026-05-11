@@ -28,6 +28,7 @@ export async function GET(req: NextRequest) {
                 title: true,
                 slug: true,
                 category: true,
+                description: true,
                 image: true,
                 likes: true,
                 views: true,

@@ -45,6 +45,7 @@ export default async function PortfolioPage() {
             title: true,
             slug: true,
             category: true,
+            description: true,
             image: true,
         }
     });
